@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report 
+            id="report_invoice_g"
+            string="Aalmir Invoice"
+            model="account.invoice" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_invoice_aalmir" 
+            name="gt_order_mgnt.report_invoice_aalmir" 
+        />
+       
+    </data>
+</openerp>

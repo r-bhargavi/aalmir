@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="order_confirm_wizard_form_view1" model="ir.ui.view">
+            <field name="name">order.confirm.wizard.form.view1</field>
+            <field name="model">order.confirm.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Quotation">
+                    <h3>
+                        <center attrs="{'invisible' : [('add_documents', '=', True)]}">
+                            Submit Atleast one Document
+                        </center>
+                        <center attrs="{'invisible' : [('add_documents', '=', False)]}">
+                            Submit Documents
+                        </center>
+                    </h3>
+                    <group attrs="{'invisible' : [('add_documents', '=', True)]}">
+                        <group>
+                            <field name="add_documents" invisible="1" />
+                             <field name="contract_id" invisible="1"/>
+                            <!--<field name="payment_term_id" options="{'no_create': True}" readonly="1"/>-->
+                            <!--<field name="match_payment_term"/>-->
+                        </group>
+                        <group> 
+                        </group>
+                    </group>
+                    <group name="order_mgnt_1">
+                        <group name="lpo" string="PO" attrs="{'invisible' : [('lpo', '=', True)]}">
+                            <field name="lpo" invisible="1"/>
+                            <field name="lpo_name" invisible="1"/>
+                            <field name="lpo_document" nolabel="1" colspan="2" filename="lpo_name" />
+                            <field name="lpo_number" attrs="{'required' : [('lpo_document', '!=', False)]}" style="width:150px"/>
+                            <field name="lpo_receipt_date" attrs="{'required' : [('lpo_document', '!=', False)]}"/>
+                            <field name="lpo_issue_date" attrs="{'required' : [('lpo_document', '!=', False)]}"/>
+                        </group>
+                        <group name="signed_quote" string="Signed Quotation" attrs="{'invisible' : [('signed_quote', '=', True)]}">
+                            <field name="signed_quote" invisible="1"/>
+                            <field name="signed_quote_name" invisible="1"/>
+                            <field name="signed_quote_receipt_doc" nolabel="1" colspan="2" filename="signed_quote_name"/>
+                            <field name="signed_quote_number" attrs="{'required' : [('signed_quote_receipt_doc', '!=', False)]}" style="width:150px"/>
+                            <field name="signed_quote_receipt_date" attrs="{'required' : [('signed_quote_receipt_doc', '!=', False)]}"/>
+                        </group>
+                    </group>
+                    <group name="order_mgnt_2">
+                        <group name="Email Confirmation" string="Email" attrs="{'invisible' : [('email', '=', True)]}">
+                            <field name="email" invisible="1"/>
+                            <field name="email_uploaded_name" invisible="1"/>
+                            <field name="email_uploaded_document" nolabel="1" colspan="2" filename="email_uploaded_name"/>
+                            <field name="email_confirmation_date" attrs="{'required' : [('email_uploaded_document', '!=', False)]}"/>
+                        </group>
+                        <group name="pop" string="POP" attrs="{'invisible' : ['|', ('pop', '=', True), ('add_documents', '=', False)]}">
+                            <field name="pop" invisible="1"/>
+                            <field name="pop_receipt_name" invisible="1"/>
+                            <field name="pop_uploaded_document" nolabel="1" colspan="2" filename="pop_receipt_name"/>
+                            <field name="pop_receipt_date" attrs="{'required' : [('pop_uploaded_document', '!=', False)]}"/>
+                        </group>
+                    </group>
+		<!--CH_N040 add support documents start-->
+		    <group name="order_mgnt_3">
+                        <group name="n_support_doc" string="Customer Documents">
+                            <field name="n_uploaded_documents" nolabel="1" context="{'order_product': True}">
+				<tree editable="botton" >
+					<field name="name" invisible="1"/>
+					<field name="n_upload_doc" string="Document" filename="name" required="1"/>
+				</tree>
+			    </field>
+                        </group>
+                         
+                        <group name="n_support_doc2" string="Product Documents">
+                            <field name="n_product_documents" nolabel="1">
+				<tree editable="bottom">
+				  <field name="sale_line" context="{'n_sale_id':parent.n_sale_order}" options="{'no_create': True, 'no_open': True}" />
+				 <!--field name="product_id" domain="[('type','!=','service')]" context="{'order_product': True,'sale_id':parent.n_sale_order}"/--> 
+				 <field name="n_upload_doc" string="Document" filename="name" required="1"/>
+				 <field name="customer_id" invisible="1"/>
+				<field name="name" invisible="1"/>
+				</tree>
+			    </field>
+                        </group>
+                   </group>
+                   <field name="state_bool" invisible="1"/>
+                   <separator string="Call Off Documents upload" colspan="6" attrs="{'invisible' : [('state_bool', '=', False)]}"/>
+                   <field name="sale_lpo_documents" nolabel="1" colspan="6" attrs="{'invisible' : [('state_bool', '=', False)]}">
+                            <tree create='0' delete='0'>
+                                    <field name="lpo" invisible="1"/>
+		                    <field name="n_upload_doc" nolabel="1" colspan="2" filename="name"/>
+				    <field name="name" invisible="1"/>
+		                    <field name="lpo_number" />
+		                    <field name="lpo_receipt_date" />
+		                    <field name="lpo_issue_date" />
+                            </tree>
+                    </field>
+		   <field name="n_sale_order" invisible="1"/>
+		<!--CH_N040 end --> 
+                     <footer>
+                        <button string="Done" name="done" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <!--record id="action_confirm_sale_order" model="ir.actions.act_window">
+            <field name="name">Confirm Quotation</field>
+            <field name="res_model">order.confirm.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="order_confirm_wizard_form_view1"/>
+            <field name="target">new</field>
+        </record-->
+
+    </data>
+</openerp>

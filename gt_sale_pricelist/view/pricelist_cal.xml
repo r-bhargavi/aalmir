@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+    <data>
+
+
+        <record id="calculater_tree_view" model="ir.ui.view">
+            <field name="name">Pricelist Calculater Tree View</field>
+            <field name="model">pricelist.calculater</field>
+            <field name="arch" type="xml">
+                <tree string="Pricelist Calculater" create="0">
+                    <field name="product_type" />
+                    <field name="material_type"/>
+                    <field name="bag_type"/>
+                    <field name="printing_type"/>
+                    <field name="delivery_location"/>
+                    <field name="packing_type"/>
+                </tree>
+            </field>
+	    </record>
+
+        <record id="calculater_form_view" model="ir.ui.view">
+            <field name="name">Pricelist Calculater Form View</field>
+            <field name="model">pricelist.calculater</field>
+            <field name="arch" type="xml">
+                <form string="Pricelist Calculater" create="0">
+                    <sheet>
+
+			<!--CH_N10 start add product bool for validation-->
+			<group>
+			<field name="product_bool" invisible="1" />
+                        <field name="product_type_name" invisible="1" />
+                        <field name="bag_name" invisible="1" />
+			<field name="n_state" invisible="1" />
+			<field name="n_hide" invisible="1" />
+			<field name="change_bool" attrs="{'invisible': ['|',('n_hide','=',True),('product_bool', '=', False)]}" />
+			<!--CH_N10 end -->
+			</group>
+                        <group colspan="4">
+                            <group col="3">
+                                <field name="product_type" widget="selection" required="1" attrs="{'readonly':[('change_bool','=',True)]}" />
+                                <field name="check_product_type" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="bag_type" widget="selection" attrs="{'invisible': [('product_type_name','not in',('Bags','Bags Multi Layer'))],'required': [('product_type_name','in',('Bags','Bags Multi Layer'))],'readonly':[('change_bool','=',True)] }" />
+                                <field name="check_bag_type" nolabel="1" attrs="{'invisible': [('product_type_name','not in',('Bags','Bags Multi Layer'))],'readonly':[('n_state','=','done')]}"/>
+                                <field name="stratch_calculator" widget="selection"  invisible="1"/>
+                                <field name="check_stratch_calculator" nolabel="1" invisible="1"/>
+                            </group>
+                            <group col="3">
+                                <field name="material_type" widget="selection" required="1" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_material_type" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="delivery_location" widget="selection" required="1" attrs="{'readonly':[('change_bool','=',True)]}" />
+                                <field name="check_delivery_location" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="packing_type" widget="selection" required="1" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_packing_type" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                            </group>
+                        </group>
+                        <group colspan="4">
+                            <group col="3">
+                                <field name="unit" required="1" widget="selection" domain="[('price_cal_uom', '=', True)]" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="printing_type_name" invisible="1" nolabel="1"/>
+                                <field name="qty" required="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="test" invisible="1" nolabel="1"/>
+                                <field name="moq_length" required="1" />
+                                <field name="check_moq_length" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="ink_weigth" />
+                                <field name="check_ink_weigth" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <!--<field name="current_ink_weigth" colspan="3" nolabel="1" attrs="{'invisible' : [('show_formula', '=', False)]}"/>-->
+                                <field name="total_printing_area"/>
+                                <field name="check_total_printing_area" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                            </group>
+                            <group col="3">
+                                <field name="micron" required="1" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_micron" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="printing_type" widget="selection" required="1" attrs="{'readonly':[('change_bool','=',True)]}" />
+                                <field name="check_printing_type" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="printing_area" attrs="{'required': [('printing_type_name', '!=', 'no printing')] , 'readonly' : ['|',('change_bool','=',True),('printing_type_name', '=', 'no printing')]}"/>
+                                <field name="check_printing_area" nolabel="1" attrs="{'readonly' : ['|',('n_state','=','done'),('printing_type_name', '=', 'no printing')]}"/>
+                                <field name="lenght" required="1" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_lenght" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="width" required="1" attrs="{'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_width" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                <field name="left" attrs="{'invisible': ['|','|', ('product_type_name', 'in', ['Flat sheet',]), ('bag_name','not in', ['Select type', 'Bottom Seal', 'Garbage bag', 'Oven Bag','t- Shirt', 'Punch handle']), ('bag_name','=', 'Oven Bag')],'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_left" nolabel="1" attrs="{'invisible': ['|','|', ('product_type_name', 'in', ['Flat sheet',]), ('bag_name','not in', ['Select type', 'Bottom Seal', 'Garbage bag', 'Oven Bag','t- Shirt', 'Punch handle']), ('bag_name','=', 'Oven Bag')],'readonly':[('n_state','=','done')]}"/>
+                                <field name="right" attrs="{'invisible': ['|','|',('product_type_name', 'in', ['Flat sheet',]), ('bag_name','not in', ['Select type', 'Bottom Seal', 'Garbage bag', 'Oven Bag','t- Shirt', 'Punch handle']), ('bag_name','=', 'Oven Bag')],'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_right" nolabel="1" attrs="{'invisible': ['|','|',('product_type_name', 'in', ['Flat sheet',]), ('bag_name','not in', ['Select type', 'Bottom Seal', 'Garbage bag','t- Shirt', 'Punch handle']), ('bag_name','=', 'Oven Bag')],'readonly':[('n_state','=','done')]}"/>
+                                <field name="top" attrs="{'invisible': ['|', ('product_type_name', 'in', ['Flat sheet', 'Film tube on roll']), ('bag_name', 'in', ['Bottom Seal', 'Oven Bag', 't- Shirt'])],'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_top" nolabel="1" attrs="{'invisible': ['|', ('product_type_name', 'in', ['Flat sheet', 'Film tube on roll']), ('bag_name', 'in', ['Bottom Seal', 'Oven Bag', 't- Shirt'])],'readonly':[('n_state','=','done')]}"/>
+                                <field name="bottom" attrs="{'invisible': ['|', ('product_type_name', 'in', ['Flat sheet', 'Film tube on roll']), ('bag_name', 'in', ['Bottom Seal','Oven Bag', 't- Shirt'])],'readonly':[('change_bool','=',True)]}"/>
+                                <field name="check_bottom" nolabel="1" attrs="{'invisible': ['|', ('product_type_name', 'in', ['Flat sheet', 'Film tube on roll']), ('bag_name', 'in', ['Bottom Seal','Oven Bag', 't- Shirt'])],'readonly':[('n_state','=','done')]}"/>
+                            </group>
+                        </group>
+                        
+                        <notebook >
+                            <page string="Pricing" name="kgprice">
+                                <group>
+                                    <field name="total_price_stretch" groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                </group>
+                                <group name="pricing" attrs="{'readonly':[('n_state','=','done')]}" >
+                                    <table class="table">
+                                        <tr>
+                                            <th>Weight Per Item(gm)</th>
+                                            <th>Weight Per Item(Kg)</th>
+                                            <th>Total weight (Kg) </th>
+                                            <th groups="base.group_sale_salesman,base.group_sale_salesman_all_leads" >Price Per Kg</th>
+                                            <th groups="base.group_sale_salesman,base.group_sale_salesman_all_leads" >Price Per Pc</th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <field name="weight_per_gram" readonly="1"/>
+                                                <field name="check_weight_per_gram" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}" groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                                <br/>
+                                            </td>
+                                            <td>
+                                                <field name="weight_per_kg" />
+                                                <field name="check_weight_per_kg" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}" groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                                <br/>
+                                            </td>
+                                            <td>
+                                                <field name="total_weight" />
+                                                <field name="check_total_weight" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}" groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                                <br/>
+                                            </td>
+                                            <td>
+                                                <field name="price_per_kg" groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                                <br/>
+                                                
+                                            </td>
+                                            <td>
+                                                <field name="price_per_pc"  groups="base.group_sale_salesman,base.group_sale_salesman_all_leads"/>
+                                                <br/>
+                                            </td>
+                                        </tr>
+                                        <tr groups="base.group_sale_salesman,base.group_sale_salesman_all_leads">
+                                            <th></th>
+                                            <th>Printing plate Cost</th>
+                                            <th>Total pcs </th>
+                                            <th>Max Discount Eligibility</th>
+                                            <th>Total Price</th>
+                                        </tr>
+                                         <tr groups="base.group_sale_salesman,base.group_sale_salesman_all_leads">
+                                            <td></td>
+                                            <td >
+                                                <field name="printing_cost" />
+                                                <field name="check_printing_cost" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}"/>
+                                                <br/>
+                                            </td>
+                                            <td>
+                                                <field name="total_pcs" />
+                                                <field name="check_total_pcs" nolabel="1" attrs="{'readonly':[('n_state','=','done')]}" />
+                                                <br/>
+                                            </td>
+                                            <td >
+                                                <field name="max_discount" />
+                                                <br/>
+                                            </td>
+                                            <td>
+                                                <field name="total_price" />
+                                                <br/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </group>
+                                <group invisible="1">
+                                    <field name="description" />
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+	    </record>
+
+
+         <record id="calculater_view_action" model="ir.actions.act_window">
+            <field name="name">Pricelist Calculater</field>
+            <field name="res_model">pricelist.calculater</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem id='pricelist_cal_menu' name='Pricelist Calculator' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="1" action="calculater_view_action"/>
+    </data>
+</openerp>

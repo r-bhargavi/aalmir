@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_request_dashboard_view" model="ir.ui.view">
+        <field name="name">payment.request.dashboard.view</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.account_journal_dashboard_kanban_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-name='kanban-box']" position="replace">
+                <t t-name="kanban-box">
+                   <t t-value="JSON.parse(record.kanban_dashboard.raw_value)" t-set="dashboard"/>
+                   <div t-attf-class="#{kanban_color(dashboard.color)}">
+                    <t t-value="record.type.raw_value" t-set="journal_type"/>
+                    <t t-call="JournalTop"/>
+                    <div class="container o_kanban_card_content o_visible">
+                        <div class="row">
+                            <t t-if="(journal_type=='bank' || journal_type == 'cash')" t-call="JournalBodyBankCashApi"/>
+                            <t t-if="journal_type == 'sale' || journal_type == 'purchase'" t-call="JournalBodySalePurchase"/>
+			    <t t-if="journal_type == 'request'" t-call="JournalRequest"/> <!--#CH_N105 -->
+                            <div t-if="journal_type == 'general' || journal_type == 'situation'" class="row">
+                        </div>
+                        </div>
+                	<t t-if="journal_type == 'bank' || journal_type == 'cash' || journal_type == 'sale' || journal_type == 'purchase'" t-call="JournalBodyGraph"/>
+                    </div><div class="container o_kanban_card_manage_pane o_invisible">
+                        <t t-call="JournalManage"/>
+                    </div>
+                   </div>
+                </t>
+                
+                <t t-name="JournalRequest">
+			<div class="col-xs-6 o_kanban_primary_left">
+			<b>Customer Credit Request</b>
+			<a type="object" name="open_action_credit_request" context="{'customer':True}">
+                                        <span  t-if="journal_type == 'request'"  title="Customer Credit Request"> 
+                                               
+                                             <t t-esc="dashboard.credit_request"/> Requested Customer Credit</span>
+				</a>
+                         <b>Advance Due Payment</b>
+			<a type="object" name="open_action_credit_request" context="{'payment':True}">
+                            <span  t-if="journal_type == 'request'" title="Customer Credit Request"> 
+                                        <t t-esc="dashboard.advance_payment"/> Due Payment</span>
+				</a>
+                        <b>Sale Order in which DO qty is not equal to Invoice qty</b>
+			<a type="object" name="open_action_credit_request" context="{'not_match':True}">
+                            <span  t-if="journal_type == 'request'" title="Sale Order in which DO qty is not equal to Invoice qty"> 
+                                        <t t-esc="dashboard.not_match"/> Sale order</span>
+			</a>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b>Payment Term Request</b>
+                            <div class="row">
+                                    <a type="object" name="open_action_payment_term" context="{'type': 'customer'}">
+                                        <span  t-if="journal_type == 'request'" title="Customer Requested Payment Term"> <t t-esc="dashboard.num_req"/> Customer Payment Term</span>    
+				</a>
+				    <a type="object" name="open_action_payment_term" context="{'type': 'supplier'}">
+                                        <span  t-if="journal_type == 'request'" title="Supplier Requested Payment Term"> <t t-esc="dashboard.num_req_sup"/> Supplier Payment Term</span>
+				</a>
+                              <b>Purchase Request</b>
+                            <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="open_po_request" context="{'request_pending':True}" type="object">Puchase Pending Request -
+                                              <span t-esc='dashboard.pending_rqst'/>
+					     </a>
+		           </a>
+                            </div>
+                        </div>
+                </t>
+            
+            <t t-name="JournalBodyBankCashApi">
+		<!-- On the left, display :
+                    - A button corresponding to the bank_statements_source, if it wasn't configured, a button for each of them
+                    - If there are statements to reconcile, a link to reconcile them -->
+        	    <div class="col-xs-6 o_kanban_primary_left">
+                    	<t t-if="journal_type == 'bank'">
+                    	    <div class="o_kanban_card_manage_title">
+				<span>Unclear Cheques</span> </div>
+	                    <div class="row" >
+				<div class="col-xs-6" >
+				    <t t-if="dashboard.pre_chq == 1">
+					<span style="color:red;" title="Previous date Cheques not clear in bank">Current Dated</span>
+				    </t>
+				    <t t-if="dashboard.pre_chq == 0">
+				    	<span title="Previous date Cheques not clear in bank">Current Dated</span>
+				    </t>
+				</div>
+				<div class="col-xs-6 text-right">
+					<a name="open_cheque_payments" context="{'type': 'unclear'}" type="object">
+						<span><t t-esc="dashboard.unclear_cheque"/></span>
+					</a>
+				</div>
+	                    </div>
+	                    <!--div class="row" >
+	                        <div class="col-xs-6" >
+	                           <t t-if="dashboard.t_chq == 1">
+	                            	<span style="color:red;" title="Todays cheques to be clear in bank">Todays Cheques</span>
+	                           </t>
+	                           <t t-if="dashboard.t_chq == 0">
+				    	<span title="Todays cheques to be clear in bank">Todays Cheques</span>
+	                           </t>
+	                        </div>
+	                        <div class="col-xs-6 text-right">
+	                            <a name="open_cheque_payments" context="{'type': 'todays'}" type="object">
+	                            <span><t t-esc="dashboard.todays_cheque"/></span>
+	                            </a>
+	                        </div>
+	                    </div-->
+	                    <div class="row" >
+	                        <div class="col-xs-6" >
+	                           <t t-if="dashboard.tm_chq == 1">
+	                            <span style="color:blue;" title="Tomorrows cheques to be clear">Tomorrow's Cheques</span>
+	                           </t>
+	                           <t t-if="dashboard.tm_chq == 0">
+				    	<span title="Tomorrows cheques to be clear">Tomorrow's Cheques</span>
+	                           </t>
+	                        </div>
+	                        <div class="col-xs-6 text-right">
+	                            <a name="open_cheque_payments" context="{'type': 'tomorrow'}" type="object">
+	                            <span><t t-esc="dashboard.tomorrows_cheque"/></span>
+	                            </a>
+	                        </div>
+	                    </div>
+	                    <div class="row" >
+		                <div class="col-xs-6">
+		                   <t t-if="dashboard.f_chq ==1">
+		                   	<span style="color:orange;" title="Cheques date is after 2 days">Future Cheques</span>
+		                   </t>
+		                   <t t-if="dashboard.f_chq == 0">
+				    	<span title="Cheques date is after 2 days">Future Cheques</span>
+		                   </t>
+		                </div>
+		                <div class="col-xs-6 text-right">
+		                    <a name="open_cheque_payments" context="{'type': 'future'}" type="object">
+		                    <span><t t-esc="dashboard.future_cheque"/></span>
+		                    </a>
+		                </div>
+	                    </div>
+	                    <t t-if="dashboard.total_chq_cnt">
+	                    <div class="row" style="color:black;">
+		                <div class="col-xs-6">
+		                    <span title="Total Chequse">TOTAL(<t t-esc="dashboard.total_chq_cnt"/>)</span>
+		                </div>
+		                <div class="col-xs-6 text-right">
+		                    <a name="open_cheque_payments" context="{'type': 'total_chq'}" type="object">
+		                    <span><t t-esc="dashboard.total_cheque"/></span>
+		                    </a>
+		                </div>
+	                    </div>
+	                    </t>
+                    	</t>
+                    	<button t-if="journal_type == 'cash'" type="object" name="create_cash_statement" class="btn btn-primary btn-sm">New Transactions</button>
+        	    </div>
+        	    <!-- On the right, show other common informations/actions -->
+        	    <div class="col-xs-6 o_kanban_primary_right">
+	    		<div class="o_kanban_card_manage_title">
+                    		<span>Bank Balance Details</span></div>
+           	 	<div class="row">
+                                <div class="col-xs-6">
+                                    <span title="Balance in bank">Balance in Bank</span>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.account_balance"/></span>
+                                </div>
+                    	</div>
+                    	<div class="row">
+                                <div class="col-xs-6">
+                                    <span title="Balance in ERP">Balance in ERP</span>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.erp_balance"/></span>
+                                </div>
+                    	</div>
+                    	<div class="row">
+                                <div class="col-xs-6">
+                                    <span title="Balance in ERP">Projected Balance</span>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.pro_balance"/></span>
+                                </div>
+                    	</div>
+                    	<t t-if="dashboard.chq_cnt">
+                    	<div class="row" name="unreconcile_balance" style="color:black;">
+                                <div class="col-xs-6">
+                                    <span title="Cheques received from customer and not submited in bank">Unreconcile balance(<t t-esc="dashboard.chq_cnt"/>)</span>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <a name="open_cheque_payments" context="{'type': 'un_reconcile'}" type="object">
+                                    <span><t t-esc="dashboard.unreconcile_data"/></span>
+                                    </a>
+                                </div>
+                    	</div>
+                    	</t>
+                    	<div class="row">
+                                <div class="col-xs-6">
+                                    <span title="Last Transaction Date">Last Transaction</span>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.last_transaction"/></span>
+                                </div>
+                    	</div>
+        	    </div>
+            	</t>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>                                                                                                                             

@@ -1,0 +1,935 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="purchase_order_request_tree_ext" model="ir.ui.view">
+        <field name="name">Purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"></field>
+        <field name="arch" type="xml">
+           
+            <field name="origin" position="after">
+             <field name="production_ids" />
+             <field name="n_request_date" readonly="1" string="Product Receive Date"/>
+            </field>
+           <field name="amount_untaxed" position="replace">
+                <!--field name="amount_untaxed" sum="Total Untaxed amount" string="Untaxed" 
+                     groups="purchase.group_purchase_manager,purhcase.group_purchase_user" widget="monetary"/-->
+           </field>
+           <field name="amount_total" position="replace">
+               <field name="amount_total" sum="Total amount" widget="monetary"   groups="purchase.group_purchase_manager,purhcase.group_purchase_user"/>
+                <field name="converted_amount_total" sum="Total amount" widget="monetary"
+                    string='Total in AED'
+                    groups="purchase.group_purchase_manager,purhcase.group_purchase_user"/>
+           </field>
+        </field>
+    </record>
+
+   <record id="purchase_requisition_purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">Purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase_requisition.purchase_order_form_inherit"></field>
+        <field name="arch" type="xml">
+           <field name="requisition_id" position="replace"/>
+	</field>
+    </record>
+    
+    <record id="purchase_order_request_form_ext" model="ir.ui.view">
+        <field name="name">Purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"></field>
+        <field name="arch" type="xml">
+              <xpath expr="//label[1]" position="attributes">
+                 <attribute name='invisible'>context.get('show_purchase')</attribute>
+              </xpath>
+              <xpath expr="//label[1]" position="after">
+                <label string="Draft PO " attrs="{'invisible': [('state','not in',('draft','sent','bid','awaiting'))]}" invisible="not context.get('show_purchase')"/>
+              </xpath>
+              <xpath expr="//label[3]" position="replace">
+                <label string="Purchase Order " attrs="{'invisible': [('state','in',('draft','sent','bid','awaiting'))]}"/>
+              </xpath>
+             
+           <button name="action_rfq_send" states="sent" position="attributes">
+               <attribute name="class">oe_highlight</attribute>
+               <attribute name='invisible'>context.get('show_purchase')</attribute>
+              </button>
+               <button name="action_rfq_send" states="draft" position="attributes">
+               <attribute name='invisible'>context.get('show_purchase')</attribute>
+              </button>
+               <button name="action_rfq_send" states="purchase" position="attributes">
+               <attribute name="class">oe_highlight</attribute>
+              </button>
+               <button name="print_quotation"  states="draft" position="attributes">
+               <!--attribute name="class">oe_highlight</attribute>
+               <attribute name="string">Download</attribute-->
+                <attribute name="invisible">1</attribute>
+              </button>
+             <button name="print_quotation" states="sent"  position="attributes">
+               <!--attribute name="class">oe_highlight</attribute>
+                <attribute name="string">Download</attribute-->
+               <attribute name="invisible">1</attribute>
+              </button>
+               <button name="button_confirm"  states="draft" position="attributes">
+               <attribute name="invisible">1</attribute>
+              </button>
+             <button name="button_confirm"  states="sent"  position="attributes">
+               <attribute name="invisible">1</attribute>
+              </button>
+               <button name="print_quotation"  states="draft" position="after">
+                <button type='object' name='pending_send_mail' string='Send For Approval'
+                  icon='fa-envelope' class='oe_highlight'
+                  groups="purchase.group_purchase_manager,purhcase.group_purchase_user"
+                  attrs="{'invisible':['|','|',('state','!=','draft'),('sent_mail','=',True),('management_user','=',False)]}"/>
+                 <button type='object' name='pending_send_mail' string='Approval Reminder'
+                  icon='fa-envelope' class='oe_highlight'
+                  groups="purchase.group_purchase_manager,purhcase.group_purchase_user"
+                  attrs="{'invisible':['|',('state','!=','awaiting'),('sent_mail','=',False)]}"/>
+                <button type='object' name='resend_approval_mail' string='Resend For Approval'
+                  icon='fa-envelope' class='oe_highlight'  context="{'resend_mail':True}"
+                  groups="purchase.group_purchase_manager,purhcase.group_purchase_user"
+                  attrs="{'invisible':['|','|',('state','!=','rejected'),('sent_mail','=',True),('management_user','=',False)]}"/>
+              </button>
+               
+              <button name="action_view_picking" position="attributes">
+               <attribute name="class">oe_highlight</attribute>
+              </button>
+             <button name="button_cancel" position="attributes">
+               <attribute name="class">oe_highlight</attribute>
+               <attribute name="states">draft,to approve,awaiting,rejected,sent po,sent,purchase</attribute>
+               <attribute name="groups">purchase.group_purchase_manager</attribute>
+              </button>
+              <button name="button_done" position="attributes">
+               <attribute name="class">oe_highlight</attribute>
+               <attribute name="states">sent po</attribute>
+              </button>
+               <button name="button_approve" position="attributes">
+               <attribute name="invisible">1</attribute>
+              </button>
+                <button name="action_view_picking" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </button>
+              <!--button name="button_confirm" states="sent" position='replace'>
+               <button name="button_confirm" type="object" states="to approve" string="Confirm RFQ" class="oe_highlight" />
+              </button-->
+               <div class="oe_button_box" position='replace'>
+                   <div class="oe_button_box" name="button_box" attrs="{'invisible': [('state', 'not in', ('purchase', 'done', 'cancel','sent po'))]}">
+                        <button type="object" name="action_view_picking" class="oe_stat_button" icon="fa-truck">
+                            <field name="picking_count" widget="statinfo" string="Shipment" help="Incoming Shipments"/>
+                        </button>
+                        <button type="object" name="action_view_invoice" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button> 
+                    </div>
+
+               </div>
+               <button name="button_confirm" states="draft" position='replace'>
+               <button name="button_confirm" type="object" states="to approve" string="Confirm Draft PO" class="oe_highlight"  groups='purchase.group_purchase_user,purchase.group_purchase_manager'/>
+              </button>
+                <button name="action_rfq_send" states="purchase" position='replace'>
+                     <button name="action_rfq_send" states="purchase,sent po" string="Send PO by Email" type="object" context="{'send_rfq':False,'from_purchase':True}" class="oe_highlight"
+                   groups='purchase.group_purchase_user,purchase.group_purchase_manager'/>
+                <button name="force_confirm" states="awaiting,draft" string="Force Confirm"
+                   type="object" class="oe_highlight" groups='purchase.group_purchase_manager'/>
+                   
+              </button>
+             
+                <field name="state" position='replace'> 
+                 <field name="state" widget="statusbar" statusbar_visible="draft,awaiting,to approve,purchase,done" readonly="1" />  
+                </field>
+              <field name='date_order' position='after'>
+                    
+                    <field name='document_ids' widget="many2many_binary" string='PO Supporting Docs.'/>
+              </field>
+             <button name="action_rfq_send" states="sent" position="after">
+                 <button type="object" name="approve_reason" string="Approve" class="btn-primary"
+                 attrs="{'invisible':['|',('state','!=','awaiting'),('current_users_bool','=',True)]}"
+                  context="{'po_approved':True}"
+                 />
+
+                 <button name="download_reports" string="Download" type="object"
+                   states="draft,sent,awaiting,to approve,purchase,sent po,done" class="btn-primary" />
+                 <button name="preview_purchaseOrder" string="Preview" type="object" states="draft,sent,awaiting,to approve,purchase,sent po,done" class="btn-primary"/>
+                </button> 
+                 <button type="object" name="action_view_invoice" position='attributes'>
+                      <attribute name='invisible'>1</attribute>
+                 </button>
+                <div class="oe_button_box" name="button_box" position='inside'>
+                     <button type="object" name="open_invoices" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Vendor Bill"/>
+                        </button> 
+                 </div>
+                <field name='partner_id' position='after'>
+                  <label for='vendor_vat' />
+                     <div> 
+                        <field  name='vendor_vat' class='oe_inline' nolabel='1' readonly="1"/>
+                        <field name='vendor_vat_bool' class='oe_inline' nolabel='1'/>
+                     </div>
+                  <field name="attend_id" string="Attn." options="{'no_create': True}" domain="[('company_type','=','person'), ('parent_id','=',partner_id)]" attrs="{'readonly':[('state','in',('purchase','done'))]}"/>
+                </field>
+                <field name='order_line' position='attributes'>
+                    <attribute name='attrs'>{'readonly':[('state','in',('to approve','purchase','sent po','done'))]}</attribute>
+
+               </field>
+             <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+             </xpath>
+             <field name="incoterm_id" position="replace">
+                <label for='incoterm_id' string='Terms of Delivery'/>
+                <div>
+                     <field name="incoterm_id" class='oe_inline' nolabel='1' required="1" attrs="{'readonly':[('state','in',('purchase','done'))]}" options="{'no_create': True, 'no_open': True}"/>
+                     <field name='show_delivery_term' class='oe_inline' nolabel='1'/>
+                </div>
+                <field name='allow_extra' attrs="{'invisible':[('state','not in',('purchase','sent po','done','cancel'))],
+                			'readonly':[('state','not in',('purchase','sent po'))]}" groups='purchase.group_purchase_manager' />
+             </field>
+             
+             <field name="picking_type_id" position="replace">
+                <label for='picking_type_id' string='Received Location'/>
+                <div>
+                     <field name="picking_type_id" class='oe_inline' required="1"  nolabel='1' attrs="{'readonly':[('state','in',('purchase','done'))]}" options="{'no_create': True, 'no_open': True}" domain="[('code','=','incoming')]" groups="stock.group_locations"/>
+                  
+                     <field name='show_delivery_address' class='oe_inline' nolabel='1'/>
+                </div>
+                <field name="show_product_schedule"></field>
+             </field>
+             
+              <field name="fiscal_position_id" position="attributes">
+               <attribute name="invisible">1</attribute>
+             </field>
+             <field name="invoice_status" position="after">
+               	<field name="requisition_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_create': True, 'no_open': True}"/>
+             </field>
+           <field name="notes" position="replace">
+              <group>
+                    <field name='internal_note'/>
+                    <field name="notes" string="Instruction From Production" readonly="1"
+                        attrs="{'invisible':[('notes','=',False)]}"/>
+                    <field name='vendor_instruction' attrs="{'readonly':[('state','=','done')]}"/>
+                    <field name="vendor_remark" attrs="{'readonly':[('state','=','done')]}"/>
+                    <field name='warranty' attrs="{'readonly':[('state','=','done')]}"/>
+                     <field name='company_currency_id' invisible='1'/>
+              </group>
+            </field>
+           <xpath expr="//field[@name='amount_total']" position="after" >
+                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                        <label for="converted_amount_total" />
+                    </div>
+                   
+                    <field name="converted_amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget='monetary' options="{'currency_field': 'company_currency_id'}" />
+           </xpath>
+           <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="attributes">
+             <attribute name="options">{'no_quick_create': True}</attribute>
+          </xpath>
+           <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="after">
+             <field name="sale_price" string="Quoted Price" readonly='1'/>
+             <!--field name='approved_price' readonly='1'/>
+             <field name='approved_status' readonly='1'/-->
+          </xpath>
+          <xpath expr="//field[@name='amount_tax']" position="attributes">
+             <attribute name="string">VAT</attribute>
+        
+          </xpath>
+          <xpath expr="//field[@name='order_line']/tree/field[@name='taxes_id']" position="attributes">
+             <attribute name="string">VAT</attribute>
+             <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+          </xpath> 
+          <xpath expr="//field[@name='order_line']/form/sheet/group/group/field[@name='taxes_id']" position="attributes">
+             <attribute name="string">VAT</attribute>
+             <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+          </xpath>
+          <xpath expr="//field[@name='order_line']/tree/field[@name='company_id']" position="attributes">
+              <attribute name="invisible">1</attribute>	
+          </xpath>
+
+          <xpath expr="//field[@name='order_line']/tree/field[@name='account_analytic_id']" position="attributes">
+              <attribute name="invisible">1</attribute>	
+          </xpath>
+          
+          <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
+              <attribute name="context">{'purchase':True,'product_id':product_id}</attribute>
+              <attribute name="options">{'no_create': True, 'no_open': True, 'create': False}</attribute>	
+          </xpath>
+
+          <notebook position="inside">
+             <page string="Extra Infomation">
+                 <group>
+                     <group>
+                       <field name='sent_mail' invisible='1'/>
+                      <field name='current_users_bool' invisible='1'/>
+                       <field name='po_validation' invisible='1'/>
+                       <label for='management_user'/>
+                       <div> 
+                        <field name='management_user' domain="[('approve_purchase','=',True)]" 
+                             options="{'no_create': True, 'no_open': True}" 
+                             context="{'po_user_1':True ,'2_user':procurement_user, '3_user':inventory_user}"
+                         class='oe_inline' nolabel='1' attrs="{'readonly':['|',('state','in',('awaiting','purchase','done')),('approve_mgnt','=',True)]}"/>
+                         <field name='approve_mgnt' class='oe_inline' nolabel='1'
+                          help='Approve On Behalf Of This User'
+                         attrs="{'invisible':[('state','in',('draft','sent'))],'readonly':['|',('po_validation','=','max'),('state','in',('purchase','done','to approve','sent po'))]}"/>
+                          <field name='approved_msg1' style='color:green' attrs="{'invisible':[('approve_mgnt','=',False)]}" readonly='1' class='oe_inline' nolabel='1'/>
+                        
+                       </div>
+
+                        <label for='inventory_user'/>
+                       <div> 
+                        <field name='inventory_user' domain="[('approve_purchase','=',True)]" 
+                          options="{'no_create': True, 'no_open': True}"
+                         context="{'po_user_3':True ,'1_user':management_user, '2_user':procurement_user}"
+                         class='oe_inline' nolabel='1' attrs="{'readonly':['|',('state','in',('awaiting','purchase','done')),('approve_inv','=',True)]}"/>
+                         <field name='approve_inv' class='oe_inline' nolabel='1'
+                                help='Approve On Behalf Of This User'
+                               attrs="{'invisible':[('state','in',('draft','sent'))],'readonly':['|','|',('po_validation','=','medium'),('po_validation','=','max'),('state','in',('purchase','done','to approve','sent po'))]}"/>
+                         <field name='approved_msg3' style='color:green' attrs="{'invisible':[('approve_inv','=',False)]}" readonly='1' class='oe_inline' nolabel='1'/>
+                       
+                       </div>
+
+                        <label for='procurement_user'/>
+                       <div> 
+                        <field name='procurement_user' domain="[('approve_purchase','=',True)]" 
+                           options="{'no_create': True, 'no_open': True}"
+                           context="{'po_user_2':True ,'1_user':management_user, '3_user':inventory_user}"
+                         class='oe_inline' nolabel='1' attrs="{'readonly':['|',('state','in',('awaiting','purchase','done')),('approve_prq','=',True)]}"/>
+                         <field name='approve_prq' class='oe_inline' nolabel='1'
+                                help='Approve On Behalf Of This User'
+                      attrs="{'invisible':[('state','in',('draft','sent'))],'readonly':['|','|',('po_validation','=','medium'),('po_validation','=','max'),('state','in',('purchase','done','to approve','sent po'))]}"/>
+                         <field name='approved_msg2' style='color:green' attrs="{'invisible':[('approve_prq','=',False)]}" readonly='1' class='oe_inline' nolabel='1'/>
+                       
+                       </div>
+                      
+                        
+
+                       <field name="sale_id" attrs="{'invisible':[('sale_id','=',False)]}" readonly="1"/>
+                     <field name="contract_id" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
+                     </group>
+                     <group>
+                           <label for='management_name' string='Designation'/>
+                             <div> 
+		                
+		                 <field name='management_name' class='oe_inline' nolabel='1'/>
+		                 <field name='management_name_bool' class='oe_inline' nolabel='1' help='Show User Name On PO'/>  
+		               </div>
+                              <field name='default_signature1'/>
+		                <label for='procurement_name' string='Designation'/>
+		               <div> 
+		                 <field name='procurement_name' class='oe_inline' nolabel='1'/>
+		                 <field name='procurement_name_bool' class='oe_inline' nolabel='1' help='Show User Name On PO'/>
+		               </div>
+		              <field name='default_signature2'/>
+		                <label for='inventory_name' string='Designation'/>
+		               <div> 
+		                <field name='inventory_name' class='oe_inline' nolabel='1'/> 
+		                 <field name='inventory_name_bool' class='oe_inline' nolabel='1' help='Show User Name On PO'/>
+		               </div>
+                               <field name='default_signature3'/>
+                         <field name='show_stamp'/>
+                          <field name='report_company_name' context="{'report_com':True}"/>
+                        <field name="production_ids" attrs="{'invisible':[('production_ids','=',False)]}" readonly="1"/>
+                         <field name="production_reqst_id"  string="OutsourceForm Request" attrs="{'invisible':[('production_reqst_id','=',False)]}" readonly="1"/>
+                <field name="line_id" invisible="1"/>
+                        <field name="request_id" readonly="1" attrs="{'invisible':['|',('request_id','=', False)]}"/>
+                     </group>
+                    <group string='PO Requested By'>
+                          <label for='employee_id' string='User'/>
+                          <div >
+                             <field name='employee_id' class='oe_inline' nolabel='1'/>
+                          </div>
+                           <label for='employee_email' attrs="{'invisible':[('employee_id','=',False)]}"/>
+                          <div attrs="{'invisible':[('employee_id','=',False)]}">
+                             <field name='employee_email' readonly='1'/>
+                             <button name="action_mail_send" string="Send Mail To Requested User" type="object" icon="fa-envelope"  class='oe_highlight' />
+                         </div>
+                     </group>
+                     <group>
+
+
+                     </group>
+                </group>
+                <!--field name='approved_msg' style='color:green' attrs="{'invisible':[('approved_msg','=', '')]}" readonly='1'/-->
+             </page>
+          </notebook>
+           <xpath expr="//page[2]/group/group/field[@name='date_planned']" position='attributes'>
+                 <attribute name='string'>Receiving Date</attribute>
+           </xpath>
+           <xpath expr="//field[@name='order_line']/tree/field[@name='date_planned']" position='attributes'>
+                 <attribute name='string'>Schedule Receiving Date</attribute>
+           </xpath>
+           <!--xpath expr="//page[2]/group/group/field[@name='date_planned']" position='after'>
+                <label for='new_schedule_date'/>
+                <div>
+                    <field name="new_schedule_date" class='oe_inline' nolabel='1'/>
+                    <field name="date_planned_bool" class='oe_inline' nolabel='1'/>
+                 </div>
+               
+           </xpath-->
+             <notebook position='before'>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','request')]}" style='color:blue'>Payment Term Request Sent to Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','approve')]}" style='color:green'>Payment Term Request Approved By Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','reject')]}" style='color:red'>Payment Term Request  Rejected By Account Department.</h4>
+            </notebook>
+           <field name="payment_term_id" position="replace">
+           </field>
+           <field name="currency_id" position="after">
+                <field name='payment_term_request' invisible='1'/>
+ 	      	<field name="payment_term_id" required="1" options="{'no_open':True,'no_create':True}"
+                  context="{'partner_id':partner_id,'vendor':True}"
+                    attrs="{'readonly':[('state','in',('purchase','done','cancel'))]}" />
+ 	      	<button name="request_payment_term" type="object" 
+                   string="Request Payment Term"  style="margin-left: 160px" colspan="2" 
+                    attrs="{'invisible': ['|',('payment_term_request','in',('request','approve')),('payment_term_bool','!=','new')]}"       
+                    class="oe_edit_only,btn-primary" context="{'from_purchase':True}"/>	
+ 	      	<field name="payment_term_bool" invisible='1'/>
+                <field name='milestone_ids'  string='Milestone Payment Term'
+                  attrs="{'invisible': [('payment_term_bool','!=','mile')]}" >
+                  <tree editable='bottom' delete='0'>
+                     <field name='term_name_id' required='1' attrs="{'readonly': [('done_ok','=',True)]}"/>
+                     <field name='value' required='1' string='Value %' attrs="{'readonly': [('done_ok','=',True)]}"/>
+                     <field name='done_ok' readonly='1'/>
+                     <button type='object' name='payment_done' class='oe_highlight' string='Done'
+                     attrs="{'invisible':[('done_ok','=', True)]}"/>
+                  </tree>
+                </field>
+           </field>
+           
+	   <field name="partner_id" position="attributes">
+ 	       <attribute name="options">{'no_create': True}</attribute>
+ 	       <attribute name="domain">[('supplier','=',True),('company_type','=','company')]</attribute>
+           </field>
+          
+	   <field name="origin" position="attributes">
+ 	      <attribute name="readonly">1</attribute>	
+           </field>
+           
+	   <field name="currency_id" position="attributes">
+ 	      <attribute name="attrs">{'readonly':['|',('state','in',('purchase','done','sent po')),('request_id','!=', False)]}</attribute>	
+ 	      <attribute name="options">{'no_open':True,'no_create':True}</attribute>
+           </field>
+           
+	   <field name="company_id" position="attributes">
+ 	      <attribute name="invisible">1</attribute>	
+           </field>
+           
+           <field name="partner_ref" position="attributes">
+ 	      <attribute name="invisible">1</attribute>	
+           </field>
+           
+           <field name="company_id" position="after">
+              <field name="delivery_date" invisible="1" />
+		<field name="n_request_date" readonly="1" string="Product Receive Date" attrs="{'invisible':[('request_id','=', False)]}"/>
+		<field name="n_request_date_bool" invisible="1" />
+		<field name="n_request_date_bool1" invisible="1" />
+		<button name="purchase_schedule_date" string="Change Date" type="object"  class="btn-primary" attrs="{'invisible':['|',('request_id','=', False),('state','not in',('draft','sent','purchase'))]}"/>
+		<label style="color:red" attrs="{'invisible': [('n_request_date_bool1', '=', False)]}" string="New Date has been sent for approval"/>
+		 <label style="color:green" attrs="{'invisible': [('n_request_date_bool', '=', False)]}" string="Date is Approved"/>
+           </field>
+	  <field name="date_approve" position="replace">
+	      <field name="date_approve" invisible="1"/>
+           </field>
+         </field>
+    </record>
+    <!--record model="ir.ui.view" id="purchase_order_request_form_ext_inherited">
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase_order_request_form_ext" />
+            <field name="groups_id" eval="[(6, 0, [ref('purchase.group_purchase_user')])]"/>
+            <field name="arch" type="xml">
+
+                <field name="management_user" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+               <field name="procurement_user" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+               <field name="inventory_user" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+                <field name="approve_prq" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+               <field name="approve_inv" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+               <field name="approve_mgnt" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+            </field>
+        </record-->
+
+    <record id="view_purchase_requisition_tree_ext" model="ir.ui.view">
+        <field name="name">purchase.requisition.form</field>
+        <field name="model">purchase.requisition</field>
+        <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_tree"></field>
+        <field name="arch" type="xml">
+            <field name="name" position="replace">
+	      <field name="name" string="Purchase Requisition"/>
+           </field>
+              <field name="date_end" position="replace">
+                 <field name="date_end" string="Purchase Requisition Closing Deadline"/>
+              </field>
+        </field>
+   </record>
+   
+    <record id="view_purchase_requisition_form_ext" model="ir.ui.view">
+        <field name="name">purchase.requisition.form</field>
+        <field name="model">purchase.requisition</field>
+        <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"></field>
+        <field name="arch" type="xml">
+
+                   <button name="sent_suppliers" position='attributes'>
+                       <attribute name="string">Aknowledge RFQ</attribute>
+                   </button>
+                  <button name="open_bid" position='attributes'>
+                    <attribute name="string">Close RFQ</attribute>
+                   </button>
+                  
+                   <field name="dest_address_id" position="attributes">
+		     <attribute name="invisible">1</attribute>
+                  </field>
+              <button name="cancel_requisition" position="attributes">
+                 <attribute name="class">oe_highlight</attribute>
+              </button>
+              <button name="open_product_line" position="replace">
+                <button name="print_order" string="Download" type="object"  class="oe_highlight" />
+             </button>
+             <button name="button_confirm" position="replace">
+              
+             </button>
+              <button name="action_rfq_send" position="replace">
+                 
+                  <button name="action_rfq_send" states="draft,sent" 
+                   string="Send RFQ by Email" type="object" context="{'send_rfq':True}" 
+                   invisible="context.get('show_purchase')" icon="fa-envelope-o" class="btn-primary"/>  
+             </button>
+           <field name="multiple_rfq_per_supplier" position="after">
+              <!--field name="production_reqst_id"  string="Purchase Request" readonly="1"/-->
+              <field name="sale_id" readonly="1" groups="gt_order_mgnt.group_sale_support" 
+                      attrs="{'invisible':[('sale_id','=',False)]}"/>
+              <field name="line_id" invisible="1"/>
+              <field name="contract_id" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
+              <field name="production_id" readonly="1" attrs="{'invisible':[('production_id','=',False)]}" />
+              <field name="request_id" readonly="1"  attrs="{'invisible':[('request_id','=',False)]}"/> 
+              <field name='purchase_request_id' attrs="{'invisible':[('purchase_request_id','=',False)]}" 
+                     readonly="1" />
+           </field>
+          <xpath expr="//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
+            <field name="sale_price" string="Quoted Price"/>
+         </xpath>
+	 <xpath expr="//field[@name='line_ids']/tree/field[@name='schedule_date']" position="replace">
+            <field name="schedule_date" invisible="1"/>
+         </xpath>
+          <xpath expr="//separator[2]" position="replace">
+             <separator string="Instructions To Vendor"/>
+          </xpath>
+	 <field name="name" position="attributes">
+ 	      <attribute name="readonly">1</attribute>
+           </field>
+	  <field name="schedule_date" position="replace">
+	      <field name="schedule_date" string="Request Date" attrs="{'readonly':[('state','!=','draft')]}" help="product request date to vendor"/>
+           </field>
+	   <field name="origin" position="attributes">
+ 	      <attribute name="readonly">1</attribute>
+           </field>
+	   <field name="user_id" position="attributes">
+ 	      <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+           </field>
+	   <field name="exclusive" position="attributes">
+ 	      <attribute name="string">Requisition Selecton Type</attribute>
+           </field>
+	   <field name="date_end" position="attributes">
+ 	      <attribute name="string">Closing Date</attribute>
+           </field>
+	   <field name="ordering_date" position="attributes">
+ 	      <attribute name="string">Schedule Date</attribute>
+           </field>
+	   <field name="company_id" position="attributes">
+ 	      <attribute name="readonly">1</attribute>
+           </field>
+	   <notebook position="inside" >
+             <page string="Instruction" attrs="{'invisible':[('request_id','=',False)]}">
+                 <group>
+                       <field name="pr_request_date" readonly="1"/>
+                       <field name="extra_docs" widget="many2many_tags" readonly="1"/>
+		       <field name="note_from_PR" readonly="1"/>
+                </group>
+             </page>
+          </notebook>
+         </field>
+    </record>
+    
+    <menuitem action="purchase.purchase_rfq" id="purchase.menu_purchase_rfq"
+            parent="purchase.menu_procurement_management"
+            sequence="2"/>
+            
+   <menuitem
+        id="purchase_requisition.menu_purchase_requisition_pro_mgt"
+        sequence="1" name="Purchase Requisition"
+        parent="purchase.menu_procurement_management"
+        action="purchase_requisition.action_purchase_requisition"/>
+
+  
+    <menuitem id="menu_procurement_management_vendor" name="Vendors"
+            parent="base.menu_purchase_root" sequence="2" />
+    <menuitem id="base.menu_procurement_management_supplier_name" name="Vendors"
+            parent="menu_procurement_management_vendor"
+             action="base.action_partner_supplier_form" sequence="1"/>
+	
+
+    <record id="purchase_order_line_tree_inherite_api" model="ir.ui.view">
+        <field name="name">purcha orderline </field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_tree"></field>
+        <field name="arch" type="xml">
+            <field name="price_unit" position="replace">
+               <field name="price_unit" widget="monetary"/>
+	      <field name="currency_id" invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="purchase_requisition.action_purchase_requisition">
+        <field name="name">Purchase Requisition</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.requisition</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_user_id":uid}</field>
+        <field name="search_view_id" ref="purchase_requisition.view_purchase_requisition_filter"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to start a new Call for Tenders process. 
+          </p><p>
+            A Call for Tenders is a procedure for generating competing offers from
+            different bidders. In the call for tenders, you can record the
+            products you need to buy and generate the creation of RfQs to
+            vendors. Once the tenders have been registered, you can review and
+            compare them and you can validate some and cancel others.
+          </p>
+        </field>
+    </record>
+  <!-- view for production request details -->
+     <record id="product_request_detail_tree" model="ir.ui.view">
+        <field name="name">Production Request Detail</field>
+        <field name="model">production.request.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Production Details" create="0" edit="0">
+              <field name="name"/>
+             <field name="product_id"/>
+             <field name="total_qty"/>
+             <field name="request_date"/>
+             <field name="film_process"/>
+              <field name="printing_process"/>
+              <field name="cutting_bool"/>
+            </tree>
+        </field>
+     </record>
+
+    <record id="product_request_detail_form" model="ir.ui.view">
+        <field name="name">Production Request Detail</field>
+        <field name="model">production.request.detail</field>
+        <field name="arch" type="xml">
+         
+            <form string="Production Details" create="0" edit="0" >
+	       <header>
+		<field name="state" widget="statusbar" />
+	       </header>
+               <sheet>
+		  <field name="state" invisible="1"/>
+                  <group col="6" attrs="{'invisible':[('product_type', '=','injection')]}">                       
+                       <group col="5">
+                           <field name="fully_purchase" invisible="1"/>
+                           <field name="half_purchase"  string="Partial Purchase"/>
+                           <field name="product_type" invisible="1"/>
+                        </group>
+                       <group col="1">
+                            
+                       </group>
+                </group>
+                    
+                    <h2>
+                     <label for="name" string="Production Request Name" attrs="{'invisible':[('state','=','done')]}"/>
+                     <div>
+                        <field name="name" required="1"/>
+                        <field name="sale_id" invisible="1"/>
+                        <field name="line_id" invisible="1"/>
+                        <field name="sale_price" invisible="1"/>
+                    </div>
+                   </h2>
+                       <group col="6" > 
+                         <group col="3">
+                         <field name="product_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                        </group>
+                        <group col="3"> </group>
+                      </group>
+                    <group col="6" >                       
+                       <group col="2">
+                           <field name="film_process" attrs="{'invisible':[('product_type', '=','injection')]}"/>
+                           <field name="total_qty"/>
+                        </group>
+                       <group col="2">
+                            <field name="printing_process" attrs="{'invisible':[('product_type', '=','injection')]}"/>
+                            <field name="product_uom_id" string='Unit' readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                              
+                       </group>
+                        <group col="2">
+                             <field name="cutting_bool" attrs="{'invisible':[('product_type', '=','injection')]}"/>
+                             <field name="request_date"/>
+                        </group>
+                    </group>
+                     
+                   <group col="6" attrs="{'invisible':[('product_type', '=','injection')]}">
+                       <group col="3" string="Film Extruder Process" attrs="{'invisible':[('film_process', '=',False)]}"></group>
+                       <group col="3" string="Printing Process" attrs="{'invisible':[('printing_process', '=',False)]}"></group> 
+                   </group>
+                   <group >  
+                            
+                      <group attrs="{'invisible':[('product_type', '=','injection')]}">
+                         <field name="material_details" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}" options="{'no_create' : True,'no_open': True}"/>
+                         <field name="colour" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                         <field name="width" string="Width(cm)" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="length" string="Length(cm)" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="thickness" string="Thickness(Micron)" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="treatment" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="type_val" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                         <field name="core_id" string="Core ID(mm)"  attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                         <field name="avg_weight" string="Avg Weight(Kgs)" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                        <field name="appearance" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="strength" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="sealing" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                      </group>
+                      <group > 
+                          <field name="material_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="colour_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="width_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="length_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="thickness_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="treatment_tolerance" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="type_val_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="core_id_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="avg_weight_tolerance" attrs="{'invisible':[('film_process', '=',False), ('printing_process', '=',False)]}"/>
+                          <field name="appearance_tolerance" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="strength_tolerance" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          <field name="sealing_tolerance" attrs="{'invisible':[('film_process', '=',False)]}"/>
+                          
+                     </group>
+                      <group  attrs="{'invisible':['|',('printing_process', '=',False),('product_type', '=','injection')]}">
+                         <field name="cutting_process" />
+                          <field name="cutting_size" />  
+                         <field name="printing_colour" />
+                         <field name="art_color" widget="many2many_tags"/>
+                          <field name="ecas_logo" />
+                         <field name="d2w_logo" />
+                         <field name="print_mark" />
+                         
+                      </group>
+
+                       <group attrs="{'invisible':[('printing_process', '=',False)]}" >
+                      
+                           <field name="cutting_process_tolerance"/>
+                          <field name="cutting_size_tolerance"/>
+                          <field name="printing_colour_tolerance"/>
+                          <field name="art_color_tolerance"/>
+                       </group>
+                     <group >
+                          <field name="special_instruction" required="1"/>
+                          <field name="production_sheet" widget="many2many_binary" attrs="{'readonly':[('state','=','done')]}"/>
+                     </group>
+                   <group>
+                          <field name="user_id" readonly="1"/>
+                     </group>
+                  </group>
+                  <footer>
+                      <button type="object" name="create_purchase_order" string="Purchase Order" 
+                       attrs="{'invisible':['|',('state','=','done'),('half_purchase', '=',True)]}" class="oe_highlight"/>
+                      <button type="object" name="create_manufacturing_order" string="Manufacturing Order" 
+                       attrs="{'invisible':['|',('state','=','done'),('half_purchase', '=',False)]}" class="oe_highlight" context="{'request_id':active_id}"/>
+                      <button icon="gtk-cancel" special="cancel" string="Cancel" attrs="{'invisible':[('state','=','done')]}" class="btn-primary"/>
+                  </footer>
+		</sheet>
+             </form>
+        </field>
+   </record>
+
+  <record model="ir.actions.act_window" id="production_detail_action">
+        <field name="name">Outsource Request Form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">production.request.detail</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+      <record model="ir.actions.act_window" id="production_detail_action_menu">
+        <field name="name">Outsource Request Form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">production.request.detail</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+   <!-- Start view for stock purchase request -->
+        <record id="stock_purchase_request_tree" model="ir.ui.view">
+        <field name="name">stock.purchase.request.tree</field>
+        <field name="model">stock.purchase.request</field>
+        <field name="arch" type="xml">
+            <tree string="Raw Material Request">
+              <field name='name'/>
+              <!--field name='material_request_id'/-->
+              <!--field name='delivery_id' />
+             <field name='production_id'  string="Manufacturing No."/-->
+             <field name='product_id' />
+             <field name='p_state'/>
+          </tree>
+        </field>
+     </record>
+     
+     <record id="stock_purchase_request_form" model="ir.ui.view">
+        <field name="name">stock.purchase.request.form</field>
+        <field name="model">stock.purchase.request</field>
+        <field name="arch" type="xml">
+            <form string="Raw Material Request">
+              <header>
+                    <button name="create_purchaserequisition" type="object" string="Purchase Requisition"
+                     class="oe_highlight"/>
+                    <button name="rejectstate" type="object"  string="Reject" 
+                     attrs="{'invisible':[('p_state','!=','draft')]}" class="oe_highlight"/>
+                    <button name="done_sate" type="object"  string="Done" 
+                     attrs="{'invisible':[('p_state','!=','requisition')]}" class="oe_highlight"/>
+                    <field name="p_state" widget="statusbar" statusbar_visible="draft,requisition,reject,done"/>
+              </header>
+              <sheet>
+                <group>
+                  <group>
+                     <field name='name' readonly="1"/>
+                      <!--field name='material_request_id' readonly="1" invisible='1'/-->
+                      <field name="product_id" readonly="1"/>
+                      <field name='requisition_id' attrs="{'invisible':[('requisition_id','=',False)]}" invisible='1'/>
+                  </group>
+                     <group>
+                        <field name='delivery_id'  readonly="1" invisible='1'/>
+                      <field name='production_id' string="Manufacturing No." readonly="1" invisible='1'/>
+                      <field name='p_required_qty' invisible='1'/>
+                     </group>
+                  </group>
+                    <group>
+                     <field name="p_request_line_ids" nolabel="1">
+                        <tree editable="bottom">
+                         <field name='name' readonly="1" invisible='1'/>
+                          <field name="select_bool" invisible='1'/>
+                          <field name="product_id"/>
+                          <field name='description' readonly='1'/>
+                          <field name='qty' />
+                          <field name='uom_id' readonly="1"/>
+                          <field name='supplier' readonly='1'/>
+                          <field name='user_pr_id' readonly='1'/>
+                          <field name='required_date' readonly="1"/>
+                           <!--field name='delivery_id'  readonly="1"/>
+                           <field name='material_request_id' readonly="1"/>
+                          <field name='production_id' string="Manufacturing No." readonly="1"/-->
+                          <button name="select" string="Select" icon='fa-check-circle-o' type="object"  
+                               class="oe_highlight" 
+                            attrs="{'invisible':['|','|',('purchase_id','!=',False),('select_bool','=',True),('requisition_id','!=',False)]}"/>
+                         <button name="notselect" string="Select" icon='fa-times-circle-o' type="object"  
+                               class="oe_highlight"  
+                            attrs="{'invisible':['|','|',('purchase_id','!=',False),('select_bool','=',False),('requisition_id','!=',False)]}"/>
+                        <field name='purchase_id' readonly='1'/> 
+                        <field name='requisition_id' attrs="{'invisible':[('requisition_id','=',False)]}"/>
+                        <field name="p_state" invisible='1'/>
+                   
+                        </tree>
+                     </field>
+                  </group>
+                 
+              </sheet> 
+                  <!--footer>
+                    <button type="object" string="Send" class="oe_highlight" 
+                     name="extra_rawmaterial" />
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel' />
+                </footer-->
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <!-- Add draft PO menu in purchase -->
+          <record id="purchase_DPO" model="ir.actions.act_window">
+            <field name="name">Draft Purchase Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.order</field>
+            <field name="context">{'group_by':'state','show_purchase': True,'search_default_todo':1,}</field>
+            <field name="domain">[('state','in',('draft','sent','bid','cancel', 'confirmed','rejected','awaiting'))]</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph,calendar</field>
+            <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
+          
+        </record>
+        <menuitem action="purchase_DPO" id="menu_purchase_DPO"
+            parent="purchase.menu_procurement_management"
+            sequence="2"/>
+
+        <record id="purchase.purchase_form_action" model="ir.actions.act_window">
+            <field name="name">Approved Purchase Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph,calendar</field>
+            <field name="context">{'group_by':'state','show_purchase': True,'search_default_todo':1,}</field>
+            <field name="domain">[('state','in',('to approve','purchase','sent po', 'done'))]</field>
+            <field name="search_view_id" ref="purchase.view_purchase_order_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a quotation that will be converted into a purchase order. 
+              </p><p>
+                Use this menu to search within your purchase orders by
+                references, vendor, products, etc. For each purchase order,
+                you can track the related discussion with the vendor, control
+                the products received and control the vendor bills.
+              </p>
+            </field>
+        </record>
+         <menuitem action="purchase.purchase_form_action" id="purchase.menu_purchase_form_action" parent="purchase.menu_procurement_management" sequence="6" name='Approved Purchase Orders'/>
+     <!-- End add draft Po menu in po-->
+    <!--- Start purchase order cancel -->
+     <record id="purchase_order_cancel_form" model="ir.ui.view">
+        <field name="name">purchase.order.cancel.form</field>
+        <field name="model">purchase.order.cancel</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Order Cancel">
+                <group>
+                   <field name='document_name' invisible='1'/>
+                   <field name='document' invisible="not context.get('force_confirm')"
+                        filename="document_name" />
+                   <field name='po_reason'/>
+                </group>
+                  <footer>
+                     <button type="object" string="Resend" class="oe_highlight" 
+                     name="resend_mail" invisible="not context.get('resend_mail')"/>
+                   <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel' invisible="not context.get('resend_mail')"/>
+  
+                    <button type="object" string="Approve" class="oe_highlight" 
+                     name="approve_puchase_order" invisible="not context.get('po_approved')"/>
+                    <button type="object" string="Reject" class="oe_highlight" 
+                     invisible="not context.get('po_approved')" name='reject_puchase_order'
+                     />
+                    <button type="object" string="Force Confirm" class="oe_highlight" 
+                     name="force_confirm" invisible="not context.get('force_confirm')"/>
+                   <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel' invisible="not context.get('force_confirm')"/>
+                </footer>
+               
+            </form>
+        </field>
+    </record>
+ 
+     <!-- End purchase order cancel-->
+    <record model="ir.actions.act_window" id="stock_purchase_request_action">
+        <field name="name">Stock Purchase Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.purchase.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <menuitem
+            action="stock_purchase_request_action" id="menu_stock_purchase_request" 
+               name="New Requests" parent="purchase.menu_procurement_management" sequence="0"/>
+            
+   <!-- End view for stock purchase request -->
+</odoo>
+

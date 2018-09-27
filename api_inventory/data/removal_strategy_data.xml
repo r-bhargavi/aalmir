@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+	<record id="removal_strategy_data1" model="product.removal">
+            <field name="name">Reserved Quantity</field>
+            <field name="method">reserve</field>
+        </record>
+        <record id="removal_strategy_data2" model="product.removal">
+            <field name="name">Edges Bin-Location</field>
+            <field name="method">edges</field>
+        </record>
+    </data>
+</openerp>

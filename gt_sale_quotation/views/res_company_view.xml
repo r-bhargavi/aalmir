@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_company_form_aalmir_custom" model="ir.ui.view">
+            <field name="name">res.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="sale.view_company_inherit_form2" />
+            <field name="arch" type="xml">
+                <field name="sale_note" position="replace"/>
+                <xpath expr="//notebook" position="inside">
+                    <page name='terms_and_condition' string="Terms and Condition">
+                        <separator string="Stamp" />
+                        <field name="stamp_image" widget="image"/>
+                        <separator string="Invoice Paid Stamp" />
+                        <field name="invoice_paid_stamp" widget="image"/>
+                        <separator string="Sale Note" />
+                        <field name="sale_note" nolabel="1" placeholder="Sale Note"/>
+                       
+                        <group name="terms_and_condition" string="Sale Terms and Condition">
+                            <group>
+                                <field name="term_and_condition_1" nolabel="1" placeholder="Terms and Condition"/>
+                            </group>
+                            <group>
+                                <field name="term_and_condition_2" nolabel="1" placeholder="Terms and Condition"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="company_view_form_aalmir_inherite_tax" model="ir.ui.view">
+            <field name="name">Res Company form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="account.view_company_inherit_form" />
+            <field name="arch" type="xml">
+                <field name="tax_calculation_rounding_method" position="after">
+                        <field name="tax_validation" />
+                </field>
+            </field>
+          </record>
+          
+    </data>
+</openerp>

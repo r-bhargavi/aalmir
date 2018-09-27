@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<odoo>
+        <record id="assign_to_other_salesman_form_view" model="ir.ui.view">
+            <field name="name">assign.to.other.salesman.form.view</field>
+            <field name="model">assign.to.other.salesman</field>
+            <field name="arch" type="xml">
+                <form string="Assign to Other Sales Person">
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <footer>
+                        <button string="Assign" name="assign" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+         <record id="action_assign_to_other_salesman" model="ir.actions.act_window">
+            <field name="name">Assign to Other Sales Person</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">assign.to.other.salesman</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="assign_to_other_salesman_form_view"/>
+            <field name="target">new</field>
+        </record>
+
+</odoo>

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<record id="store_picking_list_tree_view" model="ir.ui.view">
+		<field name="name"> Picking List Tree View</field>
+		<field name="model">stock.picking</field>
+		<field name="type">tree</field>
+		<field name="priority">21</field>
+		<field name="arch" type="xml">
+		    <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done') and min_date &lt; current_date" string="Picking list">
+		            <field name="name"/>
+		            <field name="location_dest_id"/>
+		            <field name="partner_id"/>
+		            <field name="date" invisible="1"/>
+		            <field name="min_date"/>
+		            <field name="dispatch_date"/>
+		            <field name="origin"/>
+		            <field name="state" string="Stock Status"/>
+		            <field name="picking_status"/>
+		        </tree>
+		</field>
+        </record>
+    	
+    	<!--view for PICKING LIST form View (New)--> 
+         <record id="store_picking_list_batch_form_view" model="ir.ui.view" >
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="arch" type="xml">
+		<form string="Picking List(Select Batches)">
+		<header>
+			<button name="done_bin_picking_operation" string="Close Picking List" type="object" attrs="{'invisible': [('picking_status','!=','pick_list')]}" class="oe_highlight" confirm="Are you sure want to Close Picking List operation"/>
+			<button name="open_bin_picking_operation" class="oe_highlight" string="Open Picking List" type="object" attrs="{'invisible': [('picking_status','!=','r_t_dispatch')]}" group="stcok.group_stock_user"/>
+			<button name="open_delivery_order" group="stcok.group_stock_user" string="Delivery Order" type="object"/>
+            		<field name="state" widget="statusbar" statusbar_visible="confirmed,partially_available,assigned"/>
+		</header>
+		<sheet>
+                    <h1 class="hidden-xs">
+                        <field name="name" attrs="{'invisible': [('name','=','/')]}" readonly="1"/>
+                    </h1>
+                    <group class="hidden-xs">
+                        <group>
+                            <field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}" on_change="onchange_picking_type(picking_type_id,partner_id)" readonly="1" options="{'no_create': True,'no_open':True}"/>
+                            <field name="term_of_delivery" options="{'no_open': True}" readonly="1"/>
+                            <field name="location_id" options="{'no_open': True}" readonly="1"/>
+                            <field name="location_dest_id" options="{'no_open': True}" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="min_date" readonly="1"/>
+                            <field name="origin" readonly="1"/>
+                            <field name="picking_status" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="pack_operation_product_ids" options="{'reload_on_button': True}" context="{'default_picking_id': id,'default_location_id':location_id, 'default_location_dest_id':location_dest_id}" mode="tree,kanban">
+                                <tree edit='false' delete='false' create='false'>
+                                    <field name="product_id" required="1" />
+                                    <field name="product_uom_id"  options="{'no_open': True}" groups="product.group_uom"/>
+                                    <field name="lots_visible" invisible="1"/>
+                                    <field name="location_id" invisible="1"/>
+                                    <field name="location_dest_id"  invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="qty_done" string="Qty To Pick" sum="total"/>
+                                    <field name="pick_qty" sum="total"/>
+                                    <button name="bin_picking_operation" context="{'picking_view':True}" string="Pick" type="object" />
+                                    <button name="unpick_operation" string="UnPick" type="object"  attrs="{'invisible': [('pick_qty','=',0.0)]}" group="gt_order_mgnt.group_sale_support" />
+                                    <button name="autopick_operation" string="AutoPick" type="object"  group="stock.group_stock_manager" />
+                                </tree>
+                                <form><group col="4">
+                                    <field name="product_id" required="1" />
+                                    <field name="product_uom_id"  options="{'no_open': True}" groups="product.group_uom"/>
+                                    <field name="lots_visible" invisible="1"/>
+                                    <field name="location_id"  invisible="1"/>
+                                    <field name="location_dest_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="product_qty" readonly="1" />
+                                    <field name="qty_done" string="Qty To Dispatch"/>
+                                    <field name="pick_qty" />
+                                    </group>
+                                    <group>
+                                    	<field name="batch_number"  readonly="1" nolabel="1" >
+					<tree limit="20" string="Batches" eadonly="1" >
+						<field name="name" string="Number" readonly="1"/>
+						<field name="lot_id" readonly="1"/>
+						<field name="product_qty" string="Quantity" sum="total"/>
+						<field name="uom_id" readonly="1"/>
+						<field name="logistic_state" groups="stock.group_stock_user"/>
+					</tree>
+					<form readonly="1">
+	 				 	<group col="4">
+							<field name="name" string="Number" readonly="1"/>
+							<field name="product_id" readonly="1"/>
+							<field name="lot_id" readonly="1"/>
+							<field name="convert_product_qty" string="Quantity"/>
+							<field name="uom_id" readonly="1"/>
+							<field name="logistic_state" groups="stock.group_stock_user"/>
+						</group>
+					</form>
+				        </field>
+                                    </group>
+                                </form>
+                            </field>
+                    	<notebook>
+                    	
+                        <page string="Picking History ">
+                        	 <field name="master_batches" domain="[('logistic_state','=','transit')]" readonly="1">
+		                        <tree readonly="1" >
+		                            <field name="name" string="Master Batch"/>
+		                            <field name="product_id" />
+		                            <field name="batch_id"/>
+		                            <field name="total_quantity" um="total"/>
+		                            <field name="uom_id"/>
+		                            <field name="store_id" />
+		                        </tree>
+		                        <form readonly="1" >
+		                           <group col="4">
+						<field name="name" />
+						<field name="store_id" />
+						<field name="product_id" />
+						<field name="lot_id"/>
+						<field name="total_quantity"/>
+						<field name="uom_id"/>
+					   </group>
+					   <field name="batch_id"/>
+		                        </form>
+                        	 </field>
+                        </page>
+                        
+                        <page string="Additional Info" name="extra" invisible="1">
+                            <group>
+                                <group>
+                                    <field name="move_type"/>
+                                    <field name="picking_type_id" on_change="onchange_picking_type(picking_type_id,partner_id)"/>
+                                    <field name="picking_type_code" invisible="1"/>
+                                    <field name="quant_reserved_exist" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                    <field name="group_id"/>
+                                    <field name="priority"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+            </field>
+	</record>
+        
+   <!-- Bin-Picking view in Delivery order Picking List -->
+	<record id="bin_picking_list_html_form_view" model="ir.ui.view" >
+            <field name="name">Store Picking List</field>
+            <field name="model">store.picking.list</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+		<form string="Picking List">
+			<header>
+				<button name="show_picking_list" string="Picking List" type="object"/>
+		    		<field name="status" widget="statusbar"/>
+			</header>
+	            	<group col="4">
+		                    <field name="product_id" readonly="1"/>
+				    <label for="dispatch_qty"/>
+				    <div>
+				    	<field name="dispatch_qty"  class="oe_inline" readonly="1"/>
+				    	<field name="dispatch_unit" class="oe_inline" readonly="1"/>
+				    </div>
+				    <label for="qty_pick"/>
+				    <div>
+				    	<field name="qty_pick" class="oe_inline" readonly="1"/>
+				    	<field name="pickunit" class="oe_inline" readonly="1"/>
+				    </div>
+				    <label for="qty_to_pick"/>
+				    <div>
+				    	<field name="qty_to_pick" class="oe_inline" readonly="1"/>
+				    	<field name="pick_unit" class="oe_inline" readonly="1"/>
+				    </div>
+				    <field name="removel_strategy" options="{'no_create': True, 'no_open': True}"/>
+				    <field name="picking_id" readonly="1"  context="{'form_view_ref':'api_invnetory.store_picking_list_batch_form_view'}"/>
+		            </group>
+	            	    <group name="data_test" col="1">
+		                    
+	            	    </group>
+                </form>
+            </field>
+         </record>
+
+	 <!--ACtion window to PickingLists -->  
+    <record model="ir.actions.act_window" id="picking_list_view_action">
+		<field name="name">Picking List</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">stock.picking</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[("picking_status","!=",'draft'),('state','not in',('done','delivered'))]</field>
+    </record>
+    
+    <record model="ir.actions.act_window.view" id="pick_list_tree_view_action">
+		<field eval="100" name="sequence"/>
+		<field name="view_mode">tree</field>
+		<field name="view_id" ref="store_picking_list_tree_view"/>
+		<field name="act_window_id" ref="picking_list_view_action"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="pick_list_form_view_action">
+		<field eval="200" name="sequence"/>
+		<field name="view_mode">form</field>
+		<field name="view_id" ref="store_picking_list_batch_form_view"/>
+		<field name="act_window_id" ref="picking_list_view_action"/>
+    </record>
+    
+    <menuitem id="menu_picking_list_detail" name="Picking List" action="picking_list_view_action"
+            parent="api_inventory.menu_stock_detail_api" sequence="0"/>
+    
+        <!--record id="store_picking_list_form_view" model="ir.ui.view" >
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="arch" type="xml">
+		<form string="Picking List">
+		<header>
+            	<field name="state" widget="statusbar" statusbar_visible="confirmed,partially_available,assigned,done"/>
+		</header>
+                <sheet>
+                    <h1 class="hidden-xs">
+                        <field name="name" attrs="{'invisible': [('name','=','/')]}" readonly="1"/>
+                    </h1>
+                    <group class="hidden-xs">
+                        <group>
+                            <field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}" on_change="onchange_picking_type(picking_type_id,partner_id)" readonly="1"/>
+                            <field name="term_of_delivery" readonly="1"/>
+                            <field name="location_id" invisible="1"/>
+                            <field name="location_dest_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="min_date" readonly="1"/>
+                            <field name="origin" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="pack_operation_product_ids" options="{'reload_on_button': True}" context="{'default_picking_id': id,'default_location_id':location_id, 'default_location_dest_id':location_dest_id}" mode="tree,kanban">
+                                <tree readonly="1" >
+                                    <field name="product_id" required="1" />
+                                    <field name="product_uom_id" groups="product.group_uom"/>
+                                    <field name="lots_visible" invisible="1"/>
+                                    <field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>
+                                    <field name="location_dest_id" domain="[('id', 'child_of', parent.location_dest_id)]" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="product_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}"/>
+                                    <field name="qty_done" attrs="{'readonly': [('lots_visible', '=', True)]}"/>
+                                    <button name="pick_operation" string="Pick" type="object"/>
+                                </tree>
+                            </field>
+                    <notebook>
+                        <page string="Operations">
+                        	 <field name="picking_store" readonly="1" mode="tree,kanban">
+		                        <tree readonly="1" >
+		                            <field name="store_name" />
+		                            <field name="product_id" />
+		                            <field name="batches_to_pick"/>
+		                            <button name="pick_all_batch" string="Pick" attrs="{'invisible':[('status','=','pick')]}" type="object"/>
+		                            <button name="pick_partial_batch" string="Partial" attrs="{'invisible':[('status','=','pick')]}" type="object"/>
+		                            <button name="interchange_batch" string="Interchange" attrs="{'invisible':[('status','=','pick')]}" type="object"/>
+		                            <button name="un_pick" string="Un-Pick" attrs="{'invisible':[('status','!=','pick')]}" type="object"/>
+		                            <field name="pick_batches"/>
+		                            <field name="quantity"/>
+		                            <field name="qty_unit"/>
+		                            <field name="status" invisible="1"/>
+		                        </tree>
+                        	 </field>
+                        </page>
+                        <page string="Additional Info" name="extra" invisible="1">
+                            <group>
+                                <group>
+                                    <field name="move_type"/>
+                                    <field name="picking_type_id" on_change="onchange_picking_type(picking_type_id,partner_id)"/>
+                                    <field name="picking_type_code" invisible="1"/>
+                                    <field name="quant_reserved_exist" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                    <field name="group_id"/>
+                                    <field name="priority"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+            </field>
+         </record-->
+         
+    </data>
+</openerp>

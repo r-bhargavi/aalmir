@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+     <record id="quality_dashboard_kanban_view" model="ir.ui.view">
+     	<field name="name">Quality Dashboard view</field>
+    	<field name="model">quality.dashboard</field>
+    	<field name="arch" type="xml">
+        <kanban class="oe_background_grey o_kanban_dashboard o_account_kanban" create="false">
+            <field name="color"/>
+            <field name="name"/> 
+            <field name="status_dashboard"/>
+            <templates>
+                <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(0)}">
+                            <t t-value="record.name.raw_value" t-set="quality_type"/>
+                            <t t-value="JSON.parse(record.status_dashboard.raw_value)" t-set="n_status"/>
+                            <t t-call="JournalTop"/>
+                            <div class="container o_kanban_card_content o_visible">
+                                <div class="row">
+                                    <t t-if="quality_type== 'Quality Requests'" t-call="quality_check"/>
+				    <t t-if="quality_type== 'Inspections'" t-call="inspection_details"/>
+				    <t t-if="quality_type== 'Tests'" t-call="test_details"/>
+				</div><t t-call="JournalBodyGraph"/>
+                            </div><div class="container o_kanban_card_manage_pane o_invisible">
+                            </div>
+                        </div>
+                    </t>
+		    <t t-name="JournalTop">
+                        <div class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <div class="o_primary">
+                                    <field name="name"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_manage_button_section">
+                                <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
+                            </div>
+                        </div>
+                    </t>
+                    
+		    <t t-name="quality_check">
+			<lable />
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            
+                            <!--button type="object" name="action_open_quality" class="btn btn-primary btn-sm">
+                                <t><span>Quality Test</span></t>
+                            </button-->
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <div class="row">
+                            	<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_open_quality" context="{'n_state': 'mo'}" type="object">Manufacturing - 
+					<span title="Manufacturing Check Requests" t-esc="n_status.from_mo" /> </a>
+				</a>
+                       		
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_open_quality" context="{'n_state': 'repaired'}" type="object">Repaired - 
+					<span title="Purchase Check Requests" t-esc="n_status.from_repaired" /> </a>
+				</a>
+				
+			        <!--a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_open_quality" context="{'n_state': 'available'}" type="object">Available Orders - 
+					<span title="Quantity is Available" t-esc="n_status.available" /> </a>
+				</a>
+				
+			        <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_open_quality" context="{'n_state': 'waiting'}" type="object">Waiting Orders - 
+					<span title="Waiting For Quantity" t-esc="n_status.waiting" /> </a>
+				</a-->
+                            </div>
+                        </div>
+                    </t>
+	<!--Delivery Details -->
+		    <t t-name="inspection_details">
+                        <lable />
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <button type="object" name="action_open_inspection" class="btn btn-primary btn-sm">
+                                <t><span>Inspetions</span></t>
+                            </button>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <div class="row">
+                            	<a class="o_project_kanban_box" name="" type="action">
+                       		<a name="action_open_inspection" context="{'n_state': 'draft'}" type="object">
+					   In Draft State  <span title="In Draft" t-esc="n_status.draft">
+					   </span></a>
+			        </a>
+				<a class="o_project_kanban_box" name="" type="action">
+				<a name="action_open_inspection" context="{'n_state': 'ready'}" type="object">
+					   In Ready State <span title="In Ready" t-esc="n_status.ready">
+					   </span></a>
+			        </a>
+				<a class="o_project_kanban_box" name="" type="action">
+			   	<a name="action_open_inspection" context="{'n_state': 'partial_failed'}" type="object">
+					   Partial Failed <span title="Partial Failed" t-esc="n_status.failed"> 
+					   </span></a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+			   	<a name="action_open_inspection" context="{'n_state': 'partial'}" type="object">
+					   Partial Success <span title="Partial Success" t-esc="n_status.success"> 
+					   </span></a>
+				</a>
+                            </div>
+                        </div>
+                    </t>
+	<!--State Details -->
+		    <t t-name="test_details">
+			<lable />
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <button type="object" name="action_open_tests" class="btn btn-primary btn-sm">
+                                <t><span>Tests</span></t>
+                            </button>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b><field name="name"/></b> 
+                            <div class="row">
+                            	<a class="o_project_kanban_box" name="" type="action">
+                       		<a name="action_open_tests" context="{'n_state': 'generic'}" type="object">
+					   Generic Tests <span title="Generic Tests" t-esc="n_status.generic"> 
+					   </span></a>
+			 	</a>
+				<a class="o_project_kanban_box" name="" type="action">
+				<a name="action_open_tests" context="{'n_state': 'related'}" type="object">
+					   Related Tests <span title="Related Tests" t-esc="n_status.related"> 
+					   </span></a>
+			        </a>
+                            </div>
+                            <b>Question</b>
+                            <div class="row">
+                            	<a class="o_project_kanban_box" name="" type="action">
+                       		<a name="action_open_questions" context="{'n_state': 'qualitative'}" type="object">
+					   Qualitative Question<span title="Qualitative Question" t-esc="n_status.qualitative"> 
+					   </span></a>
+			 	</a>
+			   	<a class="o_project_kanban_box" name="" type="action">
+				<a name="action_open_questions" context="{'n_state': 'quantitative'}" type="object">
+					   Quantitative Question<span title="quantitative Question" t-esc="n_status.quantitative">  
+					   </span></a>
+				</a>
+                            </div>
+                        </div>
+                    </t>
+		    <t t-name="JournalBodyGraph">
+                        <div class="o_kanban_graph_section">
+                            <field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/>
+                        </div>
+                    </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+	<record id="quality_dashboard_action" model="ir.actions.act_window">
+	    <field name="name">Dashboard</field>
+	    <field name="res_model">quality.dashboard</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">kanban</field>
+	</record>
+	<menuitem  id="quality_dashboard_menu" sequence="0" name="Dashboard" action="quality_dashboard_action" parent="main_quality_menu_id" groups="quality_control.group_quality_check_user"/>
+    </data>
+
+</openerp>                                                                                                                             

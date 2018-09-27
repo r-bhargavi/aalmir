@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <record id="customer_credit_tree" model="ir.ui.view">
+            <field name="name">Reject Customer Credit Tree</field>
+            <field name="model">res.partner.credit</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Credit Form">
+			 <field name="partner_id" />
+                 	<field name="sale_id" />
+                         <field name="sale_amount" />
+                         <field name="inv_paid" />
+                         <field name="credit_ask" />
+                         <field name="create_uid" string="Requested By" />
+                 	 <field name="create_date" string="Request Date" />
+                         <field name="note"/> 
+                         <field name="state"/>    
+                </tree>
+            </field>
+         </record>
+
+         <record id="customer_credit_form" model="ir.ui.view">
+            <field name="name">Allow Customer Credit Form</field>
+            <field name="model">res.partner.credit</field>
+            <field name="arch" type="xml">
+                <form string="Customer Credit Request Form" attrs="{'edit':[('state', 'in', ['request'])]}">
+                    <group>   
+                      <group>
+                         <field name="sale_id" readonly="1"/>
+                          <field name="stop_delivery"/>
+			  <field name="state" invisible="1"/>
+                      </group>
+                      <group>
+                          <field name="note" />
+                      </group>
+         	</group>
+                  <footer>
+              		  <button type="object" string="Approved" name="allow_rqst" class="btn-primary oe_edit_only" attrs="{'invisible':[('state','!=','request')]}"/>
+		          <button type="object" string="Reject" name="reject_rqst" class="btn-primary oe_edit_only" attrs="{'invisible':[('state','!=','request')]}"/>
+                  </footer>
+
+                </form>
+            </field>
+         </record>
+         
+         <record id="customer_credit_tree_ac" model="ir.ui.view">
+            <field name="name">Customer Credit tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Credit Form">
+                    <field name="name" />
+                    <field name="credit_limit" />
+                    <field name="credit_currency_id" />
+                    <field name="to_date" string="Credit Exp. Date"/>
+                    <!--field name="invoice_pending"/>  CH_N103 merge in one for data show  'invoices_pending'
+                    <field name="total_invoice_pending"/-->
+		    <field name="invoices_pending" />
+                    <!--field name="delay_invoice"/>   CH_N103 merge in one for data show   'delay_payment_done' 
+                    <field name="delay_inv_paid_amt"/-->
+		    <!--field name="delay_payment_done" /-->
+                    <!--field name="run_sale"/>		CH_N103 merge in one for data show  'active_order'
+		    <field name="total_sale_amount"/-->
+ 		    <field name="active_order" />
+                    <field name="total_sale_pending_amount"/>
+                    <field name="total_pay" string="Total Payments Receive"/>
+                    <button type="object" name="totalpayment_val" icon="fa-history" string="History" attrs="{'invisible':[('total_pay','=',0.0)]}"/>
+                    <field name="cr_state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="customer_credit_form_ac" model="ir.ui.view">
+            <field name="name">Customer Credit Form</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <form string="Customer Credit Form">
+                     <sheet>
+                      <group> 
+                        <group>
+                           <field name="name" invisible="1"/>
+                              <field name="partner_id" string="Customer Name"/>
+                            <field name="credit_limit" readonly="1" widget='monetary' options="{'currency_field': 'credit_currency_id'}"/>
+                        </group>
+                      <group>
+                      </group>
+                          
+                      <group string="Duration">
+				 <field name="from_date" string="From" attrs="{'required': ['|',('new_credit_limit','>',0.0),('credit_limit', '>', 0.0)]}"/>
+				 <field name="to_date" string="To" attrs="{'required': ['|',('new_credit_limit','>',0.0),('credit_limit', '>', 0.0)]}"/>
+                       </group>
+                       <group string="New Credit Allow">
+                           <field name="new_credit_limit" />
+			   <field name="credit_currency_id" attrs="{'required': ['|',('new_credit_limit','>',0.0),('credit_limit', '>', 0.0)]}" options="{'no_open': True, 'no_create': True}"/>
+			   <field name="doc_name" invisible="1"/>
+                           <field name="new_upload" filename="doc_name"/>
+                           <field name="new_note" />
+                       </group>
+                     </group>
+                     <notebook>
+                         <page string="Current Requests">
+                          <field name="crdit_ids" string="Customer Credit Request Form" editable="bottom">
+                            <tree create="false">
+                                 <field name="sale_id" readonly="1"/>
+                                 <field name="sale_amount" readonly="1"/>
+                                 <field name="inv_paid" readonly="1"/>
+                                 <field name="credit_ask"  readonly="1"/>
+                                 <field name="delivery_id" readonly="1"/>
+                                 <field name="deliery_note"/>
+				 <field name="create_uid" string="Requested By" />
+                         	 <field name="create_date" string="Request Date" />
+                                 <field name="state"/> 
+                                 <button name="delivery_allow" icon="gtk-apply" type="object"  attrs="{'invisible':['|',('state','=','approve'),('delivery_id', '=',False)]}"/>    
+                                 <button name="open_request" icon="gtk-go-forward" type="object" string="Opem Form View" attrs="{'invisible':[('state','=','approve')]}"/>
+                            </tree>
+                          </field>
+                        </page>
+			<page string="Request History">
+                          <field name="crdit_ids_history">
+                            <tree create="false">
+                                 <field name="sale_id" />
+                                 <field name="sale_amount" />
+                                 <field name="inv_paid" invisible="1" />
+                                 <field name="credit_ask" />
+				 <field name="stop_delivery" />
+                                 <field name="create_uid" string="Requested By" />
+                         	 <field name="create_date" string="Request Date" />
+                                 <field name="state"/> 
+				 <field name="user_id" />                                      
+                            </tree>
+                          </field>
+                        </page>
+                        <page string="Open Sale Orders">
+                          <field name="sale_ids" >
+                             <tree string="Sales Orders"  create="false">
+				    <field name="name" string="Order Number"/>
+				    <field name="date_order"/>
+				    <field name="user_id"/>
+				    <field name="amount_total" sum="Total Tax Included" widget="monetary"/>
+				    <field name="invoice_status"/>
+                                    <field name="validity_date"/>
+				    <field name="state" />
+                                    <!--field name="cr_state"/-->
+				</tree>
+                          </field>
+                        </page>
+                         <page string="Total Invoiced">
+                           <field name="invoice_val_ids" >
+                             <tree string="Invoice" create="false">
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="origin" string="Sale Order No."/>				   
+				    <field name="payment_date_inv"/>
+				    <field name="amount_total_signed" sum="total"/>
+				    <field name="residual_signed" sum="total"/>
+				    <field name="currency_id" invisible="1"/>
+				    <field name="state"/>
+                        
+                             </tree>
+                           </field>
+                        </page>
+                         <page string="Total Deliveries">
+                           <field name="delivery_ids" >
+                              <tree create="false">
+				    <field name="name" string="Delivery NO."/>
+				    <field name="min_date"/>
+				    <field name="origin" string="Sale Order No."/>
+				    <field name="backorder_id"/>
+				    <field name="state"/>
+				</tree>
+                           </field>
+                        </page>
+                     </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                       <!--button name="action_mail_sent" string="Send Mail" type="object" 
+                            class='oe_highlight' style="float:left;margin-left:550px;margin-top:15px;position:absolute;"/-->
+                        <!--field name="message_follower_ids" widget="mail_followers"/-->
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_credit_profile_form" model="ir.ui.view">
+            <field name="name">view.credit.profile.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account.view_partner_property_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='city']" position="replace">
+                    <field name="city" invisible="1"/>
+                    <field name="city_id" placeholder="City" class="o_address_city"/>
+                </xpath>
+                  
+              <field name="currency_id" invisble="1"/>
+                <xpath expr="//field[@name='credit']" position="before">
+		<!--CH_N105 add currency field and make credit limit readonly -->
+		     
+                   
+                    <label for="credit_limit" string="Credit Limit"/>
+                   <div>
+                        <field name="credit_limit" readonly="1"  widget='monetary' nolabel="1"  options="{'currency_field': 'currency_id'}" class="oe_inline"/>
+                       <button type="object" name="open_creditprofile" class="oe_inline"  nolabel="1"  icon="gtk-go-forward" help="Credit Profile"/>
+                   </div>
+                   
+                    <label for="from_date" string="Credit Duration" />
+                    <div>
+                        <field name="from_date" readonly="1" nolabel="1" class="oe_inline"/> 
+                        <label for="from_date" string="To" class="oe_inline"/>
+                        <field name="to_date"  readonly="1" nolabel="1" class="oe_inline"/>
+                    </div>
+                </xpath>
+                   <field name="type" position="before">
+                       <field name="counter_customer" invisible="1" groups='gt_order_mgnt.group_sale_reception'/>
+                   </field>
+                   <field name="property_payment_term_id" position="replace">
+                       <field name="property_payment_term_id" widget="many2many_tags" options="{'no_create': True}" attrs="{'readonly':[('account_user_bool','!=',True)]}"/>
+                       	<field name="account_user_bool" invisible="1"/>
+                   </field>
+                   <field name="property_supplier_payment_term_id" position="replace">
+                       <field name="property_supplier_payment_term_id" widget="many2many_tags" options="{'no_create': True}" attrs="{'readonly':[('account_user_bool','!=',True)],'invisible':[('supplier','!=',True)]}" />
+                   </field>
+            </field>
+        </record>
+        
+
+        <record id="city_form_view" model="ir.ui.view">
+            <field name="name">city_form_view</field>
+            <field name="model">res.partner.city</field>
+            <field name="arch" type="xml">
+                <form string="City">
+                    <group>
+                        <field name="name" />
+                        <field name="state_id" />
+                        <field name="transit_time" />
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="city_tree_view" model="ir.ui.view">
+            <field name="name">city_tree_view</field>
+            <field name="model">res.partner.city</field>
+            <field name="arch" type="xml">
+                <tree string="City">
+                    <field name="name" />
+                    <field name="state_id" />
+                    <field name="transit_time" />
+                </tree>
+            </field>
+        </record>
+
+<!--CH_N041 add code to shows customre payment terms -->
+        <record id="payment_term_view_tree" model="ir.ui.view">
+            <field name="name">Account Payment Term</field>
+            <field name="model">account.payment.term</field>
+            <field name="arch" type="xml">
+            	<tree string="Sale Pricelist">
+            		<field name="name"/>
+			<field name="n_standard_term"/>
+			<field name="n_partner_id"/>
+            		<field name="n_purchase_term"/>
+            		<field name="supplier_id"/>
+
+            		<!--field name="company_id"/>
+            		<field name="currency_id"/>
+            		<field name="generic_use"/-->
+            	</tree>
+            </field>
+        </record>
+
+        <record id="action_open_payment_term" model="ir.actions.act_window">
+            <field name="name">Account Payment Term</field>
+            <field name="res_model">account.payment.term</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="search_view_id" ref="payment_term_view_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Payment Term
+                </p>
+            </field>
+        </record>
+
+        <record id="view_payment_term_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+               <xpath expr="//group[@name='purchase']/field[@name='supplier']" position='after'>
+                  <field name="supplier_type" widget='many2many_tags'
+                   attrs="{'invisible':[('supplier','=',False)], 'required':[('supplier','=',True)]}"/>
+                 </xpath>
+               
+                     <xpath expr="//field[@name='message_follower_ids']" position="replace">
+                        <!--button name="action_mail_sent" string="Send Mail" type="object" 
+                            class='oe_highlight' style="float:left;margin-left:550px;margin-top:15px;position:absolute;" /-->
+                   </xpath>
+                   
+            	<div name="button_box" position="inside">
+            		 <button type="action" icon="fa-list" class="oe_stat_button" string="Payment Terms" name="%(action_open_payment_term)d" attrs="{'invisible': [('customer', '=', False)]}" context="{'search_default_n_partner_id': [active_id],'default_n_partner_id': active_id}">
+                    </button>
+            	</div>
+		<!--CH_N065 add customer doc -->
+		 <notebook position="inside">
+		  <page  string="Documents">
+                     <field name="n_doc_upload" readonly="1">
+				<tree >
+				<field name="name" invisible="1"/>
+				<field name="n_upload_doc" string="Document name" filename="name"/>
+				<field name="product_id" invisible="1" />
+				<field name="create_uid" string="Upload User"/>
+				<field name="create_date" string="Upload Date"/>
+				</tree>
+			</field>
+                  </page>
+                  </notebook>
+		<!--CH_N065 -->
+            </field>
+         </record>
+	<!--CH_N041 end-->
+
+        <record model="ir.actions.act_window" id="action_city_list">
+            <field name="name">City</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.city</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem action="action_city_list" id="menu_base_city" name="City" parent="base.menu_localisation" sequence="4" groups="base.group_no_one"/>
+        
+         <record model="ir.actions.act_window" id="action_customer_credit">
+            <field name="name">Customer Credit</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[('company_type','=','company')]</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="action_invoice_credit_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="customer_credit_tree_ac"/>
+            <field name="act_window_id" ref="action_customer_credit"/>
+        </record>
+
+        <record id="action_invoice_credit_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="customer_credit_form_ac"/>
+            <field name="act_window_id" ref="action_customer_credit"/>
+        </record>
+        <menuitem action="action_customer_credit" id="menu_base_city" name="Customer Credit" parent="account.menu_finance_receivables" sequence="2" groups="account.group_account_manager"/>
+<!--        <record id="view_partner_address_form_aalmir" model="ir.ui.view">
+            <field name="name">res.partner.form.address.aalmir</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_address_form" />
+            <field name="arch" type="xml">
+                <xapth expr="//field[@name='city']" position="replace">
+                    <field name="city_id" placeholder="City" class="o_address_city"/>
+                </xapth>
+            </field>
+        </record>-->
+        
+        
+    </data>
+</openerp>

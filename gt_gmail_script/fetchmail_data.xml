@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <record id="fetchmail.ir_cron_mail_gateway_action" model="ir.cron">
+            <field name="name">Fetchmail Service</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">fetchmail.server</field>
+            <field name="function">_gmail_data</field>
+            <field name="args">()</field>
+            <!-- Active flag is set on fetchmail_server.create/write -->
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+    
+    <data>
+    	
+    	<record model="ir.ui.view" id="view_email_server_form">
+            <field name="name">fetchmail.server.form</field>
+            <field name="model">fetchmail.server</field>
+            <field name="inherit_id" ref="fetchmail.view_email_server_form"/>
+            <field name="arch" type="xml">
+                <button type="object" name="fetch_mail" states="done" position="replace">
+                	<button string="Fetch Now" type="object" name="gmail_data" states="done"/>
+                </button>
+                <field name="user" position="before">
+                    <field name="owner" />
+                </field>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="replace_crm_case_form_view_oppor_cust1">
+            <field name="name">crm.case.form.view.oppor.cust1</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor" />
+            <field name="arch" type="xml">
+            	<field name="name" posistion="replace">
+            		<field name="name" placeholder="e.g. Product Pricing" invisible="1"/>
+            		<field name="mail_subject" placeholder="e.g. Product Pricing" required="1"/>
+            	</field>
+            </field>
+        </record>
+    	
+    </data>
+</openerp>

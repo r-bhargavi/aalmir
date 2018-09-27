@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="product_pricelist_form" model="ir.ui.view">
+            <field name="name">produc.pricelist.inherit</field>
+            <field name="model">product.pricelist</field>
+            <field name="arch" type="xml">
+            	<form string="pricelist">
+            		<sheet string="PriceList">
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="company_id"/>
+                            <field name="customer" domain="[('company_type','=','company'),('customer','=',True)]" attrs="{'invisible':[('generic_use','=',True)]}" context="{'search_default_customer': 1, 'show_address': 1}"/>
+                            <field name="currency_id"/>
+                            <field name="active"/>
+                            <field name="generic_use" attrs="{'invisible':[('contract_use','=',True)]}"/>
+                            <field name="contract_use" attrs="{'invisible':[('generic_use','=',True)]}"/>
+                        </group>
+                        <notebook>
+                            <page string="Items" name="price_line">
+                                <field name="item_ids" nolabel="1">
+                                    <tree string="Items" editable="bottom">
+                                        <field name="product_tmpl_id" string="Description"/>
+                                        <field name="qty" string="MOQ"/>
+                                        <field name="min_quantity" string="Quanitity"/>
+                                        <field name="price_discount" string="Discount(%)"/>
+                                        <field name="fixed_price"/>
+                                        <field name="floor_price" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+            		</sheet>
+			<!--div class="oe_chatter">
+                           <field name="message_ids" widget="mail_thread"/>
+                        </div-->
+            	</form>
+            </field>
+         </record>
+         
+        <record id="view_customer_pricelist_filter" model="ir.ui.view">
+            <field name="name">product.pricelist.select</field>
+            <field name="model">product.pricelist</field>
+            <field name="arch" type="xml">
+                <search string="Search Pricelist">
+                    <separator/>
+                    <field name="customer" string="Customer" operator="child_of"/>
+                    <field name="name" filter_domain="['|', '|', ('customer', 'ilike', self),('name', 'ilike', self)]"/>
+                    <field name="company_id" string="Company"/>
+                    <filter string="Generic Pricelist" name="generic" domain="[('generic_use','=',True)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                    	<filter name="group_by_partner_id" string="Customer" context="{'group_by':'customer'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="product.product_pricelist_view_search">
+            <field name="name">product.pricelist.search</field>
+            <field name="model">product.pricelist</field>
+            <field name="arch" type="xml">
+                <search string="Products Price Search">
+                    <field name="name" string="Products Price"/>
+                    <field name="currency_id" groups="base.group_multi_currency" />
+                    <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                    <filter string="Generic Pricelist" name="generic" domain="[('generic_use','=',True)]"/>
+                </search>
+            </field>
+        </record>
+         
+        <record id="product_pricelist_tree" model="ir.ui.view">
+            <field name="name">produc.pricelist.tree</field>
+            <field name="model">product.pricelist</field>
+            <field name="arch" type="xml">
+            	<tree string="Sale Pricelist">
+            		<field name="name"/>
+            		<field name="customer"/>
+            		<field name="company_id"/>
+            		<field name="currency_id"/>
+            		<field name="generic_use"/>
+            	</tree>
+            </field>
+        </record>
+
+        <record id="action_open_customer_pricelist" model="ir.actions.act_window">
+            <field name="name">CustomerPricelist</field>
+            <field name="res_model">product.pricelist</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="search_view_id" ref="view_customer_pricelist_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Customer Pricelist
+                </p>
+            </field>
+        </record>
+<!--CH_N041 add new action for customers -->
+	<record id="action_open_customer_pricelist_new" model="ir.actions.act_window">
+            <field name="name">CustomerPricelist</field>
+            <field name="res_model">product.pricelist</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="search_view_id" ref="product_pricelist_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Customer Pricelist
+                </p>
+            </field>
+        </record>
+       
+        <record id="view_res_partner_pricelist_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+            	<div name="button_box" position="inside">
+            		 <button type="action" icon="fa-list" class="oe_stat_button" string="Pricelist" name="%(action_open_customer_pricelist_new)d" attrs="{'invisible': [('customer', '=', False)]}" context="{'search_default_customer': [active_id],'default_customer': active_id}">
+                    </button>
+            	</div>
+            </field>
+         </record>
+<!--CH_N041 end --> 
+         <record id="property_pricelist_product_view_partner_inherite" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="product.view_partner_property_form"/>
+            <field name="arch" type="xml">
+		<xpath expr="//field[@name='property_product_pricelist']" position="replace">
+			  <field name="property_product_pricelist" groups="base.group_sale_manager" attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}"/>
+		</xpath>
+            </field>
+         </record>
+      	<!--record id="view_calendar_event_search" model="ir.ui.view">
+            <field name="name">CRM - Meetings Search</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
+            <field name="arch" type="xml">
+                <filter name="mymeetings" position="replace">
+                    <filter string="Meetings" help="Meetings" domain="['|',('event_name','ilike','[Meeting]'), ('name','ilike','[Meeting]')]" name="mymeetings" context='{"mymeetings": 1}'/>
+                    <filter string="Tasks" help="Task List" name="task_list" domain="['|',('event_name','ilike','[Task]'),('name','ilike','[Task]')]" context='{"task_list": 1}'/>
+                    <filter string="Calls Remi." help="Call Remi." name="rem_list" domain="['|','|',('event_name','ilike','[Call]'), ('event_name', 'ilike', '[Cold Calling Reminder]'),('name','ilike','[Call]'), ]" context='{"rem_list": 1}'/>
+                </filter>
+                <field name="name" position="after">
+                    <field name="event_name" string="Events" filter_domain="[('event_name','ilike',self)]"/>
+                </field>
+            </field>
+        </record--> 
+    
+         <!-- <record id="calendar.action_calendar_event_task" model="ir.actions.act_window">
+            <field name="name">Task List</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="view_id" ref="calendar.view_calendar_event_calendar"/>
+            <field name="search_view_id" ref="view_calendar_event_search"/>
+            <field name="context">{'search_default_task_list': 1}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to schedule a new meeting.
+              </p><p>
+                The calendar is shared between employees and fully integrated with
+                other applications such as the employee holidays or the business
+                opportunities.
+              </p>
+            </field>
+        </record>
+    
+      <record id="calendar.action_calendar_event_call" model="ir.actions.act_window">
+            <field name="name">Call Reminders</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="view_id" ref="calendar.view_calendar_event_calendar"/>
+            <field name="search_view_id" ref="view_calendar_event_search"/>
+            <field name="context">{'search_default_rem_list': 1}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to schedule a new meeting.
+              </p><p>
+                The calendar is shared between employees and fully integrated with
+                other applications such as the employee holidays or the business
+                opportunities.
+              </p>
+            </field>
+
+        </record>-->
+
+    </data>
+</openerp>

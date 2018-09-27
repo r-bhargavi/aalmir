@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<template id="aalmir_custom_external_layout">
+    <!-- Multicompany -->
+    <t t-if="not o and doc">
+        <t t-set="o" t-value="doc"/>
+    </t>
+    <t t-if="o and 'report_company_name' in o">
+        <t t-set="company" t-value="o.report_company_name"></t>
+    </t>
+    <t t-if="not o or not 'report_company_name' in o">
+        <t t-set="company" t-value="res_company"></t>
+    </t>
+    <t t-call="gt_sale_quotation.external_layout_header_aalmir" />
+    <t t-raw="0" />
+    <t t-call="gt_sale_quotation.external_layout_footer_aalmir" />
+</template>
+<template id="aalmir_custom_external_layout_picking">
+    <!-- Multicompany -->
+    <t t-if="not o and doc">
+        <t t-set="o" t-value="doc"/>
+    </t>
+    <t t-if="o and 'report_company_name' in o">
+        <t t-set="company" t-value="o.report_company_name"></t>
+    </t>
+    <t t-if="not o or not 'report_company_name' in o">
+        <t t-set="company" t-value="res_company"></t>
+    </t>
+    <t t-call="gt_sale_quotation.external_layout_header_aalmir_picking" />
+    <t t-raw="0" />
+    <t t-call="gt_sale_quotation.external_layout_footer_aalmir" />
+</template>
+ <template id="external_layout_header_aalmir_picking">
+    <div class="header">
+        <div class="row">
+            <div class="col-xs-5">
+                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 150px;"/>
+                <p style='text-transform: uppercase;'><t t-esc='company.rml_header1'/></p>
+                <!--<p>ال مىر للصناعات البلاستىكىة ذ.</p>-->
+            </div>
+            <div class="col-xs-3">
+            </div>
+            <div class="col-xs-4" style="text-align:right;">
+                <ul class="list-inline">
+                    <li>Page:</li>
+                    <li><b><span class="page"/></b></li>
+                    <!--li>of</li>
+                    <li><b><span class="topage"/></b></li-->
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="external_layout_header_aalmir">
+    <div class="header">
+        <div class="row">
+            <div class="col-xs-5">
+                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 150px;"/>
+                <p style='text-transform: uppercase;'><t t-esc='company.rml_header1'/></p>
+                <!--<p>ال مىر للصناعات البلاستىكىة ذ.</p>-->
+            </div>
+            <div class="col-xs-3">
+            </div>
+            <div class="col-xs-4" style="text-align:right;">
+                <ul class="list-inline">
+                    <li>Page:</li>
+                    <li><b><span class="page"/></b></li>
+                    <li>of</li>
+                    <li><b><span class="topage"/></b></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="external_layout_footer_aalmir">
+    <div class="footer">
+        <div class="row">
+            <div class="col-xs-12" style="text-align:center;font-size:small">
+                <t t-if="company.street"><t t-esc="company.street"/></t>
+                <t t-if="company.street2">, <t t-esc="company.street2"/></t>
+                <t t-if="company.city">, <t t-esc="company.city"/></t>
+                <t t-if="company.state_id">, <t t-esc="company.state_id.name"/></t>
+                <t t-if="company.country_id">, <t t-esc="company.country_id.code"/></t>
+                <t t-if="company.phone">, <span t-field="company.phone"/></t>
+                <t t-if="company.fax and company.phone">&amp;bull;</t>
+                <t t-if="company.fax">, <span t-field="company.fax"/></t>
+                <p>
+                    <t t-if="company.email"><span t-field="company.email"/></t>
+                    <t t-if="company.website"> | <span t-field="company.website"/></t>
+                </p>
+            </div>
+        </div>
+    </div>      
+</template>
+
+</data>
+</openerp>

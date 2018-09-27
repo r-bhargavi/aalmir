@@ -1,0 +1,35 @@
+.openerp .oe_form div.oe_chatter {
+  box-sizing: border-box;
+  min-width: 682px;
+  max-width: 892px;
+  margin: 0 auto;
+  color:black;
+  padding: 16px 16px 48px;
+}
+.ul_toggle_leftmenu .toggle_upperheader{
+  padding-left: 0px;
+  list-style: outside none none;
+  list-style-type: none;
+  list-style-image: none;
+  list-style-position: outside;
+  margin-bottom: 0px !important;
+  max-width: 50px;
+}
+.navbar-collapse {
+    border-top: 0 none;
+    box-shadow: none;
+    width: auto;
+}
+
+.toggle_leftmenu{
+
+  color: #FFF !important;
+  padding: 5px 8px;
+}
+
+.toggle_leftmenu .toggle_upperheader:hover{
+  color: #9D9D9D !important;
+  cursor: pointer;
+}
+
+.n_my_class[data-id="n_status_rel"]{width: auto;}

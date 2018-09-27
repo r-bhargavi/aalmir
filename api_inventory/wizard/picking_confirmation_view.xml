@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--Picking Confirmation -->
+        <record id="store_pick_confirm_wizard" model="ir.ui.view">
+            <field name="name">Store </field>
+            <field name="model">store.pick.confirm.wizard</field>
+            <field name="arch" type="xml">
+            	<form string="Pick Confirmation">
+            		<h3><b><label style="font-weight: bold;font-size: 15px;" string="Are you sure want to Transfer from " class="oe_inline"/> 
+                       <field name="loc_bin_id" readonly="1" nolabel="1" class="oe_inline"/> 
+                      <label style="font-weight: bold;font-size: 15px;" string=" To " class="oe_inline"/> 
+                       <field name="dest_bin_id" readonly="1" nolabel="1" class="oe_inline"/></b></h3>
+            		
+            		<group>
+			    	<label for="product_id"/>
+				<div >
+					<field name="product_id" readonly="1" nolabel="1" class="oe_inline"/>
+				</div>
+				<label for="master_batch"/>
+				<div >
+					<field name="master_batch" readonly="1" nolabel="1" class="oe_inline"/>
+				</div>
+				<label for="t_qty" string="Quantity"/>
+				<div >
+					<field name="t_qty" readonly="1" nolabel="1" class="oe_inline"/>
+					<field name="t_qty_unit" readonly="1" nolabel="1"  class="oe_inline"/>
+				</div>
+				<field name="picked_qty" readonly="1"/>
+			</group>
+			
+			<group attrs="{'invisible':[('qty_warning','!=',True)]}" >
+				<label style="color:red;font-weight: bold;font-size: 15px;" string="Your Master Batch has extra quantity then total allowed Dispatch Quantity. " class="oe_inline"/>
+			</group>
+			
+			<group col="4">
+				<field name="operation_type"/>
+				<field name="pick_list" invisible="1"/>
+				<field name="qty_warning" invisible="1"/>
+			</group>
+			
+			<group attrs="{'invisible':[('operation_type','!=','keep')]}">
+				<label style="color:red;font-weight: bold;font-size: 15px;" string="You are processing full  Master batch. " class="oe_inline"/>
+			</group>
+			
+			<group attrs="{'invisible':[('operation_type','=','keep')]}" >
+				<field name="new_batch_number" readonly="1"/>
+				<field name="child_ids" domain="[('master_id','=',master_batch)]" >
+					<tree create='true' edit='false'>
+						<field name="name" readonly="1"/>
+						<field name="convert_product_qty" string="Quantity" sum="total"/>
+						<field name="qty_unit_id" readonly="1"/>
+					</tree>
+				</field>
+				<!--field name="quantity" readonly="1"/-->
+			</group>
+			<group attrs="{'invisible':[('operation_type','!=','split')]}" >
+				<label style="color:green;font-weight: bold;font-size: 15px;" string="After process, The Selected quantity is Transfered to New Master-Batch. and Pick Existing Master Batch" class="oe_inline"/>
+			</group>
+			<group attrs="{'invisible':[('operation_type','!=','split_tk')]}" >
+				<label style="color:green;font-weight: bold;font-size: 15px;" string="After process, The Selected quantity is Transfered to New Master-Batch and Pick It." class="oe_inline"/>
+			</group>
+			<group col="4">
+			<button name="process_picking" string="Process" type="object" 	class="btn-primary oe_highlight" />
+			<!--button name="cancel_process" string="Cancel" type="object"/-->
+			<button string="_Cancel" class="btn-default" special="cancel" />
+			</group>
+            	</form>
+            </field>
+        </record>
+    </data>
+</openerp>
+
+              	
+

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<odoo>
+<!--CH_N043 start manufacture date view and deivery date info view view -->
+	<record id="manufacturing_date_history_view" model="ir.ui.view">
+            <field name="name">Mrp Complete Date</field>
+            <field name="model">mrp.complete.date</field>
+	    <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Manufacturing History" create="false">
+			<field name="n_prevoiusdate" readonly="1"/>
+			<field name="create_date" string="Change on" readonly="1"/>
+		        <field name="n_nextdate" readonly="1"/>
+		        <field name="n_status" readonly="1"/>
+			<field name="n_user_id" readonly="1"/>
+			<field name="n_reason" readonly="1"/>
+			<field name="n_name" readonly="1"/>
+			<!--button name="n_approved" string="Approved" type="object" /-->
+			<field name="n_line_id" invisible="1"/>
+            	</tree>
+            </field>
+        </record>
+	<!--CH_N057 add code -->
+	<record id="view_change_production_qty_wizard_inherite" model="ir.ui.view">
+            <field name="name">Change Product Qty</field>
+            <field name="model">change.production.qty</field>
+	    <field name="inherit_id" ref="mrp.view_change_production_qty_wizard"></field>
+            <field name="arch" type="xml">
+		<xpath expr="//field[@name='product_qty']" position="after">
+                        <field name="n_reason" required="1"/>
+		</xpath>
+            </field>
+        </record> <!--#CH_N057 end -->
+
+	<record id="manufacturing_date_history_form_view" model="ir.ui.view">
+            <field name="name">Mrp Complete Date</field>
+            <field name="model">mrp.complete.date</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Manufacturing Date Change Request">
+			<group col="4">
+				<field name="n_prevoiusdate" invisible="1"/>
+				<field name="n_prevoiusdate1" attrs="{'invisible':[('n_prevoiusdate1','=',False)]}" readonly="1"/>
+				<field name="n_nextdate" attrs="{'invisible':[('n_mo','=',False)]}" string="Complete Date"/>
+                                <field name='mo_schedule_date'  invisible="not context.get('mo_state')"/>
+				<field name="n_status" invisible="1"/>
+				<field name="n_mo" invisible="1"/>
+				<field name="n_po" invisible="1"/>
+				<field name="n_line_id" invisible="1"/>
+                                <field name="wo_schedule_planned"  attrs="{'invisible':[('n_mo','!=',False)]}" />
+				<field name="wo_schedule_planned_end" attrs="{'invisible':[('n_mo','!=',False)]}"
+                                 readonly='1' />
+                                <field name='time_adjust' widget="float_time"
+                                    attrs="{'invisible':[('n_mo','!=',False)]}"  />
+                               <field name='work_order_id' invisible="1"/>
+			</group>
+			<group>
+				<field name="n_reason" required="1" string='Reason'/>
+			</group>
+			<button name="save" string="Save &amp; Close"  class="btn-primary" type="object"/>
+
+            	</form>
+            </field>
+        </record>
+
+<!--#CH_N055 -->        
+	<record id="delivery_date_view" model="ir.ui.view">
+            <field name="name">Delivery Date Information</field>
+            <field name="model">mrp.delivery.date</field>
+            <field name="arch" type="xml">
+        	<tree string="Scheduled Deliveryes" create="false">
+			<field name="n_manu_date" readonly="1"/>
+			<field name="n_dispatch_date" readonly="1"/>
+			<field name="n_status" readonly="1"/>
+			<field name="create_uid" readonly="1"/>
+			<field name="n_transit_time" readonly="1"/>
+			<field name="n_schdule_date" readonly="1"/>
+			<field name="n_picking_id" string="DO No." readonly="1"/>
+			<field name="n_delivery_date" readonly="1"/>
+			<field name="n_type" readonly="1"/>
+    		</tree>
+            </field>
+        </record>
+<!--#CH_N055 -->
+	<record id="delivery_date_view_form" model="ir.ui.view">
+            <field name="name">Delivery Date Information</field>
+            <field name="model">mrp.delivery.date</field>
+            <field name="arch" type="xml">
+		<form string="Delivery Date">
+			<field name="n_scheduled_id">
+				<tree string="Delivery Date History" create="false">
+					<field name="create_date" string="Created On" readonly="1"/>
+					<field name="create_uid" string="Created By" readonly="1"/>
+					<field name="n_reason" readonly="1"/>
+					<field name="n_prevoiusdate" readonly="1"/>
+					<field name="n_nextdate" readonly="1"/>
+					<field name="n_picking_id" invisible="1"/>
+					<!--field name="n_delivery_date" readonly="1"/-->
+					<field name="n_status" readonly="1"/>
+	    			</tree>
+			</field>
+		</form>
+            </field>
+        </record>
+</odoo>

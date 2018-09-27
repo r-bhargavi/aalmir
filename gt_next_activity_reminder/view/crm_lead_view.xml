@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+    <record model="calendar.alarm" id="alarm_mail_15">
+        <field name="name">15 Minute(s) mail</field>
+        <field name="duration" eval="15" />
+        <field name="interval">minutes</field>
+        <field name="type">email</field>
+    </record>
+    
+    <record model="calendar.alarm" id="alarm_mail_90">
+        <field name="name">2 Minute(s) mail</field>
+        <field name="duration" eval="2" />
+        <field name="interval">minutes</field>
+        <field name="type">notification</field>
+    </record>
+     <record id="crm_activity_data_note" model="crm.activity">
+            <field name="name">Note</field>
+            <field name="days">1</field>
+     </record>
+    <record id="crm_activity_data_meeting" model="crm.activity">
+            <field name="name">Meeting</field>
+            <field name="days">1</field>
+     </record>
+
+     <record id="view_calendar_reminder_search_almir" model="ir.ui.view">
+        <field name="name">CRM - Activity Search</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="gt_aalmir_coldcalling.view_calendar_reminder_search_almir" />
+        <field name="arch" type="xml">
+            <field name="lead_id" position="after">
+                <field name="lead_act"/>
+            </field>
+            <filter name="coldcalling_reminder" position="after">
+                <filter string="My Activity Reminder" name="lead_act" domain="[('user_id','=',uid), ('lead_act','=', True), ('lead_id.user_id','=', uid)]" help="My Lead Activity"/>
+            </filter>
+        </field>
+    </record>
+
+      <record model="ir.ui.view" id="view_calendar_event_form_popup">
+	        <field name="name">Meetings Dialog</field>
+	        <field name="model">calendar.event</field>
+	        <field name="inherit_id" ref="gt_aalmir_coldcalling.view_calendar_event_form_popup" />
+	        <field name="arch" type="xml">
+	            <field name="email_from" position="before">
+	                    <field name="lead_act" invisible="1"/>
+	            </field>
+                    <label for="duration" position="replace">
+                        <label for="duration" attrs="{'invisible': [('allday','=',True)]}" invisible="1"/>
+                   </label>
+                   <div attrs="{'invisible': [('allday','=',True)]}" position="replace">
+                       <div attrs="{'invisible': [('allday','=',True)]}" invisible="1">
+                           <field name="duration" widget="float_time" string="Duration" on_change="onchange_duration(start_datetime, duration)" class="oe_inline" />
+                           <span> hours</span>
+                       </div>
+                   </div>
+	        </field>
+	    </record>
+            
+        <record id="view_sales_order_filter_aalmir" model="ir.ui.view">
+            <field name="name">sale.order.list.select.almir</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter" />
+            <field name="arch" type="xml">
+                <filter name="draft" position="after">
+                    <filter name="cancel" domain="[('state','=','cancel')]" />
+                </filter>
+            </field>
+        </record>
+            
+        <record id="sale_crm.sale_action_quotations" model="ir.actions.act_window">
+            <field name="name">Quotations</field>
+            <field name="res_model">sale.order</field>
+            <field name="domain">[('opportunity_id', '=', active_id)]</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'search_default_cancel': 1, 'from_lead_button': True}</field>
+        </record>
+    
+        <!--      add activity page   in inquiries-->
+        <record model="ir.ui.view" id="replace_crm_case_form_view_leads_activity">
+            <field name="name">crm.case.form.view.oppor.cust1</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads" />
+            <field name="arch" type="xml">
+                <div class="oe_button_box" name="button_box" position="inside">
+                           <button class="oe_stat_button" type="object" context="{'partner_id': partner_id}" name="action_schedule_meeting" icon="fa-calendar">
+                                <div class="o_stat_info">
+                                    <field name="meeting_count" class="o_stat_value"/>
+                                    <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&lt;', 2)]}"> Meetings</span>
+                                    <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&gt;', 1)]}"> Meeting</span>
+                                </div>
+                            </button>
+                	 <button class="oe_stat_button" type="object" context="{'partner_id': partner_id}" attrs="{'invisible':[('activ_log', '=', False)]}" name="action_activity_reminder" icon="fa-calendar">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text"> Activity Reminders</span>
+                        </div>
+                    </button>
+                </div>
+                  <xpath expr="//page[1]" position="attributes">
+                      <attribute name='invisible'>1</attribute>
+                  </xpath>
+                <xpath expr="//page[1]" position="before">
+                     <page string="Activity" name="activity">
+                         <group col="4">
+
+                            <group col="2">
+                                <field name="meeting_or_task" invisible="1" />
+                                <field name="last_activity_id" invisible="1"/>
+                                <field name="note" invisible="1"/>
+                                <field name="call" invisible="1"/>
+                                <field name="meeting" invisible="1"/>
+                                <field name="task" invisible="1"/>
+                                <field name="next_activity_id" string="Activity"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="['|',('team_id','=',False),('team_id','=',team_id), ('name','!=','Email')]"
+                                       on_change="onchange_next_activity_id(next_activity_id)"/>
+                                <field name="availability" attrs="{'invisible': [('call', '=', False)]}" widget="radio"/>
+                                <group col="1">
+	                                 <label for="title_action" string="Description" attrs="{'invisible': ['|', ('next_activity_id', '=', False),('call', '=', True)]}" />
+	                                 <label for="title_action" string="Remark" attrs="{'invisible': [('call', '=', False)]}" />
+                                </group>
+                                <group col="1">
+	                                <div class="o_row oe_inline">
+                                        <field name="title_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" />
+                                        <label for="notify_manager" attrs="{'invisible': ['|',('next_activity_id', '=', False),('note', '=', False)]}"/>
+                                        <field name="notify_manager" attrs="{'invisible': ['|',('next_activity_id', '=', False),('note', '=', False)]}"/>
+	                                </div>
+                                </group>
+								<group col="1">
+	                                 <label for="assign_partner" string="Attendee" attrs="{'invisible': [('meeting', '=', False)]}"/>
+	                                 <label for="assign_partner" string="Assign To" attrs="{'invisible': [('task', '=', False)]}"/>
+	                             </group>
+                                 <group col="1">
+	                                 <div class="o_row oe_inline">
+	                                    <field class="oe_inline" name="assign_partner" widget="many2many_tags" attrs="{'invisible': [('meeting', '=', False), ('task', '=', False)]}"/>
+	                                 </div>
+                                 </group>
+								<div class="o_row">
+                                    <div attrs="{'invisible': [('next_activity_id', '=', False)]}">
+                                        <button name="log_next_activity_done" string="Done" type="object" class="oe_highlight"/>
+                                        <button name="cancel_next_activity" string="Cancel" type="object" class="oe_highlight" style="margin-left: 20px"/>
+                                    </div>
+                                </div>
+                             </group>
+                            <group col="2">
+                                <field name="activ_log" invisible="1"/>
+
+                                <field name="set_reminder" attrs="{'invisible': [('call', '=', False)]}"/>
+                                <field name="set_schedule" attrs="{'invisible': [('meeting_or_task', '=', False)]}"/>
+                                <field name="action_visible" invisible="1"/>
+
+                                <field name="date_action" string="Date" attrs="{'invisible': [('action_visible','!=',True)], 'required' : [('action_visible','=',True)]}" placeholder="Choose a date..."/>
+                                <field name="date_due_action" invisible="1" placeholder="End Date"/>
+                                <div attrs="{'invisible': ['|', ('last_activity_id', '=', False), ('next_activity_id', '!=', False)]}">
+                                    <button name="log_next_activity_1" type="object" class="btn-link" attrs="{'invisible': [('next_activity_1','=',False)]}">
+                                        <field name="next_activity_1" readonly="1"/>
+                                    </button>
+                                    <span attrs="{'invisible': [('next_activity_2','=',False)]}">|</span>
+                                    <button name="log_next_activity_2" type="object" class="btn-link" attrs="{'invisible': [('next_activity_2','=',False)]}">
+                                        <field name="next_activity_2" readonly="1"/>
+                                    </button>
+                                    <span attrs="{'invisible': [('next_activity_3','=',False)]}">|</span>
+                                    <button name="log_next_activity_3" type="object" class="btn-link" attrs="{'invisible': [('next_activity_3','=',False)]}">
+                                        <field name="next_activity_3" readonly="1"/>
+                                    </button>
+                                </div>
+
+                              </group>
+
+                        </group>
+                            <group col="4">
+                                <group col="2">
+                                
+                             </group>
+                                <group col="2"></group>
+                            </group>
+                        </page>
+               </xpath>
+            </field>
+        </record>
+
+        <!--      add activity   in pipelines-->
+        <record model="ir.ui.view" id="replace_crm_case_form_view_oppor_cust1">
+            <field name="name">crm.case.form.view.oppor.cust1</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor" />
+            <field name="arch" type="xml">
+                <field name="priority" position="before">
+                    <field name="date_deadline" />
+                </field>
+<!--                <field name="name" position="replace">
+                    <field name="name" invisible="1"/>
+                    <field name="subject_email" />
+                </field>-->
+                 
+                <div class="oe_button_box" name="button_box" position="inside">
+                	 <button class="oe_stat_button" type="object" context="{'partner_id': partner_id}" attrs="{'invisible':[('activ_log', '=', False)]}" name="action_activity_reminder" icon="fa-calendar">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text"> Activity Reminders</span>
+                        </div>
+                    </button>
+                </div>
+                <xpath expr="//notebook" position="replace">
+                    <notebook>
+                        <page string="Activity" name="activity">
+                         <group col="4">
+
+                            <group col="2">
+                                <field name="meeting_or_task" invisible="1" />
+                                <field name="last_activity_id" invisible="1"/>
+                                <field name="note" invisible="1"/>
+                                <field name="call" invisible="1"/>
+                                <field name="meeting" invisible="1"/>
+                                <field name="task" invisible="1"/>
+                                <field name="next_activity_id" string="Activity"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="['|',('team_id','=',False),('team_id','=',team_id), ('name','!=','Email')]"
+                                       on_change="onchange_next_activity_id(next_activity_id)"/>
+                                <field name="availability" attrs="{'invisible': [('call', '=', False)]}" widget="radio"/>
+                                <group col="1">
+	                                 <label for="title_action" string="Description" attrs="{'invisible': ['|', ('next_activity_id', '=', False),('call', '=', True)]}" />
+	                                 <label for="title_action" string="Remark" attrs="{'invisible': [('call', '=', False)]}" />
+                                </group>
+                                <group col="1">
+	                                <div class="o_row oe_inline">
+                                        <field name="title_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" />
+                                        <label for="notify_manager" attrs="{'invisible': ['|',('next_activity_id', '=', False),('note', '=', False)]}"/>
+                                        <field name="notify_manager" attrs="{'invisible': ['|',('next_activity_id', '=', False),('note', '=', False)]}"/>
+	                                </div>
+                                </group>
+								<group col="1">
+	                                 <label for="assign_partner" string="Attendee" attrs="{'invisible': [('meeting', '=', False)]}"/>
+	                                 <label for="assign_partner" string="Assign To" attrs="{'invisible': [('task', '=', False)]}"/>
+	                             </group>
+                                 <group col="1">
+	                                 <div class="o_row oe_inline">
+	                                    <field class="oe_inline" name="assign_partner" widget="many2many_tags" attrs="{'invisible': [('meeting', '=', False), ('task', '=', False)]}"/>
+	                                 </div>
+                                 </group>
+								<div class="o_row">
+                                    <div attrs="{'invisible': [('next_activity_id', '=', False)]}">
+                                        <button name="log_next_activity_done" string="Done" type="object" class="oe_highlight"/>
+                                        <button name="cancel_next_activity" string="Cancel" type="object" class="oe_highlight" style="margin-left: 20px"/>
+                                    </div>
+                                </div>
+                             </group>
+                            <group col="2">
+                                <field name="activ_log" invisible="1"/>
+
+                                <field name="set_reminder" attrs="{'invisible': [('call', '=', False)]}"/>
+                                <field name="set_schedule" attrs="{'invisible': [('meeting_or_task', '=', False)]}"/>
+                                <field name="action_visible" invisible="1"/>
+
+                                <field name="date_action" string="Date" attrs="{'invisible': [('action_visible','!=',True)], 'required' : [('action_visible','=',True)]}" placeholder="Choose a date..."/>
+                                <field name="date_due_action" invisible="1" placeholder="End Date"/>
+                                <div attrs="{'invisible': ['|', ('last_activity_id', '=', False), ('next_activity_id', '!=', False)]}">
+                                    <button name="log_next_activity_1" type="object" class="btn-link" attrs="{'invisible': [('next_activity_1','=',False)]}">
+                                        <field name="next_activity_1" readonly="1"/>
+                                    </button>
+                                    <span attrs="{'invisible': [('next_activity_2','=',False)]}">|</span>
+                                    <button name="log_next_activity_2" type="object" class="btn-link" attrs="{'invisible': [('next_activity_2','=',False)]}">
+                                        <field name="next_activity_2" readonly="1"/>
+                                    </button>
+                                    <span attrs="{'invisible': [('next_activity_3','=',False)]}">|</span>
+                                    <button name="log_next_activity_3" type="object" class="btn-link" attrs="{'invisible': [('next_activity_3','=',False)]}">
+                                        <field name="next_activity_3" readonly="1"/>
+                                    </button>
+                                </div>
+
+                              </group>
+
+                        </group>
+                            <group col="4">
+                                <group col="2">
+                                
+                             </group>
+                                <group col="2"></group>
+                            </group>
+                        </page>
+
+                        <page string="Remark">
+                            <field name="description"/>
+                        </page>
+                        <page name="lead" string="Contact Information">
+                            <group>
+                                <group>
+                                    <field name="partner_name"/>
+                                    <label for="street" string="Address"/>
+                                    <div class="o_address_format">
+                                        <field name="street" placeholder="Street..." class="o_address_street"/>
+                                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                        <field name="city" placeholder="City" class="o_address_city"/>
+                                        <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" on_change="onchange_state(state_id)"/>
+                                        <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                        <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                    </div>
+                                </group>
+
+                                <group>
+                                    <label for="contact_name"/>
+                                    <div class="o_row">
+                                        <field name="contact_name"/>
+                                        <field name="title" placeholder="Title" domain="[]" options="{&quot;no_open&quot;: True}"/>
+                                    </div>
+                                    <field name="function" invisible="1"/>
+                                    <field name="mobile"/>
+                                    <field name="fax"/>
+                                    <field name="opt_out"/>
+                                </group>
+                                <group string="Marketing">
+                                    <field name="campaign_id" options="{'no_create': True,'no_open': True}" context="{'n_user':user_id}" required="1"/> <!--#CH_N037 add option to avoid create and edit -->
+                                    <field name="medium_id" invisible="1" /> <!--CH_N039 invisible the fields -->
+                                    <field name="source_id" options="{'no_create': True,'no_open': True}" required="1"/> <!--#CH_N037 add option to avoid create and edit -->
+                                </group>
+                                <group string="Misc" name="Misc">
+                                    <field name="day_open" groups="base.group_no_one"/>
+                                    <field name="day_close" groups="base.group_no_one"/>
+                                    <field name="referred"/>
+                                    <field name="type" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Merge Leads" attrs="{'invisible': [('opp_merge_ids','=',[])]}">
+                            <field name="opp_merge_ids" nolabel="1" context="{'merge_form' : True}">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="name"/>
+                                    <field name="type"/>
+                                    <field name="contact_name"/>
+                                    <field name="country_id" invisible="context.get('invisible_country', True)"/>
+                                    <field name="email_from"/>
+                                    <field name="phone"/>
+                                    <field name="stage_id"/>
+                                    <field name="user_id"/>
+                                    <field name="team_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+             </field>
+        </record>
+
+    </data>
+</openerp>

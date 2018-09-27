@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="import_coldcallig_list_form_view_aalmir" model="ir.ui.view">
+            <field name="name">import.coldcalling.list.form.view.aalmir</field>
+            <field name="model">import.coldcallng.list</field>
+            <field name="arch" type="xml">
+                <form string="Import Cold Calling List">
+                    <group>
+                        <field name="name" />
+                        <field name="file" />
+                    </group>
+                     <footer>
+                        <button string="Import" name="import_coldcalling_list" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        
+        <record id="action_import_coldcalling_list" model="ir.actions.act_window">
+            <field name="name">Cold Calling List</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">import.coldcallng.list</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="import_coldcallig_list_form_view_aalmir"/>
+            <field name="target">new</field>
+        </record>
+          <menuitem name="Import Cold Calling" id="menu_import_coldcalling" parent="base.menu_base_partner" sequence="2" /> 
+          <menuitem name="Import ColdCalling" id="menu_import_cold_calling" parent="menu_import_coldcalling" sequence="0"
+            action="action_import_coldcalling_list" />
+        
+    </data>
+</openerp>

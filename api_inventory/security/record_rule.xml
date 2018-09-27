@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+	<record model="ir.rule" id="ir_rule_store_bin">
+		<field name="name">BIN Locaiton Multi-Company Rule</field>
+		<field name="model_id" ref="model_n_warehouse_placed_product"/>
+		<field name="domain_force">['|',('company_id','=',False),('company_id','in',(user.company_ids._ids))]</field>
+		<field name="perm_read" eval="True"/>
+		<field name="perm_write" eval="True"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="True"/>
+	</record>
+	
+	<record model="ir.rule" id="ir_rule_stock_location_view">
+		<field name="name">stock Location Multicompany Rule</field>
+		<field name="model_id" ref="model_stock_location_view"/>
+		<field name="domain_force">['|',('company_id','=',False),('company_id','in',(user.company_ids._ids))]</field>
+		<field name="perm_read" eval="True"/>
+		<field name="perm_write" eval="True"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="True"/>
+	</record>
+
+	<record model="ir.rule" id="ir_rule_mrp_production_batch_rule">
+		<field name="name">mrp batch Multicompany Rule</field>
+		<field name="model_id" ref="model_mrp_order_batch_number"/>
+		<field name="domain_force">['|',('company_id','=',False),('company_id','in',(user.company_ids._ids))]</field>
+		<field name="perm_read" eval="True"/>
+		<field name="perm_write" eval="True"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="True"/>
+	</record>
+
+	<record model="ir.rule" id="ir_rule_stock_master_batch_rule">
+		<field name="name">Master batch MultiCompany Rule</field>
+		<field name="model_id" ref="model_stock_store_master_batch"/>
+		<field name="domain_force">['|',('company_id','=',False),('company_id','in',(user.company_ids._ids))]</field>
+		<field name="perm_read" eval="True"/>
+		<field name="perm_write" eval="True"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="True"/>
+	</record>
+	
+	<!--record model="ir.rule" id="ir_rule_stock_picking_order_api">
+		<field name="name">Delivery Rule</field>
+		<field name="model_id" ref="model_stock_picking"/>
+		<field name="domain_force">[('picking_type_id.warehouse_id.user_rel','=',user.id)]</field>
+		<field name="perm_read" eval="False" />	
+		<field name="perm_write" eval="False" />
+		<field name="perm_unlink" eval="True" />
+		<field name="perm_create" eval="False" />
+	</record>
+	
+	<record model="ir.rule" id="ir_rule_stock_move_api">
+		<field name="name">stock move Rule</field>
+		<field name="model_id" ref="stock.model_stock_move"/>
+		<field name="domain_force">[('picking_id.picking_type_id.warehouse_id.user_rel','=',user.id)]</field>
+		<field name="perm_read" eval="False"/>
+		<field name="perm_write" eval="False"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="False"/>
+	</record>
+	
+	<record model="ir.rule" id="ir_rule_master_batch">
+		<field name="name">Master Batch</field>
+		<field name="model_id" ref="model_stock_store_master_batch"/>
+		<field name="domain_force">['|',('store_id','!=',False),('store_id.n_warehouse.user_rel','=',user.id)]
+		</field>
+		<field name="perm_read" eval="False"/>
+		<field name="perm_write" eval="False"/>
+		<field name="perm_unlink" eval="True"/>
+		<field name="perm_create" eval="False"/>
+	</record-->
+	
+	<record model="ir.rule" id="injection_product_batches_rule_users">
+             <field name="name">Injectoin Product Batches Rule</field>
+             <field name="model_id" ref="model_mrp_order_batch_number"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','film')]</field>
+	</record>
+	<record model="ir.rule" id="film_product_batches_rule_users">
+             <field name="name">Film Product Batches Rule</field>
+             <field name="model_id" ref="model_mrp_order_batch_number"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','injection')]</field>
+	</record>
+	
+    </data>
+</openerp>
+

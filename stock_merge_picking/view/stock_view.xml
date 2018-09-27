@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="view_picking_form" model="ir.ui.view">
+			<field name="name">stock.picking.form</field>
+			<field name="model">stock.picking</field>
+			<field name="type">form</field>
+			<field name="inherit_id" ref="stock.view_picking_form" />
+			<field name="arch" type="xml">
+			<field name="min_date" position="attributes">
+				<attribute name="attrs">{'readonly':['|',('state','in',('done','delivered')),('picking_type_code','=','outgoing')]}</attribute>
+			</field>
+			
+                     	<button name="force_assign" position="replace">
+                 		 <button name="force_assign" string="Force Availability" type="object" groups="gt_order_mgnt.group_sale_support,gt_order_mgnt.group_sale_reception" attrs="{'invisible':['|','|',('state','not in',('confirmed','waiting','partially_available')),('picking_status','!=','draft'),('picking_type_code','!=','outgoing')]}" />
+                 		 
+                 		 <button name="force_assign" string="Force Availability" type="object" groups="stock.group_stock_manager" attrs="{'invisible':['|','|',('state','not in',('confirmed','waiting','partially_available')),('picking_status','!=','draft'),('picking_type_code','!=','internal')]}" />
+			</button>
+			
+			<button name="do_unreserve" position="replace">
+                 		<button name="do_unreserve" string="Unreserve" groups="gt_order_mgnt.group_sale_support" type="object" attrs="{'invisible': ['|','|',('picking_status','!=','draft'),('quant_reserved_exist', '=', False),('picking_type_code','!=','outgoing')]}"/>
+                 		<button name="do_unreserve" string="Unreserve" groups="stock.group_stock_manager" type="object" attrs="{'invisible': ['|','|',('picking_status','not in',('draft','pick_list')),('quant_reserved_exist', '=', False),('picking_type_code','!=','internal')]}"/>
+			</button>
+			
+			<button name="action_assign" position="replace">
+                 		<button name="action_assign" attrs="{'invisible':['|','|',('state','not in',('confirmed','waiting','partially_available')),('picking_status','!=','draft'),('picking_type_code','!=','outgoing')]}" string="Reserve" type="object" class="oe_highlight" groups="gt_order_mgnt.group_sale_support,gt_order_mgnt.group_sale_reception"/>
+                 		<button name="action_assign" attrs="{'invisible':['|','|',('state','not in',('confirmed','waiting','partially_available')),('picking_status','!=','draft'),('picking_type_code','!=','internal')]}" string="Reserve" type="object" class="oe_highlight" groups="stock.group_stock_manager"/>
+			</button>
+			
+			<button name="action_cancel" position="replace">
+				<button name="action_second_validation" attrs="{'invisible':['|',('state','!=','done'),('picking_type_code','!=','outgoing')]}" string="Delivered" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+
+  				<button name="schedule_date_change" string="Change Delivery Date"  type="object" 
+					attrs="{'invisible':['|','|',('picking_type_code','!=','outgoing'),
+						('state','in',('delivered','done','cancel'))]}" 
+  					groups="gt_order_mgnt.group_sale_support" class="oe_highlight"/>
+				<button name="dispatch_date_change" type="object" string="Change Dispatch Date"
+					 attrs="{'invisible':['|','|',('picking_type_code','!=','outgoing'),
+					 	('picking_status','=','draft'),('state','not in',('assigned','partially_available'))]}"
+					 groups="stock.group_stock_manager" class="oe_highlight"/>
+                               <button name="action_cancel" states="confirmed,draft,waiting" type="object" string="Cancel" class="oe_highlight"/>    
+			</button>
+			
+			<field name="state" position="replace">
+			      <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,partially_available,done" statusbar_colors='{"shipping_except":"red","invoice_except":"red","waiting_date":"blue"}'/>
+			</field>
+                         
+			<field name="pack_operation_product_ids" position="attributes">
+				<attribute name="attrs">{'readonly':['|',('picking_status','!=','draft'),('state','in',('done','dispatch','transit','delivered'))]}</attribute>
+			</field>
+		     </field>
+		</record>
+		
+		<record id="schedule_delivery_date_change_form_view" model="ir.ui.view">
+		    <field name="name">Schedule Delivery Date</field>
+		    <field name="model">schedule.delivery.date.history</field>
+		    <field name="type">form</field>
+		    <field name="arch" type="xml">
+		        <form string="Change Schedule Date">
+				<group col="4">
+					<field name="n_prevoiusdate" invisible="1"/>
+					<field name="n_prevoiusdate1" readonly="1" attrs="{'invisible':[('n_prevoiusdate1','=',False)]}"/>
+					<field name="n_nextdate" required="1"/>
+					<field name="n_status" invisible="1"/>
+					<field name="n_picking_id" invisible="1"/>
+					<field name="n_line_id" invisible="1"/>
+				</group>
+				<group>
+					<field name="n_reason" required="1" />
+				</group>
+				<button name="save" string="Save &amp; Close" type="object" class="oe_highlight"/>
+
+		    	</form>
+		    </field>
+		</record>
+
+		<record id="dispatch_date_change_form_view" model="ir.ui.view">
+		    <field name="name">Schedule Delivery Date</field>
+		    <field name="model">schedule.delivery.date.history</field>
+		    <field name="type">form</field>
+		    <field name="arch" type="xml">
+		        <form string="Change Schedule Dispatch Date">
+				<group col="4">
+					<field name="n_prevoiusdate" invisible="1"/>
+					<field name="n_prevoiusdate1" readonly="1" attrs="{'invisible':[('n_prevoiusdate1','=',False)]}"/>
+					<field name="n_nextdate" required="1" string="New Dispatch Date" />
+					<field name="n_status" invisible="1"/>
+					<field name="n_picking_id" invisible="1"/>
+					<field name="n_line_id" invisible="1"/>
+				</group>
+				<group>
+					<field name="n_reason" required="1" />
+				</group>
+				<button name="save" string="Save &amp; Close" type="object" class="oe_highlight"/>
+
+		    	</form>
+		    </field>
+		</record>
+	
+	<!--record id="view_picking_internal_search_inherit" model="ir.ui.view">
+            <field name="name">stock.picking.internal.search</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_internal_search"></field>
+            <field name="arch" type="xml">
+                    <filter name="available" position="after">
+                    	<filter name="picking_status" string="Ready to Dispatch" domain="[('picking_status','!=','draft'),('state','=','assigned')]" help="Ready To dispatch"/>
+                    </filter>
+        	</field>
+	</record> 
+	
+	<record id="stock.action_picking_tree_ready" model="ir.actions.act_window">
+            <field name="name">To Do</field>
+            <field name="res_model">stock.picking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="domain"></field>
+            <field name="context">{
+                    'search_default_picking_type_id': [active_id],
+                    'default_picking_type_id': active_id,
+                    'contact_display': 'partner_address',
+                    'search_default_picking_status': 1,
+                    'search_default_available': 1,
+            }
+            </field>
+            <field name="search_view_id" ref="stock.view_picking_internal_search"/>
+             <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create a new transfer.
+              </p><p>
+                You can either do it immediatly or mark it as Todo for future processing. Use your scanner to validate the transferred quantity quicker.
+              </p>
+            </field>
+         </record-->
+	</data>
+</openerp>
+
+
+
+

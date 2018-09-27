@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<odoo>
+   <record id="sale_action_trial_new" model="ir.actions.act_window">
+            <field name="name">Trial Order</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">form,tree,graph</field>
+            <field name="domain">[('opportunity_id', '=', active_id)]</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'default_is_trail':True}</field>
+        </record>
+    <record model="ir.ui.view" id="crm_case_form_view_oppor_ext_sale">
+            <field name="name">crm.lead.form</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+               <field name="stage_id"  position="before">
+                <field name="sale_id" invisible="1"/>
+                <button  string="Create Trial Request" name="%(sale_action_trial_new)d" type="action" class="oe_highlight"
+                           attrs="{'invisible':[('sale_id','=',False),('stage_name','!=','Awaiting')]}" context="{'search_default_partner_id': partner_id,  
+                                      'default_partner_id': partner_id, 'default_sale_trail_id':sale_id,
+                                      'default_team_id': team_id}"/>
+              </field> 
+            </field>
+   </record>
+  
+</odoo>

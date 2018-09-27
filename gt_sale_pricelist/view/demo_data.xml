@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="decimal.precision" id="pricelist">
+            <field name="name">film_pricelist</field>
+            <field name="digits">5</field>
+        </record>
+
+        <!--Product.template-->
+         <record id="aalmir_product_template_1" model="product.template">
+            <field name="name">Film tube on roll</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_template_2" model="product.template">
+            <field name="name">Flat sheet</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_template_3" model="product.template">
+            <field name="name">flat sheet on roll</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_template_4" model="product.template">
+            <field name="name">Bags</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_template_5" model="product.template">
+            <field name="name">Stretch Film</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="sale_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <!--Product .Product-->
+        <record id="aalmir_product_1" model="product.product">
+            <field name="name">ldpe</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_2" model="product.product">
+            <field name="name">ldpe + UV</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_3" model="product.product">
+            <field name="name">hdpe</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_4" model="product.product">
+            <field name="name">Black recyle</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_5" model="product.product">
+            <field name="name">HD + CC 50%</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_6" model="product.product">
+            <field name="name">BOPP</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_7" model="product.product">
+            <field name="name">Dull recyle</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_8" model="product.product">
+            <field name="name">Shrink PE</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_9" model="product.product">
+            <field name="name">oven film</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <record id="aalmir_product_10" model="product.product">
+            <field name="name">stretch film hand</field>
+            <field name="categ_id" ref="product.product_category_5"/>
+            <field name="purchase_ok">True</field>
+            <field name="list_price">0.0</field>
+            <field name="standard_price">0.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+        </record>
+        <!--Attribute For Bag Type-->
+        <record id="aalmir_attribute_1" model="product.attribute">
+            <field name="name">Select type</field>
+        </record>
+        <record id="aalmir_attribute_2" model="product.attribute">
+            <field name="name">Loop Handle</field>
+        </record>
+        <record id="aalmir_attribute_3" model="product.attribute">
+            <field name="name">Punch handle</field>
+        </record>
+        <record id="aalmir_attribute_4" model="product.attribute">
+            <field name="name">Side sealing</field>
+        </record>
+        <record id="aalmir_attribute_5" model="product.attribute">
+            <field name="name">Patch handle</field>
+        </record>
+        <record id="aalmir_attribute_6" model="product.attribute">
+            <field name="name">Draw string</field>
+        </record>
+        <record id="aalmir_attribute_7" model="product.attribute">
+            <field name="name">Courrier permanent</field>
+        </record>
+        <record id="aalmir_attribute_8" model="product.attribute">
+            <field name="name">Courrier resealable</field>
+        </record>
+        <record id="aalmir_attribute_9" model="product.attribute">
+            <field name="name">Self adhesive permanent</field>
+        </record>
+        <record id="aalmir_attribute_10" model="product.attribute">
+            <field name="name">Self adhesive resealable</field>
+        </record>
+        <record id="aalmir_attribute_11" model="product.attribute">
+            <field name="name">Bottom Seal</field>
+        </record>
+        <record id="aalmir_attribute_12" model="product.attribute">
+            <field name="name">Garbage bag</field>
+        </record>
+        <record id="aalmir_attribute_13" model="product.attribute">
+            <field name="name">t-Shirt</field>
+        </record>
+        <record id="aalmir_attribute_14" model="product.attribute">
+            <field name="name">Oven Bag</field>
+        </record>
+
+        <!--Aalmir Film Coversation-->
+        <record id="aalmir_film_conversion_1" model="product.type">
+            <field name="name" ref="aalmir_product_template_1"/>
+            <field name="price_per_kg">0.70</field>
+            <field name="calculation_for_print_area">2</field>
+        </record>
+         <record id="aalmir_film_conversion_2" model="product.type">
+            <field name="name" ref="aalmir_product_template_2"/>
+            <field name="price_per_kg">0.70</field>
+            <field name="calculation_for_print_area">1.0</field>
+        </record>
+         <record id="aalmir_film_conversion_3" model="product.type">
+            <field name="name" ref="aalmir_product_template_3"/>
+            <field name="price_per_kg">0.70</field>
+            <field name="calculation_for_print_area">1.0</field>
+        </record>
+         <record id="aalmir_film_conversion_4" model="product.type">
+            <field name="name" ref="aalmir_product_template_4"/>
+            <field name="price_per_kg">0.70</field>
+            <field name="calculation_for_print_area">2</field>
+        </record>
+         <record id="aalmir_film_conversion_5" model="product.type">
+            <field name="name" ref="aalmir_product_template_5"/>
+            <field name="price_per_kg">2</field>
+            <field name="calculation_for_print_area">1</field>
+        </record>
+
+        <!--Aalmir Material Details-->
+        <record id="aalmir_material_1" model="material.details">
+            <field name="name" ref="aalmir_product_1"/>
+            <field name="kg_price">4.78</field>
+            <field name="density">0.93</field>
+        </record>
+        <record id="aalmir_material_2" model="material.details">
+            <field name="name" ref="aalmir_product_2"/>
+            <field name="kg_price">5.78</field>
+            <field name="density">0.73</field>
+        </record>
+        <record id="aalmir_material_3" model="material.details">
+            <field name="name" ref="aalmir_product_3"/>
+            <field name="kg_price">4.60</field>
+            <field name="density">0.96</field>
+        </record>
+        <record id="aalmir_material_4" model="material.details">
+            <field name="name" ref="aalmir_product_4"/>
+            <field name="kg_price">2.60</field>
+            <field name="density">0.96</field>
+        </record>
+        <record id="aalmir_material_5" model="material.details">
+            <field name="name" ref="aalmir_product_5"/>
+            <field name="kg_price">3.57</field>
+            <field name="density">1.88</field>
+        </record>
+        <record id="aalmir_material_6" model="material.details">
+            <field name="name" ref="aalmir_product_6"/>
+            <field name="kg_price">9</field>
+            <field name="density">0.96</field>
+        </record>
+        <record id="aalmir_material_7" model="material.details">
+            <field name="name" ref="aalmir_product_7"/>
+            <field name="kg_price">3.30</field>
+            <field name="density">0.96</field>
+        </record>
+        <record id="aalmir_material_8" model="material.details">
+            <field name="name" ref="aalmir_product_8"/>
+            <field name="kg_price">5.36</field>
+            <field name="density">0.96</field>
+        </record>
+        <record id="aalmir_material_9" model="material.details">
+            <field name="name" ref="aalmir_product_9"/>
+            <field name="kg_price">9</field>
+            <field name="density">1.44</field>
+        </record>
+        <record id="aalmir_material_10" model="material.details">
+            <field name="name" ref="aalmir_product_10"/>
+            <field name="kg_price">5.36</field>
+            <field name="density">0.96</field>
+        </record>
+
+        <!--Bag Type-->
+        <record id="aalmir_bag_type_1" model="bag.type">
+            <field name="name" ref="aalmir_attribute_1"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_2" model="bag.type">
+            <field name="name" ref="aalmir_attribute_2"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">6</field>
+        </record>
+        <record id="aalmir_bag_type_3" model="bag.type">
+            <field name="name" ref="aalmir_attribute_3"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_4" model="bag.type">
+            <field name="name" ref="aalmir_attribute_4"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_5" model="bag.type">
+            <field name="name" ref="aalmir_attribute_5"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">8</field>
+        </record>
+        <record id="aalmir_bag_type_6" model="bag.type">
+            <field name="name" ref="aalmir_attribute_6"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">1.953</field>
+        </record>
+        <record id="aalmir_bag_type_7" model="bag.type">
+            <field name="name" ref="aalmir_attribute_7"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">3.3852</field>
+        </record>
+        <record id="aalmir_bag_type_8" model="bag.type">
+            <field name="name" ref="aalmir_attribute_8"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">3.3852</field>
+        </record>
+        <record id="aalmir_bag_type_9" model="bag.type">
+            <field name="name" ref="aalmir_attribute_9"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_10" model="bag.type">
+            <field name="name" ref="aalmir_attribute_10"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_11" model="bag.type">
+            <field name="name" ref="aalmir_attribute_11"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_12" model="bag.type">
+            <field name="name" ref="aalmir_attribute_12"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+        <record id="aalmir_bag_type_13" model="bag.type">
+            <field name="name" ref="aalmir_attribute_13"/>
+            <field name="conversion_charge">0</field>
+            <field name="extra_weight">0</field>
+        </record>
+
+        <!--Microns -->
+        <record id="aalmir_microns_type_1" model="microns.details">
+            <field name="name" ref="aalmir_attribute_2"/>
+            <field name="microns1">0.015</field>
+            <field name="microns2">0.015</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_2" model="microns.details">
+            <field name="name" ref="aalmir_attribute_3"/>
+            <field name="microns1">0.015</field>
+            <field name="microns2">0.015</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_3" model="microns.details">
+            <field name="name" ref="aalmir_attribute_4"/>
+            <field name="microns1">0.015</field>
+            <field name="microns2">0.015</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_4" model="microns.details">
+            <field name="name" ref="aalmir_attribute_5"/>
+            <field name="microns1">0.015</field>
+            <field name="microns2">0.015</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_5" model="microns.details">
+            <field name="name" ref="aalmir_attribute_6"/>
+            <field name="microns1">0.015</field>
+            <field name="microns2">0.015</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_6" model="microns.details">
+            <field name="name" ref="aalmir_attribute_7"/>
+            <field name="microns1">0.036</field>
+            <field name="microns2">0.036</field>
+            <field name="microns3">0.036</field>
+        </record>
+         <record id="aalmir_microns_type_7" model="microns.details">
+            <field name="name" ref="aalmir_attribute_8"/>
+            <field name="microns1">0.0255</field>
+            <field name="microns2">0.0255</field>
+            <field name="microns3">0.0255</field>
+        </record>
+         <record id="aalmir_microns_type_8" model="microns.details">
+            <field name="name" ref="aalmir_attribute_9"/>
+            <field name="microns1">0.036</field>
+            <field name="microns2">0.036</field>
+            <field name="microns3">0.036</field>
+        </record>
+         <record id="aalmir_microns_type_9" model="microns.details">
+            <field name="name" ref="aalmir_attribute_10"/>
+            <field name="microns1">0.0255</field>
+            <field name="microns2">0.0255</field>
+            <field name="microns3">0.0255</field>
+        </record>
+         <record id="aalmir_microns_type_10" model="microns.details">
+            <field name="name" ref="aalmir_attribute_11"/>
+            <field name="microns1">0.025</field>
+            <field name="microns2">0.018</field>
+            <field name="microns3">0.015</field>
+        </record>
+         <record id="aalmir_microns_type_11" model="microns.details">
+            <field name="name" ref="aalmir_attribute_12"/>
+            <field name="microns1">0.025</field>
+            <field name="microns2">0.018</field>
+            <field name="microns3">0.015</field>
+        </record>
+        <record id="aalmir_microns_type_12" model="microns.details">
+            <field name="name" ref="aalmir_attribute_13"/>
+            <field name="microns1">0.025</field>
+            <field name="microns2">0.018</field>
+            <field name="microns3">0.015</field>
+        </record>
+
+        <!-- Printing Type -->
+        <record id="aalmir_print_type_1" model="printing.type">
+            <field name="name">no printing</field>
+            <field name="cost">0</field>
+            <field name="plates">0</field>
+        </record>
+        <record id="aalmir_print_type_2" model="printing.type">
+            <field name="name">block: 1 colour</field>
+            <field name="cost">0.35</field>
+            <field name="plates">1</field>
+        </record>
+        <record id="aalmir_print_type_3" model="printing.type">
+            <field name="name">block: 2 color</field>
+            <field name="cost">0.4</field>
+            <field name="plates">1</field>
+        </record>
+        <record id="aalmir_print_type_4" model="printing.type">
+            <field name="name">block: 3 color</field>
+            <field name="cost">0.5</field>
+            <field name="plates">1</field>
+        </record>
+        <record id="aalmir_print_type_5" model="printing.type">
+            <field name="name">block: 4 color</field>
+            <field name="cost">0.6</field>
+            <field name="plates">1</field>
+        </record>
+        <record id="aalmir_print_type_6" model="printing.type">
+            <field name="name">Full print</field>
+            <field name="cost">1</field>
+            <field name="plates">1.2</field>
+        </record>
+        <record id="aalmir_print_type_7" model="printing.type">
+            <field name="name">Graphic full</field>
+            <field name="cost">1.1</field>
+            <field name="plates">5</field>
+        </record>
+        <record id="aalmir_print_type_8" model="printing.type">
+            <field name="name">Graphic partial</field>
+            <field name="cost">1.1</field>
+            <field name="plates">5</field>
+        </record>
+
+        <!-- Delivery Location-->
+        <record id="aalmir_delivery_location_1" model="delivery.location">
+            <field name="name">RAK</field>
+            <field name="km1">0.2666666667</field>
+            <field name="km2">0.2</field>
+            <field name="km3">0.12</field>
+        </record>
+        <record id="aalmir_delivery_location_2" model="delivery.location">
+            <field name="name">Ajman</field>
+            <field name="km1">0.1666666667</field>
+            <field name="km2">0.1428571429</field>
+            <field name="km3">0.1</field>
+        </record>
+        <record id="aalmir_delivery_location_3" model="delivery.location">
+            <field name="name">UAQ</field>
+            <field name="km1">0.2666666667</field>
+            <field name="km2">0.2</field>
+            <field name="km3">0.12</field>
+        </record>
+        <record id="aalmir_delivery_location_4" model="delivery.location">
+            <field name="name">Abudhabi</field>
+            <field name="km1">0.2666666667</field>
+            <field name="km2">0.2</field>
+            <field name="km3">0.1</field>
+        </record>
+        <record id="aalmir_delivery_location_5" model="delivery.location">
+            <field name="name">Fujairah</field>
+            <field name="km1">0.2666666667</field>
+            <field name="km2">0.2</field>
+            <field name="km3">0.12</field>
+        </record>
+        <record id="aalmir_delivery_location_6" model="delivery.location">
+            <field name="name">Dubai</field>
+            <field name="km1">0.1666666667</field>
+            <field name="km2">0.1428571429</field>
+            <field name="km3">0.1</field>
+        </record>
+        <record id="aalmir_delivery_location_7" model="delivery.location">
+            <field name="name">Sharjah</field>
+            <field name="km1">0.1666666667</field>
+            <field name="km2">0.1428571429</field>
+            <field name="km3">0.1</field>
+        </record>
+
+        <!--Packing Type-->
+        <record id="aalmir_packing_details_1" model="packing.details">
+            <field name="name">Cartons+Pallets</field>
+            <field name="cost">0.42</field>
+        </record>
+        <record id="aalmir_packing_details_2" model="packing.details">
+            <field name="name">Cartons</field>
+            <field name="cost">0.35</field>
+        </record>
+        <record id="aalmir_packing_details_3" model="packing.details">
+            <field name="name">Bundles/rolls</field>
+            <field name="cost">0</field>
+        </record>
+
+        <!--Ink Type-->
+        <record id="aalmir_ink_type_1" model="ink.type">
+            <field name="name">solvent ink</field>
+            <field name="ink_price_per_kg">0.01</field>
+            <field name="ink_price">price per cm2</field>
+            <field name="ink_printing_plates">0.45</field>
+        </record>
+
+        <!--Discount Eligiblity-->
+        <record id="aalmir_discount_1" model="discount.type">
+            <field name="qty_from">500-1000</field>
+            <field name="discount">5</field>
+        </record>
+        <record id="aalmir_discount_2" model="discount.type">
+            <field name="qty_from">1000-4999</field>
+            <field name="discount">10</field>
+        </record>
+         <record id="aalmir_discount_3" model="discount.type">
+            <field name="qty_from">5000+</field>
+            <field name="discount">20</field>
+        </record>
+
+        <!--Stretch Film Configuration-->
+        <record id="aalmir_stratch_calculator_1" model="stratch.calculator">
+            <field name="thickness">20-22</field>
+            <field name="weight_each_roll_in_kg">1.5</field>
+            <field name="pcs_ctn">6</field>
+            <field name="kg_ctn">9</field>
+            <field name="price_ctn">60</field>
+        </record>
+        <record id="aalmir_stratch_calculator_2" model="stratch.calculator">
+            <field name="thickness">20-22</field>
+            <field name="weight_each_roll_in_kg">1.8</field>
+            <field name="pcs_ctn">6</field>
+            <field name="kg_ctn">10.8</field>
+            <field name="price_ctn">72</field>
+        </record>
+
+		
+
+    </data>
+</openerp>

@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+	<!--#CH_N078 START Template for complete MRP-->
+	<record id="email_template_MRP_complete" model="mail.template">
+            <field name="name">Quantity Manufacture/Purchased</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP MRP Alert :Quantity Manufacture/Purchased</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+         <record id="email_template_customer_credit_sale" model="mail.template">
+            <field name="name">Request for customer Credit Unblock</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Customer Credit Alert :Request for customer Credit Unblock</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+         <record id="email_template_customer_credit_sale_approve" model="mail.template">
+            <field name="name">Request for customer Credit Unblock</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Customer Credit Alert :Request for customer Credit Unblock</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+	<!--#CH_N078 <<< end -->
+	<!--CH_N045 add template to send mail if production request is sent more than one for same request -->
+	<record id="email_template_producton_req_again" model="mail.template">
+            <field name="name">Production Requested</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP MRP Alert :Production Requested again</field>
+            <field name="model_id" ref="gt_order_mgnt.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+	<!--CH_N045 -->
+
+       <!-- Start Email Template for Send Mail to Maitenance Department -->
+             <record id="email_template_maintenance_department" model="mail.template">
+		    <field name="name">Request For Machine Maitenance</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Maitenance Alert :Request For Machine Maitenance</field>
+		    <field name="model_id" ref="gt_order_mgnt.model_machine_maintenance"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+         <!-- End Email Template For Send Mail to Maitenance Department -->
+        
+
+
+        <!-- Start Email Template for partial Completed Production -->
+             <record id="email_template_partial_production" model="mail.template">
+		    <field name="name">Partial Production Complete</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">Partial Production Complete</field>
+		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+         <!-- End Email Template For partial Completed Production -->
+         
+        <!--start template for hold Mo -->
+            <record id="email_template_hold_mo" model="mail.template">
+		    <field name="name">Hold Manufacturing Order.</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP MRP Alert :Hold Manufacturing Order</field>
+		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+          <record id="email_template_active_mo" model="mail.template">
+		    <field name="name">Active Hold Manufacturing Order.</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP MRP Alert :Active hold Manufacturing Order</field>
+		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+         <!--End Template for Hold Mo-->
+  
+        <record id="template_change_date_mrp" model="mail.template">
+            <field name="name">Schedule Date Change MRP</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP MRP Alert :Schedule Date Change</field>
+            <!--<field name="email_to">${object.team_id.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>-->
+            <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+	<record id="template_change_date_purchase" model="mail.template">
+            <field name="name">Schedule Date Change Purchase</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Purchase Alert :Schedule Date Change</field>
+            <!--<field name="email_to">${object.team_id.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>-->
+            <field name="model_id" ref="gt_order_mgnt.model_purchase_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+
+        <record id="email_template_payment_term_req" model="mail.template">
+            <field name="name">Payment Term Requested</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Requested for ${object.name}</field>
+            <field name="email_to">${object.team_id.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+
+        <record id="email_template_payment_term_req_po" model="mail.template">
+            <field name="name">Payment Term Requested</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Requested for ${object.name}</field>
+            <!--field name="email_to">${object.team_id.user_id.email|safe}</field-->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+
+        <record id="email_template_payment_term_accepted" model="mail.template">
+            <field name="name">Payment Term Accepted</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted for ${object.name}</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+         <record id="email_template_payment_term_accepted_po" model="mail.template">
+            <field name="name">Payment Term Accepted</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted for ${object.name}</field>
+            <!--field name="email_to">${object.user_id.email|safe}</field-->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        <record id="email_template_payment_term_rejected" model="mail.template">
+            <field name="name">Payment Term Rejected</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Rejected for ${object.name}</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        <record id="email_template_payment_term_rejected_po" model="mail.template">
+            <field name="name">Payment Term Rejected</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Rejected for ${object.name}</field>
+            <!--field name="email_to">${object.user_id.email|safe}</field-->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        <record id="email_template_payment_term_rejected" model="mail.template">
+            <field name="name">Payment Term Rejected</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted for ${object.name}</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        
+        <record id="email_template_for_force_payment" model="mail.template">
+            <field name="name">Force Payment</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Advance Payment Alert :${object.partner_id.name},${object.name} has been Confirmed.</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+               <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+	            <p style="text-align:center"><b><u>${object.partner_id.name},${object.name} has been Confirmed</u></b></p>
+
+	    </div>
+            ]]>
+            </field>
+        </record>
+        
+        <record id="email_template_for_due_payment" model="mail.template">
+            <field name="name">Due Payment</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Payment Alert :Due Payment</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="account.model_account_invoice"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        <!-- Delivery Order Date Changed -->
+        <record id="email_template_for_delivery_date_changed" model="mail.template">
+		    <field name="name">Delivery Date Changed</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Delivery Alert :${(user.name)} Changed ${object.state in ('transit') and 'Dispatch' or 'Delivery'} Date for ${object.partner_id.name}, ${object.sale_id.name}. 
+                   </field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="stock.model_stock_picking"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+        </record>
+
+        <!-- End Delivery order Date Changed-->
+
+        <!-- start Purchased Request approved  -->
+           
+        <record id="email_template_for_purchase_approve_pending1" model="mail.template">
+		    <field name="name">Purchase Order Approval Required </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP PO Alert :${object.state in ('draft', 'sent') and 'Purchase Order Approval Required' or 'Purchase Order Approval Reminder'} </field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="purchase.model_purchase_order"/>
+                    <field name="report_template" ref="purchase.report_purchase_quotation"/>
+                    <field name="report_name">API_${object.partner_id.name}_${(object.name or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+        </record>
+		
+        <record id="email_template_for_purchase_requested_user_po11" model="mail.template">
+		    <field name="name">PO confirmed </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Purchase Alert :PO confirmed</field>
+		    <field name="email_to">${object.employee_id.work_email|safe}</field>
+                    <!--field name="partner_to">${object.partner_id.email|safe}</field-->
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="purchase.model_purchase_order"/>
+                    <field name="report_template" ref="purchase.action_report_purchase_order"/>
+                    <field name="report_name">API_${object.partner_id.name}_${(object.name or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		   <field name="body_html"><![CDATA[
+				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+				    <p>Hello ${object.employee_id.name},</p>
+
+				    <p>Here is a ${object.state in ('draft', 'sent') and 'request for quotation' or 'purchase order confirmation'}: </p>
+
+				    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+				       &nbsp;&nbsp;<strong>REFERENCES</strong><br />
+				       &nbsp;&nbsp;PO number: <strong>${object.name}</strong><br />
+				       &nbsp;&nbsp;PO date: ${object.date_order}<br />
+				       % if object.origin:
+				       &nbsp;&nbsp;PO reference: ${object.origin}<br />
+				       % endif
+				       % if object.partner_ref:
+				       &nbsp;&nbsp;Your reference: ${object.partner_ref}<br />
+				       % endif
+				       % if object.create_uid:
+				       &nbsp;&nbsp;Sender By: ${user.name}
+				    
+				       % endif
+				    </p>
+
+				</div>
+            ]]></field>
+        </record>
+  
+        <record id="email_template_for_purchase_approved" model="mail.template">
+		    <field name="name">Purchase Order Approved/Rejected</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Purchase Alert :Purchase Order Approved/Rejected</field>
+		    <!--field name="email_to">${object.user_id.email|safe}</field-->
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="purchase.model_purchase_order"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+
+        <!-- End Purchased Request approved-->
+        <!-- start Vendor Bill  Request approvd  -->
+        <record id="email_template_for_invoice_vendor123" model="mail.template">
+		    <field name="name">Vendor Payment Detail</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Bill Payment Alert:Payment release approved by you for ${object.partner_id.name}, ${object.origin}.</field>
+		    <field name="email_to">${object.user_id.email|safe}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		     <field name="model_id" ref="account.model_account_invoice"/>
+                    <!--field name="report_template" ref="gt_order_mgnt.report_invoice_aalmir"/-->
+                    <field name="report_name">API-Bill_${object.partner_id.name}_${(object.number or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html"><![CDATA[
+				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+				    <p>Dear Amir,</p>
+
+				    <p>This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. </p>
+                                    <p>Note: No action is required by your side unless you want to stop the release of bill payment, once payment is done, you will be informed. </p>
+
+				</div>
+                    ]]></field>
+        </record>
+        <record id="email_template_for_milestone_payment" model="mail.template">
+		    <field name="name">Milestone Payment Done Request </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Milestone Payment Alert :Milestone Payment Done Request</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="purchase.model_purchase_order"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+        </record>
+        <!-- End Purchased Request approved-->
+      <!-- start Advance Payment paid -->
+        <record id="email_template_for_advance_payment_remainder1" model="mail.template">
+		    <field name="name">Sale Order Advance Payment Pending </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Advance Payment Alert :Sale Order Advance Payment Pending ${object.name}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="sale.model_sale_order"/>
+                    <field name="report_template" ref="sale.report_sale_order"/>
+                    <field name="report_name">Pro-Forma Invoice_${object.partner_id.name}_${(object.name or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+                    <field name='user_signature' eval="True"/>
+		   <field name="body_html"><![CDATA[
+			<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                           <p style="text-align:center"><u>Pro-Forma Invoice payment pending</u></p>
+			    <p>Dear ${ object.attend_id.name},${object.partner_id.name}</p>
+                            <p>Please find attached Due Pro-Forma Invoice of your order.</p>
+                            <p>The details of order as below:</p>
+			    <p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+			       &nbsp;&nbsp;SO Number: <strong>${object.name}</strong><br />
+                               &nbsp;&nbsp;Sale Order Amount: ${object.amount_total}  ${object.n_quotation_currency_id.name}<br />
+			       &nbsp;&nbsp;Advance Due Amount: ${object.payment_id.sale_amount} ${object.payment_id.currency_id.name}<br />
+			    </p>
+
+			</div>
+            ]]></field>
+        </record>
+        <record id="email_template_for_advance_payment_paid" model="mail.template">
+		    <field name="name">Sale Order Advance Payment Received </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Payment Alert: ${object.payment_id.amount}${object.payment_id.currency_id.symbol} Advance Payment Received For ${object.name}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="sale.model_sale_order"/>
+                    <!--field name="report_template" ref="gt_order_mgnt.report_payment_sale_report"/-->
+                    <field name="report_name">Advance Payment Receipt_${object.partner_id.name}_${(object.name or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+        </record>
+        <record id="email_template_for_register_payment_received1" model="mail.template">
+		    <field name="name">Payment Received </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Payment Alert :Payment Received ${object.name}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="account.model_account_payment"/>
+		    <field name="auto_delete" eval="False"/>
+                    <field name="report_name">Payment Receipt_${object.partner_id.name}_${(object.name or '').replace('/','_')}</field>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+     <!-- End advance payment paid -->
+    <!-- Start template for sale order return-->
+         <record id="email_template_forsale_order_return" model="mail.template">
+		    <field name="name">Quotation Return </field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Quotation Alert :Quotation Return ${object.name}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="sale.model_sale_order"/>
+		    <field name="auto_delete" eval="False"/>
+		      <field name="body_html"><![CDATA[
+			
+            ]]></field>
+		</record>
+    
+    <!--end template for sale order return-->
+    <!-- Start template for vendor price request and approved -->
+          <record id="email_template_for_supplier_price_request" model="mail.template">
+		    <field name="name">Request For Supplier Product Price</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Supplier Alert :Request For Supplier Product Price</field>
+		    <field name="lang">${object.name.lang}</field>
+		    <field name="model_id" ref="product.model_product_supplierinfo"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+       <record id="email_template_for_supplier_price_approved" model="mail.template">
+		    <field name="name">Approved Supplier Product Price</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Supplier Alert :Approved Supplier Product Price</field>
+		    <field name="lang">${object.name.lang}</field>
+		    <field name="model_id" ref="product.model_product_supplierinfo"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+		</record>
+    <!-- End template for vendor price request and approved-->
+   
+    </data>
+</openerp>

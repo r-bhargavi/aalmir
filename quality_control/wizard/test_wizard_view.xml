@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_scrap_doc_form" model="ir.ui.view">
+            <field name="name">Quality Scrap Document form</field>
+            <field name="model">quality.scrap.doc</field>
+            <field name="arch" type="xml">
+                <form string="Select Batch Details">
+                    <group col="4">
+                      <group>
+                    	<label for="approve_qty" attrs="{'invisible':[('approve_qty','=',0)]}"/>
+                    	<div attrs="{'invisible':[('approve_qty','=',0)]}">
+                    		<field name="approve_qty" nolabel="1" class="oe_inline" readonly="1"/>
+                    		<field name="approve_uom" readonly="1" class="oe_inline"/>
+            		</div>
+            		<label for="reject_qty" attrs="{'invisible':[('reject_qty','=',0)]}"/>
+                    	<div attrs="{'invisible':[('reject_qty','=',0)]}">
+                    		<field name="reject_qty" nolabel="1" class="oe_inline" readonly="1"/>
+                    		<field name="reject_uom" readonly="1" class="oe_inline"/>
+            		</div>
+            		<field name="check_bool"/>
+            		<!--field name="ntype" attrs="{'invisible':['|',('approve_qty','=',0),('reject_qty','=',0)]}"/-->
+                     </group>
+                     <group attrs="{'invisible':[('lots_ids','=',[])]}">
+                    	<field name="lots_ids" readonly="1" nolabel="1">
+                    		<tree string="Available lots">
+                    			<field name="lot_id" />
+                    			<field name="approve_qty" />
+                    			<field name="reject_qty" />
+			    		<field name="uom_id" />
+                    		</tree>
+                    		<form string="Available lots">
+                    			<field name="lot_id" />
+                    			<field name="approve_qty" />
+                    			<field name="reject_qty" />
+			    		<field name="uom_id" />
+                    		</form>
+                    	</field>
+                      </group>
+                    </group>
+                    	
+                    <group>
+                    	<field name="batches_ids" nolabel="1">
+                    		<tree string="Available Batches" create="false" editable="top" delete="false">
+                    			<field name="check_bool" />
+                    			<field name="lot_id" readonly="1"/>
+                    			<field name="main_batches" readonly="1"/>
+                    			<field name="product_id" readonly="1"/>
+		            		<field name="product_qty" readonly="1"/>
+			    		<field name="uom_id" readonly="1"/>
+			    		<field name="approve_quantity" invisible="not context.get('approve')"/>
+			    		<field name="reject_quantity" invisible="not context.get('reject')"/>
+                    		</tree>
+                    		<form string="Available Batches" create="false" delete="false">
+                    		   <group>
+                    			<field name="lot_id" readonly="1"/>
+                    			<field name="main_batches" readonly="1"/>
+                    			<field name="product_id" readonly="1"/>
+		            		<field name="product_qty" readonly="1"/>
+			    		<field name="uom_id" readonly="1"/>
+			    	   </group>
+                    		</form>
+                    	</field>
+                    </group>
+                    <group>
+                        <field name="uploaded_documents" widget="many2many_binary" attrs="{'invisible':[('nbool','=',False)]}"/>
+                        <field name="note" />
+                        <field name="nbool" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_upload_document" string="Process" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" class="oe_link" string="Cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_quality_scrap_document" model="ir.actions.act_window">
+            <field name="name">Quality Scrap Document</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">quality.scrap.doc</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

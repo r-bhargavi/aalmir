@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+      <!--#CH_N074 fields for salle support -->
+        <record id="dashboard_record1" model="custom.sales.dashboard">
+            <field name="name">Sales Details</field>
+            <field name="sale support Dashboard">1</field>
+        </record>
+	<record id="dashboard_record2" model="custom.sales.dashboard">
+            <field name="name">Delivery Details</field>
+            <field name="sale support Dashboard">1</field>
+        </record>
+	<record id="dashboard_record3" model="custom.sales.dashboard">
+            <field name="name">Requests Details</field>
+            <field name="sale support Dashboard">1</field>
+        </record>
+	<record id="dashboard_record4" model="custom.sales.dashboard">
+            <field name="name">State Details</field>
+            <field name="sale support Dashboard">1</field>
+        </record>
+     <!--#CH_N074 fields <<<<< -->
+     
+        <record id="action_dashboard_api_menu_mrp" model="custom.mrp.dashboard">
+            <field name="name">Production Request</field>
+            <field name="MRP Production">1</field>
+        </record>
+        <record id="action_dashboard_api_menu2" model="custom.mrp.dashboard">
+            <field name="name">Manufacture Planning</field>
+            <field name="MRP Production">1</field>
+        </record>
+        <record id="action_dashboard_api_menu3" model="custom.mrp.dashboard">
+            <field name="name">Work Oders Planning</field>
+            <field name="MRP Production">1</field>
+        </record>
+        <!--record id="action_dashboard_api_menu41" model="custom.mrp.dashboard">
+            <field name="name">Purchase Order</field>
+            <field name="MRP Production">1</field>
+        </record-->
+        <record id="action_dashboard_api_menu4" model="custom.mrp.dashboard">
+            <field name="name">Rejected Quantity</field>
+            <field name="MRP Production">1</field>
+        </record>
+        <record id="action_dashboard_api_menu5" model="custom.mrp.dashboard">
+            <field name="name">Transfer Quantity</field>
+            <field name="MRP Production">1</field>
+        </record>
+        
+        <!--Purchase Dashboard -->
+         <record id="action_dashboard_api_menu_purhase_rqst" model="custom.purchase.dashboard">
+            <field name="name">Purchase Request</field>
+            <field name="MRP Production">1</field>
+        </record> 
+         <record id="action_dashboard_api_menu_purhase_rquisition" model="custom.purchase.dashboard">
+            <field name="name">Purchase Requisition</field>
+            <field name="MRP Production">1</field>
+        </record>
+        <record id="action_dashboard_api_purchase_order" model="custom.purchase.dashboard">
+            <field name="name">Purchase Order</field>
+            <field name="Purchase Order">1</field>
+        </record>
+
+        <!--#Dashboard For Stock -->
+        <record id="dashboard_stock1" model="custom.stock.dashboard">
+            <field name="name">Stock Details</field>
+            <field name="Stock  Dashboard">1</field>
+        </record>
+        <record id="dashboard_stock2" model="custom.stock.dashboard">
+            <field name="name">Raw Material</field>
+            <field name="Stock  Dashboard">1</field>
+        </record>
+    </data>
+</openerp>                                                                                                                             

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record forcecreate="True" id="decimal_product_qty" model="decimal.precision">
+            <field name="name">Stock qty</field>
+            <field name="digits">2</field>
+        </record>
+    
+       <!--Material type data -->
+        <record id="attribute_data1" model="n.product.discription.value">
+            <field name="name">Product Type</field>
+            <field name="string">product_type</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data2" model="n.product.discription.value">
+            <field name="name">Type Of Bags</field>
+            <field name="string">type_of_bag</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data3" model="n.product.discription.value">
+            <field name="name">Length</field>
+            <field name="string">length</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data4" model="n.product.discription.value">
+            <field name="name">Width</field>
+            <field name="string">width</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data5" model="n.product.discription.value">
+            <field name="name">Left gusset</field>
+            <field name="string">lgusset</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data6" model="n.product.discription.value">
+            <field name="name">Right gusset</field>
+            <field name="string">rgusset</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data7" model="n.product.discription.value">
+            <field name="name">Top Fold</field>
+            <field name="string">topfold</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data8" model="n.product.discription.value">
+            <field name="name">Bottom gusset</field>
+            <field name="string">bgusset</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data9" model="n.product.discription.value">
+            <field name="name">Printing Area</field>
+            <field name="string">printing_area</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data10" model="n.product.discription.value">
+            <field name="name">Printing Type</field>
+            <field name="string">printing_type</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data11" model="n.product.discription.value">
+            <field name="name">Thickness</field>
+            <field name="string">thickness</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data12" model="n.product.discription.value">
+            <field name="name">Material</field>
+            <field name="string">material</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data13" model="n.product.discription.value">
+            <field name="name">Ink Weight</field>
+            <field name="string">inkweight</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data14" model="n.product.discription.value">
+            <field name="name">Total Printing area</field>
+            <field name="string">total_printing_area</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="attribute_data15" model="n.product.discription.value">
+            <field name="name">Weight</field>
+            <field name="string">weight</field>
+            <field name="active">1</field>
+        </record>
+    </data>
+</openerp>

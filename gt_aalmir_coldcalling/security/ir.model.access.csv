@@ -1,0 +1,8 @@
+id;name;model_id:id;group_id:id;perm_read;perm_write;perm_create;perm_unlink
+access_coldcalling_history_manager;access.coldcalling.history.manager;model_crm_coldcalling_history;base.group_sale_manager;1;1;1;0
+access_coldcalling_history_saleman;access_coldcalling_history_saleman;model_crm_coldcalling_history;base.group_sale_salesman;1;1;1;0
+access_coldcallinf_dep_mail;access_coldcalling_dep_mail;model_dep_mail;;1;1;1;0
+crm.access_crm_stage_lead;crm.stage.lead.person;crm.model_crm_stage;base.group_sale_salesman;1;1;1;0
+crm.access_crm_stage_alllead;crm.stage.alllead;crm.model_crm_stage;base.group_sale_salesman_all_leads;1;1;1;0
+access_irrelevant_reason_access;irrelevant_reason_access;model_irrelevant_reason;;1;1;1;0
+crm_lead2opportunity_partner;crm.lead2opportunity.partner;crm_lead2opportunity_partner;base.group_sale_salesman;1;1;1;0

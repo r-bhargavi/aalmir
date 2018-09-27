@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+      <record id="procurement_form_view_exr12" model="ir.ui.view">
+            <field name="name">procurement.order.form</field>
+            <field name="model">procurement.order</field>
+            <field name="inherit_id" ref="procurement.procurement_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']"
+                  position="after">
+                    <field name="delivery_address_id"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']"
+                  position="after">
+                    <field name="warehouse_id"/>
+                     <field name="delivery_address_id"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_order_form_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='route_id']"
+                  position="before">
+                    <field name="warehouse_id"/>
+                   <field name="delivery_address_id"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="context">{'default_warehouse_id': warehouse_id, 'default_delivery_address_id':partner_shipping_id}</attribute>
+                </xpath>
+            </field>
+        </record>
+</openerp>

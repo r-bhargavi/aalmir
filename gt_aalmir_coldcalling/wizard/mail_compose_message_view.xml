@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="email_compose_message_wizard_form_aalmir">
+            <field name="name">mail.compose.message.form</field>
+            <field name="model">mail.compose.message</field>
+            <field name="inherit_id" ref="mail.email_compose_message_wizard_form" />
+            <field name="arch" type="xml">
+                <span attrs="{'invisible':['|', ('model', '=', False), ('composition_mode', '=', 'mass_mail')]}" position="replace">
+                    <span attrs="{'invisible':['|', '|', ('model', '=', False), ('composition_mode', '=', 'mass_mail')]}" invisible="context.get('cold_calling', False)"></span>
+                </span>
+                <label for="partner_ids" position="before">
+                    <field name="irrelevant_reason_id" required="context.get('from_irrelavent', False)" context="{'irrelevant_reason_id':irrelevant_reason_id, 'irr_reason_description':irr_reason_description}" invisible="not context.get('from_irrelavent', False)"/>
+                    <field name="irr_reason_description" invisible="not context.get('from_irrelavent', False)" required="context.get('from_irrelavent', False)"/>
+                	<field name="dep_id" invisible="not context.get('from_irrelavent', False)" options="{'on_create': False}"/>
+                </label>
+                <field name="subject" position="before">
+                    <field name="cc_ids" string="Cc" widget="many2many_tags"/>
+                </field>
+                <xpath expr="//footer/button[@name='send_mail_action']" position="attributes">
+                    <attribute name="context">{'email_cc_ids':cc_ids}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+    <!--Material type data -->
+    	<record id="material_type_data0" model="product.material.type">
+            <field name="name">Product</field>
+            <field name="sequence">1</field>
+            <field name="string">product</field>
+            <field name="active">1</field>
+        </record>
+        <record id="material_type_data1" model="product.material.type">
+            <field name="name">Packaging Material</field>
+            <field name="sequence">2</field>
+            <field name="string">packaging</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="material_type_data2" model="product.material.type">
+            <field name="name">Component</field>
+            <field name="sequence">3</field>
+            <field name="string">component</field>
+            <field name="active">1</field>
+        </record>
+        
+         <record id="material_type_data4" model="product.material.type">
+            <field name="name">Raw Material</field>
+            <field name="sequence">4</field>
+            <field name="string">raw</field>
+            <field name="active">1</field>
+        </record>
+        <record id="material_type_data5" model="product.material.type">
+            <field name="name">Assets</field>
+            <field name="sequence">5</field>
+            <field name="string">asset</field>
+            <field name="active">1</field>
+        </record>
+        <record id="material_type_data6" model="product.material.type">
+            <field name="name">Grinding</field>
+            <field name="sequence">6</field>
+            <field name="string">grinding</field>
+            <field name="active">1</field>
+        </record>
+        <record id="material_type_data7" model="product.material.type">
+            <field name="name">Scrap</field>
+            <field name="sequence">7</field>
+            <field name="string">scrap</field>
+            <field name="active">1</field>
+        </record>
+        <record id="material_type_data8" model="product.material.type">
+            <field name="name">Other</field>
+            <field name="sequence">5</field>
+            <field name="string">other</field>
+            <field name="active">1</field>
+        </record>
+        
+    <!--Raw Material type data -->
+        <record id="raw_material_data1" model="product.raw.material.type">
+            <field name="name">Raw Material</field>
+            <field name="sequence">1</field>
+            <field name="string">raw</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data4"/>
+        </record>
+        <record id="raw_material_data2" model="product.raw.material.type">
+            <field name="name">Ink</field>
+            <field name="sequence">2</field>
+            <field name="string">ink</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data4"/>
+        </record>
+        <record id="raw_material_data3" model="product.raw.material.type">
+            <field name="name">Solvent</field>
+            <field name="sequence">3</field>
+            <field name="string">solvent</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data4"/>
+        </record>
+        <record id="raw_material_data4" model="product.raw.material.type">
+            <field name="name">Spare part</field>
+            <field name="sequence">4</field>
+            <field name="string">part</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data5"/>
+        </record>
+        
+        <record id="raw_material_data5" model="product.raw.material.type">
+            <field name="name">Machine</field>
+            <field name="sequence">5</field>
+            <field name="string">machine</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data5"/>
+        </record>
+        
+        <record id="raw_material_data6" model="product.raw.material.type">
+            <field name="name">Printing Plate</field>
+            <field name="sequence">6</field>
+            <field name="string">plate</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data5"/>
+        </record>
+        
+        <record id="raw_material_data7" model="product.raw.material.type">
+            <field name="name">Others</field>
+            <field name="sequence">7</field>
+            <field name="string">other</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data5"/>
+        </record>
+        <record id="raw_material_data8" model="product.raw.material.type">
+            <field name="name">Carton</field>
+            <field name="sequence">8</field>
+            <field name="string">carton</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data1"/>
+        </record>
+        <record id="raw_material_data9" model="product.raw.material.type">
+            <field name="name">Pallets</field>
+            <field name="sequence">9</field>
+            <field name="string">pallet</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data1"/>
+        </record>
+        <record id="raw_material_data10" model="product.raw.material.type">
+            <field name="name">Others</field>
+            <field name="sequence">10</field>
+            <field name="string">other</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data1"/>
+        </record>
+        
+        <record id="raw_material_data11" model="product.raw.material.type">
+            <field name="name">Mould</field>
+            <field name="sequence">6</field>
+            <field name="string">mould</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data5"/>
+        </record>
+        
+        <record id="raw_material_data12" model="product.raw.material.type">
+            <field name="name">Masterbatch</field>
+            <field name="sequence">4</field>
+            <field name="string">mstbtch</field>
+            <field name="active">1</field>
+            <field name="main_id" ref="gt_customer_products.material_type_data4"/>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    <!--Unit type data -->
+    	<record id="unit_type_data0" model="product.uom.type">
+            <field name="name">Product Uom</field>
+            <field name="string">product</field>
+            <field name="description">This will show unit for only Products and primary packaging type unit of a products</field>
+            <field name="active">1</field>
+        </record>
+        <record id="unit_type_data1" model="product.uom.type">
+            <field name="name">Primary Packaging Type</field>
+            <field name="string">pri_packaging</field>
+            <field name="description">This will show unit in packaging type for primary type packaging of product</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="unit_type_data2" model="product.uom.type">
+            <field name="name">Secondary Packaging Unit</field>
+            <field name="string">sec_packaging</field>
+            <field name="description">This will show unit in Unit for secondary type packaging of product</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="unit_type_data3" model="product.uom.type">
+            <field name="name">Attribute Uom</field>
+            <field name="string">attribute</field>
+            <field name="description">This will show unit in product Specification attributes units</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="unit_type_data4" model="product.uom.type">
+            <field name="name">Raw Material Packaging Type</field>
+            <field name="string">raw_packaging</field>
+            <field name="description">This will show unit in packaging type for primary and secondary type packaging of Raw material type products</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="unit_type_data5" model="product.uom.type">
+            <field name="name">Secondary Packaging Type</field>
+            <field name="string">product_packaging</field>
+            <field name="description">This will show unit in packaging type for secondary type packaging of product</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="unit_type_data6" model="product.uom.type">
+            <field name="name">Purchase Uom</field>
+            <field name="string">purchase</field>
+            <field name="description">This will show unit for as Purchase Products UOM and primary packaging type unit of a products</field>
+            <field name="active">1</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--menuitem name="Customers" id="menu_sales_customre" parent="base.menu_base_partner" sequence="5" /-->
+        
+	 <!--menuitem id="sale.menu_account_customer" name="Customers"
+            parent="menu_sales_customre"
+            action="base.action_partner_customer_form" sequence="1"/-->
+	<!--record id="sale.menu_account_customer" model="ir.ui.menu">
+	    <field name="parent" ref="menu_sales_customre"/>
+	</record-->
+	<record id="calendar.mail_menu_calendar" model="ir.ui.menu">
+	    <field name="sequence">100</field>
+	</record>
+	<record id="mail.menu_contacts" model="ir.ui.menu">
+	    <field name="sequence">101</field>
+	</record>
+   <!--MRP menu start>>>-->
+   	<record id="mrp.menu_mrp_manufacturing" model="ir.ui.menu">
+	    <field name="sequence">2</field>
+	</record>
+	<record id="mrp.menu_mrp_planning" model="ir.ui.menu">
+	    <field name="sequence">3</field>
+	</record>
+   <!-- END<<-->	
+   
+	 <!--menuitem name="Invoicing"
+            id="sale.menu_sale_invoicing" parent="base.menu_base_partner"
+            sequence="5" groups="group_api_menu_hide"/-->
+	<record id="sale.menu_sale_invoicing" model="ir.ui.menu">
+	    <field name="groups_id" eval="[(6, 0, [ref('gt_order_mgnt.group_api_no_user')] )]"/>
+	</record>
+	<record id="mail.mail_channel_menu_root_chat" model="ir.ui.menu">
+	    <field name="groups_id" eval="[(6, 0, [ref('gt_order_mgnt.group_api_no_user')] )]"/>
+	</record>
+	
+	<!--Inventory Schedular hide -->
+	<record id="stock.menu_stock_sched" model="ir.ui.menu">
+	    <field name="groups_id" eval="[(6, 0, [ref('gt_order_mgnt.group_api_no_user')] )]"/>
+	</record>
+	
+	<!--Inventory Reordering Rule hide -->
+	<record id="stock.menu_reordering_rules_config" model="ir.ui.menu">
+	    <field name="groups_id" eval="[(6, 0, [ref('gt_order_mgnt.group_api_no_user')] )]"/>
+	</record>
+	
+	<!--Inventory Packages hide -->
+	<record id="stock.menu_package" model="ir.ui.menu">
+	    <field name="groups_id" eval="[(6, 0, [ref('gt_order_mgnt.group_api_no_user')] )]"/>
+	</record>
+	
+    </data>
+</openerp>
+

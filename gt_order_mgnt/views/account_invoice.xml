@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <record model="ir.ui.view" id="invoice_supplier_tree_inherit_aalmir">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+               <field name='amount_total_signed' position='after'>
+                   <field name="amount_total_company_signed" sum="Total amount" string='Total in AED' />
+		   <field name="residual_company_signed" string="To Pay	" sum="Total amount"/>
+                </field>
+		<field name="residual_signed" position="replace"/>
+		<field name="date_invoice" position="attributes">
+                     <attribute name="invisible">1</attribute>
+                </field>
+		<field name="date_due" position="attributes">
+                     <attribute name="invisible">1</attribute>
+                </field>
+		<field name="number" position="after">
+                    <field name="date_invoice" string="Bill Date"/>
+		    <field name="date_due" string="Payment Due date"/>
+		    <field name="payment_term_id"/>
+            	</field>
+            </field>
+       </record>
+
+       <record model="ir.ui.view" id="invoice_tree_vw_inherit_aalmir">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+		<field name="residual_signed" position="replace"/>
+                <field name='amount_total_signed' position='after'>
+                   <field name="amount_total_company_signed" sum="Total amount" string='Total in AED' />
+		   <field name="residual_company_signed" string="Amount Due" sum="Total amount"/>
+		   <field name="advance_invoice" invisible="1"/>
+                </field>
+		<field name="date_invoice" position="attributes">
+                     <attribute name="invisible">1</attribute>
+                </field>
+		<field name="date_due" position="attributes">
+                     <attribute name="invisible">1</attribute>
+                </field>
+		<field name="number" position="after">
+                    <field name="date_invoice"/>
+		    <field name="date_due" string="Payment Due date"/>
+		    <field name="payment_term_id"/>
+            	</field>
+            </field>
+       </record>
+
+       <record model="ir.ui.view" id="invoice_supplier_form_aalmir_ext123">
+            <field name="name">account.supplier.form.aalmir123</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+              
+                 <button name="invoice_cancel" states="draft,proforma2"  position="before">
+                  <button name="aalmir_invoice_print" string="Download" type="object" states="paid,open" class="oe_highlight" context="{'out_invoice':True}" />
+                  <button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
+                 </button>
+                  <xpath expr="//sheet/group[1]" position="before">
+			<div  class="oe_button_box"  name='button_box'>
+                            <button name="open_delivery_history" string="Delivery" type="object" class="oe_stat_button"
+                                icon="fa-truck">
+                            </button>
+			</div>
+		 </xpath>
+                 <field name='partner_id' position='replace'>
+		        <label for='partner_id' string='Vendor'/>
+			 <div>
+		                <field name="partner_id" 
+                                context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" 
+                                domain="[('supplier', '=', True)]" class="oe_inline" nolabel="1"/>
+			     <field name="check_partner"  class="oe_inline" nolabel="1" />
+			</div>
+		        <label for='partner_invoice_id' string='Bill Address'/>
+			 <div>
+			    <field name="partner_invoice_id" class="oe_inline" nolabel="1" 
+		              attrs="{'required':[('check_destination','=',True)]}"  domain="[('type','in',('delivery','invoice')),('parent_id','=',partner_id)]"/>
+			     <field name="check_destination"  class="oe_inline" nolabel="1" />
+			</div>
+		        
+
+                  </field>
+                 <field name="reference"  position="replace">
+                    <field name='reference' string="Vendor Invoice No."/>
+                    <field name="paid_amount"  invisible="1"/>
+                    <field name='vendor_invoice_date'/>
+                    <field name="vendor_doc_name"  invisible="1" />
+		    <field name="vendor_uploaded_document" filename="vendor_doc_name" />
+                 </field> 
+                <xpath expr='//page[2]' position='inside'>
+                     <group>
+                            <group string="Depositor Name &amp; signature">
+				<label for="signature_image" class="oe_edit_only" string="Signature"/>
+		                  <div>
+		                    <field name="signature" widget="signature"/>
+		                </div>
+		               <field name="depositor_name" />
+		               <field name="depositor_mobile"/>
+			   </group>
+               		   <group >
+		            
+			   </group>
+			  
+			</group>
+                </xpath>
+               
+                 <field name="journal_id"  position="before">
+                      <field name='send_bill_bool' invisible='1'/>
+                     <label for='approved_by'/>
+                     <div>
+		         <field name="approved_by"  options="{'no_create': True, 'no_open': True}" class='oe_inline'
+                            nolabel='1' attrs="{'readonly':[('send_bill_bool','=',True)]}"/>
+                         <button type='object' name='send_bill' class='oe_highlight' icon='fa-envelope'
+                            attrs="{'invisible':['|',('send_bill_bool','=',True),('approved_by','=',False)]}"/>
+                     </div>
+	    	 </field> 
+ 
+                <field name="company_id"  position="attributes">
+		        <attribute name="invisible">1</attribute>
+	    	 </field> 
+                 <field name="date"  position="attributes">
+		        <attribute name="invisible">1</attribute>
+	    	 </field> 
+                 <!--field name="reference"  position="attributes">
+		        <attribute name="invisible">1</attribute>
+	    	 </field-->  
+                <field name="fiscal_position_id" position='after'>
+                      
+                       <label for='picking_ids' string='Receiving No.'/>
+			 <div>
+                             <field name='picking_ids' widget='many2many_tags' 
+                               options="{'no_create': True, 'no_open': True}" 
+                               string='Delivery No.' domain="[('origin','=',origin),('state','in',('assigned','done')),('picking_type_code','=','incoming')]" class="oe_inline" nolabel="1"/>
+			    
+			     <field name="check_do_number"  class="oe_inline" nolabel="1" />
+			</div>
+                </field>
+                <field name='payment_term_id' position='replace'>
+		          <label for='payment_term_id'/>
+			 <div>
+		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
+                                     options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
+			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
+			</div>
+                      <field name='show_stamp'/>
+                      <field name='customer_name_report'/>
+                      <field name='destination_report'/>
+                       <field name='report_company_name'/>
+                       <field name='company_currency_id' invisible='1'/>
+               </field>
+                <field name="currency_id"  groups="base.group_multi_currency" position='replace'>
+                 <label for='currency_id' groups="base.group_multi_currency"/>
+                  <div groups="base.group_multi_currency">
+		        <field name="currency_id" options="{'no_create': True, 'no_open': True}" class="oe_inline" nolabel="1" />
+		        <field name="check_currency"  class="oe_inline" nolabel="1" />
+		   </div>  
+                </field>  
+                  <xpath expr="//field[@name='amount_total']" position="after" >
+                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                        <label for="amount_total_company_signed" string='Converted Total'/>
+                    </div>
+                   
+                    <field name="amount_total_company_signed" nolabel="1" class="oe_subtotal_footer_separator oe_inline"  widget='monetary' options="{'currency_field': 'company_currency_id'}" />
+                 </xpath> 
+                <field name="amount_untaxed" position="after"> 
+                      <field name="payable_discount" nolabel="1" width="60%" class="oe_inline" 
+                               style="color:#4c4c4c;" readonly="1" attrs="{'invisible':[('payable_amount','=',0)]}"/>
+                      <field name="payable_amount" nolabel="1" width="40%" widget='monetary' 
+                              options="{'currency_field': 'currency_id'}"
+                         readonly="1" attrs="{'invisible':[('payable_amount','=',0)]}"/>
+                       
+                  </field>
+            </field>
+        </record>
+
+	<record model="ir.ui.view" id="sales_account_invoice_form_inherit_aalmir">
+            <field name="name">sales Account Invoice Form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="sale.account_invoice_form"/>
+            <field name="arch" type="xml">
+		<field name="team_id" position="attributes">
+                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+		     <!--attribute name="attrs">{'readonly':[('state','!=','draft']}</attribute-->
+                 </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="invoice_form_inherit_aalmir">
+            <field name="name">account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+
+		 <xpath expr="//button[2]" position="replace">
+                   <button name="aalmir_invoice_print" string="Download" type="object" context="{'in_invoice':True}" states="paid,open" class="oe_highlight" groups="base.group_user"/>
+                 </xpath>
+
+                   <xpath expr="//page[2]" position="attributes">
+                        <attribute name="string">Taxes Details</attribute>
+                  </xpath>
+                
+                 <xpath expr="//button[4]" position="replace">
+                        <button name="credit_increase_amount"  string="Customer Credit Profile" type="object" 
+                        	attrs="{'invisible':[('partner_id', '=', False)]}" class="btn-primary"
+                        	groups="account.group_account_invoice" />
+                 	<button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
+                 </xpath>
+		        <field name='payment_term_id' position='replace'>
+		        <label for='payment_term_id'/>
+			<div>
+	               		<field name="payment_term_id" class="oe_inline" nolabel="1" context="{'n_partner_id':partner_id,'sale_id':sale_id}" options="{'no_create': True}"/>
+		      		<field name="check_payment_term"  class="oe_inline" nolabel="1" />
+			</div>
+                          <field name="delivery_date"  attrs="{'invisible':[('delivery_date','=',False)]}"/>
+		           <field name='lpo_number' attrs="{'invisible':[('lpo_number','=',False)]}" readonly='1'/>
+                           <field name="invoice_due_date" invisible="1"/>
+		           <field name="paid_amount"  invisible="1"/>
+		           <field name="invoice_paid_date" attrs="{'invisible':[('state','!=','paid')]}"/>
+		           <field name="invoice_barcode" widget="BarCode128"  attrs="{'invisible':[('invoice_barcode','=',False)]}"/>
+		    </field>
+		     <div groups="base.group_multi_currency" position='replace'>
+		         <div groups="base.group_multi_currency">
+		                        <field name="currency_id" options="{'no_create': True, 'no_open': True}" class="oe_inline" nolabel="1" />
+		                      <field name="check_currency"  class="oe_inline" nolabel="1" />
+		           </div>            
+		      </div>
+                 <field name='partner_id' position='replace'>
+		        <label for='partner_id'/>
+			 <div>
+		               <field string="Customer" name="partner_id"
+                                context="{'search_default_customer':1, 'show_address': 1}" 
+                                options="{'always_reload': True,'no_create': True}"
+                                domain="[('customer', '=', True)]" class="oe_inline" nolabel="1"/>
+			     <field name="check_partner"  class="oe_inline" nolabel="1" />
+			</div>
+		        <label for='partner_invoice_id' string='Invoice Address'/>
+			 <div>
+			    <field name="partner_invoice_id" class="oe_inline" nolabel="1" 
+		              attrs="{'required':[('check_destination','=',True)]}"  domain="[('type','in',('delivery','invoice')),('parent_id','=',partner_id)]"/>
+			     <field name="check_destination"  class="oe_inline" nolabel="1" />
+			</div>
+		         <field name="contact_number" readonly="1" attrs="{'invisible':[('contact_number','=',False)]}" />
+		         <field name="user_ids" invisible="1"/>
+
+            </field>
+                 <field name="fiscal_position_id" position='after'>
+                      
+                       <label for='picking_ids' string='Deliveries'/>
+			 <div>
+                             <field name='picking_ids' widget='many2many_tags' 
+                               options="{'no_create': True, 'no_open': True}" 
+                               string='Delivery No.' domain="[('origin','=',origin),('state','in',('done','transit','delivered')),('picking_type_id.code','=','outgoing')]" class="oe_inline" nolabel="1"/>
+			    
+			     <field name="check_do_number"  class="oe_inline" nolabel="1" />
+			</div>
+                     
+                   <label for='document_id' string="PO Number"/>
+	         <div>
+                    <field name="document_id"  domain="[('sale_id_lpo','=',sale_id)]"
+                       context="{'lpo_name':True}" widget='many2many_tags'
+                       options="{'no_create': True, 'no_open': True}" 
+                       class="oe_inline" nolabel="1"/>
+		     <field name="check_lpo"  class="oe_inline" nolabel="1" />
+		</div>
+                   <label for='total_gross_weight'/>
+	         <div>
+		    <field name="total_gross_weight" class="oe_inline" nolabel="1" 
+                      attrs="{'required':[('check_gross','=',True)]}"/>
+		     <field name="check_gross"  class="oe_inline" nolabel="1" />
+		</div>
+              <label for='total_net_weight'/>
+	         <div>
+		    <field name="total_net_weight" class="oe_inline" nolabel="1"
+                       attrs="{'required':[('check_net','=',True)]}" />
+		     <field name="check_net"  class="oe_inline" nolabel="1" />
+		</div>
+               <label for='shipment_mode'/>
+	         <div>
+		    <field name="shipment_mode" class="oe_inline" nolabel="1" 
+                        attrs="{'required':[('check_ship','=',True)]}"/>
+		     <field name="check_ship"  class="oe_inline" nolabel="1" />
+		</div>
+		     <label for='origin_id'/>
+			 <div>
+			    <field name="origin_id" class="oe_inline" nolabel="1" />
+			     <field name="check_origin"  class="oe_inline" nolabel="1" />
+			</div>
+		     <label for='manufactured_by'/>
+			 <div>
+			    <field name="manufactured_by" class="oe_inline" nolabel="1" 
+                           attrs="{'required':[('check_manuf','=',True)]}"/>
+			     <field name="check_manuf"  class="oe_inline" nolabel="1" />
+			</div>
+		    <label for='term_of_delivery'/>
+			 <div>
+			    <field name="term_of_delivery" class="oe_inline" nolabel="1" 
+                               attrs="{'required':[('check_term','=',True)]}"/>
+			     <field name="check_term"  class="oe_inline" nolabel="1" />
+			</div>
+ 
+                </field>
+                <field name="date_due" position='after'>
+                   <field name='report_company_name'/>
+                  <field name="check_hs" />
+                  <field name='check_invnumber'/>
+		  <field name='check_date_withnotcol'/>
+		  <field name='check_date_withcol'/>
+		  <field name='check_sale'/>
+		  <field name='check_saleperson'/>
+                  <field name='check_packaging'/>
+                  <field name='check_packaging_count'/>
+                  <field name='check_lpo_line'/>
+                  <label for='check_vat'/>
+                   
+                  <div>
+                  	<field name='check_vat'/>
+                  	<field name='partner_vat' attrs="{'required':[('check_vat','=',True)],'invisible':[('check_vat','=',False)]}"/>
+                  	<h4  style="color:red" attrs="{'invisible': [('check_vat', '=', True)]}">
+			Customer VAT can be removed from print only in case of export items, before removing make it sure, as further export documents will be required to upload
+		  	</h4>
+                  </div>
+		  <field name='tax_documents' attrs="{'invisible': [('check_vat', '=',True)]}" widget="many2many_binary"/>
+                   <field name='show_stamp'/>
+                   <field name='customer_name_report'/>
+                   <field name='destination_report'/>
+                   <field name='delivey_address'/>
+                   <field name='company_currency_id' invisible='1'/>
+                </field>
+                 <field name="comment" position="replace">
+                 </field>
+    		 <field name="user_id" position="attributes">
+                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+                 </field>	
+		 
+                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+                    <attribute name='string'>VAT</attribute>  
+                 </xpath>
+               
+                 <field name="amount_tax" position="attributes">
+                	<attribute name="string">VAT</attribute>
+                 </field>
+                 <xpath expr="//field[@name='amount_total']" position="after" >
+                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                        <label for="amount_total_company_signed" string='Converted Total'/>
+                    </div>
+                   
+                    <field name="amount_total_company_signed" nolabel="1" class="oe_subtotal_footer_separator oe_inline" widget='monetary' options="{'currency_field': 'company_currency_id'}" />
+                 </xpath> 
+                 
+                 <field name="amount_untaxed" position="before"> 
+                     <label for='all_invoice_due_amount' style='color:red' attrs="{'invisible':['|',('all_invoice_due_amount','=',0),('state','in',('paid','cancel','open'))]}"/>
+                     <div >
+                        <field name='all_invoice_due_amount' attrs="{'invisible':['|',('all_invoice_due_amount','=',0),('state','in',('paid','cancel','open'))]}" widget='monetary' options="{'currency_field': 'currency_id'}" style='color:red' nolabel='1' class='inline'/>
+                     </div>
+                      <!--field name="total_sale_amount" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible':[
+
+'|',('order_line', '=',False),('sale_id','=',False)]}"/-->
+                      <!--field name="payable_discount" nolabel="1" width="60%" class="oe_inline" 
+                               style="color:#4c4c4c;" readonly="1" attrs="{'invisible':[('payable_amount','=',0)]}"/>
+                      <field name="payable_amount" nolabel="1" width="40%" widget='monetary' 
+                              options="{'currency_field': 'currency_id'}"
+                         readonly="1" attrs="{'invisible':[('payable_amount','=',0)]}"/-->
+                       
+                 </field>
+                 
+                 <field name="invoice_line_ids" position="before">
+                     <field name="order_line" nolabel="1" widget="one2many_list" mode="tree,kanban" context="{'type': type, 'journal_id': journal_id, 'default_invoice_id': id}" attrs="{'readonly':[('state','!=','draft')],'invisible':[('advance_invoice','=',False)]}">
+                                <tree string="Invoice Lines" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="account_id" groups="account.group_account_user" domain="[('company_id', '=', parent.company_id), ('internal_type', '=', 'other')]"/>
+                                    <field name="account_analytic_id" groups="analytic.group_analytic_accounting" domain="[('company_id', '=', parent.company_id), ('account_type', '=', 'normal')]"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" groups="product.group_uom"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                    <field name="invoice_line_tax_ids" widget="many2many_tags" context="{'type':parent.type}" domain="[('type_tax_use','=','sale'),('company_id', '=', parent.company_id)]" options="{'no_create': True}"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                           </field>
+                 </field>
+                 <!--xpath expr="//group[@class='oe_subtotal_footer oe_right']" position="after">
+                      <h4 style="color:green" attrs="{'invisible':[('tax_apply','=',False)]}">Taxes are Applied on this invoice.</h4>
+                       <h4 style="color:Red" attrs="{'invisible':[('tax_cancel','=',False)]}">Applied taxes are  cancelled.</h4>
+                    <group style="width: 65%%">
+                        <label for="taxe" string="Taxes"/>
+                        <div>
+                            <field name="n_invoice_type" readonly="0" invisible="1"/>
+                            <field name="tax_apply" invisible="1"/>
+                             <field name="tax_cancel" invisible="1"/>
+                            <field name="taxe"  widget="many2many_tags" attrs="{'readonly':['|',('state','=','open'),('sale_id','!=',False)]}"
+                              domain="[('type_tax_use','=','sale')]"/>
+                             <button type="object" name="compute_global_tax" string="Apply" class="btn-primary" attrs="{'invisible':[('sale_id','!=',False)]}"/>
+                        </div>
+                    </group>
+                 </xpath-->
+                  <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+                   
+                    <field name="product_hs_code" readonly='1' attrs="{'invisible':[('name','=','Deposit Product')]}"/>
+                     <field name='lpo_documents' widget='many2many_tags' domain="[('sale_id_lpo','=',parent.sale_id)]" options="{'no_create': True, 'no_open': True}"/>
+                    <field name='packaging_id' readonly='1' attrs="{'invisible':[('name','=','Deposit Product')]}"/>   
+                     <field name='pack_qty' invisible='1'/>
+                     <field name='gross_weight' attrs="{'invisible':[('name','=','Deposit Product')]}"/>
+                    <field name='net_weight' invisible="1" attrs="{'invisible':[('name','=','Deposit Product')]}"/>
+                   </xpath>
+                 <field name="date_invoice" position="before">
+                   <field name="proforma_date" attrs="{'invisible': [('state','not in',('proforma','proforma2'))]}"/>
+                 </field>
+                 <field name="origin" position="attributes">
+                   <attribute name="invisible">1</attribute>
+                 </field>
+
+                 <label for="currency_id" position="before">
+                   <field name="sale_id" attrs="{'invisible':[('sale_id','=',False)]}" readonly="1"/>
+                   
+                 </label>
+
+                 <xpath expr="//field[@name='residual']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                 </xpath>
+
+                 <field name="residual" position="after">
+                     <field name="residual_new1" class="oe_subtotal_footer_separator"  
+                         attrs="{'invisible': ['|',('residual_new1','=',0),('state', '=', 'draft')]}" string="Amount Due"/>
+                         <field name="advance_invoice" invisible="1"/>
+                 </field>
+
+                 <field name="team_id" position="after">
+                   <field name="n_pop_receipt_date"  attrs="{'invisible':[('n_pop_receipt_date','=',False)]}"/>
+		   <field name="n_pop_uploaded_document"  nolabel="1" colspan="2" 
+                    attrs="{'invisible':[('n_pop_receipt_date','=',False)]}" filename="lpo_name" readonly="1"/>
+                 </field>
+
+                  <xpath expr="//notebook/page[2]" position='attributes'>
+                       <attribute name='string'>Other Info</attribute>
+                  </xpath>
+                  <field name="tax_line_ids" position='before'>
+                        <group>
+                             <group>
+                                 <field name="comment" readonly="0" string="Invoice Remark" attrs="{'readonly':[('state','in',('done','cancel'))]}"/>
+                             </group>
+                             <group>
+                                 <field name="receipt_remark" attrs="{'readonly':[('state','in',('done','cancel'))]}"/>
+                         </group>
+                       </group>
+		        <group>
+               		   <group string="PO Information" >
+		             <field name="n_lpo_receipt_date" readonly="1" attrs="{'invisible':[('n_lpo_receipt_date','=',False)]}"/>
+			     <field name="n_lpo_issue_date" readonly="1" attrs="{'invisible':[('n_lpo_issue_date','=',False)]}"/>
+			     <field name="n_lpo_document" nolabel="1" colspan="2" filename="n_lpo_name"
+                        		attrs="{'invisible':[('n_lpo_document','=',False)]}" readonly="1"/>
+			     <field name="n_lpo_name" invisible="1"/>
+			   </group>
+			   <group string="Depositor Signature">
+				<label for="signature_image" class="oe_edit_only" string="Signature"/>
+		                  <div>
+		                    <field name="signature" widget="signature"/>
+		                </div>
+		               <field name="depositor_name" />
+		               <field name="depositor_mobile"/>
+			   </group>
+			</group>
+
+                  </field>
+            </field>
+       </record>
+         <record id="view_invoice_line_form_inherit_aalmir" model="ir.ui.view">
+            <field name="name">account.invoice.line.form</field>
+            <field name="model">account.invoice.line</field>
+             <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                 <field name="invoice_line_tax_ids" position="attributes">
+                	<attribute name="string">VAT</attribute>
+                </field>
+            </field>
+      </record>
+    </data>
+</openerp>

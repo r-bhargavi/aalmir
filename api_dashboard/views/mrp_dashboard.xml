@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="channel_dashboard_mrp_kanban_view" model="ir.ui.view">
+        <field name="name">Custom Mrp Dashboard View</field>
+    	<field name="model">custom.mrp.dashboard</field>
+    	<field name="arch" type="xml">
+	<kanban class="oe_background_grey o_kanban_dashboard o_account_kanban" create="false">
+            <field name="color"/>
+            <field name="name"/> 
+            <field name="status_dashboard"/>
+            <templates>
+                <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(0)}">
+                            <t t-value="JSON.parse(record.status_dashboard.raw_value)" t-set="mrp_detail"/>
+                            <t t-value="record.name.raw_value" t-set="quality_type"/>
+                            <t t-call="JournalTop"/>
+                            <div class="container o_kanban_card_content o_visible">
+                                <div class="row">
+                                    <t t-if="quality_type== 'Production Request'" t-call="production_request"/>
+				    <t t-if="quality_type== 'Manufacture Planning'" t-call="manu_orders"/>
+				    <t t-if="quality_type== 'Purchase Order'" t-call="po_orders"/>
+				    <t t-if="quality_type== 'Rejected Quantity'" t-call="rejected_details"/>
+                                    <t t-if="quality_type== 'Work Oders Planning'" t-call="work_orders"/>
+                                    <t t-if="quality_type== 'Transfer Quantity'" t-call="transfer_details"/>
+				</div><t t-call="JournalBodyGraph"/>
+                            </div><div class="container o_kanban_card_manage_pane o_invisible">
+                            </div>
+                        </div>
+                    </t>
+		    <t t-name="JournalTop">
+                        <div class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <div class="o_primary">
+                                    <field name="name"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_manage_button_section">
+                                <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
+                            </div>
+                        </div>
+                    </t>
+          <!--Production Request Details -->          
+		    <t t-name="production_request">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Production Requests</b>
+                          <div >
+                            	<a name="action_open_production" context="{'n_state': 'sales'}" type="object">
+			           Request from Sales-<span t-esc="mrp_detail.sales_request_count"/>                                
+					   </a>
+				<a name="action_open_production" context="{'n_state': 'contract'}" type="object">
+					   <span title="Request from Contract"> Request Contract -<span t-esc="mrp_detail.contract_request_count"/>                        
+					   </span></a>
+			   	<a name="action_open_production" context="{'n_state': 'stock'}" type="object">
+					   <span title="Request from Stock"> Request from Stock -<span t-esc="mrp_detail.stock_request_count"/>
+					   </span></a>
+			   	<a name="action_open_production" context="{'n_state': 'raw_material'}" type="object">
+					   <span title="request Raw material Manufacturing Order"> Request Raw Material Mo -<span t-esc="mrp_detail.material_request_count"/>
+					   </span></a>
+                          </div>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b>Manufacture Order Details</b>
+                            <div>
+                            	<a name="action_open_mrp" context="{'n_state': 'new'}" type="object">
+					   <span title="New Manufacturing"> New Manufacturing - <span t-esc="mrp_detail.new_mrp_count"/>                              
+					   </span></a>
+				<a name="action_open_mrp" context="{'n_state': 'waiting'}" type="object">
+					   <span title="Awaiting Raw materials"> Awaiting Raw materials -<span t-esc="mrp_detail.awaiting_mrp_count"/>
+					   </span></a>
+			   	<a name="action_open_mrp" context="{'n_state': 'in-process'}" type="object">
+					   <span title="In Process Manufacture Orders"> In Process Orders -<span t-esc="mrp_detail.progress_mrp_count"/>
+					   </span></a>
+			   	<a name="action_open_mrp" context="{'n_state': 'done'}" type="object">
+					   <span title="Completed Orders"> Completed Orders -<span t-esc="mrp_detail.complete_mrp_count"/>
+					   </span></a>
+			   	<a name="action_open_mrp" context="{'n_state': 'cancel'}" type="object">
+					   <span title="Cancelled Orders">Cancelled Orders - <span t-esc="mrp_detail.cancel_mrp_count"/>
+					   </span></a>
+                               <a name="action_open_mrp" context="{'n_state': 'hold'}" type="object">
+					   <span title="Cancelled Orders">Hold Orders -<span t-esc="mrp_detail.hold_mrp_count"/>
+					   </span></a>
+                            </div>
+                        </div>
+                    </t>
+	<!--MO Planning -->
+		    <t t-name="manu_orders">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <b>Manufacture Order Planned</b>
+                            <div class="row">
+                       		<a name="action_planning_mrp" context="{'n_state': 'today'}" type="object">
+				   <span title="Todays Planned Orders">Today's Planned -<span t-esc="mrp_detail.today_mrp_start"/>
+					   </span></a>
+				<a name="action_planning_mrp" context="{'n_state': 'tomorrow'}" type="object">
+				   <span title="Tomorrow Planned">Tomorrow's Planned -<span t-esc="mrp_detail.tomorrow_mrp_start"/>
+					   </span></a>
+			   	<a name="action_planning_mrp" context="{'n_state': 'week'}" type="object">
+				   <span title="This Week Planned">This Week Planned -<span t-esc="mrp_detail.week_mrp_start"/> 
+					   </span></a>
+			   	<a name="action_planning_mrp" context="{'n_state': 'month'}" type="object">
+				   <span title="This Month Planned">This Month Planned -<span t-esc="mrp_detail.month_mrp_start"/>
+					   </span></a>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b>Manufacture Completed Orders</b>
+                            <div class="row">
+                       		<a name="action_completed_mrp" context="{'n_state': 'today'}" type="object">
+				   <span title="Today's Completed">Today's Completed - <span t-esc="mrp_detail.today_mrp_completed"/>
+					   </span></a>
+				<a name="action_completed_mrp" context="{'n_state': 'tomorrow'}" type="object">
+				   <span title="Tomorrow Completed ">Tomorrow Completed - <span t-esc="mrp_detail.tomorrow_mrp_completed"/>
+					   </span></a>
+			   	<a name="action_completed_mrp" context="{'n_state': 'week'}" type="object">
+				   <span title="This Week Completed">This Week Completed - <span t-esc="mrp_detail.week_mrp_completed"/> 
+					   </span></a>
+			   	<a name="action_completed_mrp" context="{'n_state': 'month'}" type="object">
+				   <span title="This Month Completed">This Month Completed - <span t-esc="mrp_detail.month_mrp_completed"/>
+					   </span></a>
+                            </div>
+                        </div>
+                    </t>
+	<!--Po Details -->
+		    <t t-name="po_orders">
+			<lable />
+                        <div class="col-xs-6 o_kanban_primary_left">
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <a name="action_purchase_open" context="{'n_state': 'new'}" type="object"> 
+                            	<span title="New Purchase order">New Purchase order - <span t-esc="mrp_detail.total_purchase_new"/>   </span></a>
+                            <a name="action_purchase_open" context="{'n_state': 'confirmed'}" type="object">
+                            	<span title="Confirmed Purchase">Confirmed Purchase -<span t-esc="mrp_detail.total_purchase_confirmed"/> </span></a>
+                            <a name="action_purchase_open" context="{'n_state': 'done'}" type="object">
+                                 <span title="Done Purchase order">Done Purchase order - <span t-esc="mrp_detail.total_purchase_done"/>  </span></a>
+                            <a name="action_purchase_open" context="{'n_state': 'cancel'}" type="object">
+                                 <span title="New Purchase order">Cancelled Purchase order -<span t-esc="mrp_detail.month_mrp_cancel"/> </span></a>
+                        </div>
+                    </t>
+                    
+            <!--rejected from Quality -->
+                    <t t-name="rejected_details">
+                       <div class="col-xs-6 o_kanban_primary_left">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Raw Material Details</span>
+		                     </div>
+		                     <div>
+		               		<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state': 'not_receive'}" type="object">Not Received - <span t-esc="mrp_detail.rm_virtual_available"/> </a>
+						
+					</a>
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'received'}" type="object">Received -<span t-esc="mrp_detail.rm_virtual_done"/>
+					   </a>
+					</a>
+					
+                       	   	     </div>
+                       </div>
+                       
+                       <div class="col-xs-6 o_kanban_primary_right">
+                            <b><field name="name"/></b> 
+                            <div class="row">
+                       		<a name="" context="{'n_state': 'generic'}" type="object">
+					   <span title="Generic Tests"> - Rejected by Quantity
+					   </span></a>
+				<a name="" context="{'n_state': 'related'}" type="object">
+					   <span title="Related Tests"> - Rejected by Quality
+					   </span></a>
+                            </div>
+                       </div>
+                    </t>
+                    
+                   <!-- Start Work order planning-->
+                      <t t-name="work_orders">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <b>Work Orders Planned</b>
+                            <div class="row">
+                       		<a name="action_planning_workorders" context="{'n_state': 'today'}" type="object">
+				   <span title="Todays Planned Orders">Today's Planned - <span t-esc="mrp_detail.today_work_start"/>
+					   </span></a>
+				<a name="action_planning_workorders" context="{'n_state': 'tomorrow'}" type="object">
+				   <span title="Tomorrow Planned">Tomorrow's Planned - <span t-esc="mrp_detail.tomorrow_work_start"/>
+					   </span></a>
+			   	<a name="action_planning_workorders" context="{'n_state': 'week'}" type="object">
+				   <span title="This Week Planned">This Week Planned -<span t-esc="mrp_detail.week_work_start"/>
+					   </span></a>
+			   	<a name="action_planning_workorders" context="{'n_state': 'month'}" type="object">
+				   <span title="This Month Planned">This Month Planned -<span t-esc="mrp_detail.month_work_start"/> 
+					   </span></a>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b>Work Orders Details</b>
+                            <div class="row">
+                       		<a name="action_workorder_open" context="{'n_state': 'new'}" type="object">
+				   <span title="New Work Orders">New Work Orders -<span t-esc="mrp_detail.new_work_count"/> 
+					   </span></a>
+                                <a name="action_workorder_open" context="{'n_state': 'hold'}" type="object">
+				   <span title="Hold Work Orders">Hold Work Orders -<span t-esc="mrp_detail.hold_work_count"/>
+					   </span></a>
+                                <a name="action_workorder_open" context="{'n_state': 'ready'}" type="object">
+				   <span title="Ready Work Orders">Ready Work Orders -<span t-esc="mrp_detail.ready_work_count"/>
+				</span></a>
+				<a name="action_workorder_open" context="{'n_state': 'start'}" type="object">
+				   <span title="Start Work Orders ">Start Work Orders -<span t-esc="mrp_detail.start_work_count"/> 
+					   </span></a>
+			   	<a name="action_workorder_open" context="{'n_state': 'pause'}" type="object">
+				   <span title="Pause Work Orders">Pause Work Orders -<span t-esc="mrp_detail.pause_work_count"/> 
+					   </span></a>
+			   	<a name="action_workorder_open" context="{'n_state': 'completed'}" type="object">
+				   <span title="Completed Work Orders">Completed Work Orders -<span t-esc="mrp_detail.done_work_count"/>
+					   </span></a>
+                                <a name="action_workorder_open" context="{'n_state': 'cancel'}" type="object">
+				   <span title="Cancelled Work Orders">Cancelled Work Orders -<span t-esc="mrp_detail.cancel_work_count"/>
+					   </span></a>
+                                
+                            </div>
+                        </div>
+                    </t>
+                    
+                  <!--Transfer Quality -->
+                    <t t-name="transfer_details">
+                       <div class="col-xs-6 o_kanban_primary_left">
+			    <!--div class="o_kanban_card_manage_title">
+	                            <span>Production Details</span>
+	                     </div>
+	                     <div>
+	               		<button type="object" name="action_create_transfer" class="btn btn-primary btn-sm" groups="gt_order_mgnt.group_injection_product,base.group_sale_manager" context="{'warehouse_name':'Dubai'}">
+                                	<t><span>Transfer(DXB)</span></t>
+                            	</button>
+                            	<button type="object" name="action_create_transfer" class="btn btn-primary btn-sm" groups="gt_order_mgnt.group_film_product,base.group_sale_manager" context="{'warehouse_name':'Sharjah'}">
+                                	<t><span>Transfer(SHJ)</span></t>
+                            	</button>
+               	   	     </div-->
+	                </div>
+                       
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <b>Transfer Operations</b>
+                            <div class="row">
+                            	<a name="action_open_transfers" context="{'n_state': 'draft'}" type="object">
+					   <span title="Rejected by Inventory">In_Production Transfers - <span t-esc="mrp_detail.draft_trns_count"/> 
+					   </span></a>
+                       		<a name="action_open_transfers" context="{'n_state': 'reject'}" type="object">
+					   <span title="Rejected by Inventory">Rejected Transfers - <span t-esc="mrp_detail.reject_trns_count"/> 
+					   </span></a>
+			   	<a name="action_open_transfers" context="{'n_state': 'waiting'}" type="object">
+					   <span title="Waiting to approved by Inventory">Waiting for Approve - <span t-esc="mrp_detail.waiting_trns_count"/> 
+					   </span></a>
+				<a name="action_open_transfers" context="{'n_state': 'done'}" type="object">
+					   <span title="Done Transfers">Done Transfers - <span t-esc="mrp_detail.done_trns_count"/> 
+					   </span></a>
+                            </div>
+                        </div>
+                    </t>
+                    
+                   <!--End Work Order Plannind -->
+		    <t t-name="JournalBodyGraph">
+                        <div class="o_kanban_graph_section">
+                            <!--field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/-->
+                        </div>
+                    </t>
+            </templates>
+        </kanban>
+    </field>
+    </record>
+    
+    <record id="custom_mrp_dashboard_action" model="ir.actions.act_window">
+	    <field name="name">Dashboard</field>
+	    <field name="res_model">custom.mrp.dashboard</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">kanban,tree</field>
+	    <field name="domain">[('active','=',True)]</field>
+    </record>
+    
+    <menuitem  id="mrp_dashboard_menu" sequence="0" name="Dashboard"  parent="base.menu_mrp_root"  action="custom_mrp_dashboard_action" groups="mrp.group_mrp_user"/>
+    </data>
+    
+</openerp>  

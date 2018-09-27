@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        
+         <record id="view_order_from123" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+             <div class="oe_title"  position="inside">
+                   
+                     <!--button
+                        string="Generate the EAN13"
+                        name="generate_ean13"
+                       
+                        type="object" colspan="2"/-->
+                 <div>
+                    <field name="barcode" widget="BarCode128" readonly='1' style="margin-left:-17px;"
+                       attrs="{'invisible':[('barcode','=',False)]}"/>
+                    <field name='barcode_copy' readonly='1' style="margin-left:70px;font-size:70%"/>
+                </div>
+                <field name="ean_sequence_id" domain="[('barcode_sequence', '=', 1)]" invisible='1'
+                        context="{'default_name': name and 'EAN ' + name or 'EAN', 'default_barcode_sequence': 1}"
+                        class="oe_edit_only" />
+              </div>
+           </field>
+         </record>
+        <record id="view_picking_form_ext" model="ir.ui.view">
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+             <h1 class="hidden-xs" position="after">
+                   <field name="ean_sequence_id" domain="[('barcode_sequence', '=', 1)]" invisible='1'
+                        context="{'default_name': name and 'EAN ' + name or 'EAN', 'default_barcode_sequence': 1}"
+                        class="oe_edit_only" />
+                     <!--button
+                        string="Generate the EAN13"
+                        name="generate_ean13"
+                       
+                        type="object" colspan="2"/-->
+                 <div>
+                    <field name="barcode" widget="BarCode128" readonly='1' style="margin-left:-17px;"
+                      attrs="{'invisible':[('barcode','=',False)]}"/>
+                    <field name='barcode_copy' readonly='1' style="margin-left:70px;font-size:70%"/>
+                </div>
+              </h1>
+           </field>
+         </record>
+         
+         <record id="mrp_production_form_view_ext_barcode" model="ir.ui.view">
+            <field name="name">mrp.production.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+             <div class="oe_title"  position="inside">
+                   <field name="ean_sequence_id" domain="[('barcode_sequence', '=', 1)]" invisible='1'
+                        context="{'default_name': name and 'EAN ' + name or 'EAN', 'default_barcode_sequence': 1}"
+                        class="oe_edit_only" />
+                     <!--button
+                        string="Generate the EAN13"
+                        name="generate_ean13"
+                       
+                        type="object" colspan="2"/-->
+                 
+                 <div>
+                    <field name="barcode" widget="BarCode128" readonly='1' style="margin-left:-17px;"
+                         attrs="{'invisible':[('barcode','=',False)]}"/>
+                    <field name='barcode_copy' readonly='1' style="margin-left:10px;font-size:70%"/>
+                </div>
+              </div>
+           </field>
+         </record>
+         
+    </data>
+</openerp>
+

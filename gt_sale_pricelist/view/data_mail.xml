@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		
+        <record id="email_template_approve_req" model="mail.template">
+            <field name="name">Discount requested for &lt; ${object.name} &gt;</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Discount requested Alert :${object.user_id.name} Requested Discount For ${object.partner_id.name} ${object.name}</field>
+            <field name="email_to">${object.team_id.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+         <record id="email_template_approve_req_line" model="mail.template">
+            <field name="name">Discount requested for &lt; ${object.order_id.name} &gt;</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Discount requested Alert :${object.order_id.name} Quotation Details</field>
+            <field name="email_to">${object.order_id.team_id.user_id.email|safe}</field>
+            <field name="lang">${object.order_id.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        <record id="email_template_approved_req" model="mail.template">
+            <field name="name">&lt;${object.name}&gt; discount updated</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP Discount Request Approved Alert :${object.user_id.name} Discount Request Approved ${object.partner_id.name} ${object.name}</field>
+            <field name="email_to">${object.user_id.email|safe}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        
+
+    </data>
+</openerp>

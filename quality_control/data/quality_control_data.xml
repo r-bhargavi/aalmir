@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record forcecreate="True" id="decimal_quality_control" model="decimal.precision">
+            <field name="name">Quality Control</field>
+            <field name="digits">5</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="seq_quality_inspection" model="ir.sequence">
+            <field name="name">Quality inspection</field>
+            <field name="code">quality.inspection</field>
+            <field name="prefix">QI-</field>
+            <field name="padding">6</field>
+        </record>
+        
+        <record id="seq_quality_checking" model="ir.sequence">
+            <field name="name">Quality Checking</field>
+            <field name="code">quality.checking</field>
+            <field name="prefix">QCC-</field>
+            <field name="padding">5</field>
+        </record>
+        
+        <!--record id="seq_quality_checking_line" model="ir.sequence">
+            <field name="name">Quality checking Line</field>
+            <field name="code">quality.checking.line</field>
+            <field name="prefix">QCL-</field>
+            <field name="padding">6</field>
+        </record-->
+    </data>
+  <!--Dashboard Data -->  
+    <data noupdate="1">
+        <!--record id="qc_dashboard_record1" model="quality.dashboard">
+            <field name="name">Quality Requests</field>
+            <field name="Quality Dashboard">1</field>
+        </record>
+	<record id="qc_dashboard_record2" model="quality.dashboard">
+            <field name="name">Inspections</field>
+            <field name="Quality Dashboard">1</field>
+        </record>
+	<record id="qc_dashboard_record3" model="quality.dashboard">
+            <field name="name">Tests</field>
+            <field name="Quality Dashboard">1</field>
+        </record-->
+	<record id="qc_dashboard_record4" model="quality.dashboard">
+            <field name="name">Quality Requests</field>
+            <field name="Quality Dashboard">1</field>
+        </record>
+    </data>
+
+</openerp>

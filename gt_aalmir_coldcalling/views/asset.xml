@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_backend" name="Many2one clickable assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/gt_aalmir_coldcalling/static/src/js/web_tree_many2one_clickable.js"></script>
+               <script type="text/javascript" src="/gt_aalmir_coldcalling/static/src/js/web_tree_dynamic_colored_field.js"></script>
+               <script type="text/javascript" src="/gt_aalmir_coldcalling/static/src/js/chatter_history.js"></script>
+               <link rel="stylesheet" href="/gt_aalmir_coldcalling/static/src/less/chatter.less" type="text/less"/>
+		<!-- <script type="text/javascript" src="/gt_aalmir_coldcalling/static/lib/sticky_table_header/sticky_table_headers.js"/>
+                <script type="text/javascript" src="/gt_aalmir_coldcalling/static/src/js/web_list_view_sticky.js"/>-->
+            </xpath>
+        </template>
+   
+    </data>
+</openerp>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record id="view_crm_lead2opportunity_partner_aalmir" model="ir.ui.view">
+            <field name="name">crm.lead2opportunity.partner.form,aalmir</field>
+            <field name="model">crm.lead2opportunity.partner</field>
+            <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner" />
+            <field name="arch" type="xml">
+                <field name="team_id" widget="selection" position="replace">
+                    <field name="team_id" widget="selection" invisible="1"/>
+                </field>
+                <field name="user_id" position="replace">
+                    <field name="is_sales_person" invisible="1"/>
+                    <field name="user_id" required="1" attrs="{'readonly': [('is_sales_person','=', True)]}"/>
+                </field>
+                <field name="opportunity_ids" position="replace">
+                    <field name="opportunity_ids" nolabel="1" context="{'from_opp_form': True}">
+                        <tree>
+                            <field name="create_date"/>
+                            <field name="name"/>
+                            <field name="type"/>
+                            <field name="contact_name"/>
+                            <field name="country_id" invisible="context.get('invisible_country', True)"/>
+                            <field name="email_from"/>
+                            <field name="phone"/>
+                            <field name="stage_id"/>
+                            <field name="user_id"/>
+                            <field name="team_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

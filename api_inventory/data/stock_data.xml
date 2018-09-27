@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+	<record id="unit_type_data7" model="product.uom.type">
+            <field name="name">Storage Uom</field>
+            <field name="string">store</field>
+            <field name="description">This will show unit for Storage Unit of Product Store Location in Inventory</field>
+            <field name="active">1</field>
+        </record>
+    </data>
+</openerp>

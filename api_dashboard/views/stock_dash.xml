@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+	<record id="stock_dashboard_kanban_view" model="ir.ui.view">
+	     	<field name="name">custom.stock.dashboard.view</field>
+	    	<field name="model">custom.stock.dashboard</field>
+	    	<field name="arch" type="xml">
+		<kanban class="oe_background_grey o_kanban_dashboard o_account_kanban" create="false">
+		    <field name="color"/>
+		    <field name="name"/> 
+		    <field name="status_dashboard"/>
+		    <templates>
+		        <t t-name="kanban-box">
+		                <div t-attf-class="#{kanban_color(0)}">
+				    <t t-value="JSON.parse(record.status_dashboard.raw_value)" t-set="raw_material"/>
+		                    <t t-value="record.name.raw_value" t-set="sale_type"/>
+		                    <t t-call="JournalTop"/>
+		                    <div class="container o_kanban_card_content o_visible">
+		                        <div class="row">
+		                            <t t-if="sale_type== 'Stock Details'" t-call="stock_details"/>
+					    <t t-if="sale_type== 'Raw Material'" t-call="raw_details"/>
+					</div><t t-call="JournalBodyGraph"/>
+		                    </div>
+		                </div>
+		            </t>
+			    <t t-name="JournalTop">
+		                <div class="o_kanban_card_header">
+		                    <div class="o_kanban_card_header_title">
+		                        <div class="o_primary">
+		                            <field name="name"/>
+		                        </div>
+		                    </div>
+		                    <div class="o_kanban_manage_button_section">
+		                        <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
+		                    </div>
+		                </div>
+		            </t>
+		         
+		<!--Delivery Details -->
+			    <t t-name="stock_details">
+		                <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Product Stock Information</span>
+		                     </div>
+		                    <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="get_count" context="{'p_stock':True}" type="object">Minimum Stock -
+                                              <span t-esc='raw_material.total_proudct_min_qty'/>
+					     </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'raw_stock':True}" type="object">Return Raw Material -
+                                              <span t-esc='raw_material.return_raw_material'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'request_pending':True}" type="object">Puchase Pending Request -
+                                              <span t-esc='raw_material.pending_rqst'/>
+					     </a>
+					</a>
+		                    </div>
+		                </div>
+                               <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Wastage Request Information</span>
+		                     </div>
+		                    <div>
+		               		<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state': 'wastage_new'}" type="object">New Request - 
+						<span t-esc="raw_material.new_wastage"/> </a>
+					</a>
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'wastage_approved'}" type="object">Approved Request -
+						<span t-esc="raw_material.approved_wastage"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'wastage_cancel'}" type="object">cancelled Request - 
+						<span t-esc="raw_material.cancel_wastage"/> </a>
+					</a>
+					
+                       	   	     </div>
+		                </div>
+				
+		            </t>
+			    <t t-name="JournalBodyGraph">
+		                <div class="o_kanban_graph_section">
+		                    <field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/>
+		                </div>
+		            </t>
+		            
+    		<!--Raw Material Details -->
+			    <t t-name="raw_details">
+		                <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Raw Material Information</span>
+		                     </div>
+		                     <div>
+		               		<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state': 'new'}" type="object">New Request - 
+						<span t-esc="raw_material.new_request"/> </a>
+					</a>
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'approve_request'}" type="object">Approved Request -
+						<span t-esc="raw_material.approved_state"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'cancel'}" type="object">cancelled Request - 
+						<span t-esc="raw_material.cancel_state"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state': 'new_schedule'}" type="object">New RM Delivery - 
+					<span t-esc="raw_material.schedule_picking"/> </a>
+					</a>
+                       	   	     </div>
+		                </div>
+		                <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Schedule Raw Material</span> </div>
+		                    <div>
+		               		<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'rm_delivery': 'today'}" type="object">Todays Delivery - 
+						<span t-esc="raw_material.rm_virtual_today"/> </a>
+					</a>
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'rm_delivery':'tomorrow'}" type="object">Tomorrow's Delivery -
+						<span t-esc="raw_material.rm_virtual_tomorrow"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'rm_delivery':'delay'}" type="object">Delayed's Delivery - 
+						<span t-esc="raw_material.rm_virtual_delay"/> </a>
+					</a>
+		                    </div>
+	   		      </div>
+                              <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Extra Raw Material Information</span>
+		                     </div>
+		                     <div>
+		               		<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state': 'extra_new'}" type="object">New Request - 
+						<span t-esc="raw_material.extra_new_request"/> </a>
+					</a>
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'extra_approve_request'}" type="object">Approved Request -
+						<span t-esc="raw_material.extra_approved_state"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'extra_cancel'}" type="object">cancelled Request - 
+						<span t-esc="raw_material.extra_cancel_state"/> </a>
+					</a>
+					
+                       	   	     </div>
+		                </div>
+                              
+		            </t>
+			    <t t-name="JournalBodyGraph">
+		                <div class="o_kanban_graph_section">
+		                    <field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/>
+		                </div>
+		            </t>
+
+		    </templates>
+		</kanban>
+	    </field>
+	</record>
+	     <record id="custom_stock_dashboard_action" model="ir.actions.act_window">
+	    <field name="name"> Stock Dashboard</field>
+	    <field name="res_model">custom.stock.dashboard</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">kanban</field>
+	</record>
+	
+         <menuitem  id="stock_dashboard_menu" parent="stock.menu_stock_root" sequence="0"
+                name="Stock Dashboard" action="custom_stock_dashboard_action"/>
+</data>
+</openerp>

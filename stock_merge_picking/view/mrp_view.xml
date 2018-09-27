@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <record id="view_sales_config_ext" model="ir.ui.view">
+            <field name="name">sale settings</field>
+            <field name="model">sale.config.settings</field>
+            <field name="inherit_id" ref="base_setup.view_sale_config_settings"/>
+            <field name="arch" type="xml">
+               <div id="main" position="inside">
+                <group>
+                    <group string='Imports Files'>
+                     <button name="changeleadtime" type="object" string="Change Product Customer Lead Time" class="btn-primary"/>
+                     <button name="importsaleorder" type="object" string="Create Multi Sale order" class="btn-primary" />
+               
+                    <button name="importcarton" type="object" string="Import Carton Product" class="btn-primary" />
+                  </group>
+                 <group>
+                 </group>
+              </group>
+              </div>
+            </field>
+       </record>
+       
+     <record id="product_leadtime_change" model="ir.ui.view">
+            <field name="name">Mrp Complete Date</field>
+            <field name="model">mrp.complete.date</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Product Customer Lead Time Change">
+                     <group string="Please Select Option before click button for Change Product Customer Lead Time">
+                         <group >
+                                <field name="change_film"/>
+                                <field name="produce_delay" attrs="{'invisible':[('change_film','=',False)]}"
+                                  string="Customer Lead Time Film"/>
+			</group>
+			  <group>
+                                <field name="change_injection"/>
+                                <field name="produce_delay_injection" attrs="{'invisible':[('change_injection','=',False)]}"
+                                  string="Customer Lead Time Injection"/>
+			 </group>
+                     </group>
+		     <button name="changeleadtimeadmin" string="Done &amp; Close"  class="btn-primary" type="object"/>
+            	</form>
+            </field>
+        </record>
+        
+       <record id="view_mrp_settings_inherite" model="ir.ui.view">
+            <field name="name">MRP settings</field>
+            <field name="model">mrp.config.settings</field>
+            <field name="inherit_id" ref="mrp.view_mrp_config"/>
+            <field name="arch" type="xml">
+               <xpath  expr="//form" position="inside">
+                 	<button name="importProduct" type="object" string="Import Product" class="btn-primary"/>
+              </xpath>
+              <field name="group_rounding_efficiency" position="after">
+                   <label for='process_shift_time' string="Process Shift Time"/>
+		      <div>
+		         <field name="process_shift_time" class="oe_inline" nolabel="1"/> 
+		         <button name="UpdateShifttime"  class="oe_inline oe_highlight" nolabel="1" 
+                          type="object" icon='fa-refresh' />
+		     </div>
+              </field>
+            </field>
+       </record>
+       
+       <record id="product_import_data" model="ir.ui.view">
+            <field name="name">Product Import data</field>
+            <field name="model">product.import.data</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Product Import Data">
+                         <group>
+                                <field name="name" invisible="1"/>
+                                <field name="new_upload" filename="name"/>
+			</group>
+			
+			<button name="import_data" string="Import"  class="btn-primary" type="object"
+                          invisible="not context.get('product')"/>
+                        <button name="import_sale" string="Import"  class="btn-primary" type="object"
+                           invisible="not context.get('sale')"/>
+                        <button name="import_carton" string="Import"  class="btn-primary" type="object"
+                           invisible="not context.get('carton')"/>
+                        <button name="update_name" string="Update Name"  class="btn-primary" type="object"
+                           invisible="not context.get('carton')" />
+            	</form>
+            </field>
+        </record>
+        
+        <!--  Produce -->
+	<record id="mrp_sale_form_view_inherite" model="ir.ui.view">         
+        <field name="name">mrp.product.produce</field>
+        <field name="model">mrp.product.produce</field>
+        <field name="inherit_id" ref="mrp.view_mrp_product_produce_wizard"></field>
+        <field name="arch" type="xml">
+          <button name="do_produce" position="replace">
+                <button name="do_produce" type="object" string="Transfer" class="btn-primary"
+                 attrs="{'invisible':[('complete_produce','=',True)]}"
+                 confirm="Are you sure you want to Transfer This Qty?"/>
+
+		<button name="api_do_produce" type="object" string="Closed MO" class="btn-primary"
+                  attrs="{'invisible':[('complete_produce','=',False)]}"
+                  confirm="Are you sure you want to Close MO?"/>
+	  </button>
+            
+         <xpath expr='//form/group[2]' position='attributes'>
+             <attribute name='invisible'>1</attribute>
+         </xpath>
+         <xpath expr='//form/group[2]' position='before'>
+            <group string="Remaining Raw Material Details" attrs="{'invisible':[('complete_produce','=',False)]}">
+                        <field name="remain_lines" nolabel="1"   options="{'no_create': True}">
+                            <tree string="Remaining Raw Material" editable="top">
+                                <field name="product_id" readonly='1'/>
+                                <field name='remain_consmed_qty' readonly='1'/>
+                                <field name="remain_qty"/>
+                                <field name='uom_id' readonly='1'/>
+                            </tree>
+                        </field>
+                    </group>
+         </xpath>
+         <field name='product_qty' position="replace"> 
+              
+              <label for='produced_qty' string="Produced Qty"/>
+	     <div>
+                <field name="produced_qty" colspan="2"  class="oe_inline" nolabel="1" readonly="1"/>
+		<field name="produced_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+	     </div>
+             <field name='production_id' invisible='1'/>
+             <field name='batch_ids' widget='many2many_tags'  context="{'last_batch':True, 'production':production_id}"
+              domain="[('production_id','=',production_id),('lot_id','=',False),('product_qty','&gt;',0)]"
+              options="{'no_create': True}" />
+              <!-- attrs="{'required': [('product_qty', '&gt;', 0)],'readonly':[('complete_produce','=',True)]}" /-->
+             <label for='product_qty' string="Select Quantity"/>
+	     <div>
+               <!--field name="product_qty" colspan="2" class="oe_inline" nolabel="1"/-->
+                <field name="product_qty" colspan="2" on_change="on_change_qty(product_qty, consume_lines, context)"
+                   class="oe_inline" nolabel="1"/>
+		<field name="product_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+	     </div>
+             
+          </field> 
+            <field name="mode" position="attributes">
+                <attribute name='invisible'>1</attribute>
+            </field>
+          <field name="lot_id" position="replace">
+            <field name="lot_id" domain="[('product_id', '=', product_id), ('production_id', '=', production_id)]"
+                 string='Transfer No.'  context="{'default_product_id':product_id}" readonly='1'
+                                    attrs="{'invisible':[('mode','!=','consume_produce')]}"
+                                    groups="stock.group_production_lot"/>
+          </field>
+       
+          <xpath expr="//form/group[1]" position="before">
+                <group>
+                  <group>
+                     <field name="complete_produce" string='Mark as Done'/>  
+                  </group>
+                  <group>
+                  </group>
+                </group>
+                 
+          </xpath>
+          <xpath expr='//footer' position="before">
+             <group colspan="4">
+                     <!--field name="remaining_raw_material" attrs="{'invisible':[('complete_produce','=',False)]}"/-->  
+                     <field name="reason" attrs="{'invisible':[('complete_produce','=',False)],'required':[('complete_produce','=',True)]}"/>  
+              </group>
+          </xpath>
+	</field>
+	</record>
+
+	<record id="view_mrp_operations_calendar_inherite" model="ir.ui.view">
+            <field name="name">mrp operation calendar</field>
+            <field name="model">mrp.production.workcenter.line</field>
+            <field name="inherit_id" ref="mrp_operations.workcenter_line_calendar"/>
+            <field name="arch" type="xml">
+            	<calendar position="replace">
+        		<calendar string="Operations"  date_start="date_planned_end" color="product" date_stop="date_planned">
+                		<field name="workcenter_id"/>
+                		<field name="production_id"/>
+            		</calendar>
+                </calendar>
+            </field>
+        </record>
+        
+	<record id="mrp_production_form_view_inherite" model="ir.ui.view">
+		<field name="name">mrp.production.form</field>
+		<field name="model">mrp.production</field>
+		<field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
+		<field name="arch" type="xml">
+			<field name="product_qty" position="replace">
+		      		<field name="product_qty" attrs="{'readonly': ['|',('state','!=','draft'),('request_line', '!=',False)]}"/>
+		   	</field>
+		</field>
+	</record>
+
+	<record id="view_production_calendar_inherite" model="ir.ui.view">
+            <field name="name">mrp production calendar</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.view_production_calendar"/>
+            <field name="arch" type="xml">
+            	<calendar position="replace">
+        		<calendar string="Manufacturing Orders State" date_start="date_planned" date_stop="n_request_date" color="calendar_state">
+		            <field name="name"/>
+		            <field name="product_id"/>
+		            <field name="product_qty"/>
+	                </calendar>
+                </calendar>
+            </field>
+        </record>
+       
+        <record id="mrp_production_action_planning_complete" model="ir.actions.act_window">
+            <field name="name">Manufacturing Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">calendar,tree,form,pivot,graph</field>
+            <field name="domain">[('state','in',('ready','confirmed','in_production'))]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to start a new manufacturing order.
+              </p><p>
+                A manufacturing order, based on a bill of materials, will
+                consume raw materials and produce finished products.
+              </p><p>
+                Manufacturing orders are usually proposed automatically based
+                on customer requirements or automated rules like the minimum
+                stock rule.
+              </p>
+            </field>
+        </record>
+     
+         	
+       <record id="view_production_calendar_complete" model="ir.ui.view">
+            <field name="name">mrp.production.calendar.complete</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <calendar date_start="n_request_date" string="Manufacturing Orders" color="request_line">
+                    <field name="name"/>
+                    <field name="product_id"/>
+                    <field name="product_qty"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <record id="action_mrp_calendar_view1" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_production_calendar_complete"/>
+            <field name="act_window_id" ref="mrp_production_action_planning_complete"/>
+        </record>
+   
+        <menuitem action="mrp_production_action_planning_complete"
+                id="menu_mrp_production_order_action_complte" name="Completion Planning"
+                parent="mrp.menu_mrp_planning" sequence="2"/>
+  
+  <!--New calenders -->     
+        
+        <record id="view_mrp_order_calendar_inherite" model="ir.ui.view">
+            <field name="name">mrp operation calendar</field>
+            <field name="model">mrp.production.workcenter.line</field>
+            <field name="arch" type="xml">
+		<calendar string="Operations" date_start="date_planned" date_stop="date_planned_end" color="production_data" mode="month">
+                       <field name='hold_order'  attrs="{'invisible':[('hold_order','=','active')]}"/>
+                        <field name="name" />
+        		<field name="workcenter_id" />
+        		<field name="production_id"/>
+                        <field name='sequence'/>
+                        <field name='partner_id'/>
+                        <field name='state'/>
+    		</calendar>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="api_mrp_order_production_planning">
+		<field name="name">Work Centers Calenders</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.production.workcenter.line</field>
+		<field name="view_type">form</field>
+		<field name="domain">[('production_state','in',('ready','confirmed','in_production'))]</field>
+		<field name="view_mode">calendar,tree,form,graph</field>
+		<field name="view_id" ref="view_mrp_order_calendar_inherite"/>
+	    </record>
+	    
+    	<record id="action_mrp_order_calendar_view1" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_mrp_order_calendar_inherite"/>
+            <field name="act_window_id" ref="api_mrp_order_production_planning"/>
+        </record>
+   
+        <menuitem id="menu_mrp_order_operation" action="api_mrp_order_production_planning"
+                 name="MO Planning" parent="mrp.menu_mrp_planning" sequence="3"/>
+   
+   
+                
+        <record id="view_mrp_machine_calendar_inherite" model="ir.ui.view">
+            <field name="name">mrp operation calendar</field>
+            <field name="model">mrp.production.workcenter.line</field>
+            <field name="arch" type="xml">
+		<calendar string="Operations" date_start="date_planned" date_stop="date_planned_end"  
+                   mode="month" color="machine" >
+                        <field name='hold_order' attrs="{'invisible':[('hold_order','=','active')]}"/>
+        		<field name="name" />
+        		<field name="workcenter_id" />
+        		<field name="production_id"/>
+                        <field name='sequence'/>
+                        <field name='partner_id'/>
+                        <field name='state'/>
+    		</calendar>
+            </field>
+        </record>
+        <!-- start calendar view for work order wise -->
+            <record id="view_mrp_workorder_calendar_inherite" model="ir.ui.view">
+		    <field name="name">mrp operation calendar</field>
+		    <field name="model">mrp.production.workcenter.line</field>
+		    <field name="arch" type="xml">
+			<calendar string="Operations" date_start="date_planned" date_stop="date_planned_end"  
+		           mode="month" color="self_id" >
+		                <field name='hold_order' attrs="{'invisible':[('hold_order','=','active')]}"/>
+				<field name="name" />
+        			<field name="workcenter_id" />
+        			<field name="production_id"/>
+                        	<field name='sequence'/>
+                        	<field name='partner_id'/>
+                        	<field name='state'/>
+	    		</calendar>
+		    </field>
+		</record>
+            
+        <!-- End Calendar View for work order wise -->
+        <record model="ir.actions.act_window" id="api_mrp_machine_planning">
+		<field name="name">Work Centers Calenders</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.production.workcenter.line</field>
+		<field name="view_type">form</field>
+		<field name="domain">[('production_state','in',('ready','confirmed','in_production'))]</field>
+		<field name="view_mode">calendar,tree,form,graph</field>
+		<field name="view_id" ref="view_mrp_machine_calendar_inherite"/>
+	    </record>
+	    
+        <menuitem id="menu_mrp_machine_action" action="api_mrp_machine_planning"
+                 name="Machine Planning" parent="mrp.menu_mrp_planning" sequence="4"/>
+                 
+    </data>
+</openerp>
+

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+    	<record id="group_stock_operator" model="res.groups">
+        	<field name="name">Store Operator</field>
+        	<field name="category_id" ref="base.module_category_warehouse_management"/>
+    	</record>
+    	
+    	<record id="stock.group_stock_user" model="res.groups">
+        	<field name="implied_ids" eval="[(4, ref('group_stock_operator'))]"/>
+    	</record>
+    	
+    	<!--record id="group_bin_operator" model="res.groups">
+            <field name="name">Store Operator</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="category_id" ref="base.module_category_usability"/>
+        </record-->
+        
+        <record id="group_contract_msq_alert" model="res.groups">
+        	<field name="name">Contract MSQ Email</field>
+            	<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            	<field name="category_id" ref="gt_order_mgnt.module_category_mail_usability"/>
+            	<field name="comment">Get Email Alert When Contract Product is out of Contract Minimum Stock Quantity</field>
+    	</record>
+    	<record id="group_inventory_msq_alert" model="res.groups">
+        	<field name="name">Logistics MSQ Email</field>
+            	<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            	<field name="category_id" ref="gt_order_mgnt.module_category_mail_usability"/>
+            	<field name="comment">Get Email Alert When Warehouse Product is out of Minimum Stock Quantity</field>
+    	</record>
+    </data>
+</openerp>
+
+

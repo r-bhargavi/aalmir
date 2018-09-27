@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <!--CH_N045 start-->
+	<record model="ir.ui.view" id="utm_campaign_tree_inherite">
+            <field name="name">utm.campaign.tree</field>
+            <field name="model">utm.campaign</field>
+	    <field name="inherit_id" ref="utm.utm_campaign_tree" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="user_m2m" />
+                </field>
+            </field>
+        </record>
+
+	<record model="ir.ui.view" id="utm_campaign_form_inherite">
+            <field name="name">utm.campaign.tree</field>
+            <field name="model">utm.campaign</field>
+	    <field name="inherit_id" ref="utm.utm_campaign_form" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="user_m2m" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                </field>
+            </field>
+        </record>
+	<!--CH_N045 end-->
+    </data>
+</openerp>

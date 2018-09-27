@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="quality_inspection_form_view">
+            <field name="name">Quality Inspection Form</field>
+            <field name="model">quality.inspection</field>
+            <field name="arch" type="xml">
+                <form string="Quality Inspection" create='false' delete='false'>
+                    <header>
+                        <button name="action_draft" type="object" string="Draft"
+                                attrs="{'invisible': [('state', '!=', 'canceled')]}" groups="quality_control.group_quality_check_user"/>
+                        <button name="action_validate" type="object" class="oe_highlight"
+                                states="draft" string="Validate" groups="quality_control.group_quality_check_user"/>
+                        <button name="action_confirm" type="object" class="oe_highlight"
+                                states="ready" string="Confirm" icon="gtk-ok" groups="quality_control.group_quality_check_user"/>
+                        <button name="action_cancel" type="object"
+                                attrs="{'invisible': [('state', 'not in', ['waiting', 'ready', 'failed', 'success'])]}" string="Cancel"  icon="gtk-cancel" groups="quality_control.group_quality_check_user"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,success,canceled" statusbar_colors='{"success": "green","failed": "red"}' />
+                    </header>
+                    <sheet>
+                    	<h1>
+                            <label string="Inspection "/>
+                            <field name="name"/>
+                         </h1>
+                       	    <field name="full_test" invisible="1"/>
+                        <group>
+                                <field name="quality_id" groups="quality_control.group_quality_check_user"/>
+                         </group>
+                        <group>
+                            <group>
+                                <field name="product" />
+                                <label for="qty" groups="quality_control.group_quality_check_user"/>
+				    <div groups="quality_control.group_quality_check_user">
+				        <field name="qty" readonly="1" nolabel="1" class="oe_inline"/> 
+				        <field name="uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+				    </div>
+                            </group>
+                            <group>
+                            	<field name="ntype" attrs="{'readonly':[('state','!=','draft')],'invisible':[('full_test','=',True)],'required':[('full_test','!=',True)]}"/>
+                                <field name="test" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="user" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                            <group>
+                                <field name="date" />
+                                <field name="success" attrs="{'invisible':[('state','=','draft')]}" groups="quality_control.group_quality_check_user"/>
+                            </group>
+                            <group>
+                            	<label for="approve_qty" groups="quality_control.group_quality_check_user" attrs="{'readonly':[('state','!=','ready')],'invisible':[('ntype','!=','accept')]}"/>
+                            	<div groups="quality_control.group_quality_check_user" attrs="{'readonly':[('state','!=','ready')],'invisible':[('ntype','!=','accept')]}">
+                                	<field name="approve_qty" attrs="{'readonly':[('state','!=','ready')]}" class="oe_inline"/>
+                                	<field name="auom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+                                </div>
+                                <label for="reject_qty" attrs="{'readonly':[('state','!=','ready')],'invisible':[('ntype','!=','reject')]}"/>
+                            	<div attrs="{'readonly':[('state','!=','ready')],'invisible':[('ntype','!=','reject')]}">
+                                	<field name="reject_qty" attrs="{'readonly':[('state','!=','ready')]}" class="oe_inline" />
+                                	<field name="ruom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+                                </div>
+                                <field name="lot_lines" nolabel="1" attrs="{'readonly':[('state','!=','ready')],'invisible':['|',('state','=','draft'),('full_test','!=',True)]}">
+                        	    <tree string="Inspection lines" editable="top" delete="false">
+                                        <field name="quality_line_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="approve_qty" />
+                                        <field name="reject_qty" />
+                                        <field name="quality_id" invisible="1"/>
+                                        <field name="inspection_id" invisible="1"/>
+                                    </tree>
+                                    <form string="Inspection lines" edit='false' create='false' delete="false">
+                                        <field name="quality_line_id" readonly="1" />
+                                        <field name="approve_qty" readonly="1"/>
+                                        <field name="reject_qty" readonly="1"/>
+                                        <field name="quality_id" invisible="1"/>
+                                        <field name="inspection_id" invisible="1"/>
+                                    </form>
+                                </field>
+                            </group>
+                            <group>
+                            	<field name="uploaded_documents" widget="many2many_binary" attrs="{'invisible': [('uploaded_documents', '=', [])]}" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Questions">
+                                <field name="inspection_lines" nolabel="1">
+                                    <tree string="Inspection lines" editable="top">
+                                        <field name="test_line" required="1" readonly="0" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="question_type" />
+                                        <field name="possible_ql_values" invisible="1" />
+                                        <field name="qualitative_value" attrs="{'readonly': [('question_type', '=', 'quantitative')]}" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="quantitative_value" attrs="{'readonly': [('question_type', '=', 'qualitative')]}" />
+                                        <field name="uom_id" attrs="{'readonly': [('question_type', '=', 'qualitative')]}" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="test_uom_category" invisible="1"/>
+                                        <field name="valid_values" />
+                                        <field name="success" />
+                                        <field name="inspection_id" invisible="1"/>
+                                    </tree>
+                                    <form string="Inspection lines" create='false' editable="top" delete="false">
+                                    	<group col="4">
+		                                <field name="test_line" options="{'no_create': True, 'no_open': True}"/>
+		                                <field name="question_type" />
+		                                <field name="possible_ql_values" invisible="1" />
+		                                <field name="qualitative_value" attrs="{'readonly': [('question_type', '=', 'quantitative')]}" options="{'no_create': True, 'no_open': True}"/>
+		                                <field name="quantitative_value" attrs="{'readonly': [('question_type', '=', 'qualitative')]}" />
+		                                <field name="uom_id" attrs="{'readonly': [('question_type', '=', 'qualitative')]}" options="{'no_create': True, 'no_open': True}"/>
+		                                <field name="test_uom_category" invisible="1"/>
+		                                <field name="valid_values" />
+		                                <field name="success" />
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Notes">
+                                <group string="Internal notes" >
+                                    <field name="notes" nolabel="1" readonly="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!--div class="oe_chatter">
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div-->
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="quality_inspection_tree_view">
+            <field name="name">Quality Inspection Tree</field>
+            <field name="model">quality.inspection</field>
+            <field name="arch" type="xml">
+                <tree string="Inspections" create='false' delete='false'>
+                    <field name="name" />
+                    <field name="user" />
+                    <field name="date"/>
+                    <field name="test" />
+                    <field name="success" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="quality_inspection_search_view">
+            <field name="name">Quality Inspection Search</field>
+            <field name="model">quality.inspection</field>
+            <field name="arch" type="xml">
+                <search string="Search inspection">
+                    <group>
+                        <field name="name" />
+                        <field name="user" />
+                        <field name="test" />
+                    </group>
+                    <newline />
+                    <filter name="group_quality_id" string="Quality" context="{'group_by':'quality_id'}"/>
+                    <filter string="Success" domain="[('success', '=', True)]"/>
+                    <filter string="Failed" domain="[('success', '=', False)]"/>
+                    <newline />
+                    <group expand="0" string="Group by...">
+                        <filter string="Test"
+                                domain="[]"
+                                context="{'group_by': 'test'}" />
+                        <filter string="Responsible"
+                                domain="[]"
+                                context="{'group_by': 'user'}" />
+                        <filter string="Product"
+                                domain="[]"
+                                context="{'group_by': 'product'}" />
+                        <filter string="State"
+                                domain="[]"
+                                context="{'group_by': 'state'}" />
+                        <filter string="Success"
+                                domain="[]"
+                                context="{'group_by': 'success'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_quality_inspection">
+            <field name="name">Inspections</field>
+            <field name="res_model">quality.inspection</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_group_quality_id': 1}</field>
+        </record>
+
+        <record model="ir.ui.view" id="quality_inspection_line_tree_view">
+            <field name="name">qc.inspection.line.tree</field>
+            <field name="model">quality.inspection.line</field>
+            <field name="arch" type="xml">
+                <tree string="Inspection lines" delete="false" create="false" colors="red: success==False">
+                    <field name="inspection_id" />
+                    <field name="product" />
+                    <field name="name" />
+                    <field name="question_type" />
+                    <field name="possible_ql_values" invisible="1" />
+                    <field name="qualitative_value"
+                           attrs="{'readonly': [('question_type', '=', 'quantitative')]}" />
+                    <field name="quantitative_value"
+                           attrs="{'readonly': [('question_type', '=', 'qualitative')]}" />
+                    <field name="uom_id"
+                           groups="product.group_uom"
+                           attrs="{'readonly': [('question_type', '=', 'qualitative')]}" />
+                    <field name="test_uom_category" invisible="1"/>
+                    <field name="valid_values" />
+                    <field name="success" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="quality_inspection_line_search_view">
+            <field name="name">Quality Inspection Line Search</field>
+            <field name="model">quality.inspection.line</field>
+            <field name="arch" type="xml">
+                <search string="Search inspection line">
+                    <group>
+                        <field name="name" />
+                        <field name="inspection_id" />
+                        <field name="product" />
+                        <field name="success" />
+                    </group>
+                    <newline />
+                    <filter string="Correct"
+                            domain="[('success', '=', True)]"/>
+                    <filter string="Incorrect"
+                            domain="[('success', '=', False)]"/>
+                    <newline />
+                    <group expand="0" string="Group by...">
+                        <filter string="Inspection"
+                                domain="[]"
+                                context="{'group_by': 'inspection_id'}" />
+                        <filter string="Product"
+                                domain="[]"
+                                context="{'group_by': 'product'}" />
+                        <filter string="Question"
+                                domain="[]"
+                                context="{'group_by': 'name'}" />
+                        <filter string="Success"
+                                domain="[]"
+                                context="{'group_by': 'success'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+	<!--menuitem id="parent_quality_inspection_menu" name="Inspections" parent="main_quality_menu_id" sequence="20" />
+	<menuitem name="Inspections" parent="parent_quality_inspection_menu" id="quality_inspection_menu" action="action_quality_inspection" /-->
+	
+    </data>
+</openerp>
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Delivered To customer  -->
+	<record id="email_template_for_delivery_done" model="mail.template">
+	    <field name="name">Delivery order is Received by Customer</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Delivery Alert :${(object.name)} is Delivered To ${(object.partner_id.name)}. 
+                   </field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="stock.model_stock_picking"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+	    </field>
+	</record>
+        <!-- Dispatch From Stock -->
+        <record id="email_template_for_dispatch_done" model="mail.template">
+	    <field name="name">Delivery order is Dispatched</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Dispatch Alert :${(object.name)} for ${(object.origin)} is Dispatched. 
+                   </field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		    <field name="model_id" ref="stock.model_stock_picking"/>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+	    </field>
+	</record>
+
+ 
+    </data>
+</openerp>

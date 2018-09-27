@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="import_pricelsit_form_view_aalmir" model="ir.ui.view">
+            <field name="name">import.pricelsit.form.view.aalmir</field>
+            <field name="model">import.pricelist</field>
+            <field name="arch" type="xml">
+                <form string="Import Pricelist">
+                    <group>
+                        <field name="name" />
+                    </group>
+                     <footer>
+                        <button string="Import" name="import_pricelist" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+         <act_window
+            id="action_import_pricelist_aalmir"
+            name="Import Pricelist"
+            res_model="import.pricelist"
+            src_model="product.pricelist"
+            view_mode="form"
+            multi="True"
+            target="new"
+            key2="client_action_multi"
+        />
+        
+    </data>
+</openerp>

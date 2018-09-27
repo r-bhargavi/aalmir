@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record id="custom_sales_support" model="ir.ui.view">
+        <field name="name">custom.sales.dashboard</field>
+        <field name="model">custom.sales.dashboard</field>
+        <field name="arch" type="xml">
+            <tree string="Data" editable="bottom">
+                     <field name="name"/> 
+		    <field name="orders_count"/>
+		    <field name="orders_done_count"/>
+		    <field name="awaiting_count"/>
+            </tree>
+        </field>
+      </record>
+ 
+   <record model="ir.actions.act_window" id="custom_sales_support_action">
+        <field name="name">Reserved History</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">custom.sales.dashboard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="custom_sales_support"/>
+    </record>
+
+     <record id="channel_dashboard_kanban_view" model="ir.ui.view">
+     	<field name="name">custom.sales.dashboard.view</field>
+    	<field name="model">custom.sales.dashboard</field>
+    	<field name="arch" type="xml">
+        <kanban class="oe_background_grey o_kanban_dashboard o_account_kanban" create="false">
+            <field name="color"/>
+            <field name="name"/> 
+            <field name="orders_count"/>
+            <field name="orders_done_count"/>
+	    <field name="awaiting_count"/>
+	    <field name="awaiting_invoice_count"/>
+	    <field name="delivery_dashboard"/>
+	    <field name="status_dashboard"/>
+	    <field name="credit_request_dashboard"/>
+            <field name="not_match"/>
+            <templates>
+                <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(0)}">
+			    <t t-value="JSON.parse(record.delivery_dashboard.raw_value)" t-set="n_delivery"/>
+			    <t t-value="JSON.parse(record.status_dashboard.raw_value)" t-set="n_status"/>
+			    <t t-value="JSON.parse(record.credit_request_dashboard.raw_value)" t-set="credit_request"/>
+                            <t t-value="record.name.raw_value" t-set="sale_type"/>
+                            <t t-call="JournalTop"/>
+                            <div class="container o_kanban_card_content o_visible">
+                                <div class="row">
+                                    <t t-if="sale_type== 'Sales Details'" t-call="sales_details"/>
+				    <t t-if="sale_type== 'Delivery Details'" t-call="delivery_detail"/>
+				    <t t-if="sale_type== 'State Details'" t-call="state_details"/>
+				    <t t-if="sale_type== 'Requests Details'" t-call="request_details"/>
+				</div><t t-call="JournalBodyGraph"/>
+                            </div>
+                            <div class="container o_kanban_card_manage_pane o_invisible">
+                                <t t-call="JournalManage"/>
+                            </div>
+                        </div>
+                    </t>
+		    <t t-name="JournalTop">
+                        <div class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <div class="o_primary">
+                                    <field name="name"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_manage_button_section">
+                                <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
+                            </div>
+                        </div>
+                    </t>
+                    
+		    <t t-name="JournalManage">
+                        <!-- For Deliveries -->
+                        <!--div t-if="sale_type== 'Delivery Details'" class="row">
+			   <div class="col-xs-6 o_kanban_card_manage_section o_kanban_manage_view">
+			     <div class="o_kanban_card_manage_title">
+                                    <span>Done Deliveries</span>
+                             </div>
+                             <div class="row">
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_yester'}" type="object">YesterDay's Delivery -
+					<span t-esc="n_delivery.yesterday_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_prevw'}" type="object">Prevoius Week Deliverys - 
+					<span t-esc="n_delivery.previousweek_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_prevm'}" type="object">Prevoius Month Deliverys - 
+					<span t-esc="n_delivery.prevoiusmonth_delivery"/> </a>
+				</a>
+                             </div>
+			   </div>
+                        </div-->
+		    </t>
+		    
+		    <t t-name="sales_details">
+			<field name="name"/> 
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <button type="object" name="action_quotation" class="btn btn-primary btn-sm">
+                                <t><span>Quotations</span></t>
+                            </button>
+			    <button type="object" name="action_sale" class="btn btn-primary btn-sm">
+                                <t><span>Sale Order</span></t>
+                            </button>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <div class="row">
+                       		<a name="action_sales" context="{'n_state': 'awaiting'}" type="object">
+					   <span title="Awaiting Orders"><t t-esc="record.awaiting_count.raw_value"/> - Awaiting Orders
+					   </span></a>
+				<a name="action_sales" context="{'n_state': 'awaiting_inv'}" type="object">
+				   <span title="Awaiting Orders(Invoice Pending)"><t t-esc="record.awaiting_invoice_count.raw_value"/> - Awaiting Orders(Invoice Pending)
+				   </span></a>
+				<a name="action_sales" context="{'n_state': 'sale'}" type="object">
+				   <span title="Sale Orders"><t t-esc="record.orders_count.raw_value"/> - Sale Orders</span></a>
+				<a name="action_sales" context="{'n_state': 'done'}" type="object">
+				   <span title="Sale Orders"><t t-esc="record.orders_done_count.raw_value"/> - Done Orders</span>
+				</a>
+                               <a name="action_sales" context="{'n_state': 'not_match'}" type="object">
+				   <span title="Delivered/Invoiced Quantity not Matching"><t t-esc="record.not_match.raw_value"/> - Delivery/Invoice Mismatch</span>
+				</a>
+                            </div>
+                        </div>
+                    </t>
+	<!--Delivery Details -->
+		    <t t-name="delivery_detail">
+                        <div class="col-xs-6 o_kanban_primary_right">
+			    <div class="o_kanban_card_manage_title">
+                                    <span>Future Deliveries</span>
+                             </div>
+                            <div class="row">
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_today'}" type="object">Todays Deliveries -
+					<span title="Todays Delivery" t-esc="n_delivery.todays_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_tommr'}" type="object">Tomorrow's Deliveries - 
+					<span title="Tomorrow's Delivery" t-esc="n_delivery.tomorrow_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_week'}" type="object">This Week Deliveries - 
+					<span t-esc="n_delivery.thisweek_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_nweek'}" type="object">Next Week Deliveries - 
+					<span t-esc="n_delivery.nextweek_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_month'}" type="object">This Month Deliveries - 
+					<span t-esc="n_delivery.thismonth_delivery"/> </a>
+				</a>
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'next_month'}" type="object">Next Month Deliveries - 
+					<span t-esc="n_delivery.next_month_delivery"/> </a>
+				</a>
+                            </div>
+                        </div>
+			<div class="col-xs-6 o_kanban_primary_right">
+			    <div class="o_kanban_card_manage_title">
+                                    <span>Delivery</span>
+                            </div>
+                            <div class="row">
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_delay'}" type="object">Delayed Deliveries - 
+					<span t-esc="n_delivery.delay_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_rescheduled'}" type="object">Dispatch Rescheduled - 
+					<span t-esc="n_delivery.dispatch_rescheduled"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_dispatch'}" type="object">Dispatched Deliveries - 
+					<span t-esc="n_delivery.dispatch_delivery"/> </a>
+				</a>
+                            </div>
+                            <b>Done Deliveries</b>
+                             <div class="row">
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_yester'}" type="object">YesterDay's Delivery -
+					<span t-esc="n_delivery.yesterday_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state':'n_prevw'}" type="object">Prevoius Week Deliverys - 
+					<span t-esc="n_delivery.previousweek_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_delivery" context="{'n_state': 'n_prevm'}" type="object">Prevoius Month Deliverys - 
+					<span t-esc="n_delivery.prevoiusmonth_delivery"/> </a>
+				</a>
+                        </div>
+                        </div>
+                    </t>
+	<!--State Details -->
+		    <t t-name="state_details">
+			<div class="col-xs-6 o_kanban_primary_right">
+			    <div class="o_kanban_card_manage_title">
+                                    <span>Sale Support Status</span> </div>
+                            <div>
+                       		<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'new'}" type="object">New - 
+					<span t-esc="n_status.new_state"/> </a>
+				</a>
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'production_request'}" type="object">Production Request -
+					<span t-esc="n_status.production_request"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'manufacture'}" type="object">In Manufacturing - 
+					<span t-esc="n_status.manufacture"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'purchase'}" type="object">In Purchase - 
+					<span t-esc="n_status.purchase"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'warehouse'}" type="object">Warehouse - 
+					<span t-esc="n_status.warehouse"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'quality_check'}" type="object">Quality Check - 
+					<span t-esc="n_status.quality_check"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'pre_stock'}" type="object">Pre-Stock Quantity - 
+					<span t-esc="n_status.pre_stock"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'extra_qty'}" type="object">Extra Quantity - 
+					<span t-esc="n_status.extra_qty"/> </a>
+				</a>
+                       	   </div>
+			</div>
+			<div class="col-xs-6 o_kanban_primary_right">
+			    <div class="o_kanban_card_manage_title">
+                                    <span>Delivery</span> </div>
+                            <div>
+                       		<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'r_t_dispatch'}" type="object">Ready To Dispatch - 
+					<span t-esc="n_status.r_t_dispatch"/> </a>
+				</a>
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'dispatch'}" type="object">Dispatch -
+					<span t-esc="n_status.dispatch"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'partial_dispatch'}" type="object">In Partial Dispatch - 
+					<span t-esc="n_status.partial_dispatch"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'partial_delivery'}" type="object">Partial Delivery - 
+					<span t-esc="n_status.partial_delivery"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'delivered'}" type="object">Full Delivery - 
+					<span t-esc="n_status.delivered"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state': 'partial_invoice'}" type="object">Partial Invoice - 
+					<span t-esc="n_status.partial_invoice"/> </a>
+				</a>
+                                <a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'invoiced'}" type="object">Full Invoice -
+					<span t-esc="n_status.invoiced"/> </a>
+				</a>
+				<a class="o_project_kanban_box" name="" type="action">
+                                   <a name="action_stateopen" context="{'n_state':'paid_qty'}" type="object">Paid orders -
+					<span t-esc="n_status.paid"/> </a>
+				</a>
+                            </div>
+   		      </div>
+                    </t>
+	<!--Production Details -->
+		    <t t-name="request_details">
+			<div>
+		             <div class="col-xs-6 o_kanban_primary_right">
+				    <div class="o_kanban_card_manage_title">
+		                            <span>Production Data</span></div>
+		                    <div>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen" context="{'n_state':'date_request'}" type="object">Date Request -
+						<span t-esc="n_status.date_request"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_openpr" context="{'n_state':'pr_request'}" type="object">Cancelled PR -
+						<span t-esc="n_status.cancel_pr_request"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_instruction" context="{'n_state':'n_instrct'}" type="object">New-Instructions -
+						<span t-esc="n_status.instrct"/> </a>
+					</a>
+					<a></a>
+		                    </div>
+	                            <div class="o_kanban_card_manage_title">
+		                            <span>Contract Data</span>
+	                            </div>
+		                    <div>
+                    			<a name="action_open_exp_contract" type="object" >
+                    				<field name="expr_contract_product"/> -  Contract Product MSQ</a>
+                          
+               				<a name="action_order_contract_expr" type="object" >
+						<field name="expr_contract"/> -  Contract Expire</a>
+		                    </div>
+			     </div>
+	                     <div class="col-xs-6 o_kanban_primary_left">
+	                            <b>Sales Order Credit Request</b>
+	       			     <a class="o_project_kanban_box" name="" type="action">
+			   		<a name="action_credit_request" context="{'n_credit': 'request'}" type="object">Credit Requested - 
+						<span t-esc="credit_request.credit_request"/> </a>
+				    </a>
+	       			     <a class="o_project_kanban_box" name="" type="action">
+				        <a name="action_credit_request" context="{'n_credit': 'approve'}" type="object">Credit Approved - 
+						<span t-esc="credit_request.credit_approved"/> </a>
+					</a>
+	       			     <a class="o_project_kanban_box" name="" type="action">
+				    	<a name="action_credit_request" context="{'n_credit': 'reject'}" type="object">Credit Rejected - 
+						<span t-esc="credit_request.credit_reject"/></a>
+					</a>
+	                            <b>Delivery Credit Request</b>
+		       		  <a class="o_project_kanban_box" name="" type="action">
+				     <a name="action_credit_request" context="{'n_credit': 'd_request'}" type="object">Credit Requested - 
+				 	<span t-esc="credit_request.credit_request_delivery"/> </a>
+				     </a>
+				  <a class="o_project_kanban_box" name="" type="action">
+				      <a name="action_credit_request" context="{'n_credit': 'd_approve'}" type="object">Credit Approved - 
+					<span t-esc="credit_request.credit_approved_delivery"/> </a>
+				      </a>
+				  <a class="o_project_kanban_box" name="" type="action">
+				      <a name="action_credit_request" context="{'n_credit': 'd_reject'}" type="object">Credit Rejected - 
+					<span t-esc="credit_request.credit_reject_delivery"/></a>
+				      </a>
+	                   	</div>
+			</div>
+                    </t>
+		    <t t-name="JournalBodyGraph">
+                        <div class="o_kanban_graph_section">
+                            <!--field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/-->
+                        </div>
+                    </t>
+            </templates>
+        </kanban>
+    </field>
+</record>
+     <record id="custom_sales_dashboard_action" model="ir.actions.act_window">
+    <field name="name">Dashboard</field>
+    <field name="res_model">custom.sales.dashboard</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">kanban</field>
+</record>
+
+<!--menuitem name="Dashboard" id="employees_main_menu"/>    
+    <menuitem  id="employees_dashboard_menu1" sequence="0" name="sale view" action="custom_sales_support_action" parent="employees_main_menu"/-->
+	<menuitem  id="support_dashboard_menu" sequence="0" name="Dashboard" action="custom_sales_dashboard_action" parent="gt_order_mgnt.main_menu_sale_support"/>
+    </data>
+
+</openerp>                                                                                                                             

@@ -1,0 +1,15 @@
+<odoo>
+	<template id="assets_backend_web_menu_hide_9" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+             <link rel="stylesheet" href="/gt_order_mgnt/static/src/css/mycss.css"/>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/js/menu_my.js"></script>
+            </xpath>
+        </template>
+	
+	<template id="menu_webclient_bootstrap_web_menu_hide_9" inherit_id="web.webclient_bootstrap">
+            <xpath expr="//div[@class='navbar-header']" position="inside">
+                <span class="fa fa-bars btn-link toggle_leftmenu" style="font-size:18px"></span>
+                <span class="fa fa-bars btn-link toggle_upperheader" style="font-size:26px"></span>
+            </xpath>
+        </template>
+</odoo>

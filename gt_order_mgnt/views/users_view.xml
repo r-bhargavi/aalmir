@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="inherited_res_users_form" model="ir.ui.view">
+            <field name="name">inherited.res.users.form</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                   <field name='machine_ids' widget='many2many_tags' string='Machine'/>
+                   <field name='employee_ids' widget='many2many_tags'/>
+                </field>
+                 <xpath expr="//field[@name='signature']" position="before">
+                    <field name="approve_purchase" />
+                    <field name="designation_purchase"  attrs="{'invisible':[('approve_purchase','=',False)]}"/>
+                 </xpath>   
+                <xpath expr="//field[@name='signature']" position="after">
+                    <field name="signature_image" widget="image"/>
+                    <label for="digital_signature" class="oe_edit_only"/>
+                    <h2><field name="digital_signature" widget="signature"/></h2>
+                 </xpath>
+                
+            </field>
+        </record>     
+          
+         <record id="view_company_form_aalmir_order" model="ir.ui.view">
+            <field name="name">res.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="gt_sale_quotation.view_company_form_aalmir_custom" />
+            <field name="arch" type="xml">
+                <group name="terms_and_condition" position="before">
+                         <field name='company_active' invisible='1'/>
+                        <separator string="Invoice Note" />
+                        <field name="n_invoice_note" nolabel="1" placeholder="Invoice Note"/>
+                        <separator string="Purchase Note" />
+                        <field name="purchase_note" nolabel="1" placeholder="Purchase Note"/>
+                        <separator string="Electronic Generated Signature" />
+                        <field name="report_note" nolabel="1" placeholder="Electronic Generated Signature"/>
+                </group>
+            </field>
+        </record>
+         <record id="mrp_company_purchase" model="ir.ui.view">
+            <field name="name">res.company.mrp.config</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="purchase.mrp_company"/>
+            <field name="arch" type="xml">
+                <field name='po_double_validation_amount' position='replace'>
+                     <field name="po_double_validation_amount" string='PO Max Amount'/>
+                     <field name='min_amount' string='PO Min Amount'/>
+                 </field>
+                 <field name="po_double_validation" position='attributes'>
+                    <attribute name='invisible'>1</attribute>
+                 </field>
+            </field>
+        </record>
+
+         <record id="action_res_company_form_report" model="ir.actions.act_window">
+            <field name="name">LetterHead Companies</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.company</field>
+            <field name="view_type">form</field>
+            <field name='domain'>[('company_active','=',True)]</field>
+            <field name='context'>{'default_company_active':True}</field>
+        </record>
+        <record id="base.action_res_company_form" model="ir.actions.act_window">
+            <field name="name">Companies</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.company</field>
+            <field name="view_type">form</field>
+            <field name='domain'>[('company_active','=',False)]</field>
+            <field name="help">Create and manage the companies that will be managed by Odoo from here. Shops or subsidiaries can be created and maintained from here.</field>
+        </record>
+        <menuitem action="action_res_company_form_report" id="menu_action_res_company_form_report" parent="base.menu_users"/>
+    </data>
+</openerp>

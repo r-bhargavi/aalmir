@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Sequences for sale.order -->
+        <record id="seq_film_int_number" model="ir.sequence">
+            <field name="name">Films Internal Product Number</field>
+            <field name="code">film.internal.product.number</field>
+            <field name="prefix">1</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+   <!-- CH_N175 add product internal number -->     
+        <record id="seq_raw_material" model="ir.sequence">
+            <field name="name">Raw Material Internal Number</field>
+            <field name="code">raw.internal.product.number</field>
+            <field name="prefix">5</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+  
+        <record id="seq_packaging" model="ir.sequence">
+            <field name="name">Packaging Internal Number</field>
+            <field name="code">packaging.internal.number</field>
+            <field name="prefix">6</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_asset" model="ir.sequence">
+            <field name="name">Asset Internal Number</field>
+            <field name="code">asset.internal.number</field>
+            <field name="prefix">7</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_product_other" model="ir.sequence">
+            <field name="name">Other Product Number</field>
+            <field name="code">other.internal.number</field>
+            <field name="prefix">8</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</openerp>
+

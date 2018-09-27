@@ -1,0 +1,461 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        
+         <record model="ir.ui.view" id="crm_cold_calling_lead_tree_view">
+            <field name="name">Cold Calling Leads</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <tree string="Leads Form" editable="top" colors="green:stage_2=='qualified'; blue:stage_2=='contacted'; red:stage_2=='disqualified'">
+                    <field name="campaign_id" context="{'n_user':user_id}" options="{'no_create': True,'no_open': True}" /> <!--#CH_N037 add option to avoid create and edit -->
+                    <field name="create_date" readonly="1"/>
+                    <field name="last_contacted" readonly="1"/>
+                    <field name="number_of_days"/>
+                    <field name="interval_date" invisible="1"/>
+                    <field name="cont_pre_val" invisible="1"/>
+                    <field name="cont_last_val" invisible="1"/>
+                    <field name="cont_bool" invisible="1"/>
+                    <field name="qualified_date" invisible="1"/>
+                    <field name="disqualified_date" invisible="1"/>
+                    <field name="coldcalling_ids" invisible="1"/>
+                    <field name="contact_interval"/>
+                    <field name="partner_id"/>
+                    <field name="name" string="Company Name" required="1"/>
+                    <field name="contact_name" string="Name"/>
+                    <field name="phone" widget="phone" options="{'dial_button_invisible': True}" required="1"/>
+                    <field name="mobile" widget="phone" options="{'dial_button_invisible': True}" />
+                    <field name="email_from"/>
+                    <field name="stage_2" readonly="1"/>
+                    <field name="user_id" />
+		    <field name="history_recent" readonly="1" />
+                    <field name="id" invisible="1"/>
+                    <button name="get_contact" string="Contact" type="object" class="oe_highlight" attrs="{'invisible' : [('stage_2','not in',['contacted', 'not_contacted'])] }" icon="fa-phone"/>
+                    <button name="get_qualify" string="Qualify" type="object" attrs="{'invisible' : [('stage_2','!=','contacted')] }" icon="STOCK_APPLY" context="{'from_coldcalling' : True}"/>
+                    <button name="get_history" string="History" type="object" icon="fa-history" attrs="{'invisible' : [('stage_2','=','not_contacted')] }"/>
+                    <button name="disqualify" string="Disqualified" type="object" attrs="{'invisible' : [('stage_2','not in',['contacted', 'not_contacted'])]}" icon="fa-close"/>
+                    <button type="object" name="action_schedule_reminder" icon="fa-bell"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="crm_cold_calling_lead_pivot_view">
+            <field name="name">Cold Calling View</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <pivot string="Cold Calling" display_quantity="true">
+                    <field name="stage_2" type="row"/>
+                    <field name="create_date"/>
+                    <field name="user_id" />
+                </pivot>
+            </field>
+        </record>
+         
+        
+        <record model="ir.ui.view" id="crm_cold_calling_lead_search_view">
+            <field name="name">Cold Calling Leads</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <search string="Cold Calling" >
+                    <field name="stage_2"/>
+                    <field name="contact_name"/>
+                    <field name="partner_id"/>
+                    <field name="campaign_id" options="{'no_create': True,'no_open': True}" required="1"/> <!--#CH_N037 add option to avoid create and edit -->
+                    <separator />
+                    <filter string="Not Contacted"
+                            name="not_contacted"
+                            domain="[('stage_2','=', 'not_contacted')]"/>
+                  
+                    <filter string="Contacted"
+                            name="contacted"
+                            domain="[('stage_2','=', 'contacted')]"/>
+                  
+                    <filter string="Disqualified"
+                            name="Disqualified"
+                            domain="[('stage_2','=', 'disqualified')]"/>
+                  
+                    <filter string="Qualified"
+                            name="qualified"
+                            domain="[('stage_2','=', 'qualified')]"/>
+                  
+                    <group expand="0" string="Group By">
+                        <filter string="Status" name="groupby_status" domain="[]" context="{'group_by':'stage_2'}"/>
+                        <filter string="Sales Person" name="groupby_sales_person" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Creation Date" name="groupby_cdate" domain="[]" context="{'group_by':'create_date'}"/>
+                        <filter string="Campaign" name="groupby_campaign_id" domain="[]" context="{'group_by':'campaign_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="crm_cold_calling_action">
+            <field name="name">Cold Calling</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">tree,pivot</field>
+            <field name="domain">[('stage_2','in', ['contacted','not_contacted','qualified','disqualified'])]</field>
+            <field name="context">{'cold_calling' : True}</field>
+            <field name="search_view_id" ref="gt_aalmir_coldcalling.crm_cold_calling_lead_search_view" />
+        </record>
+        
+        <record model="ir.actions.act_window.view" id="crm_cold_calling_action_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="crm_cold_calling_lead_tree_view"/>
+            <field name="act_window_id" ref="crm_cold_calling_action"/>
+        </record>
+        
+        <record model="ir.actions.act_window.view" id="crm_cold_calling_action_pivot_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="crm_cold_calling_lead_pivot_view"/>
+            <field name="act_window_id" ref="crm_cold_calling_action"/>
+        </record>
+        
+	<menuitem name="Lead" id="menu_sales_lead" parent="base.menu_base_partner" sequence="1" />
+        
+	<menuitem name="Cold Calling" id="menu_cold_calling" parent="menu_sales_lead" sequence="0"             action="crm_cold_calling_action" />
+            
+        <record model="ir.ui.view" id="crm_dep_mail_tree_view">
+            <field name="name">Recipients</field>
+            <field name="model">dep.mail</field>
+            <field name="arch" type="xml">
+                <tree string="Leads Form" editable="1">
+                	<field name="name" required="True"/>
+                	<field name="partner_ids" widget="many2many_tags_email" string="Recipients"/>
+                </tree>
+             </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="crm_dep_mail_action">
+            <field name="name">Dep. Recipients</field>
+            <field name="res_model">dep.mail</field>
+            <field name="view_mode">tree</field>
+        </record>
+        
+        <menuitem name="Dep. Recipients" id="menu_crm_dep_mail_action" parent="base.menu_sale_config" sequence="10"
+            action="crm_dep_mail_action" />
+            
+        <record model="ir.ui.view" id="crm_cold_calling_history_tree_view">
+            <field name="name">Cold Calling History</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <tree string="History" create="false" edit="false" delete="false" copy="false">
+                    <field name="contact_time" />
+                    <field name="availability" string="Stage"/>
+                    <field name="name" />
+                    <field name="user_id" string="Sales Person" />
+                     <field name="is_mass_mail" invisible="1"/>
+                      <field name="is_disqualify" invisible="1"/>
+                     <field name="is_qualify" invisible="1"/>
+                   <!-- add button for mass mail -->
+                    <button type="object" name="action_reminder_history_mass_mail" icon="fa-inbox" attrs="{'invisible': [('is_mass_mail', '=', False)]}" />
+                    <button type="object" name="action_reminder_history_disqualify" icon="fa-close" attrs="{'invisible': [('is_disqualify', '=', False)]}" />
+                   <button type="object" name="action_reminder_history_qualify" icon="STOCK_APPLY" attrs="{'invisible': [('is_qualify', '=', False)]}" />
+                    <button type="object" name="action_reminder_history" icon="fa-bell" attrs="{'invisible': [('set_reminder', '=', False)]}"/>
+                    <field name="set_reminder"/>
+                    <field name="reminder_time"/>
+                    <field name="my_mail" invisible="1"/>
+                    <button name="action_mail_history" string="Mail History" type="object" icon="fa-envelope" context="{'mail_history' : my_mail}" attrs="{'invisible': [('send_mail', '=', False)]}" />
+                    <field name="send_mail" style="width:50px"/>
+                </tree>
+            </field>
+         </record>
+         
+          <record model="ir.ui.view" id="crm_cold_calling_history_form_view">
+            <field name="name">Cold Calling History</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="History">
+                    <div class="oe_title">
+                        <h1>
+                            <field name="customer_name" readonly="1" nolabel="1" class="oe_inline"/>(<field name="email" readonly="1" class="oe_inline" nolabel="1"/>)
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="contact_time" />
+                    </group>
+                    <group>
+                        <group>
+                            <field name="availability" widget="radio" />
+                        </group>
+                        <group>
+                            <div class="o_row">
+                                <!--<field name="reminder_name" nolabel="1" placeholder="Reminde Name"/>-->
+                                <field name="reminder_time" nolabel="1" placeholder="Reminde Date"/>
+<!--                                <div>
+                                    <button name="set_reminder_calender" string="Set Reminder" type="object"/>
+                                </div>-->
+                            </div>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="name" />
+                        <field name="user_id" invisible="1"/>
+                        <field name="lead_id" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="qualify" string="Qualify" type="object" icon="STOCK_APPLY" context="{'from_coldcalling' : True}" attrs="{'invisible' : [('availability','=', 'not_available')]}"/>
+                        <button name="action_mail_send" string="Send Mail" type="object" icon="fa-envelope" context="{'cold_calling' : True}" />
+                        <button name="action_save_comment" string="Save" type="object" icon="fa-floppy-o" />
+                    </footer>
+                </form>
+                
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="crm_cold_calling_history_form_view_for_view_1">
+            <field name="name">Cold Calling History View</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="History" create='false' edit='false'>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="customer_name" readonly="1" nolabel="1" class="oe_inline"/>(<field name="email" readonly="1" class="oe_inline" nolabel="1"/>)
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="contact_time" />
+                        </group>
+                        <group>
+                            <group>
+                                <field name="availability" widget="radio" />
+                            </group>
+                        </group>
+                        <group>
+                           <field name="is_mass_mail" invisible="1"/>
+                            <field name="name" />
+                            <field name="user_id" invisible="1"/>
+                            <field name="lead_id" invisible="1"/>
+                            <field name="my_mail" invisible="1"/>
+                        </group>
+<!--                        <separator string="Email" />
+                        <group>
+                            <field name="email_from" />
+                            <field name="partner_ids" />
+                            <field name="subject" />
+                            <field name="date" />
+                            <field name="body" />
+                            <field name="attachment_ids" />
+                        </group>-->
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="cold_calling_history_search_view_1">
+            <field name="name">Cold Calling History</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <search string="Cold Calling History" >
+                    <field name="customer_name"/>
+                  
+                    <group expand="0" string="Group By">
+                        <filter string="Sales Person" name="groupby_sales_person" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Lead" name="groupby_lead" domain="[]" context="{'group_by':'lead_id'}"/>
+                        <filter string="Contact Time" name="groupby_contact_time" domain="[]" context="{'group_by':'contact_time'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+         
+       
+        <!--Cold Calling Generic History-->
+         
+         <record model="ir.actions.act_window" id="crm_generic_cold_calling_history_action">
+            <field name="name">Cold Calling History</field>
+            <field name="res_model">crm.coldcalling.history</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'cold_calling_history' : True, 'default_user_id': uid}</field>
+            <field name="domain">[('user_id','=',uid)]</field>
+            <field name="search_view_id" ref="cold_calling_history_search_view_1" />
+        </record>
+        
+        <record model="ir.actions.act_window.view" id="crm_generic_cold_calling_history_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="crm_cold_calling_history_tree_view"/>
+            <field name="act_window_id" ref="crm_generic_cold_calling_history_action"/>
+        </record>
+        
+        <record model="ir.actions.act_window.view" id="crm_generic_cold_calling_history_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="crm_cold_calling_history_form_view_for_view_1"/>
+            <field name="act_window_id" ref="crm_generic_cold_calling_history_action"/>
+        </record>
+        
+        <menuitem name="Cold Calling History" id="menu_cold_calling_history_all" parent="base.menu_sale_report" sequence="10"
+            action="crm_generic_cold_calling_history_action" />
+        
+        
+        <record model="ir.ui.view" id="view_message_form_History_view_aalmir">
+            <field name="name">mail.message.form</field>
+            <field name="model">mail.message</field>
+            <field name="arch" type="xml">
+                <form string="Mail" readonly="1">
+                    <sheet>
+                        <group>
+                            <field name="email_from" readonly="1"/>
+                            <field name="partner_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="subject" readonly="1"/>
+                            <field name="date" readonly="1"/>
+                            <field name="body" options="{'style-inline': true}" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="reminder_popup_in_comment">
+            <field name="name">Reminder</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="Reminder" create="false" edit="false" delete="false" copy="false">
+                    <div class="oe_title"  readonly="1">
+                            <h1>
+                                <!--<field name="reminder_name" readonly="1" nolabel="1" class="oe_inline"/>-->
+                                <field name="company_name" readonly="1" nolabel="1" class="oe_inline"/>
+                            </h1>
+                    </div>
+                    <group>
+                        <field name="reminder_time" readonly="1"/>
+                        <field name="lead_id" string="Company Name" invisible="1"/>
+                        <field name="customer_name" string="Name" readonly="1"/>
+                        <field name="email" readonly="1"/>
+                    </group>
+                   
+                </form>
+            </field>
+         </record>
+        <!-- add pop for Mass mail -->
+          <record model="ir.ui.view" id="reminder_popup_in_mass_mail">
+            <field name="name">Reminder</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="Reminder" create="false" edit="false" delete="false" copy="false">
+                 <div class="oe_title"  readonly="1">
+                            <h1>
+                                <!--<field name="reminder_name" readonly="1" nolabel="1" class="oe_inline"/>-->
+                                <field name="contact_time" readonly="1" nolabel="1" class="oe_inline"/>
+                            </h1>
+                    </div>
+                   <group>
+                    <group>
+                        <field name="mass_subject" string="Subject" readonly="1"/>
+                        <field name="name" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="is_mass_mail" invisivle="1"/>
+                        <field name="mass_email" readonly="1"/>
+                        <field name="recv_mass_email"  readonly="1"/>
+                        <field name="mass_state" readonly="1"/>
+                    </group>
+              </group>
+                </form>
+            </field>
+         </record>
+        <!-- add pop for Disqualify coldcalling -->
+            <record model="ir.ui.view" id="reminder_popup_in_disqualify">
+            <field name="name">Disqualify</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="Reminder" create="false" edit="false" delete="false" copy="false">
+                    <div class="oe_title"  readonly="1">
+                            <h1>
+                                <field name="contact_time" readonly="1" nolabel="1" class="oe_inline"/>
+                            </h1>
+                    </div>
+                   <group>
+                    <group>
+                       <field name="user_id" readonly="1"/>
+                       <field name="customer_name" readonly="1"/>
+                        <field name="name" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="lead_id" string="Opportunity"/>
+                        <field name="company_name" readonly="1"/>
+                        <field name="email"  readonly="1"/>
+                        
+                    </group>
+              </group>
+                </form>
+            </field>
+         </record>
+         <!-- add pop for Qualify coldcalling -->
+            <record model="ir.ui.view" id="reminder_popup_in_qualify">
+            <field name="name">Qualify</field>
+            <field name="model">crm.coldcalling.history</field>
+            <field name="arch" type="xml">
+                <form string="Reminder" create="false" edit="false" delete="false" copy="false">
+                    <div class="oe_title"  readonly="1">
+                            <h1>                               
+                                <field name="contact_time" readonly="1" nolabel="1" class="oe_inline"/>
+                            </h1>
+                    </div>
+                   <group>
+                    <group>
+                       <field name="user_id" readonly="1"/>
+                       <field name="customer_name" readonly="1"/>
+                        <field name="name" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="lead_id" string="Opportunity" readonly="1"/>
+                        <field name="company_name" readonly="1"/>
+                        <field name="email"  readonly="1"/>
+                        
+                    </group>
+              </group>
+                </form>
+            </field>
+         </record>
+        <record id="mail.mail_template_data_notification_email_default" model="mail.template">
+            <field name="name">Notification Email</field>
+            <field name="subject">${object.subject or (object.record_name and 'Re: %s' % object.record_name) or (object.parent_id and object.parent_id.subject and 'Re: %s' % object.parent_id.subject) or (object.parent_id and object.parent_id.record_name and 'Re: %s' % object.parent_id.record_name)}</field>
+            <field name="model_id" ref="mail.model_mail_message"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                    <div itemscope itemtype="http://schema.org/EmailMessage">
+                <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
+                    % if ctx.get('button_access'):
+                    <link itemprop="target" href="${ctx['button_access']['url']}"/>
+                    <link itemprop="url" href="${ctx['button_access']['url']}"/>
+                    % endif
+                    <meta itemprop="name" content="View ${ctx['model_name']}"/>
+                </div>
+            </div>
+
+            <div style="padding:0px; width:600px; margin: -6px 130px 0 0;background: #FFFFFF repeat top /100%;color:#777777">
+                <table cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; width:600px; border-collapse:collapse; background:inherit; color:inherit; margin: -6px 130px 0 0;">
+                    <tbody><tr>
+                        <td style="padding:5px 10px 5px 5px;font-size: 14px;">
+                            ${object.body | safe}
+                            % if ctx.get('tracking'):
+                                <ul>
+                                % for tracking in ctx['tracking']
+                                    <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
+                                % endfor
+                                </ul>
+                            % endif
+                        </td>
+                    </tr></tbody>
+                </table>
+            </div>
+            % if ctx.get('signature'):
+            <div style="padding:0px; width:600px;margin: -6px 130px 0 0; background: #FFFFFF repeat top /100%;color:#777777">
+                <table cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; width:600px; border-collapse:collapse; background:inherit; color:inherit;margin: -6px 130px 0 0;">
+                    <tbody><tr>
+                        <td style="padding:5px 10px 5px 5px;font-size: 14px; text-align: left;">
+                            ${ctx['signature'] | safe}
+                        </td>
+                    </tr></tbody>
+                </table>
+            </div>
+            % endif
+            ]]></field>
+        </record>
+         
+         
+        
+    </data>
+</openerp>

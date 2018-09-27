@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+
+        <record model="ir.ui.view" id="product_template_form_view_quotation_button">
+            <field name="name">product.template.quotation.button</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="groups_id" eval="[(4, ref('base.group_sale_salesman'))]"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside" >
+                    <button class="oe_stat_button" type="object" name="n_open_pricelist" icon="fa-list" attrs="{'invisible':[('n_pricelist_count','=',0)]}" > 
+                        <field string="Customers" name="n_pricelist_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" name="n_action_view_quotations" type="object" icon="fa-usd" attrs="{'invisible':[('quotation_count','=',0)]}">
+                        <field string="Quotations" name="quotation_count" widget="statinfo" />
+                    </button>
+                </div>
+            </field>
+        </record>
+        
+<!--CH_N019 add to show data in product view start-->
+	<record id="almir_product_form_view" model="ir.ui.view">
+            <field name="name">almir.product.product.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+		<!--add fields in General information tab -->
+		<xpath expr="//notebook/page[1]/group/group[2]" position="replace">
+                    <group name="group_standard_price">
+			<field name="list_price" groups="base.group_sale_manager" widget='monetary' options="{'currency_field': 'currency_id'}" string="Counter Price" invisible="1"/>
+                        <label for="standard_price" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}" invisible="1"/>
+                        <div name="standard_price_uom" groups="base.group_user" invisible="1" >
+                            <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}" class="oe_inline" invisible="1" />
+                        </div>
+                        <field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom"/>
+                        <field name="uom_po_id" groups="product.group_uom"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+	    	</xpath>
+		<!--hide the existing item_ids field and add new fields in Sales tab -->
+		<xpath expr="//notebook/page[3]/div" position="replace">
+			<div name="pricelist" groups="product.group_product_pricelist">
+                            <separator string="Pricelist"/>
+                            <field name="item_ids" readonly="1" nolabel="1" context="{'default_base':'list_price', 'default_applied_on' :'1_product'}">
+                                <tree string="Pricelist Items" editable="bottom">
+                                    <field name="pricelist_id" string="Pricelist" required='1'/>
+				    <field name="customer"/>
+                                    <field name="fixed_price" string="Price" required='1'/>
+				    <field name="currency_id"/>
+                                    <field name="min_quantity" invisible="1"/>
+                                    <field name="applied_on" invisible="1"/>
+                                </tree>
+                            </field>
+			    
+                        </div>
+	    	</xpath>
+            </field>
+        </record>
+<!--CH_N019 add to show data in product view end-->
+	
+      <record id="sale_order_line_inherite/" model="ir.ui.view">
+        <field name="name">sale.support.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_order_line_tree"/>
+        <field name="arch" type="xml">
+        	<xpath expr="//field[@name='price_subtotal']" position="before">
+			<field name="p_currency_id" readonly="1"/>
+	                <field name="price_unit" readonly="1"/>
+			<field name="converted_company_price" readonly="1"/>
+	       </xpath>
+        </field>
+    </record>
+
+     </data>
+</openerp>

@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+       <template id="report_purchasequotation_document_ext" inherit_id="purchase.report_purchasequotation_document">
+         <xpath expr="//t[@t-call='report.external_layout']" position="replace">
+               <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+               <div class="page" style="font-family: Calibri;">
+                            <style>
+				.report_class {height:30px;
+                                              padding-top: 5px;
+					      border:1px solid #9999;
+				}
+                                .noborder td, .noborder th {
+                                                 border: none !important;
+                                  }
+		           </style>
+                        <div class="oe_structure"/>
+
+                        <h1 align="center" style="font-family: Calibri;">Draft Purchase Order</h1>
+                       <div class="row" style="border:1px solid #9999;margin-left:2px;margin-right:2px">
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;">Purchase Order No.</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p t-esc="o.name"/>
+                        </div>
+                        <!-- DO Date with Multiple condition-->
+                            <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;"> Date</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                           <p t-esc="time.strftime('%m/%d/%Y',time.strptime(o.date_order,'%Y-%m-%d %H:%M:%S'))"/>
+                        </div>
+                        <!--div class="col-xs-3 table-bordered report_class" t-if="o.partner_id">
+                              <p style="font-weight: bold;">To</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.partner_id">
+                           <span t-esc="o.partner_id.name"/>
+                        </div-->
+                         <div class="col-xs-3 table-bordered report_class" t-if="o.attend_id">
+                              <p style="font-weight: bold;">Attn.</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.attend_id">
+                           <span t-esc="o.attend_id.name"/>
+                        </div>
+                        
+                        <t t-if="o.attend_id">
+		                 <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Phone Number</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+                                  <t t-if='o.attend_id.phone'>
+		                    <p t-esc="o.attend_id.phone"/>
+                                 </t>
+                                <t t-if='not o.attend_id.phone'>
+		                    <p t-esc="o.partner_id.phone"/>
+                                 </t>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Email</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+                                  <t t-if='o.attend_id.email'>
+		                     <p t-esc="o.attend_id.email"/>
+                                 </t>
+                                    <t t-if='not o.attend_id.email'>
+		                     <p t-esc="o.partner_id.email"/>
+                                 </t>
+		                </div>
+                         </t>
+                        <t t-if="not o.attend_id">
+		                 <div class="col-xs-3 table-bordered report_class" >
+		                    <p style="font-weight: bold;">Phone Number</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class" >
+		                    <p t-esc="o.partner_id.phone"/>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class" >
+		                    <p style="font-weight: bold;">Email</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class" >
+		                    <p t-esc="o.partner_id.email"/>
+		                </div>
+                         </t>
+                        
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;">Currency</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                          <p t-esc="o.currency_id.name"/>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.date_planned_bool">
+                            <p style="font-weight: bold;">Required By Date</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.date_planned_bool"> 
+                           <p t-esc="time.strftime('%m/%d/%Y',time.strptime(o.new_schedule_date,'%Y-%m-%d %H:%M:%S'))"/>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.vendor_vat_bool">
+                            <p style="font-weight: bold;">Vendor TRN</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.vendor_vat_bool">
+                           <p t-esc="o.vendor_vat"/>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.show_delivery_term">
+                            <p style="font-weight: bold;">Terms of Delivery</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.show_delivery_term">
+                           <p t-esc="o.incoterm_id.name"/>
+                        </div>
+   </div>
+    <div class="row" style='border:1px solid #9999;margin-left:2px;margin-right:2px'>
+          <div class="col-xs-3 table-bordered report_class" >
+                           <p style="font-weight: bold;" >To</p>
+                        </div>
+                        <div class="col-xs-9 table-bordered report_class" >
+                          <span t-esc="o.partner_id.name"/><!--t t-if="o.partner_id.street">
+                                           <t t-esc="o.partner_id.street"/>,</t>
+		                         <t t-if="o.partner_id.street2"> 
+                                           <t t-esc="o.partner_id.street2"/>,</t>
+		                         <t t-if="o.partner_id.city_id"> 
+                                            <t t-esc="o.partner_id.city_id.name"/>,</t>
+		                         <t t-if="o.partner_id.state_id">
+                                             <t t-esc="o.partner_id.state_id.name"/>,</t>
+		                         <t t-if="o.partner_id.country_id"> 
+                                              <t t-esc="o.partner_id.country_id.name"/>.</t>
+		                         <t t-if="o.partner_id.zip"> <span>P.O. Box </span>
+                                             <t t-esc="o.partner_id.zip"/></t-->
+        </div>
+        <t t-if="o.show_delivery_address">
+       		<div class="col-xs-3 table-bordered report_class">
+                           <p style="font-weight: bold;">Delivery Location</p>
+                        </div>
+                        <div class="col-xs-9 table-bordered report_class">
+                         <t t-if="o.picking_type_id.warehouse_id.partner_id.street">
+                                           <t t-esc="o.picking_type_id.warehouse_id.partner_id.street"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.street2"> 
+                                           <t t-esc="o.picking_type_id.warehouse_id.partner_id.street2"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.city_id"> 
+                                            <t t-esc="o.picking_type_id.warehouse_id.partner_id.city_id.name"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.state_id">
+                                             <t t-esc="o.picking_type_id.warehouse_id.partner_id.state_id.name"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.country_id"> 
+                                              <t t-esc="o.picking_type_id.warehouse_id.partner_id.country_id.name"/>.</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.zip"> <span>P.O. Box </span>
+                                             <t t-esc="o.picking_type_id.warehouse_id.partner_id.zip"/></t>
+        	</div>
+	</t>
+    </div>
+  
+                     <table class="table table-bordered" style="border: 1px solid #9999;margin-top:5px">
+                        <tr>
+                            <td><b>SL#</b></td>
+                            <td><b>Item Description</b></td> 
+                            <t t-if="o.show_product_schedule">
+                             <td><b>Receiving Date</b></td>
+                            </t>
+                            <td><b>Quantity</b></td>
+                           <td><b>Units</b></td>
+                           <td><b>Unit Price</b></td>
+                          <td><b>Total</b></td>
+                        </tr>
+                       
+                        <t t-set="count" t-value="0"/>
+                        <t t-foreach="o.order_line" t-as="line">
+                          <t t-if="line.product_id">
+                           <tr>
+                                <td>
+                                    <t t-set="count" t-value="count+1"/>
+                                    <t t-esc="count"/>
+                                </td>
+                                <td>
+                                   
+                                     <span t-field="line.name"/>
+                                  
+                                </td>
+                                 <t t-if="o.show_product_schedule">
+                                  <td> <p t-esc="time.strftime('%d/%m/%Y',time.strptime(line.date_planned,'%Y-%m-%d %H:%M:%S'))"/></td>
+                                 </t>
+                                <td><t t-esc="line.product_qty"/></td>
+                                 <td>
+                                    <t t-esc="line.product_uom.name "/></td>   
+                                <td>                                 
+                                      
+                                        <span t-esc="'%.4f'%line.price_unit"/>
+                                  
+                                </td>
+                                 
+                                <td>
+                               
+                                  <span t-esc="'%.4f'%line.price_subtotal"/>
+                             
+                           
+                                </td>
+                            </tr>
+                        </t>
+                       </t>      
+                             
+                    </table>
+                      <div class="row">
+		            <div class="col-xs-8">
+		                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:1px;width:577px;">
+				        <tr> 
+		                            <t t-if="not o.amount_tax">
+		                              <td rowspan="2" style="height:112px;text-transform:uppercase;"><h4><b><span t-esc="o.amount_total_text"/></b></h4>
+		                               <t t-if="o.amount_tax">
+		                                   <p style="margin-top:15px"><strong>TRN Number:</strong><span t-esc="o.report_company_name.vat"/> </p>
+		                               </t>
+		                             </td>
+		                            </t> 
+		                           <t t-if="o.amount_tax">
+		                              <td rowspan="2" style="height:130px;text-transform:uppercase;"><h4><b><span t-esc="o.amount_total_text"/></b></h4>
+		                               <t t-if="o.amount_tax">
+		                                   <p style="margin-top:15px"><strong>TRN Number:</strong> <span t-esc="o.report_company_name.vat"/></p>
+		                               </t>
+		                             </td>
+		                            </t> 
+		                           </tr>
+		                    </table>
+                           
+		           </div>
+		           <div class="col-xs-4">
+	                     <table class="table table-bordered" style="border: 1px solid #9999;margin-top:1px;border-left:None;">
+		                     <tr>
+				            <td style="width:30%"><b>Gross</b></td>
+
+				            <td style="width:70%">  <span t-esc="'%.4f'%o.amount_untaxed"/>  <span t-field='o.currency_id.symbol'/></td>
+		                      </tr>
+                                   <tr>
+				            <td style="width:30%"><b>VAT
+                                                 <t t-set="count" t-value="0"/>
+							<t t-foreach="o.order_line" t-as="line">
+							   <t t-if="count == 0">
+							    <t t-foreach="line.taxes_id" t-as="tax">
+								     (<span t-esc="tax.amount"/>%)
+                                                             
+							    </t>
+							   </t>
+                                                          
+							   <t t-set="count" t-value="count+1"/>
+						</t>
+                                             </b></td>
+				           <td style="width:70%"><span t-esc="'%.4f'%o.amount_tax" /><span t-field='o.currency_id.symbol'/></td>
+		                   </tr>
+                                   <tr>
+				            <td style="width:30%"><b>Net</b></td>
+				           <td style="width:70%"><span t-esc="'%.4f'%o.amount_total" />
+                                           <span t-field='o.currency_id.symbol'/></td>
+		                   </tr>
+                                   
+                              </table>
+                             
+		            </div>
+                           
+                      </div>
+                     
+                     <div class="row">
+                        <table class="table noborder" style="width:97%;height:120px;margin-left:10px">
+		                <tr>
+                                   <td  style="width:32%">
+                                         <t t-if="o.payment_term_id">
+                                          <strong>Payment Terms:</strong>
+                              <br/>
+                              <t t-if="o.milestone_ids">
+                                 <t t-foreach="o.milestone_ids" t-as="ml">
+		                   <span t-esc="ml.value"/>%   <span t-esc="ml.term_name_id.name"/>
+		                    <br/>       
+		                  </t>
+                              </t>
+                              <t t-if="not o.milestone_ids">
+                                 <span t-esc="o.payment_term_id.name"/>
+                              </t>
+                            </t>
+                            </td>
+                           <t t-if="o.warranty">
+                              <td style="width:32%">
+                               
+                             <strong>Warranty:</strong>
+                                 <p t-esc="o.warranty"/>
+                             </td>
+                           </t>
+                                <t t-if="o.vendor_instruction">
+                                   <td style="width:32%">
+                                   <strong>Instruction </strong>
+                                  
+                                    <br/>
+                                     <p t-esc="o.vendor_instruction"/> 
+                                    </td>
+                                  </t>
+                                  
+                                 </tr>
+                                 <t t-if="o.vendor_remark">
+                                      <tr><td colspan='3'>
+                                        <strong>Terms and Conditions </strong>
+                                        <br/>
+                                         <span t-esc="o.vendor_remark"/>     
+                                          </td></tr>
+                                    </t>
+                             </table>
+                       </div>
+             <!--t t-if='o.vendor_remark'>
+                 <p><b>Terms and Conditions</b></p>
+                 <div class="row">
+                      <table class="table table-bordered" style="border: 1px solid #9999;width:97%;margin-left:10px;">
+			<tr> 
+                            <td>
+		               <span t-esc='o.vendor_remark'></span>            
+                            </td> 
+                        </tr>   
+		        </table>
+                      
+                 </div>     
+              </t-->
+              <table class="table table-bordered" style="border: 1px solid #9999;page-break-before:always;" t-if="o.production_reqst_id.film_process or o.production_reqst_id.printing_process ">
+                 <t t-if="o.production_reqst_id.film_process">
+                  <tr>
+                      <th style="text-align:center;font-weight: bold;font-size:large" colspan="3">Film Specification </th>
+                 </tr>
+                  <tr>
+                        <td/>
+                        <td style="text-align:center;font-weight: bold">Specifications</td>
+                        <td style="text-align:center;font-weight: bold">Tolerance</td>
+                           
+                  </tr>
+                  <tr t-if="o.production_reqst_id.material_details.name">
+                         <td>Material</td>
+                        <td><span t-field="o.production_reqst_id.material_details.name"/></td>
+                        <td><span t-field="o.production_reqst_id.material_tolerance"/></td>
+                  </tr>
+                   <tr t-if="o.production_reqst_id.colour.name">
+                         <td>Colour</td>
+                        <td><span t-field="o.production_reqst_id.colour.name"/></td>
+                        <td><span t-field="o.production_reqst_id.colour_tolerance"/></td>
+                  </tr>
+                 <tr t-if="o.production_reqst_id.width.name">
+                         <td>Width</td>
+                        <td><span t-field="o.production_reqst_id.width.name"/></td>
+                       <td><span t-field="o.production_reqst_id.width_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.length.name">
+                         <td>Length</td>
+                        <td><span t-field="o.production_reqst_id.length.name"/></td>
+                        <td><span t-field="o.production_reqst_id.length_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.thickness.name">
+                         <td>Thickness(micron)</td>
+                        <td><span t-field="o.production_reqst_id.thickness.name"/></td>
+                        <td><span t-field="o.production_reqst_id.thickness_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.treatment.name">
+                         <td>Treatment</td>
+                        <td><span t-field="o.production_reqst_id.treatment.name"/></td>
+                        <td><span t-field="o.production_reqst_id.treatment_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.type_val.name">
+                         <td>Type</td>
+                        <td><span t-field="o.production_reqst_id.type_val.name"/></td>
+                        <td><span t-field="o.production_reqst_id.type_val_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.core_id.name">
+                         <td>Core ID(mm)</td>
+                        <td><span t-field="o.production_reqst_id.core_id.name"/></td>
+                        <td><span t-field="o.production_reqst_id.core_id_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.avg_weight.name">
+                         <td>Avg Weight(kgs)</td>
+                        <td><span t-field="o.production_reqst_id.avg_weight.name"/></td>
+                        <td><span t-field="o.production_reqst_id.avg_weight_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.appearance.name">
+                         <td>Appearance</td>
+                        <td><span t-field="o.production_reqst_id.appearance.name"/></td>
+                        <td><span t-field="o.production_reqst_id.appearance_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.strength.name">
+                         <td>Strength</td>
+                        <td><span t-field="o.production_reqst_id.strength.name"/></td>
+                        <td><span t-field="o.production_reqst_id.strength_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.sealing.name">
+                         <td>Sealing</td>
+                        <td><span t-field="o.production_reqst_id.sealing.name"/></td>
+                        <td><span t-field="o.production_reqst_id.sealing_tolerance"/></td>
+                  </tr>
+                 </t>
+                 <t t-if="o.production_reqst_id.printing_process">
+                  <tr>
+                      <th style="text-align:center;font-weight: bold;font-size:large" colspan="3">Printing </th>
+                 </tr>
+                  <tr>
+                        <td/>
+                        <td style="text-align:center;font-weight: bold">Specifications</td>
+                        <td style="text-align:center;font-weight: bold">Tolerance</td>
+                           
+                  </tr>
+                  <tr t-if="o.production_reqst_id.material_details.name">
+                         <td>Film-Material</td>
+                        <td><span t-field="o.production_reqst_id.material_details.name"/></td>
+                       <td><span t-field="o.production_reqst_id.material_tolerance"/></td>
+                  </tr>
+                   <tr t-if="o.production_reqst_id.colour.name">
+                         <td>Film-Colour</td>
+                        <td><span t-field="o.production_reqst_id.colour.name"/></td>
+                        <td><span t-field="o.production_reqst_id.colour_tolerance"/></td>
+                  </tr>
+                 <tr t-if="o.production_reqst_id.width.name">
+                         <td>Width(cm)</td>
+                        <td><span t-field="o.production_reqst_id.width.name"/></td>
+                        <td><span t-field="o.production_reqst_id.width_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.length.name">
+                         <td>Length(cm)</td>
+                        <td><span t-field="o.production_reqst_id.length.name"/></td>
+                        <td><span t-field="o.production_reqst_id.length_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.thickness.name">
+                         <td>Thickness(micron)</td>
+                        <td><span t-field="o.production_reqst_id.thickness.name"/></td>
+                        <td><span t-field="o.production_reqst_id.thickness_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.cutting_process.name">
+                         <td>Cutting Process</td>
+                        <td><span t-field="o.production_reqst_id.cutting_process.name"/></td>
+                        <td><span t-field="o.production_reqst_id.cutting_process_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.cutting_size.name">
+                         <td>Cutting Size</td>
+                        <td><span t-field="o.production_reqst_id.cutting_size.name"/></td>
+                        <td><span t-field="o.production_reqst_id.cutting_size_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.type_val.name">
+                         <td>Type</td>
+                        <td><span t-field="o.production_reqst_id.type_val.name"/></td>
+                        <td><span t-field="o.production_reqst_id.type_val_tolerance"/></td>
+                  </tr>
+                 <tr t-if="o.production_reqst_id.core_id.name">
+                         <td>Core ID(mm)</td>
+                        <td><span t-field="o.production_reqst_id.core_id.name"/></td>
+                        <td><span t-field="o.production_reqst_id.core_id_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.avg_weight.name">
+                         <td>Avg Weight(kgs)</td>
+                        <td><span t-field="o.production_reqst_id.avg_weight.name"/></td>
+                        <td><span t-field="o.production_reqst_id.avg_weight_tolerance"/></td>
+                  </tr>
+                 <tr t-if="o.production_reqst_id.printing_colour.name">
+                         <td>Printing Colour</td>
+                        <td><span t-field="o.production_reqst_id.printing_colour.name"/></td>
+                        <td><span t-field="o.production_reqst_id.printing_colour_tolerance"/></td>
+                  </tr>
+                  <tr t-if="o.production_reqst_id.art_color">
+                         <td>Colour</td>
+                        <td><t t-foreach="o.production_reqst_id.art_color" t-as="art"><span t-field="art.name"/></t></td>
+                        <td><span t-field="o.production_reqst_id.art_color_tolerance"/></td>
+                  </tr>
+                  <!--tr t-if='o.production_reqst_id.ecas_logo'>
+                         <td>Ecas Logo</td>
+                        <td><span t-field="o.production_reqst_id.ecas_logo"/></td>
+                        <td></td>
+                  </tr>
+                  <tr t-if='o.production_reqst_id.d2w_logo'>
+                         <td>D2W Logo</td>
+                        <td><span t-field="o.production_reqst_id.d2w_logo"/></td>
+                        <td></td>
+                  </tr-->
+                  <tr t-if="o.production_reqst_id.material_details.name">
+                         <td>Print Mark</td>
+                        <td><span t-field="o.production_reqst_id.print_mark.name"/></td>
+                        <td/>
+                  </tr>
+                    </t>
+                
+                  <!--tr>
+                         <td>Total Qty</td>
+                        <td><span t-field="o.production_reqst_id.total_qty"/></td>
+                        <td></td>
+                  </tr-->
+              
+             </table>
+                 <b><span t-esc="o.company_id.report_note"/></b> 
+               </div>
+
+            </t>
+          </xpath>
+       </template>
+   
+   </data>
+</openerp>
+

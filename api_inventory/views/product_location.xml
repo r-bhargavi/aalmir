@@ -1,0 +1,83 @@
+<odoo>
+    <record id="product_template_location_form_view_inherite" model="ir.ui.view">
+            <field name="name">Product Template Inherite inventory</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="arch" type="xml">
+                 <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="open_inventory_location" icon="fa-object-group" groups="stock.group_stock_user">
+                    	<field name="bin_location_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" type="object" name="open_master_batches" icon="fa-outdent" groups="stock.group_stock_user">
+                    	<field name="master_btch_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" type="object" name="open_child_batches" icon="fa-database" >
+                    	<field name="batches_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+    </record>
+    <!--add user group on price in kanban view -->
+    <!--record id="product_template_kanban_view_inherite" model="ir.ui.view">
+            <field name="name">Product Template Inherite kanban</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view" />
+            <field name="arch" type="xml">
+                 <field name="//templates/lst_price" position="attributes">
+			<attribute name="groups">base.group_sale_salesman</attribute>
+                 </field>
+            </field>
+    </record-->
+    
+    <record id="stock_change_form_view_inherite" model="ir.ui.view">
+            <field name="name">Change Product Quantity</field>
+            <field name="model">stock.change.product.qty</field>
+            <field name="inherit_id" ref="stock.view_change_product_quantity" />
+            <field name="arch" type="xml">
+                <field name="location_id" position="attributes">
+                    <attribute name="domain">[('actual_location','=',True)]</attribute>
+                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+            	</field>
+            </field>
+    </record>
+    
+    <record id="stock_quant_inherite_search" model="ir.ui.view">
+            <field name="name">Stock Quant Search</field>
+            <field name="model">stock.quant</field>
+            <field name="inherit_id" ref="stock.quant_search_view" />
+            <field name="arch" type="xml">
+                <filter name="transit_loc" position="after">
+            		<filter name="raw_material" string="Raw Material" domain="[('product_id.matstrg' ,'=','raw')]"/>
+            		<filter name="Product" string="Product(FG)" domain="[('product_id.matstrg' ,'=','product')]"/>
+            	</filter>
+            </field>
+    </record>
+   
+    <record id="product_template_location_tree" model="ir.ui.view">
+            <field name="name">Product Template Stock Location</field>
+            <field name="model">stock.quant</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Product Stock Location" editable="top" create="false" delete='false'>
+            		<field name="product_id" />
+            		<field name="location_id" />
+            		<field name="qty" />
+            	</tree>
+            </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_free_products">
+		<field name="name">Product Template Stock action</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">stock.quant</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		<!--field name="domain">[ ("company_id", "=",user.company_id.id) ]</field-->
+		<field name="view_id" ref="product_template_location_tree"/>
+    </record>
+
+    <!--menuitem id="menu_transfer_stock_location_detail" name="Free Products" action="action_free_products" 
+            parent="menu_stock_location_detail" sequence="4"/-->
+    
+</odoo>
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--template id="layout" inherit_id="crm.view_sale_config_settings" priority="17" >
+            <xpath expr="//div/group[1]/field[@ name='group_use_lead']" position="attributes" >
+                    <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div/group[1]/field[@ name='module_crm_voip']" position="attributes" >
+                    <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div/group[2]" position="replace" />
+        </template-->
+    </data>
+</openerp>

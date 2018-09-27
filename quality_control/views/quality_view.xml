@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       	<record model="ir.ui.view" id="quality_checking_tree_view">
+            <field name="name">Quality Checking</field>
+            <field name="model">quality.checking</field>
+            <field name="arch" type="xml">
+                <tree string="Quality Checking" create='false' delete='false'>
+                    <field name="name"/>
+                    <field name="source"/>
+                    <field name="create_date" string="Date"/>
+                    <field name="product_id"/>
+                    <field name="uom_id" />
+                    <field name="quantity"/>
+                    <field name="approved_qty"/>
+                    <field name="reject_qty"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+	<record model="ir.ui.view" id="quality_checking_form_view">
+            <field name="name">Quality Checking Form</field>
+            <field name="model">quality.checking</field>
+            <field name="arch" type="xml">
+                <form string="Quality Checking" create='false'>
+                    <header>
+                    	<button name="quality_test" class="btn-primary" type="object" string="Quality Test" attrs="{'invisible':['|',('quantity','=','0'),('state','!=','available')]}"/>
+                    	<field name="state" widget="statusbar" statusbar_colors='{"canceled": "red"}'/>
+                    </header>
+                    <sheet>
+                    	<div class="oe_button_box" name="button_box">
+			       <button class="oe_stat_button" type="object" name="open_test_performed" icon="fa-bookmark-o" string="Inspections"/>
+			   </div>
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+		        <group col="4">
+			    	<field name="product_id" readonly="1" string='Product'/>
+			    	<field name="company_id" groups="base.group_multi_company"/>
+				<label for="quantity"/>
+				    <div>
+				        <field name="quantity" readonly="1" nolabel="1" class="oe_inline"/> 
+				        <field name="uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+				    </div>
+				<field name="user" readonly="1"/>
+				<field name="create_date" readonly="1" string="Date"/>
+		        </group>
+		        <group col="4">
+				<field name="mrp_id" attrs="{'invisible':[('mrp_id','=',False)]}"/>
+				<field name="mo_state" attrs="{'invisible':[('mrp_id','=',False)]}"/>
+				<field name="purchase_id" attrs="{'invisible':[('purchase_id','=',False)]}"/>
+		        </group>
+		        <group col="4">
+		        	<field name="picking_id" attrs="{'invisible':[('picking_id','=',False)]}"/>
+		        	<field name="operation_type" attrs="{'invisible':[('operation_type','=',False)]}"/>
+		        </group>
+                        <notebook>
+                        	<page string="Quantity Available">
+					<field name="quality_line" nolabel="1">
+						<tree delete='false' create='false'>
+							<field name="n_type" />
+							<field name="name" />
+							<field name="create_date" string="Date"/>
+							<field name="product_id" string='Product'/>
+							<field name="lot_id" />
+							<field name="quantity" sum="quantity"/>
+							<field name="uom_id" />
+							<field name="state" />
+						</tree>
+					</field>
+                        	</page>
+                        	<page string="Approved Quantity" attrs="{'invisible':[('history_line_approve','=',[])]}">
+                        		<field name="history_line_approve" nolabel="1">
+						<tree delete='false' create='false' edit='false'>
+							<field name="create_date" string="Date"/>
+							<field name="product_id" string='Product'/>
+							<field name="lot_id" />
+							<field name="quantity" string="Quantity Approve" sum="quantity"/>
+							<field name="uom_id" />
+						</tree>
+						<form string="Approved Quantity" readonly="1">
+							<group col="4">
+								<field name="create_date" string="Date"/>
+								<field name="product_id" string='Product'/>
+								<field name="quantity" string="Quantity Approve"/>
+								<field name="uom_id" />
+								<field name="lot_id" />
+							</group>
+							<field name="rejected_batches_line" domain="[('ntype','=','approve')]" readonly="1" nolabel="1" col="4">
+                   						<tree create='false' delete='false'>
+                   							<field name="lot_id" /> 
+                   							<field name="main_batches"/> 
+				   					<field name="quantity" /> 
+				   					<field name="uom_id" /> 
+				   					<field name="ntype" /> 
+           							</tree>
+   							</field>
+						</form>
+					</field>
+                        	</page>
+                        	<page string="Reject Quantity" attrs="{'invisible':[('history_line_reject','=',[])]}">
+                        		<field name="history_line_reject" nolabel="1">
+						<tree delete='false' create='false' edit='false'>
+							<field name="create_date" string="Date"/>
+							<field name="product_id" string='Product'/>
+							<field name="lot_id" />
+							<field name="quantity" string="Quantity Rejected" sum="quantity"/>
+							<field name="uom_id" />
+						</tree>
+						<form string="Reject Quantity" readonly="1">
+							<group col="4">
+								<field name="create_date" string="Date"/>
+								<field name="product_id" string='Product'/>
+								<field name="quantity" string="Quantity Rejected"/>
+								<field name="uom_id" />
+								<field name="lot_id" />
+								<field name="move_status" />
+							</group>
+							<field name="rejected_batches_line" domain="[('ntype','=','reject')]" readonly="1" nolabel="1" col="4">
+                   						<tree create='false' delete='false'>
+                   							<field name="lot_id" /> 
+                   							<field name="main_batches"/> 
+				   					<field name="quantity" /> 
+				   					<field name="uom_id" /> 
+				   					<field name="ntype" /> 
+           							</tree>
+   							</field>
+						</form>
+					</field>
+                        	</page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="quality_checking_search_view">
+            <field name="name">Quality Checking Search</field>
+            <field name="model">quality.checking</field>
+            <field name="arch" type="xml">
+                <search string="Search Quality Checking">
+                    <newline />
+                    <group>
+                        <field name="state" />
+                    </group>
+                    <filter string="Available" domain="[('state', '=', 'available')]"/>
+                    <filter string="Waiting" domain="[('state', '=', 'waiting')]"/>
+                    <filter string="Complete" domain="[('state', '=', 'complete')]"/>
+                    <newline />
+                    <group expand="0" string="Group by...">
+                        <filter string="Source"
+                                domain="[]"
+                                context="{'group_by': 'source'}" />
+                        <filter string="State"
+                                domain="[]"
+                                context="{'group_by': 'state'}" />
+                        <filter string="Product"
+                                domain="[]"
+                                context="{'group_by': 'product_id'}" />
+                        <filter string="User"
+                                domain="[]"
+                                context="{'group_by': 'user'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_quality_checking">
+            <field name="name">Quality Checking</field>
+            <field name="res_model">quality.checking</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_state":'available',"search_default_type_state":'available'}</field>
+        </record>
+
+	<record model="ir.ui.view" id="quality_checking_line_tree_view">
+            <field name="name">Quality Checking Line Tree View</field>
+            <field name="model">quality.checking.line</field>
+            <field name="arch" type="xml">
+                <tree string="Quality Checking" create='false' delete='false'>
+                    <!--field name="quality_id"/-->
+                    <field name="lot_id"/>
+                    <field name="n_type" />
+                    <field name="name" string="Source"/>
+                    <field name="create_date" string="Date"/>
+                    <field name="product_id"/>
+                    <field name="quantity" sum="quantity"/>
+                    <field name="uom_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+	<record model="ir.ui.view" id="quality_checking_line_form_view">
+            <field name="name">Quality Checking Line Form</field>
+            <field name="model">quality.checking.line</field>
+            <field name="arch" type="xml">
+                <form string="Quality Checking Line" create='false'>
+                    <header>
+                    	<!--button name="quality_test" class="btn-primary" type="object" string="Quality Test" attrs="{'invisible':[('state','!=','available')]}"/-->
+                    	<button name="line_approve_reject" class="btn-primary oe_edit_only" type="object" string="Complete QC" attrs="{'invisible':[('state','!=','available')]}" />
+            		
+            		<button name="line_reverse" class="btn-primary" type="object" string="Reverse" attrs="{'invisible':[('state','!=','approve')]}"/>
+                    	<field name="state" widget="statusbar" statusbar_visible="draft,approve,cancel" statusbar_colors='{"canceled": "red"}'/>
+                    </header>
+                    <sheet>
+                    	  <!--div class="oe_button_box" name="button_box">
+			       <button class="oe_stat_button" type="object" name="open_test_performed" icon="fa-bookmark-o" string="Inspections"/>
+			   </div-->
+                           <group col="4">
+                            	<field name="product_id" readonly="1"/>
+                            	<field name="company_id" groups="base.group_multi_company"/>
+                                <label for="quantity"/>
+				    <div>
+				        <field name="quantity" readonly="1" nolabel="1" class="oe_inline"/> 
+				        <field name="uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+				    </div>
+			        <field name="create_date" string="Date" attrs="{'readonly':[('state','not in',('draft','available'))]}"/>
+			        <field name="n_type" />
+			        <field name="lot_id" readonly="1"/>
+                                <field name='sample_id' readonly="1"/>
+                                <field name='mrp_id'/>
+                                <field name='check_batch_no'/>
+                           </group>
+                           <group col="4">
+                           	<label for="approved_qty" attrs="{'invisible':[('approved_qty','=',0)]}"/>
+				    <div attrs="{'invisible':[('approved_qty','=',0)]}">
+				        <field name="approved_qty" readonly="1" nolabel="1" class="oe_inline"/> 
+				        <field name="approve_uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+				    </div>
+                           	<label for="reject_qty" attrs="{'invisible':[('reject_qty','=',0)]}"/>
+				    <div attrs="{'invisible':[('reject_qty','=',0)]}">
+				        <field name="reject_qty" readonly="1" nolabel="1" class="oe_inline"/> 
+				        <field name="reject_uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+				    </div>
+                           </group>
+                           <group col="4" invisible='1'>
+                                <field name="scrap_reason" />
+                           </group>
+                           <notebook>
+                               <page string='Batch Details' name='batch'>
+                               	 <group col="4">
+                               	 	<group col="2">
+						<group col="2">
+                       	 	 		 		<field name="check_type" width="100" attrs="{'readonly':[('state','not in',('draft','available'))]}"/>
+               	 	 			</group>
+               	 	 			<group col="2">
+               	 	 			</group>
+               	 	 		</group>
+               	 	 		<group col="2">
+               	 	 		</group>
+                       	 	 </group>
+                                 <field name='batch_ids' colspan="4" attrs="{'readonly':[('state','not in',('draft','available'))]}">
+                                    <tree editable='bottom' create='0' delete='0' >
+	                                <field name='check_type' string='Check'/>
+					<field name="create_date" readonly='1'/>
+					<field name="name" string='Batch No.' readonly='1'/>
+					<field name="product_qty" string='Produced Qty' readonly='1' sum='total'/>
+					<field name="uom_id" readonly='1' />
+	                                <field name='reject_resion' attrs="{'readonly':[('check_type','!=','reject')]}" widget="many2many_tags"/>
+	                                <field name='remark' string='Comment'/>
+				     </tree>
+				     <form string="Batch Details" readonly="1">
+					<group col="4">
+                                                <field name='check_type' string='Check'/>
+						<field name="create_date" readonly='1'/>
+					        <field name="name" string='Batch No.' readonly='1'/>
+					        <lable for="product_qty"/>
+					        <div>
+					        	<field name="product_qty" string='Produced Qty' readonly='1' class="oe_inline"/>
+					        	<field name="uom_id" readonly='1' class="oe_inline"/>
+				        	</div>
+                                                <field name='reject_resion' attrs="{'readonly':[('check_type','!=','reject')]}" widget="many2many_tags"/> 
+                                                <field name='remark' string='Comment'/>
+					</group>
+					
+				      </form>
+				   </field>
+                               </page>
+                               <page string="Approved Quantity"  attrs="{'invisible':[('history_line_approve','=',[])]}">
+                        		<field name="history_line_approve" nolabel="1">
+						<tree delete='false' create='false' readonly="1">
+							<field name="create_date" string="Date"/>
+							<field name="product_id" string='Product'/>
+							<field name="quantity" string="Quantity Approved" sum="quantity"/>
+							<field name="uom_id" />
+						</tree>
+						<form string="Approved Quantity" readonly="1">
+							<group col="4">
+								<field name="create_date" string="Date"/>
+								<field name="product_id" />
+								<field name="quantity" string="Quantity Approved"/>
+								<field name="uom_id" />
+							</group>
+							<field name="rejected_batches_line" domain="[('ntype','=','approve')]" readonly="1" nolabel="1" col="4">
+                   						<tree create='false' delete='false'>
+                   							<field name="lot_id" /> 
+                   							<field name="main_batches"/> 
+				   					<field name="quantity" /> 
+				   					<field name="uom_id" /> 
+				   					<field name="ntype" /> 
+           							</tree>
+   							</field>
+						</form>
+					</field>
+                        	</page>
+                        	<page string="Rejected Quantity"  attrs="{'invisible':[('rejected_batches_line','=',[])]}">
+                        	   <field name="rejected_batches_line" readonly="1">
+                        		<tree create='false' delete='false' editable='bottom'>
+           					<field name="state" invisible="1"/>
+           					<field name="lot_id" string="Transfer No." readonly="1"/> 
+           					<field name="main_batches" readonly="1"/> 
+           					<field name="quantity" readonly="1"/> 
+           					<field name="uom_id" readonly="1"/> 
+           					<field name="reject_resion" readonly="1" widget="many2many_tags"/>
+           				</tree>
+           				<form readonly="1">
+           				    <group col="4">
+           					<field name="lot_id" readonly="1"/> 
+           					<field name="main_batches" readonly="1"/> 
+           					<field name="avail_quantity" readonly="1"/> 
+           					<field name="uom_id" readonly="1"/>
+           					<field name="reject_resion" widget="many2many_tags" readonly="1"/>
+           				    </group>
+           				    	
+           					<field name="history_line" readonly="1" nolabel="1" col="4">
+           						<tree create='false' delete='false'>
+           							<field name="main_batches" /> 
+           							<field name="product_id"/> 
+			   					<field name="quantity" /> 
+			   					<field name="unit_id" /> 
+			   					<field name="status" /> 
+   							</tree>
+						</field>
+           				    	
+           				</form>
+           			   </field>
+                        	</page>
+                        </notebook>
+                        <group col="4" attrs="{'readonly':[('state','not in',('draft','available'))]}">
+                            <field name='comment'/>
+                            <field name='document_ids' widget="many2many_binary"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+                <record model="ir.ui.view" id="quality_checking_line_search_view">
+            <field name="name">Quality Checking Line Search</field>
+            <field name="model">quality.checking.line</field>
+            <field name="arch" type="xml">
+                <search string="Search Quality Checking Line">
+                    <newline />
+                    <group>
+                        <field name="state" />
+                    </group>
+                    <filter string="Available" domain="[('state', '=', 'available')]"/>
+                    <filter string="Complete" domain="[('state', '=', 'complete')]"/>
+                    <newline />
+                    <group expand="0" string="Group by...">
+                        <filter string="State"
+                                domain="[]"
+                                context="{'group_by': 'state'}" />
+                        <filter string="Product"
+                                domain="[]"
+                                context="{'group_by': 'product_id'}" />
+                        <filter string="User"
+                                domain="[]"
+                                context="{'group_by': 'user'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_quality_checking_line">
+            <field name="name">Quality Checking Line</field>
+            <field name="res_model">quality.checking.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_state":'available',"search_default_type_state":'available'}</field>
+
+        </record>
+        
+	<menuitem id="main_quality_menu_id" name="Quality Control" sequence="40" groups="group_quality_check_user" />
+	
+	<menuitem id="parent_quality_menu_id" parent="main_quality_menu_id" name="Quality Control" sequence="10"/>
+        <!--menuitem id="quality_check_menu" name="Quality Check Requests" parent="parent_quality_menu_id"  action="action_quality_checking" sequence="1" /-->
+        <menuitem id="quality_check_line_menu" name="Orders Lines" parent="parent_quality_menu_id"  action="action_quality_checking_line" sequence="2" />
+    </data>
+</openerp>

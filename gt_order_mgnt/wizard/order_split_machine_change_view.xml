@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+            <!-- End Wizard view for shift request -->
+   <!-- Start WorkOrder Split view -->
+     <record id="mrp_work_order_split_form" model="ir.ui.view">
+        <field name="name">mrp.workorder.split.form</field>
+        <field name="model">mrp.workorder.split</field>
+        <field name="arch" type="xml">
+            <form>
+                 <group>
+                    <field name='production_id' readonly='1'/>
+                    <field name='order_id' readonly='1' string='Work Order No.'/>
+                     <field name='product' readonly='1'/>
+                     <field name='hide_rm' invisible='1'/>
+                     <field name='check_bool' invisible='1'/>
+                 </group>
+                 <group >
+                     <group>
+		             <label for='qty' string="Required Qty" invisible="context.get('change')"/>
+			     <div invisible="context.get('change')">
+				<field name="qty" class="oe_inline" nolabel="1"  readonly="1"/>
+				<field name="uom"  class="oe_inline" nolabel="1" readonly="1"/>
+			    </div> 
+			    
+			    <label for='remain_qty' string="Remaining Qty" invisible="context.get('change')"/>
+			    <div invisible="context.get('change')">
+				<field name="remain_qty" class="oe_inline" nolabel="1"/>
+				<field name="split_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+			    </div> 
+		    </group>
+		    <group attrs="{'invisible':[('hide_rm','=',False)]}">
+			    <label for='received_qty' invisible="context.get('change')"/>
+			     <div invisible="context.get('change')">
+				<field name="received_qty" class="oe_inline" nolabel="1"  readonly="1"/>
+				<field name="received_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+			    </div>
+			     
+		            <label for='remain_received_qty' invisible="context.get('change')"/>
+			    <div invisible="context.get('change')">
+				<field name="remain_received_qty" class="oe_inline" nolabel="1"/>
+				<field name="remain_received_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+			    </div>
+                    </group>
+                 </group>
+                  <group >
+                      <field name='workcenter_id' readonly='1'/>
+                      
+                      <field name='machine_type_ids' widget='many2many_tags' invisible='1'/>
+                      <field name="machine" invisible="not context.get('change')"
+                          required="context.get('change')"
+                          context="{'order_machine': True,'machine_type_ids':machine_type_ids}" />
+                      <field name='machine_capacity_type' invisible='1'/>
+                      <field name='capacity_type' 
+                               attrs="{'invisible':[('machine_capacity_type','!=','machine')],
+                               'required':[('machine_capacity_type','=','machine')]}"
+                            domain="[('machine','=',machine)]" invisible="not context.get('change')"/>
+                      <field name='change_reason' invisible="not context.get('change')"/>
+                      <field name='date_planned'  invisible="not context.get('change')"/>
+                 </group>
+                 <h3  style='color:red' attrs="{'invisible':[('check_bool','=',False)]}" invisible="context.get('change')">
+                         Remaining Received Qty not less or greater than Remaining Order Qty.
+                     </h3>
+                <h3 invisible="context.get('change')" style='color:green'>
+                         Total splitted qty should be less than required qty.
+                     </h3>
+                  <group   invisible="context.get('change')">
+                     
+                      <field name='split_line_ids' context="{'wk_qty':remain_qty, 'uom':uom,'rec_qty':remain_received_qty, 'qty':qty, 'received_qty':received_qty}" nolabel='1'>
+                          <tree editable='bottom'>
+                           <field name='qty'/>
+                           <!--field name='requested'/-->
+                           <field name='received'/>
+                           <field name='uom_id' readonly='1'/>
+                          </tree>
+                     </field>
+
+                 </group>
+               <footer>
+                    <button type="object" string="Split Order" class="oe_highlight"  
+                       invisible="context.get('change')" name="split_orders"/>
+                    <button type="object" string="Change Machine" class="oe_highlight" 
+                      name="Changemachine" invisible="not context.get('change')" />
+                     <button type="object" string="Cancel" class="oe_highlight" name='cancel' special='cancel'/>
+               </footer>
+            </form>
+        </field>
+   </record>
+
+     <!-- End WorkOrder Split View-->
+
+    </data>
+</openerp>

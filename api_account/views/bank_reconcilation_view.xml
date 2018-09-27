@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+        <!-- start Bank reconcilation view -->
+	<record id="view_api_account_bank_reconcilation1" model="ir.ui.view">
+		<field name="name">Bank Reconcilation</field>
+		    <field name="model">bank.reconcilation</field>
+		    <field name="arch" type="xml">
+			<form string="Bank reconcilation" create="0">
+			    <sheet>
+			       <group col="4">
+				        <field name='partner_id' string="Party Name" options="{'no_create': True, 'no_open': True}"/>
+				        <field name="cheque_no"/>
+					<field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
+					<field name='status' required="1"/>
+		                	<field name='from_date'/>
+		                	<field name='to_date'/>
+		                	<field name="cheque_type"/>
+					<field name="bank_name" options="{'no_create': True, 'no_open': True}"/>
+                               </group>
+                               <button name='search_data' type="object" string="Search" class="btn-primary,oe_edit_only"/>
+                               <field name='reconcile_pending' attrs="{'invisible':[('status','!=','pending')]}">
+					<tree editable="top" create="0">
+						<field name='partner_id' string="Party Name" readonly="1"/>
+						<field name="bank_name" readonly="1"/>
+						<field name="cheque_no" readonly="1"/>
+						<field name='cheque_date' readonly="1"/>
+						<field name='amount' readonly="1"/>
+						<field name='document' readonly="1"/>
+                                                <field name='payment_id' readonly="1"/>
+						<field name='reconcile_date'/>
+						<field name='rec_bool' invisible="1"/>
+						<field name='cheque_id' invisible="1"/>
+						<button name='reconcile' type="object" icon="gtk-apply" attrs="{'invisible':[('rec_bool','=','True')]}"/>
+					</tree>
+                		</field>
+                		<field name='reconcile_complete' readonly="1" attrs="{'invisible':[('status','!=','completed')]}">
+                        		<tree>
+                        			<field name='partner_id' string="Party Name"/>
+						<field name="bank_name" />
+				        	<field name="cheque_no"/>
+				        	<field name='cheque_date' />
+				        	<field name='amount'/>
+				        	<field name='document' readonly="1"/>
+                                                <field name='payment_id' readonly="1"/>
+				        	<field name='reconcile_date'/>
+				        	<field name='cheque_id' invisible="1"/>
+				        	<field name='rec_bool' invisible="1"/>
+                        		</tree>
+                        		<form >
+                        			<group col="4">
+		                			<field name='partner_id' string="Party Name"/>
+							<field name="bank_name" />
+							<field name="cheque_no"/>
+							<field name='cheque_date' />
+							<field name='document' readonly="1"/>
+							<field name='reconcile_date'/>
+                                                        <field name='payment_id' readonly="1"/>
+							<field name='amount'/>
+							<field name='cheque_id' invisible="1"/>
+							<field name='rec_bool' invisible="1"/>
+						</group>
+                        		</form>
+                		</field>
+                		<button name='reconcile' type="object" string="Reconcile" attrs="{'invisible':[('status','!=','pending')]}" class="btn-primary,oe_edit_only"/>
+                            </sheet>
+	    		</form>
+		</field>
+	</record>
+            
+	<record model="ir.actions.act_window" id="api_bank_reconcilation">
+		<field name="name">Bank Reconciltion</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">bank.reconcilation</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">form</field>
+		<field name="view_id" ref="view_api_account_bank_reconcilation1"/>
+	</record>
+	    
+	<menuitem id="menu_api_bank_reconcilation" action="api_bank_reconcilation"
+                 name="Cheque Reconcilation" parent="account.menu_finance_reports" sequence="10"/>               
+    </data>
+</openerp>
+

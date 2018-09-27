@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+    <!--#CH_N080 inventory rule-->
+	<!--record model="ir.rule" id="inventory_user_rule">
+             <field name="name">Inventory</field>
+             <field name="model_id" ref="model_stock_picking_type"></field>
+             <field name="groups" eval="[(4,ref('gt_order_mgnt.group_API_inventory'))]"></field>
+             <field name="domain_force">[('name', '!=','Quality Check'),('name', 'not in',('Injection Receive RM','Film Receive RM'))]</field>
+	</record-->
+	
+    <!--#CH_N85 add records rule for process instruction -->
+	<record model="ir.rule" id="quality_user_rule2">
+             <field name="name">process_instruction_ine</field>
+             <field name="model_id" ref="model_process_instruction_line"></field>
+             <field name="domain_force">['|',('send_user_id','in',user.id),('create_uid','=',user.id)]</field>
+	</record>
+    <!--#CH_N85<<<<< -->
+
+    <!--CH_N119 RULE for product to MRP Manager >>> -->
+	<record model="ir.rule" id="injection_product_template_rule_users">
+             <field name="name">Injectoin Rule Product Template</field>
+             <field name="model_id" ref="model_product_template"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('categ_id.cat_type','!=','film')]</field>
+	</record>
+	<record model="ir.rule" id="film_product_template_rule_users">
+             <field name="name">Film Rule Product Template</field>
+             <field name="model_id" ref="model_product_template"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('categ_id.cat_type','!=','injection')]</field>
+	</record>
+	<record model="ir.rule" id="injection_product_rule_users">
+             <field name="name">Injectoin Rule Product</field>
+             <field name="model_id" ref="model_product_product"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('product_tmpl_id.categ_id.cat_type','!=','film')]</field>
+	</record>
+	<record model="ir.rule" id="film_product_rule_users">
+             <field name="name">Film Rule Product</field>
+             <field name="model_id" ref="model_product_product"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('product_tmpl_id.categ_id.cat_type','!=','injection')]</field>
+	</record>
+
+	<!--CH_N119 add rule for MRP manager to see Producton request of his products-->
+	<record model="ir.rule" id="injection_production_request_Rule">
+             <field name="name">Injectoin Production request_Rule</field>
+             <field name="model_id" ref="model_n_manufacturing_request"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('n_category.cat_type','=','injection')]</field>
+	</record>
+
+	<record model="ir.rule" id="film_production_request_Rule">
+             <field name="name">Film Production request Rule</field>
+             <field name="model_id" ref="model_n_manufacturing_request"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('n_category.cat_type','=','film')]</field>
+	</record>
+
+	<!--CH_N119 add rule for MRP manager to see Manufacturing Order of his products-->
+	<record model="ir.rule" id="film_manufacture_order_Rule">
+             <field name="name">Film Manufacturing Order Rule</field>
+             <field name="model_id" ref="model_mrp_production"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','injection')]</field>
+	</record>
+
+	<record model="ir.rule" id="injection_manufacture_order_Rule">
+             <field name="name">Injection Manufacturing Order Rule</field>
+             <field name="model_id" ref="model_mrp_production"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','film')]</field>
+	</record>
+	<!--CH_N119 add rule for MRP manager to see BOM of his products-->
+	<record model="ir.rule" id="film_bom_Rule">
+             <field name="name">Film BOM Rule</field>
+             <field name="model_id" ref="mrp.model_mrp_bom"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','injection')]</field>
+	</record>
+
+	<record model="ir.rule" id="injection_bom_Rule">
+             <field name="name">Injection BOM Rule</field>
+             <field name="model_id" ref="mrp.model_mrp_bom"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','!=','film')]</field>
+	</record>
+    </data>
+</openerp>

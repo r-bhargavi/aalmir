@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--templates id="template">
+    <t t-name="FieldMonetary" t-extend="FieldChar">
+    <t t-jquery="t:last" t-operation="after">
+        <t t-if="widget.get('unit_info')">
+            <t t-esc="widget.get('unit_info').name"/>
+        </t>
+    </t>
+</t>
+</templates-->

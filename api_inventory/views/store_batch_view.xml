@@ -1,0 +1,325 @@
+<odoo>
+	<menuitem id="menu_stock_batches_detail" name="Batches Details"  
+            				parent="api_inventory.menu_stock_detail_api" sequence="2"/>
+            
+      <!--batches Search Form View --> 
+	<record id="batch_details_tree_view" model="ir.ui.view">
+            <field name="name">Batch Detail View</field>
+            <field name="model">mrp.order.batch.number</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Batches Details" create="false" edit="false" delete="false" readonly="1">
+			<field name="name" readonly="1"/>
+			<field name="product_id" readonly="1"/>
+			<field name="convert_product_qty" string="Quantity" readonly="1" sum="total"/>
+			<field name="store_id" readonly="1"/>
+			<field name="uom_id" readonly="1"/>
+			<field name="logistic_state" invisible="1"/>
+	     	</tree>
+            </field>
+	</record>
+    
+	<record id="batche_details_filter_view" model="ir.ui.view">
+            <field name="name">Batches Filter View</field>
+            <field name="model">mrp.order.batch.number</field>
+            <field name="arch" type="xml">
+                <search string="Search Batches">
+                    <field name="name" />
+                    <field name="product_id" />
+                    <field name="logistic_state" />
+                    <field name="picking_id" />
+                    <field name="store_id" />
+                    <filter name="transit_in" string="Transit-IN" domain="[('logistic_state','=','transit_in')]"/>
+                    <filter name="stored" string="Stored" domain="[('logistic_state','=','stored')]"/>
+                    <filter name="reserved" string="Reserved" domain="[('logistic_state','=','reserved')]"/>
+                    <filter name="transit" string="Transit-OUT" domain="[('logistic_state','=','transit')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="product_id" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter name="store_id" string="Store" domain="[]" context="{'group_by':'store_id'}"/>
+                        <filter name="picking_id" string="Delivery Order" domain="[]" context="{'group_by':'picking_id'}"/>
+                        <filter name="logistic_state" string="State" domain="[]" context="{'group_by':'logistic_state'}"/>
+                    </group>
+               </search>
+            </field>
+	</record>
+	
+     	<record id="batch_details_form_view" model="ir.ui.view">
+            <field name="name">Batch Detail View</field>
+            <field name="model">mrp.order.batch.number</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+            	<form string="Batches Details" create="false" edit="false" delete="false">
+            	    <header>
+            	    	<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False)]}" groups="base.group_system"/>
+            	    </header>
+            	    <sheet>
+            	    	<group col="4">
+				<field name="name" readonly="1"/>
+				<field name="master_id" readonly="1"/>
+				<field name="product_id" readonly="1"/>
+				<label for='convert_product_qty' string="Quantity"/>
+	   			<div >
+					<field name="convert_product_qty" readonly="1" class="oe_inline"/>
+					<field name="uom_id" readonly="1" class="oe_inline"/>
+				</div>
+				<field name="produce_qty_date" readonly="1"/>
+				<field name="store_id" readonly="1"/>
+				<field name="user_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+				<field name="employee_name" readonly="1" groups="mrp.group_mrp_user"/>
+				<field name="remark" readonly="1" groups="mrp.group_mrp_user"/>
+				<field name="logistic_state" readonly="1"/>
+			</group>
+			<notebook>
+			<page string="History">
+				<field name="batch_history" readonly="1">
+					<tree>
+					<field name="create_date" />
+					<field name="create_uid" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+					<field name="operation" readonly="1"/>
+					<field name="description" readonly="1"/>
+					</tree>
+				</field>
+			</page>
+			<page string="Other Detail">
+				<group col="4">
+					<field name="production_id" groups="mrp.group_mrp_user" readonly="1"/>
+					<field name="sale_id" groups="gt_order_mgnt.group_sale_support" readonly="1"/>
+					<field name="picking_id" groups="gt_order_mgnt.group_sale_support,
+								stock.group_stock_user" readonly="1"/>
+					<field name="lot_id" readonly="1"/>
+					<field name="document" widget="many2many_binary" groups="mrp.group_mrp_user"
+							 readonly="1"/>
+				</group>
+			</page>
+			</notebook>
+		    </sheet>
+	     	</form>
+            </field>
+	</record>
+	
+   <!--Main Batch view action for all -->
+	<record model="ir.actions.act_window" id="batch_details_view_action">
+		<field name="name">Batch Detail Action</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.order.batch.number</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[("logistic_state","!=",'draft')]</field>
+		<field name="search_view_id" ref="batche_details_filter_view"/>
+	</record>
+	
+	 <record id="action_batch_tree_view1" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="batch_details_tree_view"/>
+            <field name="act_window_id" ref="batch_details_view_action"/>
+        </record>
+        <record id="action_batch_form_view2" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="batch_details_form_view"/>
+            <field name="act_window_id" ref="batch_details_view_action"/>
+        </record>
+        
+	<menuitem id="menu_stock_batch_details" name="Batch Search"  action="batch_details_view_action"
+            		parent="api_inventory.menu_stock_batches_detail" sequence="5"/>
+	
+    <!--Main Batch view action for Manufacturing -->
+	<record model="ir.actions.act_window" id="manu_batch_details_view_action">
+		<field name="name">Batch Detail Action</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.order.batch.number</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[("logistic_state","!=",'draft'),('produce_bool','=',True)]</field>
+		<field name="search_view_id" ref="batche_details_filter_view"/>
+	</record>
+	
+	 <record id="manu_action_batch_tree_view1" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="batch_details_tree_view"/>
+            <field name="act_window_id" ref="manu_batch_details_view_action"/>
+        </record>
+        <record id="manu_action_batch_form_view2" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="batch_details_form_view"/>
+            <field name="act_window_id" ref="manu_batch_details_view_action"/>
+        </record>
+    	<menuitem id="menu_mrp_batch_details" name="Batch Details"  action="manu_batch_details_view_action"
+            		parent="mrp.menu_mrp_manufacturing" sequence="5"/>
+    <!-- End>>>>>>> -->
+    
+    	<record id="master_batch_form_view" model="ir.ui.view">
+            <field name="name">Master Batches Form View</field>
+            <field name="model">stock.store.master.batch</field>
+            <field name="arch" type="xml">
+                <form string="Batches Details" create="false" edit="false" delete="false">
+            	    <sheet>
+            	    	<group col="4">
+				<field name="name" readonly="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="total_quantity" readonly="1"/>
+				<field name="store_id" readonly="1"/>
+				<field name="lot_id" readonly="1"/>
+				<field name="uom_id" readonly="1"/>
+				<field name="logistic_state" readonly="1"/>
+			</group>
+			<field name="batch_id" readonly="1">
+				<tree>
+					<field name="name" readonly="1"/>
+					<field name="convert_product_qty" readonly="1" sum="total"/>
+					<field name="uom_id" readonly="1"/>
+					<field name="store_id" readonly="1"/>
+					<field name="lot_id" readonly="1"/>
+					<field name="logistic_state" readonly="1"/>
+				</tree>
+			</field>
+		    </sheet>
+	     	</form>
+            </field>
+	</record>
+	
+        <!--batches View --> 
+        <record id="master_batches_detail_tree_view" model="ir.ui.view">
+            <field name="name">Master Batch View</field>
+            <field name="model">stock.store.master.batch</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Batches Details" readonly="1">
+			<field name="name" />
+			<field name="product_id" readonly="1"/>
+			<field name="total_quantity" readonly="1" sum="total"/>
+			<field name="store_id" readonly="1"/>
+			<field name="uom_id" readonly="1"/>
+			<field name="logistic_state" invisible="1"/>
+	     	</tree>
+            </field>
+        </record>
+    
+        <record id="view_master_batches_filter" model="ir.ui.view">
+            <field name="name">Master Batches Filter</field>
+            <field name="model">stock.store.master.batch</field>
+            <field name="arch" type="xml">
+                <search string="Search Batches">
+                    <field name="name" />
+                    <field name="product_id" />
+                    <field name="logistic_state" />
+                    <field name="picking_id" />
+                    <field name="store_id" />
+                    <filter name="transit_in" string="Transit-IN" domain="[('logistic_state','=','transit_in')]"/>
+                    <filter name="stored" string="Stored" domain="[('logistic_state','=','stored')]"/>
+                    <filter name="reserved" string="Reserved" domain="[('logistic_state','=','reserved')]"/>
+                    <filter name="transit" string="Transit-OUT" domain="[('logistic_state','=','transit')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="product_id" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter name="store_id" string="Store" domain="[]" context="{'group_by':'store_id'}"/>
+                        <filter name="picking_id" string="Delivery Order" domain="[]" context="{'group_by':'picking_id'}"/>
+                        <filter name="logistic_state" string="State" domain="[]" context="{'group_by':'logistic_state'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+     
+        <record model="ir.actions.act_window" id="master_batch_details_action">
+		<field name="name">Master Batches</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">stock.store.master.batch</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		<field name="search_view_id" ref="view_master_batches_filter"/>
+		<field name="domain">[("logistic_state","in",("transit_in","'stored","reserved","r_t_dispatch","'transit"))]</field>
+		<field name="context">{'search_default_product_id':1,'search_default_sale_id':1,'search_default_picking_id':1}</field>
+		<field name="view_id" ref="master_batches_detail_tree_view"/>
+        </record>
+    
+     
+        <record id="batches_store_view_location_tree" model="ir.ui.view">
+            <field name="name">Batches Stock Location</field>
+            <field name="model">mrp.order.batch.number</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Batches Details" editable="top" create="false" delete='false'>
+            		<!--button name="pick_batch" string="Pick1" invisible="not context.get('show_sale')" attrs="{'invisible':[('logistic_state','!=','r_t_dispatch')]}" type="object"/>
+            		<button name="unpick_batch" string="Un-Pick" invisible="not context.get('show_sale')" attrs="{'invisible':[('logistic_state','!=','transit')]}" type="object"/-->
+			<field name="master_id" readonly="1"/>
+			<field name="name" />
+			<field name="lot_id" readonly="1"/>
+			<field name="product_id" readonly="1"/>
+			<field name="convert_product_qty" string="Quantity" sum="total" readonly="1"/>
+			<field name="uom_id" readonly="1"/>
+			<field name="store_id" readonly="1"/>
+			<field name="sale_id" readonly="1"/>
+			<field name="logistic_state" invisible="1"/>
+	     	</tree>
+            </field>
+        </record>
+    
+        <record id="view_store_batches_filter" model="ir.ui.view">
+            <field name="name">Child Batches Filter</field>
+            <field name="model">mrp.order.batch.number</field>
+            <field name="arch" type="xml">
+            	<search string="Search Batches">
+                    <field name="logistic_state" />
+                    <filter name="transit_in" string="Transit-IN" domain="[('logistic_state','=','transit_in')]"/>
+                    <filter name="stored" string="Stored" domain="[('logistic_state','=','stored')]"/>
+                    <filter name="reserved" string="Reserved" domain="[('logistic_state','=','reserved')]"/>
+                    <filter name="transit" string="Transit-OUT" domain="[('logistic_state','=','transit')]"/>
+                    <group expand="0" string="Group By">
+                    	<filter name="master_id" string="Master Batch" domain="[]" context="{'group_by':'master_id'}"/>
+                        <filter name="product_id" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter name="store_id" string="Store" domain="[]" context="{'group_by':'store_id'}"/>
+                        <filter name="sale_id" string="Sale Order" domain="[]" context="{'group_by':'sale_id'}"/>
+                        <filter name="picking_id" string="Delivery Order" domain="[]" context="{'group_by':'picking_id'}"/>
+                    </group>
+            	</search>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="store_batch_location_action">
+		<field name="name">Batches Store Location</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.order.batch.number</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		<field name="domain">[("logistic_state","in",('transit_in','stored','reserved','r_t_dispatch','transit'))]</field>
+		<field name="search_view_id" ref="view_store_batches_filter"/>
+		<field name="context">{'search_default_product_id':1,'search_default_store_id':1}</field>
+		<field name="view_id" ref="batches_store_view_location_tree"/>
+        </record>
+    
+        <record model="ir.actions.act_window" id="reserved_batch_store_action">
+		<field name="name">Reserved Batches</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.order.batch.number</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		<field name="domain">[("logistic_state","=","reserved")]</field>
+		<field name="context">{'search_default_product_id':1,'search_default_sale_id':1,'search_default_picking_id':1}</field>
+		<field name="view_id" ref="batches_store_view_location_tree"/>
+        </record>
+    
+        <record model="ir.actions.act_window" id="r_t_dispatch_batch_action">
+		<field name="name">Ready To dispatch batches</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.order.batch.number</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		<field name="domain">[("logistic_state","=","r_t_dispatch")]</field>
+		<field name="context">{'search_default_product_id':1,
+					'search_default_sale_id':1,'search_default_picking_id':1}</field>
+		<field name="view_id" ref="batches_store_view_location_tree"/>
+        </record>       
+    
+    <menuitem id="menu_master_batch_detail" name="Master Batches" action="master_batch_details_action"
+            		parent="menu_stock_batches_detail" sequence="1"/>
+    <menuitem id="menu_child_batch_detail" name="Child Batches" action="store_batch_location_action" 
+    			groups="stock.group_stock_user" parent="menu_stock_batches_detail" sequence="5"/>
+    			
+    <!--menuitem id="menu_batch_reserved_location" name="Batches Reserved" action="reserved_batch_store_action"
+            parent="menu_stock_batches_detail" sequence="4"/>
+    <menuitem id="menu_batch_r_t_dispatch" name="Ready To Dispatch" action="r_t_dispatch_batch_action"
+            parent="menu_stock_batches_detail" sequence="8"/-->
+</odoo>
+

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="layout" inherit_id="web.layout" name="Layout Inherit" priority="17" >    <!-- tab title-->
+            <xpath expr="//title" position="replace">
+    			<title>API-ERP</title>
+    		</xpath>
+    		<xpath expr="//head//link" position="replace">
+    			<link rel="shortcut icon" href="/aalmir_logo/static/src/img/favicon.ico" type="image/x-icon"/>
+    		</xpath>
+        </template>
+        
+        <template id="assets_common" inherit_id="web.assets_common" name="Assets_common_Pettools" priority="17" >    <!-- for js files-->
+    		<!--xpath expr="." position="inside">
+    		    <script type="text/javascript" src="/aalmir_logo/static/src/js/framework/dialog.js"></script>
+    		</xpath-->
+        </template> 
+        
+        <template id="assets_backend" inherit_id="web.assets_backend" name="assets_backend Inherit" priority="17" >    <!-- tab title-->
+        <xpath expr="." position="inside">
+		<!--script type="text/javascript" src="/aalmir_logo/static/src/js/web_client.js"></script-->
+		<script type="text/javascript" src="/aalmir_logo/static/src/js/framework/crash_manager_inherit.js"></script>
+		<link rel="stylesheet" href="/aalmir_logo/static/src/css/base.css"/>
+        </xpath>
+        </template>
+        
+    	<template id="login_layout" inherit_id="web.login_layout" name="Login Layout Inherit">
+    		<xpath expr="//t[@t-set='body_classname']" position="replace">
+    			<t t-set="body_classname" t-value="''"/>
+    		</xpath>
+    		
+    		<xpath expr="//t[@t-set='head']/link[last()]" position="inside">
+    			<link rel="stylesheet" href="/aalmir_logo/static/src/css/web_login_style.css"/>
+    		</xpath>
+    		
+    		<xpath expr="//div[@class='row']" position="attributes">
+    			<attribute name="class">body_login</attribute>
+    		</xpath>
+    		
+    		<xpath expr="//div[@class='col-md-6 col-md-offset-3 o_database_list']" position="before">
+    			<div id="background-wrapper"
+    				t-attf-style="background-image: url('#{background_src}');"></div>
+    		</xpath>
+    		
+    		<xpath expr="//div[@class='col-md-6 col-md-offset-3 o_database_list']" position="attributes">
+    			<attribute name="class">col-lg-3 col-md-4 col-sm-5 col-xs-11 o_database_list effect5</attribute>
+    		</xpath>
+    		
+    		<xpath expr="//div[@class='text-center']/img" position="attributes">
+    			<attribute name="class">company_logo</attribute>
+    		</xpath>
+			
+			<xpath expr="//div[@class='text-center']" position="attributes">
+    			<attribute name="class">lg_top</attribute>
+    		</xpath>
+			
+			<xpath expr="//a[@href='https://www.odoo.com']" position="replace">
+			  <div style="background:#eee;" class="block-content">
+				 <ul style="text-align:left" class="contact-info" >
+					<li style="list-style-type:none">
+						<i style="color:#32A7BA; float:left" class="fa fa-map-marker" aria-hidden="true"></i>
+						<p><b>Address</b><br></br>
+						Industrial Area No.11,<br></br>
+						Sharjah,U.A.E<br></br>
+						Po-box. 4537<br></br>
+						</p></li>
+					<li style="list-style-type:none">
+						<i style="color:#32A7BA; float:left" class="fa fa-phone" aria-hidden="true"></i>
+						<p><b>Phone</b><br></br>97165342603</p></li>
+					<li style="list-style-type:none">					
+						<i style="color:#32A7BA; float:left" class="fa fa-envelope" aria-hidden="true"></i>
+						<p><b>Email</b><br></br><a href="mailto:erp@mir.ae">erp@mir.ae</a></p></li>
+					</ul>
+				</div>
+				<div class="powe_by">
+					<a href="https://aalmirplastic.com/" target="_blank">Powered by <span>aalmir</span></a>
+				</div>
+			</xpath>
+    	</template>
+    	
+		<template id="login" inherit_id="web.login" name="Login Inherit">
+    		<xpath expr="//label[@for='db']" position="replace" />
+			<xpath expr="//label[@for='login']" position="replace" />
+			<xpath expr="//label[@for='password']" position="replace" />
+			
+			<xpath expr="//input[@name='login']" position="attributes">
+				<attribute name="placeholder">Email ...</attribute>
+				<attribute name="autocomplete">off</attribute>
+				<attribute name="autocorrect">off</attribute>
+			</xpath>
+			
+			<xpath expr="//input[@name='password']" position="attributes">
+				<attribute name="placeholder">Password ...</attribute>
+			</xpath>
+			
+			<xpath expr="//span[@class='input-group-btn']/a[@href='/web/database/selector']" position="replace">
+				<a href="/web/database/selector" class="btn btn-default btn-select"><i class="fa fa-database"></i></a>
+			</xpath>
+		</template>
+		
+		<template id="menu_secondary" inherit_id="web.menu_secondary" name="Menu Secondary Inherit">        <!--footer -->
+		        <xpath expr="//a/img" position="replace">
+		            <img src="/aalmir_logo/static/src/img/company_logo.png" />
+		        </xpath>
+		        <xpath expr="//div[2]/a" position="replace">
+				    <a href="https://aalmirplastic.com/" target="_blank"><span>Aalmir</span></a>
+			    </xpath>
+		</template>
+		
+		<template id="qunit_suite" inherit_id="web.qunit_suite" name="Qunit Suite Inherit">    <!-- tab title-->
+		    <xpath expr="//title" position="replace">
+    			<title>Aalmir Web Tests</title>
+    		</xpath>
+    		<xpath expr="//head//link" position="replace">
+    			<link rel="shortcut icon" href="/aalmir_logo/static/src/img/favicon.ico" type="image/x-icon"/>
+    		</xpath>
+        </template>       
+
+    </data>
+</openerp>

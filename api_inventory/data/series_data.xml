@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+ 	<record id="series_1" model="location.series.name">
+            <field name="name">Alphabet(Small)</field>
+            <field name="str_id">ASL</field>
+            <field name="value">a..z</field>
+        </record>
+        <record id="series_2" model="location.series.name">
+            <field name="name">Alphabet(Capital)</field>
+            <field name="str_id">ACL</field>
+            <field name="value">A..Z</field>
+        </record>
+        <record id="series_3" model="location.series.name">
+            <field name="name">Numeric</field>
+            <field name="str_id">NUM</field>
+            <field name="value">1..9..</field>
+        </record>
+        <record id="series_4" model="location.series.name">
+            <field name="name">Roman</field>
+            <field name="str_id">ROM</field>
+            <field name="value">I..V..X</field>
+        </record>
+        
+        <!--Sequence for Master Batch used in Inventory -->
+        <record id="seq_master_batch" model="ir.sequence">
+            <field name="name">Master Batch</field>
+            <field name="code">master.batch</field>
+            <field name="prefix">MBTH</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</openerp>

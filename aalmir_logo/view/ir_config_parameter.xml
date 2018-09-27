@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="0">
+    	<record id="login_form_disable_footer" model="ir.config_parameter">
+            <field name="key">login_form_disable_footer</field>
+            <field name="value">False</field>
+        </record>
+        <record id="login_form_disable_database_manager" model="ir.config_parameter">
+            <field name="key">login_form_disable_database_manager</field>
+            <field name="value">True</field>
+        </record>
+        <record id="login_form_background_night" model="ir.config_parameter">
+            <field name="key">login_form_background_night</field>
+            <field name="value">/aalmir_logo/static/src/img/fact6.jpg</field>
+        </record>
+    </data>
+</openerp>

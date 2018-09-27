@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!--Inherite MRP view to add domain in destination location -->
+        <record id="mrp_production_form_view_inherit" model="ir.ui.view">
+		<field name="name">mrp.production.form</field>
+		<field name="model">mrp.production</field>
+		<field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
+		<field name="arch" type="xml">
+			<field name="location_dest_id" position="attributes">
+		 		<!--attribute name="domain">['|',('pre_ck','=',True),('quality_ck_loc','=',True)]</attribute-->
+		 		<attribute name="context">{'production_loc': True,'sale_id':sale_id,'product_id':product_id}</attribute>
+	  		</field>
+		</field>
+	</record>
+	
+       	<record model="ir.ui.view" id="quality_checking_history_tree_view">
+            <field name="name">Quality History</field>
+            <field name="model">quality.checking.line.history</field>
+            <field name="arch" type="xml">
+                <tree string="Quality Checking" create='false' delete='false'>
+                    <field name="mrp_id"/>
+                    <field name="product_id"/>
+                    <field name="quantity"/>
+                    <field name="uom_id"/>
+                    <field name="lot_id"/>
+                    <!--field name="reject_qty"/-->
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+	
+	<record model="ir.ui.view" id="quality_checking_history_form_view">
+            <field name="name">Quality History </field>
+            <field name="model">quality.checking.line.history</field>
+            <field name="arch" type="xml">
+                <form string="Quality Checking" create='false' delete='false'>
+                   <header>
+                   	<button name="action_validate" type="object" class="oe_highlight oe_edit_only"
+                                attrs="{'invisible':[('nstate','=','done')]}" string="Validate" />
+                   	<field name="nstate" widget="statusbar"/>
+                   </header>
+                   <sheet>
+                   	<!--div class="oe_button_box" name="button_box">
+			       <button class="oe_stat_button" type="object" name="open_inspection" icon="fa-bookmark-o" string="Test Results"/>
+	   		</div-->
+                   	<group col="4">
+		            <field name="mrp_id"/>
+		            <field name="product_id"/>
+		            <field name="lot_id"/>
+		            <label for="quantity" />
+			    <div >
+				<field name="quantity" readonly="1" nolabel="1" class="oe_inline"/>
+				<field name="uom_id"  readonly="1" nolabel="1" class="oe_inline"/>
+			    </div>
+			    <label for="qty_available" attrs="{'invisible':[('qty_available','=',0)]}"/>
+			    <div attrs="{'invisible':[('qty_available','=',0)]}">
+				<field name="qty_available"  readonly="1" nolabel="1" class="oe_inline"/> 
+			    </div>
+                   	</group>
+                   	<group col="4" >
+                   	  <label for="approve_qty" attrs="{'invisible':[('reject_qty','=',0.0)]}" />
+			  <div attrs="{'invisible':[('reject_qty','=',0.0)]}">
+		            	<field name="approve_qty" readonly="1"  nolabel="1" class="oe_inline" />
+		            	<field name="approve_uom" nolabel="1" class="oe_inline" />
+	            	    </div>
+		          <label for="reject_qty" attrs="{'invisible':[('reject_qty','=',0.0)]}" />
+			  <div  attrs="{'invisible':[('reject_qty','=',0.0)]}">
+		            	<field name="reject_qty" readonly="1"  nolabel="1" class="oe_inline" /> 	
+		            	<field name="reject_uom" nolabel="1" class="oe_inline" />
+		            </div>
+                   	</group>
+                   	<notebook>
+                   		<page string="Rejected Batches" >
+                   			<field name="rejected_batches_line" >
+                   				<tree create='false' delete='false' editable='bottom'>
+                   					<field name="state" invisible="1"/>
+                   					<field name="lot_id" string="Transfer No." readonly="1"/> 
+                   					<field name="main_batches" readonly="1"/> 
+                   					<field name="avail_quantity" readonly="1"/> 
+                   					<field name="uom_id" readonly="1"/> 
+                   					<field name="approve_quantity" attrs="{'readonly':[('state','=','done')]}"/> 
+                   					<field name="reject_quantity" attrs="{'readonly':[('state','=','done')]}"/>
+                   					<field name="reject_resion" readonly="1" widget="many2many_tags"/>
+                   				</tree>
+                   				<form readonly="1">
+                   				    <group col="4">
+                   					<field name="lot_id" readonly="1"/> 
+                   					<field name="main_batches" readonly="1"/> 
+                   					<field name="quality_id" readonly="1"/> 
+                   					<field name="inspection_id" readonly="1"/> 
+                   					<field name="quantity" readonly="1"/> 
+                   					<field name="uom_id" readonly="1"/>
+                   				    </group>
+                   				    	<field name="reject_resion" widget="many2many_tags" readonly="1"/>
+                   					<field name="history_line" readonly="1" nolabel="1" col="4">
+                   						<tree create='false' delete='false'>
+                   							<field name="main_batches" /> 
+                   							<field name="product_id"/> 
+				   					<field name="quantity" /> 
+				   					<field name="unit_id" /> 
+				   					<field name="status" /> 
+           							</tree>
+   							</field>
+                   				    	
+                   				</form>
+                   			</field>
+                   		</page>
+                   		<page string="History" attrs="{'invisible':[('history_line','=',[])]}">
+                   			<field name="history_line" readonly="1">
+                   				<tree>
+                   					<field name="main_batches" /> 
+                   					<field name="product_id"/> 
+                   					<field name="quantity" />
+                   					<field name="unit_id" /> 
+                   					<field name="status" /> 
+                   				</tree>
+                   			</field>
+                   		</page>
+                   	</notebook>
+                   	<field name="document_ids" widget="many2many_binary" readonly="1"/>
+		  </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="quality_line_history_search_view">
+            <field name="name">Scrap Search</field>
+            <field name="model">quality.checking.line.history</field>
+            <field name="arch" type="xml">
+                <search string="Search Scrap">
+                    <group>
+                        <field name="mrp_id" />
+                        <field name="lot_id" />
+                        <field name="quality_id" />
+                        <field name="product_id" />
+                    </group>
+                    <newline />
+                    <filter name="group_mrp_id" string="Manufacture" context="{'group_by':'mrp_id'}"/>
+                    <filter string="From Quality"
+                            domain="[('move_status', '=', 'in_mo')]"/>
+                    <filter string="Move To Scrap"
+                            domain="[('move_status', '=', 'move_scrap')]"/>
+                    <filter string="Return To Quality"
+                            domain="[('move_status', '=', 'move_quality')]"/>
+                    <newline />
+                    <group expand="0" string="Group by...">
+                        <filter string="Manufacture"
+                                domain="[]"
+                                context="{'group_by': 'mrp_id'}" />
+                        <filter string="Lot Number"
+                                domain="[]"
+                                context="{'group_by': 'lot_id'}" />
+                        <filter string="Product"
+                                domain="[]"
+                                context="{'group_by': 'product_id'}" />
+                        <filter string="Quality Number"
+                                domain="[]"
+                                context="{'group_by': 'quality_id'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_quality_checking_line_history">
+            <field name="name">Quality History</field>
+            <field name="res_model">quality.checking.line.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=','reject')]</field>
+            <field name="context">{'search_default_group_mrp_id': 1}</field>
+        </record>
+        
+        <record id="product_template_quality_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="res_model">product.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{}</field>
+        </record>
+ <!--menu in quality -->
+        <menuitem id="menu_quality_product" name="Products" parent="main_quality_menu_id" sequence="40"/>
+	        <menuitem id="menu_quality_product_form" name="Products" action="product_template_quality_action"  parent="menu_quality_product"/>
+	        <menuitem id="menu_mrp_bom_form_action" action="mrp.mrp_bom_form_action" parent="menu_quality_product"/>
+		<menuitem action="gt_order_mgnt.n_action_bom_master" id="qc_menu_bom_master_id" name="Master BOM" parent="menu_quality_product" sequence="98" />
+ <!--menu in Manufacturing -->	
+	<menuitem id="meun_mrp_scrap" name="Rejected Quantity" sequence="4" parent="base.menu_mrp_root"/>
+		<menuitem id="mrp_scrap_id" name="Rejected Quantity" sequence="1" action="action_quality_checking_line_history" parent="meun_mrp_scrap"/>
+    </data>
+</openerp>
+

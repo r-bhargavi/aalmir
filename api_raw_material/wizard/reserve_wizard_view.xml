@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Reserve view-->
+    <record id="raw_material_reserve_wizard" model="ir.ui.view">
+        <field name="name">Raw Reserve History View</field>
+        <field name="model">raw.material.reserve.release</field>
+        <field name="arch" type="xml">
+            <form string="Reserve Raw Material">
+                <group name="reserve_data" col="4">
+                    <label for="avl_qty"/>
+                    <div>
+                        <field name="avl_qty" readonly="1" class="oe_inline" />
+                        <field name="avl_uom" class="oe_inline" readonly="1"/>
+                    </div>
+                    
+                    <label for="total_qty_reserve"/>
+                    <div>
+                        <field name="total_qty_reserve" class="oe_inline" readonly="1" />
+                        <field name="uom_id2" class="oe_inline" readonly="1"/>
+                    </div>
+                    
+                    <label for="reserve_qty"/>
+                    <div>
+                        <field name="reserve_qty" class="oe_inline" />
+                        <field name="reserve_uom" class="oe_inline" readonly="1"/>
+                    </div> 
+		    <field name="product_id" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="reserve" type="object" string="Reserve" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+<!--CH_N045 Release view-->
+    <record id="raw_material_release_wizard" model="ir.ui.view">
+        <field name="name">Raw Release History View</field>
+        <field name="model">raw.material.reserve.release</field>
+        <field name="arch" type="xml">
+            <form string="Release Raw Material">
+                <group name="release_data" col="4">
+                    <label for="res_qty"/>
+                    <div>
+                        <field name="res_qty" class="oe_inline" readonly="1"/>
+                        <field name="reserve_uom" class="oe_inline" readonly="1"/>
+                    </div>
+                    
+                    <label for="release_qty"/>
+                    <div>
+                        <field name="release_qty" class="oe_inline" />
+                        <field name="release_uom" class="oe_inline" readonly="1"/>
+                    </div>
+		    <field name="product_id" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="release" type="object" string="Release" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+   <!--Reserve release view -->
+    <record id="raw_material_reserve_history_tree" model="ir.ui.view">
+        <field name="name">reserve.history.view</field>
+        <field name="model">reserve.history</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Reserve Release History" readonly="1" create="false" colors="green:n_status == 'release'" >
+                <field name="product_id" />
+                <field name="res_date" />
+                <field name="res_qty" />
+		<field name="n_status" />
+		<field name="n_reserve_Type"/>
+		<field name="create_uid" string="Reserved By"/>
+            </tree>
+        </field>
+    </record>
+</odoo>
+<!--CH_N045 -->
+

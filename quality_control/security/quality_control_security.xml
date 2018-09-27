@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.module.category" id="module_category_quality_check">
+            <field name="name">Quality control</field>
+            <field name="description">Helps you handle your Quality checking for products coming MO and PO.</field> 
+            <field name="sequence">17</field>
+        </record>
+
+        <record id="group_quality_check_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_quality_check"/>
+        </record>
+
+        <record id="group_quality_check_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_category_quality_check"/>
+            <field name="implied_ids" eval="[(4, ref('group_quality_check_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <record id="test_multi_company_rule" model="ir.rule">
+            <field name="name">Quality control test multi-company</field>
+            <field name="model_id" ref="model_quality_test"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+        <record id="inspection_multi_company_rule" model="ir.rule">
+            <field name="name">Quality control inspection multi-company</field>
+            <field name="model_id" ref="model_quality_inspection"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+        
+        <record id="scrap_film_mrp_rule" model="ir.rule">
+            <field name="name">Quality control Scrap Film</field>
+            <field name="model_id" ref="model_quality_checking_line_history"/>
+            <field name="groups" eval="[(4,ref('gt_order_mgnt.group_film_product'))]"></field>
+            <field name="domain_force">[('product_id.categ_id.cat_type','=','film')]</field>
+        </record>
+
+	<record  id="scrap_injection_mrp_rule" model="ir.rule">
+             <field name="name">Quality control Scrap injection</field>
+             <field name="model_id" ref="model_quality_checking_line_history"></field>
+	     <field name="groups" eval="[(4,ref('gt_order_mgnt.group_injection_product'))]"></field>
+             <field name="domain_force">[('product_id.categ_id.cat_type','=','injection')]</field>
+	</record>
+    </data>
+</openerp>

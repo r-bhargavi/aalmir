@@ -1,0 +1,384 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    
+	    <record id="partner_payment_terms" model="ir.ui.view">
+            <field name="name">Payment Term</field>
+            <field name="model">account.payment.term</field>
+            <field name="inherit_id" ref="account.view_payment_term_form"></field>
+            <field name="arch" type="xml">
+                <field name="active" position="after">
+		   <field name="partner_id"/> 
+                </field>
+                
+            </field>
+        </record>
+        
+        <record id="sale_view_order_form" model="ir.ui.view">
+            <field name="name">Sale Order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"></field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="replace">
+                    <field name="name" invisible="1"/>
+                    <field name="name1" required="1"/>  <!--CH_N016 make it required -->
+                    <label for="discount_remark" string='Remark'/>
+                    <div>
+                      <field name='discount_remark'/> 
+                    </div>
+                    <button name="action_approve" groups="base.group_sale_manager"
+                                        type="object" string="Approve" 
+                                        attrs="{'invisible': [('approve_m', '=', True)]}"
+                                        class="oe_edit_only oe_highlight"  context="{'approve':True}"/>        
+                    <button name="action_approve" groups="base.group_sale_manager"
+                                        type="object" string="Reject"
+                                        attrs="{'invisible': [('approve_m', '=', True)]}"
+                                         class="oe_edit_only oe_highlight" context="{'reject':True}"/>
+                </xpath>
+           </field>
+        </record>
+      
+        <record model="ir.ui.view" id="sale_line_pricelist">
+            <field name="name">sale.order.view.customization</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock" />
+            <field name="arch" type="xml">
+                <xpath expr="//page/field[@name='order_line']/form/group/group/field[@name='product_packaging']" position="replace">
+                    <field name="product_packaging" attrs="{'invisible':[('state','not in',('sale','cancel','done')),('pricelist_type','in',('2','3'))],'required':[('pricelist_type','not in',('2','3')),('product_type','!=','service')]}" 
+                    context="{'sale_line':True,'templ_id':product_id, 'pricelist_id':pricelist_id,'price_line_id':price_line_id,'film_product':n_film_product_id}"
+                    options="{'no_open':True,'no_create':True}"/>
+                    <field name="product_type" invisible="1"/>
+                </xpath>
+                <!--xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="replace">
+                    <field name="product_id"  attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0), ('procurement_ids', '!=', [])]}"  context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"
+                       		options="{'no_create': True, 'no_open': True, 'create': False}"/>
+                </xpath-->
+                
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                    <field name="p_currency_id" readonly="1" string="Unit Price Currency" />
+                	<field name="pricelist_type" invisible="1"/>
+                	<field name="customer" invisible="1"/>
+                	<field name="price_line_id" invisible="1"/>
+                	<field name="price_calculator_id" domain="[('id','&lt;',0)]" invisible="1"/>
+                	<field name="fixed_price" invisible="1"/>
+                	<field name="max_discount" groups="base.group_sale_manager" invisible="1"/>
+                	<field name="price_discount" groups="base.group_sale_manager" invisible="1"/>
+                	<field name="s_discount" invisible="1"/>
+                	<field name="s_price" invisible="1"/>
+                	<field name="final_price" invisible="1"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
+                    <field name="calc_unit" invisible="1"/>
+                    <field name="calc_price_per_kg" invisible="1"/>
+                    <field name="calc_price_per_pcs" invisible="1"/>
+                    <field name="calc_qty" invisible="1"/>
+                    <field name="calc_total_price" invisible="1"/>
+                    <field name="calc_description" invisible="1"/>
+                </xpath>
+                 
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                	 <field name="not_update" invisible="1"/>
+                	 <field name="approve_m" invisible="1"/>
+                	 <field name="price_m" invisible="1"/>
+                	 <field name="dis_m" invisible="1"/>
+                	<button name="action_mail_send" type="object" string="Req for Approval" attrs="{'invisible': [('not_update', '=', True)]}" class="oe_edit_only oe_link" invisible="1"/>
+                	<!--button name="action_approve" groups="base.group_sale_manager" type="object" string="Approve" attrs="{'invisible': [('approve_m', '=', True)]}" class="oe_edit_only oe_link" /-->
+                </xpath>
+                <!--xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='tax_id']" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </xpath-->
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
+                        <field name="p_currency_id" invisible="1"/> 
+                        <field name="price_unit" attrs="{'invisible': [('pricelist_type', '!=', '3')]}" widget="monetory" options="{'currency_field': p_currency_id}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[@for='discount']" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='discount']" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//div[@name='discount']" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='client_order_ref']" position="replace" >
+                    <field name="client_order_ref" invisible="1" />
+                </xpath>
+
+                <!--xpath expr="//field[@name='incoterm']" position="replace" /-->
+              <xpath expr="//field[@name='pricelist_id']" position="replace" >
+                    <field name="pricelist_id"  domain="[('customer','=',partner_id)]" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="replace" >
+                    <field name="approval_status" invisible="1"/>
+                    <field name="payment_term_id" domain="['|',('partner_id', '=', partner_id),('partner_id', '=', False)]" options="{'no_create': True}" attrs="{'readonly' : ['|', ('state','in', ['cancel','done', 'sale']), ('lock', '=', True)]}"/> <!-- CH_N05 add attribute-->
+                </xpath>
+                <xpath expr="//field[@name='validity_date']" position="replace" >
+                    <field name="validity_date" attrs="{'readonly' : ['|', ('state','in', ['cancel','done', 'sale']), ('lock', '=', True)]}"/>
+			<!-- CH_N05 add attribute-->
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']" position="replace">
+                    <field context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}"
+                     name="product_uom_qty" class="oe_inline"/>
+                    <field name="calc_unit" invisible="1"/>
+                    <field name="calc_price_per_kg" invisible="1"/>
+                    <field name="calc_price_per_pcs" invisible="1"/>
+                    <field name="calc_qty" invisible="1"/>
+                    <field name="calc_moq" invisible="1"/>
+                    <field name="calc_description" invisible="1"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='order_line']/form//field[@name='invoice_lines']" position="replace">
+                    
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="replace">
+                    <field name="pricelist_type"/>
+                    <field name="product_domain_ids" invisible="1"/>
+		    <!-- CH_N06 add field n_film_product_id-->
+		    <field name="n_existing_product" string="Calculate Product" class="oe_inline" 
+		    		attrs="{'invisible': [('pricelist_type', '!=', '2')]}"/>
+   		    <field name="n_film_product_id" domain="[('n_product_type','=','film')]" class="oe_inline"        	
+   		    		attrs="{'readonly': ['|', '|', ('qty_invoiced', '&gt;', 0), ('procurement_ids', '!=', []), ('print_product', '=', True)], 'invisible' : ['|',('n_existing_product','!=','customer'),('pricelist_type','not in',('2'))]}" options="{'no_create': True, 'no_open': True}"/>
+		    <!--remove the domain for producct field-->
+		    <!--CH_N012 add context in product -->
+                    <label for='price_calculator_id' attrs="{'invisible': [('pricelist_type', '!=', '2')]}"/>
+                    <div attrs="{'invisible': [('pricelist_type', '!=', '2')]}">
+                       <field name="price_calculator_id" domain="[('id','&lt;',0)]"  
+                         class='oe_inline' nolabel='1'/>
+                       <button name='open_price_calculator' type='object' icon='fa-arrow-right' 
+                       class='oe_highlight oe_inline' />
+                    </div>
+                    <field name="customer" attrs="{'invisible': [('pricelist_type', '!=', '1')]}" context="{'new_data':'pricelist'}" domain="[('company_type','=','company')]" options="{'no_create': True, 'no_open': True}" /> <!--CH_N050 add context to get only customer who has pricelists -->
+                    <field name="pricelist_id" context="{'pricelist_type':pricelist_type,'customer':customer,'is_contract':parent.is_contract}" options="{'no_create': True, 'no_open': True}"/>
+		    <!-- CH_N10 add domain to product field and add boolean field-->
+                    <field name="product_id" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':pricelist_id,'pricelist_type':pricelist_type,'uom':product_uom, 'company_id': parent.company_id, 'onchange_prd' : True}" options="{'no_create': True, 'no_open': True, 'create': False}"/>
+                    <field name="prd_name" attrs="{'invisible': ['|',('pricelist_type', '!=', '3')], 'readonly' : [('print_product', '=', True)]}"/>
+		    <field name="n_product_category" attrs="{'invisible': ['|',('pricelist_type', '!=', '3')], 'readonly' : [('print_product', '=', True)]}" options="{'no_create': True, 'no_open': True}"/> <!--CH_N041 -->
+                    <field name="print_product" invisible="1"/>
+                </xpath>
+                
+                <!--xpath expr="//field[@name='order_line']/tree//field[@name='product_uom']" position="replace">
+                    <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button" string="UOM"/>
+                </xpath-->
+                
+                <xpath expr="//field[@name='order_line']/form//field[@name='product_uom']" position="replace">
+                    <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button"
+                       attrs="{'readonly': ['|',('pricelist_type','=','2'), ('print_product', '=', True)], 'invisible' : [('pricelist_type','in',['1','4'])]}" options="{'no_create': True, 'no_open': True}" context="{'opportunity':opportunity_id}"/>
+                    <field name="uom_related" attrs="{'invisible' : [('pricelist_type','not in',['1','4'])]}"  readonly="1" class="oe_inline"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='order_line']/form//label[@for='name']" position="before">
+                	<group col="5" colspan="5"> 
+                		<group col="2" name="price_gp" attrs="{'invisible': [('pricelist_type', '=', '3'), ]}" >
+                            <field name="id" invisible="1"/>
+                            <field name="currency_check" invisible="1"/>
+                            <field name="highest_price" invisible="1" widget="monetary"/>
+                            <field name="s_currency_id" invisible="1"/>
+                            <field name="approval_status" invisible="1"/>
+                            <field name="fixed_price" widget='monetary' options="{'currency_field': 'p_currency_id'}"/>
+                            <field name="lowest_price" options="{'currency_field': 'p_currency_id'}" attrs="{'invisible' : [('pricelist_type', 'not in', ['1','4'])]}" widget='monetary'/>
+                            <field name="floor_price" options="{'currency_field': 'p_currency_id'}" attrs="{'invisible' : [('pricelist_type', 'not in', ['1','4'])]}" widget='monetary'/>
+                            <field name="min_qty" />
+	                	</group>
+	                	<group col="1" attrs="{'invisible': ['|',('pricelist_type', '=', '3') ,('currency_check', '=', False)]}" >
+	                		<div><field name="fixed_price_c" widget='monetary' options="{'currency_field': 's_currency_id'}"/></div>
+	                		<div><field name="lowest_price_c" widget='monetary' options="{'currency_field': 's_currency_id'}" attrs="{'invisible' : [('pricelist_type', 'not in', ['1','4'])]}"/></div>
+	                		<div><field name="floor_price_c" widget='monetary' options="{'currency_field': 's_currency_id'}" attrs="{'invisible' : [('pricelist_type', 'not in', ['1','4'])]}"/></div>
+	                	</group>
+	                	<group col="2" name="workbook" attrs="{'invisible': [('pricelist_type', 'not in', ['1','4'])]}">
+		                	<field name="price_line_id" invisible="1"/>
+		                	<field name="pricelist_check" invisible="1"/>
+		                	<field name="pricelist_item_ids" options="{'no_create': True}" nolabel="1" colspan="2" attrs="{'invisible' : [('pricelist_check','=', False)]}">
+				                <tree string="Discount" editable="bottom">
+				                    <field name="do_term"/>
+				                    <field name="min_quantity" string="Disc. Qty From"/>
+				                    <field name="qty" string="Disc. Qty To"/>
+				                    <field name="fixed_price" string="Price"/>
+				                    <field name="currency_id"/>
+				                </tree>
+		                	</field>
+
+	                	</group>
+                              
+                	</group>
+                	<group col="5" name="gp_discount" attrs="{'invisible': [('pricelist_type', '=', '3')]}">
+                        <group col="2">
+                            <field name="price_discount" attrs="{'invisible' : [('pricelist_type', 'in', ['1','4'])]}" readonly="1" widget='monetary' options="{'currency_field': 'p_currency_id'}"/>
+                            <field name="max_discount" readonly="1"/>
+                            <field name="final_price" widget='monetary' options="{'currency_field': 'p_currency_id'}"/>
+                            <div attrs="{'invisible': [('pricelist_type', 'in', ['1','4'])]}">
+
+                                <label style="color:red" attrs="{'invisible': [('price_m', '=', False)]}" string="Final Price must be greater or equal to Suggested Price"/>
+                            </div>
+                            <div attrs="{'invisible': [('pricelist_type', 'not in', ['1','4'])]}">
+                                <label style="color:red" attrs="{'invisible': [('price_m', '=', False)]}" string="Final Price must be greater or equal to Price After Discount Allowed"/>
+                            </div>
+                        </group>
+                        <group col="1" attrs="{'invisible': [('currency_check', '=', False)]}">
+                            <div><field name="price_discount_c" attrs="{'invisible' : [('pricelist_type', 'in', ['1','4'])]}" widget='monetary' options="{'currency_field': 's_currency_id'}"/></div>
+                            <div><field name="s_price_c" attrs="{'invisible' : [('pricelist_type', 'in', ['1','4'])]}" widget='monetary' options="{'currency_field': 's_currency_id'}"/></div>
+                        </group>
+                        <group col="2">
+                            <field name="s_price" attrs="{'invisible' : [('pricelist_type', 'in', ['1','4'])]}" widget='monetary' options="{'currency_field': 'p_currency_id'}"/>
+                            <field name="req_discount_type" invisible="1"/>
+                            <field name="s_discount" attrs="{'invisible' : [('pricelist_type', 'in', ['1','4'])]}"/>
+                            <label attrs="{'invisible': [('dis_m', '=', False)]}" style="color:red;" string="Please Get Approval from Manager for Higher Discount"/>
+                            <field name="not_update" invisible="1"/>
+                            <field name="approve_m" />
+                            <field name="dis_m" />
+                            <field name="price_m" />
+                        </group>
+                    </group>
+
+                </xpath>
+                <field name="amount_tax" position="attributes">
+                	<attribute name="string">VAT</attribute>
+                </field>
+                <!--field name="amount_untaxed" position="attributes">
+                	<attribute name="invisible">1</attribute>
+                </field-->
+<!--                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom']" position="before">
+                	<field name="min_qty" />
+                </xpath>-->
+                <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                	<attribute name="editable"/>
+                	<attribute name="colors">red:approve_m!=True;orange:price_m==True and pricelist_type == '2';red:price_m==True and pricelist_type in ('1','4');</attribute>
+                	<!--<attribute name="colors">red:approve_m!=True;orange:price_m==True and pricelist_type == '2'; red:price_m==True and pricelist_type in ('1','4'); </attribute>-->
+                </xpath>
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="context">{'partner_id' : partner_id}</attribute>
+                </xpath>
+                <field name="order_line" position="before">
+                	<field name="check_approve" invisible="1"/>
+                </field>
+                <xpath expr="//group[@name='sale_pay']" position="replace">
+                    <group name="sale_pay" string="Invoicing" attrs="{'invisible': [('state', 'not in', ('sale','done'))]}">
+                        <field name="fiscal_position_id" options="{'no_create': True}" invisible="1"/>
+                        <field name="invoice_status"
+                            attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                    </group>
+                </xpath>
+               
+            </field>
+        </record>
+
+<!--        <record model="ir.ui.view" id="res_partner_pricelist">
+            <field name="name">res.partner.pricelist</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+            	<notebook position="inside">
+            		<page string="Pricelist" name="pricelist">
+                            <group>
+                                <button name="copy_pricelist" type="object" string="Copy" class="oe_highlight"/>
+                            </group>
+            			<field name="item_ids" nolable="1" context="{'part_id': active_id}" invisible="1">
+            				<tree string="Pricelist" editable="bottom" context="{'part_id': active_id}">
+            					<field name="copy_price_list"/>
+            					<field name="product_tmpl_id" string="Product" invisible="1"/>
+            					<field name="product_id" string="Product" options="{'no_create': True}"/>
+                                                <field name="uom_id" domain="[('name','in', ['kg','pcs'])]" options="{'no_create': True}"/>
+            					<field name="qty" string="MOQ"/>
+            					<field name="min_quantity" string="Quantity"/>
+            					<field name="price_discount" string="Discount(%)"/>
+            					<field name="fixed_price"/>
+            					<field name="floor_price" />
+            					<field name="pricelist_id" invisible="1"/>
+            				</tree>
+            			</field>
+            		</page>
+            	</notebook>
+            </field>
+        </record>-->
+        
+        <record model="ir.ui.view" id="view_quotation_tree">
+            <field name="name">sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree" />
+            <field name="arch" type="xml">
+            	<field name="state" position="after">
+            		<field name="check_approve" invisible="1"/>
+            	</field>
+            </field>
+        </record>
+        
+        
+        <!-- add object type mathod insted action to show different view according to request
+        <record id="action_quotations_salesteams" model="ir.actions.act_window">
+            <field name="name">Quotations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="sale.view_quotation_tree"/>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                    'search_default_team_id': [active_id],
+                    'default_team_id': active_id,
+                    'show_address': 1,
+                }
+            </field>
+            <field name="domain">[('state','in',('draft','sent','cancel')), ('check_approve', '=', True)]</field>
+            <field name="search_view_id" ref="sale.view_sales_order_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Create a Quotation, the first step of a new sale.
+              </p><p>
+                Your next actions should flow efficiently: confirm the Quotation 
+                to a Sale Order, then create the Invoice and collect the Payment.
+              </p><p>
+                Note that once a Quotation becomes a Sale Order, it will be moved 
+                from the Quotations list to the Sales Order list.
+              </p>
+            </field>
+        </record>
+        
+         <record id="action_orders_salesteams" model="ir.actions.act_window">
+            <field name="name">Quotations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="sale.view_quotation_tree"/>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                    'search_default_team_id': [active_id],
+                    'default_team_id': active_id,
+                    'show_address': 1,
+                }
+            </field>
+            <field name="domain">[('state','in',('draft','sent','cancel')), ('check_approve', '=', False)]</field>
+            <field name="search_view_id" ref="sale.view_sales_order_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Create a Quotation, the first step of a new sale.
+              </p><p>
+                Your next actions should flow efficiently: confirm the Quotation 
+                to a Sale Order, then create the Invoice and collect the Payment.
+              </p><p>
+                Note that once a Quotation becomes a Sale Order, it will be moved 
+                from the Quotations list to the Sales Order list.
+              </p>
+            </field>
+        </record-->
+        
+        <record model="ir.ui.view" id="crm_team_salesteams_view_kanban">
+            <field name="name">crm.team.kanban</field>
+            <field name="model">crm.team</field>
+            <field name="inherit_id" ref="sale.crm_team_salesteams_view_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[contains(@class, 'o_kanban_manage_view')]" position="inside">
+                    <div>
+                        <a style="color:red;" name="show_discount_requested" type="object"><field name="waiting_orders"/> - Disc. Requested</a>
+                    </div>
+                    <div>
+                        <a name="show_approve_discount" type="object"><field name="approved_order"/> - Disc. Updated</a>
+                    </div>
+            	</xpath>
+            </field>
+        </record>        
+    </data>
+</openerp>
+

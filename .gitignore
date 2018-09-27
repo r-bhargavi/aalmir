@@ -1,0 +1,10 @@
+*.pyc
+*.py~
+*.xml~
+*[0-9]*.py
+*copy*.py
+*[0-9]*.xml
+*copy*.xml
+*~*
+*.~lock*
+*[0-9]*.csv

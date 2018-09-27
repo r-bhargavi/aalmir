@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    <!-- start lot form -->
+         <record id="view_production_lot_form_aalmir" model="ir.ui.view">
+            <field name="name">stock.production.lot.form</field>
+            <field name="model">stock.production.lot</field>
+           <field name="inherit_id" ref="stock.view_production_lot_form" />
+            <field name="arch" type="xml">
+                <field name='ref' position='after'>
+                  <field name='production_id' attrs="{'invisible':[('production_id','=',False)]}" readoly='1'/>
+                  <label for='total_qty' string="Total Qty" 
+                            attrs="{'invisible':[('total_qty','=',0)]}"/>
+		   <div attrs="{'invisible':[('total_qty','=',0)]}">
+			<field name="total_qty" class="oe_inline" nolabel="1" 
+                                    readonly="1"/>
+			<field name="product_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		   </div>
+                </field>
+		<notebook position="inside">
+                   <page string="Batch Details">
+                       <field name='batch_ids' nolabel='1' readonly='1' >
+                          <tree editable="bottom">
+                            <field name="production_id" string="Production No."/>
+                            <field name='order_id' string='Operation No.'/>
+                            <field name='prev_batch_id' string='Parent Batch No.'/>
+                            <field name='name' string="Batch No."/> 
+                            <field name="product_id" />
+		            <field name="product_qty" sum="Total" string="Produced Qty"/>
+			    <field name="uom_id"  />
+		           
+                         </tree>
+                      
+                        <form editable="bottom">
+                          <group col="4">
+                            <field name="production_id" string="Production No."/>
+                            <field name='order_id' string='Operation No.'/>
+                            <field name='prev_batch_id' string='Parent Batch No.'/>
+                            <field name='name' string="Batch No."/> 
+                            <field name="product_id" />
+		            <field name="product_qty" sum="Total" string="Produced Qty"/>
+			    <field name="uom_id"  />
+		         </group>   
+                         </form>
+                       
+                       </field>
+                   </page>
+			
+		</notebook>
+               
+            </field>
+        </record>  
+ 
+    <!-- end lot form-->
+    
+      <record id="view_stock_move_scrap_wizard_aalmir" model="ir.ui.view">
+            <field name="name">Scrap Move</field>
+            <field name="model">stock.move.scrap</field>
+           <field name="inherit_id" ref="stock.view_stock_move_scrap_wizard" />
+            <field name="arch" type="xml">
+		<field name="product_qty" position="replace">
+			<field name="product_qty" required="1" class="oe_inline" nolabel="1" />/
+			<field name="available_qty" readonly="1" class="oe_inline" nolabel="1"/>
+		</field>
+                <field name="location_id" position="after">
+                   <field name="scrap_reason" />
+                    <field name="uploaded_documents" widget="many2many_binary"/>  
+                </field>
+               
+            </field>
+        </record>
+
+       <!-- add Reverse reason on reverse button-->
+        <record model="ir.ui.view" id="view_stock_return_picking_form_aalmir">
+            <field name="name">stock.return.picking.form</field>
+            <field name="model">stock.return.picking</field>
+            <field name="inherit_id" ref="stock.view_stock_return_picking_form"/>
+            <field name="arch" type="xml">
+                   <field name="location_id" position="after">
+                      <field name="reverse_reason" />
+                      
+                   </field>
+     
+            </field>
+
+       </record>
+       <record model="ir.ui.view" id="view_picking_form_split_aalmir">
+            <field name="name">stock.picking.split.form</field>
+            <field name="model">stock.picking.split</field>
+            <field name="arch" type="xml">
+                   <form string="Stock Picking">
+                  <sheet>
+                  <group>
+                      
+                        <field name="picking_id" readonly="1" string="Current Delivery Order Number"/>
+                        <field name="required_date" required="1" string="Schedule Date"/>
+                       <field name="qty_exceed" invisible="1"/>
+                   </group>
+                     <h4 style="color:red;margin-left:50px;" attrs="{'invisible':[('qty_exceed', '=',False)]}"> 
+                       Split Qty is greater than Total Delivery Qty.</h4>
+                           
+                    <notebook>                
+                        <page string="Split Product For New Delivery Order">
+                           <field name="move_line_id">
+                           <tree editable='bottom' >
+                              <field name="product_id" readonly="1"/>
+                              <field name="product_uom_qty" readonly="1"/>
+                              <field name="split_qty"/>
+                              <field name="rm_qty"/>
+                              <field name="product_uom" options="{'no_open': True, 'no_create': True}" readonly="1"/>                              
+                              <field name="state" readonly="1"/>
+                             
+                           </tree> 
+                           	</field>
+                        </page>
+                       
+                    </notebook>
+                        <!--group>
+                          <separator colspan="4" />                            
+                           <p style="color:blue">
+				Please note that:<br/><br/>
+				* Split Qty is not Greater than order Qty.<br/>
+				* Delivery Date use for new Delivery Schedule date.<br/>
+				* Remaining Qty update in old delivery Order.<br/>
+				* Invoice is based on your delivery Qty not split qty<br/>
+                            </p>
+                    </group-->
+                   <footer>
+                     <button type="object" name="create_new_delivery_order" string="Split Process" class="btn-primary" />
+                      <button string="Cancel" class="btn-default btn-primary" special="cancel"/>
+                  </footer>
+                </sheet>
+               </form>
+           </field>
+       </record>
+
+        <record model="ir.ui.view" id="view_picking_form_inherit_aalmir">
+            <field name="name">stock.picking.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+            	<xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace"/>
+            	<button name="%(stock.act_stock_return_picking)d"  states="done" position="replace">
+		        <button name="%(stock.act_stock_return_picking)d" string="RETURN" type="action" groups="base.group_user" attrs="{'invisible':['|',('state','!=','done'),('picking_type_code','=','outgoing')]}" class="oe_highlight"/>
+		        
+		        <button name="%(stock.act_stock_return_picking)d" string="RETURN" type="action" groups="base.group_user" attrs="{'invisible':['|',('state','!=','delivered'),('picking_type_code','!=','outgoing')]}" class="oe_highlight"/>
+            	</button>
+
+            	<button name="do_print_picking" position="replace">
+                	<button name="aalmir_picking_print" string="Download" type="object" class="oe_highlight"
+	 			groups="stock.group_stock_user, gt_order_mgnt.group_sale_support" 
+	 			attrs="{'invisible':['|',('picking_type_code', 'in', ('internal','incoming')),('picking_type_code','=','outgoing'),('picking_status','=','draft')]}" 
+	 			/>
+			<!--button name="split_picking_data" string="Split &amp;Schedule Delivery" type="object"
+ 				class="oe_highlight" groups="gt_order_mgnt.group_sale_support" 
+                   		attrs="{'invisible':['|','|',('picking_status','!=','draft'),
+				('state','in',('delivered','cancel')),('picking_type_code', 'not in', ('outgoing','incoming'))]}"/-->
+            	</button>
+	<!--#CH_N079 make fields readonly -->
+    		<field name="origin" position="replace">
+		 <field name="origin" attrs="{'readonly':[('state', '!=','draft')]}"/>
+              </field>
+            	<field name="move_type" position="attributes">
+			<attribute name="attrs">{'readonly':[('state', 'in',
+					('done','cancel','transit','dispatch','delivered'))]}</attribute>
+		</field>
+            	<field name="picking_type_id" position="attributes">
+			<attribute name="attrs">{'readonly':[('state', '!=','draft')]}</attribute>
+			<attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+		</field>
+		
+            	<field name="priority" position="attributes">
+			<attribute name="attrs">{'readonly':[('state', 'in',
+						('done','cancel','transit','dispatch','delivered'))]}</attribute>
+		</field>
+		
+            	<field name="sale_id" position="replace" />
+            	<field name='partner_id' position="replace">
+		   	<label for='partner_id' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+		          	<field name="partner_id" string='Consignee'
+		                      attrs="{'readonly':['|',('sale_id','!=',False),('state', 'in',('done','cancel','transit','delivered'))]}"
+		                      on_change="onchange_picking_type(picking_type_id,partner_id)"
+		                      class="oe_inline" nolabel="1" 
+		                      options="{'no_create': True}"/>
+				<field name="check_partner"   class="oe_inline" nolabel="1" />
+			</div>
+		
+			<label for='partner_shipping_id' attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}">
+				<field name="partner_shipping_id" class="oe_inline" nolabel="1" 
+				  	attrs="{'required':[('check_destination','=',True)]}" 
+		                       options="{'no_create': True, 'no_open': True}"
+		                       domain="[('type','=','delivery'),('parent_id','=',partner_id)]"/>
+				<field name="check_destination"   class="oe_inline" nolabel="1" />
+			</div>
+		
+			<label for='lpo_document_id' attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}">
+			       <field name="lpo_document_id" string="PO Number" widget='many2many_tags' domain="[('sale_id_lpo','=',sale_id)]" options="{'no_create': True, 'no_open': True}" context="{'lpo_name':True}" attrs="{'readonly':[('state','in',('cancel','delivered'))], 'required':[('check_lpo','=',True)]}" groups="gt_order_mgnt.group_sale_support" class="oe_inline" nolabel="1"/>
+				<field name="check_lpo"  class="oe_inline" nolabel="1" />
+			</div>
+		</field>
+	  
+		<field name='company_id' position='after'>
+                     <field name='report_company_name' context="{'report_com':True}"/>
+                     <field name='invoice_done' invisible='1'/>
+		</field>
+		<!--field name="company_id" position="attributes">
+                    <attribute name="readonly">1</attribute>
+             </field-->
+	    
+	<!--#CH_N079 -->
+		<field name="origin" position="after">
+                     <field name="reverse_reason" readonly="1" attrs="{'invisible' : [('reverse_reason','=',False)]}"/>
+                     <div attrs="{'invisible' : [('ntransfer_type','in',('internal','manufacturing'))]}">
+		     <label for='invoice_ids' string="Bills" class="oe_inline" attrs="{'invisible':[('purchase_id','=',False)]}"/>
+		     <label for='invoice_ids' string="Invoices" class="oe_inline" attrs="{'invisible':[('sale_id','=',False)]}"/>
+		     </div>
+		     <div attrs="{'invisible':[('purchase_id','=',False),('sale_id','=',False)]}" > 
+                           <field name='invoice_ids' widget='many2many_tags'
+		                  domain="[('sale_id.id','=',sale_id)]" 
+		                  attrs="{'required':[('check_invoice','=',True)]}"
+		                  options="{'no_create': True, 'no_open': True}" 
+		                  class="oe_inline" nolabel="1"/>
+			   <field name="check_invoice" class="oe_inline" nolabel="1" />
+		     </div>
+		     
+		     <field name='print_copy' attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"/>
+		     <field name="stop_delivery" invisible="1"/>
+		     <field name="allow_delivery" invisible="1"/>
+		     <field name="credit_bool"  invisible="1"/>
+		     <field name="picking_status" invisible="1"/>
+		</field>
+		<field name="name" position="after">
+               		<field name="qty_exceed" invisible="1"/>
+               	</field>
+		<notebook position="before">
+                      <h4 style="color:red" attrs="{'invisible':['|','|',('state','in',('transit','done','delivery','cancel')),('qty_exceed', '=',False),('picking_type_code','!=','outgoing')]}">Delivery Qty is Greater than order Qty so Extra qty add in sale order. but invoice create on Delivered qty</h4>
+                       <h4 style="color:red" attrs="{'invisible':['|','|',('state','in',('transit','done','delivery','cancel')),('picking_type_code','!=','outgoing'),('credit_bool','=',False)]}">Credit limit is low</h4>
+                       <h4 style="color:green" attrs="{'invisible':['|','|',('state','in',('transit','done','delivery','cancel')),('picking_type_code','!=','outgoing'),('allow_delivery', '=',False)]}">Delivery Unblock request is Approved by Accountant.</h4>
+
+                   <button type="object" name="send_block_rqst" string="Request Delivery Allow" class="btn-primary"
+                       attrs="{'invisible':['|','|',('state','in',('transit','done','delivery','cancel')),('picking_type_code','!=','outgoing'),('credit_bool','=',False)]}"/>
+                       <h4  attrs="{'invisible':['|','|',('state','in',('transit','done','delivery','cancel')),('picking_type_code','!=','outgoing'),('credit_bool','=',False)]}" style="color:red">                      
+                      Your Total Due Amount + Current Order Invoice Pending Amount is greater than Customer Credit Allowed.</h4>
+                </notebook>
+
+                <button name="do_new_transfer" position="replace">
+                 	<button name="send_to_dispatch"  string="Validate" groups="gt_order_mgnt.group_sale_support" 
+                 		type="object" class="oe_highlight" attrs="{'invisible' : [ '|','|','|','|',
+				('state','not in',('draft','partially_available','assigned')),('credit_bool','=',True),
+				('picking_status','!=','draft'),('picking_type_code','!=','outgoing')]}" confirm="Are you Sure want to Continue.?"/>
+			
+			<button name="send_to_dispatch"  string="Force Validate" groups="stock.group_stock_user" 
+                 		type="object" class="oe_highlight" attrs="{'invisible' : [ '|','|','|','|',
+				('state','not in',('draft','partially_available','assigned')),('credit_bool','=',True),
+				('picking_status','!=','draft'),('picking_type_code','!=','outgoing')]}" confirm="This Order is not validated by Sale Support, Are you Sure want to Continue.?"/>
+			
+			<button name="reverse_from_dispatch"  string="Revert" groups="base.group_sale_manager" 
+                 		type="object" class="oe_highlight" attrs="{'invisible' : [ '|','|','|','|',
+				('state','not in',('draft','partially_available','assigned')),('credit_bool','=',True),
+				('picking_status','!=','pick_list'),('picking_type_code','!=','outgoing')]}"/>
+				
+	         	<button name="do_new_transfer"  string="Validate"  type="object" class="oe_highlight" 
+	         		groups="stock.group_stock_user,mrp.group_mrp_manager" 
+	         		attrs="{'invisible' : [ '|',('picking_type_code','=','outgoing'),
+       					('state','not in',('draft','partially_available','assigned'))]}"/>
+                </button>
+
+                <field name="min_date" position="after">
+                   <field name="sale_id" groups="gt_order_mgnt.group_sale_support"
+           		attrs="{'invisible':['|',('sale_id','=',False),('picking_type_code', '=','incoming')]}"  />
+
+		   <field name="dispatch_doc_name" invisible="1"/>
+                   <field name="production_id" attrs="{'invisible':['|',('production_id','=',False),('picking_type_code', '!=','internal')]}" readonly="1"/>
+                   
+                   <field name="dispatch_date" readonly="1" attrs="{'invisible':['|',('picking_status','=','draft'),('picking_type_code', '!=', 'outgoing')],'readonly':[('state','!=','transit')]}" groups="stock.group_stock_user"/>
+		   <field name="dispatch_doc" attrs="{'invisible':['|',('picking_type_code', '!=', 'outgoing'),('state','not in',['done','transit','delivered'])]}" groups="stock.group_stock_user" readonly="1" widget="many2many_binary" />
+                   <field name="delivery_date" attrs="{'invisible':['|',('picking_type_code', '!=', 'outgoing'),('state','not in',['done','delivered'])],'readonly':[('state','=','delivered')]}" groups="stock.group_stock_user"/>
+                   <field name="delivery_doc" attrs="{'invisible':['|',('picking_type_code', '!=', 'outgoing'),('state','not in',['done','delivered'])],'readonly':[('state','=','delivered')]}" groups="stock.group_stock_user" widget="many2many_binary" />
+                    <field name="incoming_doc" attrs="{'invisible':[('picking_type_code', '!=', 'incoming')],'readonly':[('state','=','done')]}" groups="stock.group_stock_user,purchase.group_purchase_user" widget="many2many_binary" />
+                   <field name="parent_pick_id" attrs="{'invisible':[('parent_pick_id','=',False)]}"/>
+                   <field name="purchase_id" attrs="{'invisible':['|',('purchase_id','=',False),('picking_type_code', '!=', 'incoming')]}" groups="stock.group_stock_user,purchase.group_purchase_user"/>
+               </field>
+               <field name="location_dest_id" position="after">
+
+               	   <label for='term_of_delivery' attrs="{'readonly':[('picking_status','!=','draft')],'invisible':[('picking_type_code','!=','outgoing')]}"/>
+               	   <div attrs="{'invisible':[('picking_type_code','!=','outgoing')]}">
+               	           <field name="term_of_delivery" class="oe_inline" nolabel="1" attrs="{'required':[('check_term','=',True)]}"/>
+               	           <field name="check_term" class="oe_inline" nolabel="1" />
+               	   </div>
+		</field>
+		<xpath expr="//group" position="after">
+			<group col="4">           
+				<field name="credit_limit"  widget='monetary' 
+					attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"
+					groups="gt_order_mgnt.group_sale_support" 
+					options="{'currency_field':'n_quotation_currency_id'}"/>
+
+				<field name="amount_total" widget='monetary' groups="gt_order_mgnt.group_sale_support" 
+					options="{'currency_field': 'n_quotation_currency_id'}"  
+					attrs="{'invisible' : ['|',('picking_type_code', '!=', 'outgoing'),
+							('amount_total','=',0)]}"/>
+							
+				<field name="customer_invoice_pending_amt" widget='monetary' 
+					groups="gt_order_mgnt.group_sale_support" string="Total Due Amount" 
+					options="{'currency_field': 'n_quotation_currency_id'}" 
+					attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"/>
+					
+				<field name="total_current_invoice" widget='monetary' 
+					fg_color="red:is_pending == True;" 
+					groups="gt_order_mgnt.group_sale_support" 
+					options="{'currency_field': 'n_quotation_currency_id'}" 
+					attrs="{'invisible':[('picking_type_code', '!=', 'outgoing')]}"/>
+				
+				<field name="total_delivery_amount"  widget='monetary' 
+						groups="gt_order_mgnt.group_sale_support" 
+						options="{'currency_field': 'n_quotation_currency_id'}" 
+						attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}"/>
+						
+				<field name="n_quotation_currency_id" invisible="1"/>
+			</group>  
+               </xpath>
+                   
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_id']" position="after">  
+                    	<field name="product_hs_code" readonly='1'/> 
+                    	<field name='external_no' invisible='1'/>
+                     	<field name='lpo_documents' domain="[('sale_id_lpo','=',parent.sale_id)]" options="{'no_create': True, 'no_open': True}" widget='many2many_tags'/>
+                      	<field name='packaging_id' readonly='1'/>
+                      	<field name='pallet_no' string="Packing / Pallet"/>
+                      	<field name='secondary_pack' invisible='1'/>
+                      	<field name='primary_cbm' invisible='1'/>
+                      	<field name='secondary_cbm' invisible='1'/>
+			<field name="gross_weight" sum="gross_weight"/>
+			<field name='net_weight' sum="total" invisible='1'/>
+			<field name="n_sale_order_line" invisible="1"/>
+                </xpath>
+                
+		<!--CH_N066 -->
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_qty']" position="before">
+            		<field name="n_sale_order_price" readonly="1" sum="total" groups="gt_order_mgnt.group_sale_support"  /> 
+			<field name="price_subtotal" sum="price_subtotal" readonly="1" groups="gt_order_mgnt.group_sale_support" invisible="1" />
+                </xpath>
+		<!--CH_N066 -->
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="replace">
+			<field name="qty_done" attrs="{'readonly': [('lots_visible', '=', True)]}" sum="qty_done"/>
+                </xpath>
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='from_loc']" position="attributes">
+			<attribute name='invisible'>1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='to_loc']" position="attributes">
+			<attribute name='invisible'>1</attribute>
+                </xpath>
+		<!--#CH_N079 replace button Recompute to shown in state condition-->
+		
+                <xpath expr="//notebook/page/button[@name='do_prepare_partial']" position="replace">
+			 <button name="do_prepare_partial" type="object" string="Recompute" 
+			 	attrs="{'invisible': ['|',('picking_status','!=','draft'),
+			 		('state','in',('transit','dispatch','done','delivered'))]}" 
+			 	class="btn-primary"/>
+                </xpath>
+                <button name="put_in_pack"  groups="stock.group_tracking_lot" position='attributes'>
+                  	<attribute name='invisible'>1</attribute>
+                </button>
+                
+                <field name='priority' position='attributes'>
+                  	<attribute name='invisible'>1</attribute>
+                </field>
+                
+                <field name='move_type' position='attributes'>
+                  	<attribute name='invisible'>1</attribute>
+                </field>
+                
+                <field name='note' position='attributes'>
+                  	<attribute name='attrs'>{'readonly':['|',('picking_status','!=','draft'),
+                  		('state','in',('done','dispatch','delivered','cancel'))]}</attribute>
+                </field>
+                <div name='button_box'  position="inside">
+                    <button name="action_child_delivery"
+                            type="object"  
+                            class="oe_stat_button" attrs="{'invisible':['|',('split_count','=',0),
+                            			('picking_type_code', 'not in', ('outgoing','incoming'))]}"
+                            icon="fa-pencil-square-o">
+                 	<field name="split_count" string="Deliveries" widget="statinfo"/>
+                    </button>
+
+                    <button name="open_return_orders"  type="object"  class="oe_stat_button" 
+				attrs="{'invisible':[('return_order','=','0')]}"
+                            		icon="fa-pencil-square-o">
+			<field name="return_order" string="Return Deliveries" widget="statinfo"/>
+                    </button>
+                    <button name="open_invoices_history"
+                            string="Invoice"
+                            type="object"
+                            class="oe_stat_button" attrs="{'invisible':['|',('invoice_ids','=',[])]}"
+                            icon="fa-pencil-square-o">
+                    </button>
+
+                </div> 
+                <xpath expr="//notebook" position="before">
+                        <field name="is_pending" invisible="1"/>
+                         <!--h4 style="color:red" attrs="{'invisible':['|',('picking_type_code', '!=', 'outgoing'),('is_pending', '=',False)]}">Current Order Invoice is pending. Please Check Invoices Before validate Delivery order.</h4-->
+                </xpath>
+                
+                <field name='priority' position='after'> 
+			<field name='check_donumber'/>
+			<field name='check_date_withnotcol'/>
+			<field name='check_date_withcol'/>
+			<field name='check_sale'/>
+			<field name='check_saleperson'/>
+			<field name='show_stamp'/>
+			<field name='check_lpo_line'/>
+		</field>
+
+		<field name='quant_reserved_exist' position='after'>
+			<field name='check_pallet' />
+			<field name='check_packaging'/>
+			<field name='check_hs'/>
+			<field name='report_name'/>
+			<field name='customer_name_report'/>
+			<field name='destination_report'/>
+			
+			<label for='shipment_mode' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+			    <field name="shipment_mode" class="oe_inline" nolabel="1"
+                                      attrs="{'required':[('check_ship','=',True)]}" groups="stock.group_stock_user" /> 
+			     <field name="check_ship"  class="oe_inline" nolabel="1" />
+			</div>
+			<label for='employee_id' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+			    <field name="employee_id" class="oe_inline" nolabel="1" 
+				         attrs="{'required':[('check_employee','=',True)],
+				         	'readonly':[('state','in',('done','dispatch','delivered','cancel'))]}"
+				         	 groups="stock.group_stock_user" 
+				         	 options="{'no_create': True, 'no_open': True}"/>
+			     <field name="check_employee"  class="oe_inline" nolabel="1" />
+			</div>
+			<label for='vehicle_number' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+				<field name="vehicle_number" class="oe_inline" nolabel="1" 
+				      attrs="{'required':[('check_vehicle','=',True)],
+				      	'readonly':[('state','in',('done','dispatch','delivered','cancel'))]}"  />
+				<field name="check_vehicle"  class="oe_inline" nolabel="1" />
+			</div>
+			<label for='origin_id' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+		       	<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+				<field name="origin_id" class="oe_inline" nolabel="1"  readonly='1'
+		  			attrs="{'required':[('check_origin','=',True)], 
+		  			'readonly':[('state', 'not in',('draft'))]}" 
+		  			options="{'no_create': True, 'no_open': True}"/>
+				<field name="check_origin"  class="oe_inline" nolabel="1" />
+			</div>
+			<label for='manufactured_by' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
+			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+				    <field name="manufactured_by" class="oe_inline" nolabel="1" 
+			      	 			attrs="{'required':[('check_manuf','=',True)]}"/>
+				    <field name="check_manuf"  class="oe_inline" nolabel="1" />
+			</div>
+		</field>
+		
+		<notebook position="inside">
+			<page name='Packaging' String="Packaging Information" attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">
+			  <group >
+                            <group string='Primary Packaging'>
+                             <field name='total_pack' string='Packaging Qty'/>
+                             <label for='total_gross_weight' />
+                             <div>
+				    <field name="total_gross_weight" class="oe_inline" nolabel="1"
+                                     help="(To do qty or done qty * product weight)"
+				     attrs="{'required':[('check_gross','=',True)]}" />
+				     <field name="check_gross"  class="oe_inline" nolabel="1" />
+                             </div>
+                             <label for='total_net_weight'/>
+                             <div>
+				    <field name="total_net_weight" class="oe_inline" nolabel="1" 
+                                      help="Net-weight + (Primary Packging Weight + Secondary Packaging Weight)"
+				      attrs="{'required':[('check_net','=',True)]}"/>
+				     <field name="check_net"  class="oe_inline" nolabel="1" />
+                             </div>
+                              <label for='total_primary_cbm'/>
+                             <div>
+				    <field name="total_primary_cbm" class="oe_inline" nolabel="1" 
+                                      help='(l*W*H*Packaging Qty)/1000000'
+				      />
+				     <field name="check_primary_cbm"  class="oe_inline" nolabel="1" />
+                             </div>
+                            </group>
+                            
+                            <group string='Secondary Packaging'>
+                              <field name='total_pallet' string='Packaging Qty'/>
+                              <!--label for='secondary_weight'/>
+                              <div>
+				    <field name="secondary_weight" class="oe_inline" nolabel="1" 
+                                      help="(Total Gross Weight +(packaging qty * Packaging Weight))"/>
+                                    <label string='Kg'/>
+				    <field name="check_secondary_wt"  class="oe_inline" nolabel="1" />
+                              </div-->
+                              <label for='total_secondary_cbm'/>
+                              <div>
+                              <field name="total_secondary_cbm" class="oe_inline" nolabel="1" 
+                                     help='secondary cbm((l*W*H*Packaging Qty)/1000000) + primary cbm(m3)'
+				      />
+				     <field name="check_secondary_cbm"  class="oe_inline" nolabel="1" />
+                                </div>
+                            </group>
+			</group>
+                     <group string='Packaging Error Information' attrs="{'invisible':[('packaging_info','=',False)]}">
+                        <field name='packaging_info' readonly='1' nolabel='1' style='color:red'/>
+                     </group>
+		</page>
+		</notebook>
+           </field>
+       </record>
+       
+      <record id="view_move_picking_tree_aalmir" model="ir.ui.view">
+            <field name="name">stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+            <field name="arch" type="xml">
+                <field name="product_id" position="after">
+                	<field name="product_packaging" string="Packaging" domain="[('pkgtype','=','primary'),('product_tmpl_id.product_variant_ids','in',(product_id))]" options="{'no_open': True, 'no_create': True}" attrs="{'readonly':[('procurement_id','!=',False)]}"/>
+                       <field name="product_hs_code"/> 
+                       <field name="gross_weight" sum="gross_weight"/>
+                       <field name="procurement_id" invisible="1"/>
+                 </field>
+                 <field name="product_uom_qty" position="replace">                       
+                    <field name="product_uom_qty" sum="product_uom_qty"/>
+                    <field name="scrap_reason" invisible="1"/>
+                 </field>
+                  <field name="state" position="replace">                       
+                    <field name="state" invisible="context.get('show_incoming')"/>
+                 </field>
+                <button name="%(stock.move_scrap)d" position='attributes'>
+                    <attribute name='invisible'>1</attribute>
+               </button>
+              </field>
+     </record>
+     
+     <record id="view_move_tree_aalmir" model="ir.ui.view">
+            <field name="name">stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_tree"/>
+            <field name="arch" type="xml">
+                 <field name="product_uom" position="after">  
+                    <field name="product_packaging" string="Packaging"/>
+                    <field name="pack_qty"/>
+                    <field name="scrap_reason"/>
+                    <field name="uploaded_documents" widget="many2many_binary" invisible="1"/>
+                 </field>
+                 <field name="origin" position="after">  
+                    <field name="picking_partner_id" string="Customer"/>
+                 </field>
+                 <button name="%(stock.move_scrap)d" position='attributes'>
+                    	<attribute name='invisible'>1</attribute>
+                 </button>
+                 <field name="date" position="replace">                       
+                    	<field name="date" string="Dispatch Date"/>
+                 </field>
+            </field>
+     </record>
+     
+     <record id="vpicktree_inherit" model="ir.ui.view">
+            <field name="name">stock.picking.tree</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.vpicktree"/>
+            <field name="arch" type="xml">
+              <xpath expr="//tree" position='attributes'>
+                  <attribute name='default_order'>date desc</attribute>
+              </xpath>
+            </field>
+     </record>
+     
+     <record model="ir.actions.act_window" id="action_raw_matrial_request">
+		<field name="name">Approved Raw Material Requested</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">stock.picking</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		 <field name="view_id" ref="stock.vpicktree"/>
+                 <field name="domain">[('production_id','!=',False),('return_raw_picking','=',False)]</field> 
+     </record>
+	  
+     <menuitem action="action_raw_matrial_request" id="menu_raw_material" name="Approved Raw Material"
+            parent="stock.menu_stock_inventory_control" sequence="2"/>
+    </data>
+</openerp>
+

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_sales_dashboard,access.custom.sales.dashboard,model_custom_sales_dashboard,gt_order_mgnt.group_sale_support,1,1,1,0
+,,,,,,,
+access_custom_mrp_dashboard,access.custom.mrp.dashboard,model_custom_mrp_dashboard,mrp.group_mrp_manager,1,1,1,0
+,,,,,,,
+access_custom_purchase_dashboard,custom_purchase_dashboard,model_custom_purchase_dashboard,purchase.group_purchase_user,1,1,1,0
+,,,,,,,
+access_custom_stock_dashboard_user,custom_stock_dashboard_user,model_custom_stock_dashboard,stock.group_stock_user,1,0,0,0
+access_custom_stock_dashboard_manager,custom_stock_dashboard_manager,model_custom_stock_dashboard,stock.group_stock_manager,1,1,1,1
+,,,,,,,
+access_account_bank_statement,account_bank_statement_quality_manager,account.model_account_bank_statement,purchase.group_purchase_manager,1,0,0,0

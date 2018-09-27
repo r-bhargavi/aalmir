@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+,,,,,,,
+sales_n_custom_product,sales.n.custom.product,model_n_custom_product,base.group_sale_salesman,1,1,1,1
+sales_n_custom_product_line,sales.n.custom.product.line,model_n_custom_product_line,base.group_sale_salesman,1,1,1,1
+sales_access_product_uom,sales.access.product.uom,product.model_product_uom,base.group_sale_salesman,1,1,0,0
+sales_access_product_pricelist_item_manager,sales.access.product.pricelist.item,product.model_product_pricelist_item,base.group_sale_manager,1,1,1,0
+sales_access_product_pricelist_item,sales.access.product.pricelist.item,product.model_product_pricelist_item,base.group_sale_salesman,1,0,1,0
+sales_n_product_pricelist_manager,sales.product.pricelist,product.model_product_pricelist,base.group_sale_manager,1,1,1,0
+sales_n_product_pricelist_sales,sales.product.pricelist,product.model_product_pricelist,base.group_sale_salesman,1,0,1,0

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_quality_approve_reject_form" model="ir.ui.view">
+            <field name="name">Quality Reject form</field>
+            <field name="model">quality.reject.qty</field>
+            <field name="arch" type="xml">
+                <form string="Rejection">
+                   <notebook attrs="{'invisible':[('approve_line_one2many','=',[])]}">
+                       <page string='Approved Batches' name='approve_batch'>
+		           <field name='approve_line_one2many'  readonly='1'>
+		                    <tree create="1" delete="1" edit="1">
+		        		<field name='check_bool' string='Check' readonly='1'/>
+					<field name="batches" string="Approved batches"/>
+				    </tree>
+				    <form readonly="1" create="1" delete="1" edit="1">
+		                        <field name='check_bool' string='Check'/>
+					<field name="batches"/>
+				    </form>
+			    </field>
+		        </page>
+	            </notebook>
+		    
+                    <notebook attrs="{'invisible':[('line_one2many','=',[])]}">
+                       <page string='Rejected Batches' name='reject_batch'>
+                    	<field name='line_one2many'  readonly='1'>
+                            <tree create="1" delete="1" edit="1">
+                		<field name='check_bool' string='Check' />
+				<field name="batches" string="Rejected batches"/>
+			    </tree>
+			    <form create="1" delete="1" edit="1">
+                                <field name='check_bool' string='Check'/>
+				<field name="batches"/>
+			    </form>
+		    	</field>
+		    	<group>
+		    	<field name="reject_resion" string="Reject Reason" attrs="{'required':[('line_one2many','!=',[])],'invisible':[('line_one2many','=',[])]}" widget="many2many_tags" />
+		    	</group>
+	    	    </page>
+	            </notebook>
+                    
+                    <footer>
+                        <button name="action_process" string="Process" type="object" class="oe_highlight"/>
+                        <button special="cancel" class="oe_link" string="Cancel" />
+                    </footer>
+                    
+                </form>
+           </field>
+      </record>     
+    </data>
+</openerp>

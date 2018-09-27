@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+	<!--Incomming product used to Transfer (MOve to location >> Transit-IN area)-->
+        <record id="incomming_batches_form_view_wizard" model="ir.ui.view">
+            <field name="name">Location Form </field>
+            <field name="model">stock.store.location.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Master Batche Detail" create='false' delete='false' >
+                     <group col="4">
+		     	<field name="picking" readonly="1"/>
+		     	<field name="locations" readonly="1"/>
+		     	<field name="status" invisible="1"/>
+		     </group>
+		     <group attrs="{'invisible':[('backorder','!=',True)]}">
+		     	<p style="color:red"><b> Please Select reason for quantity rejection</b></p>
+		     </group>
+		     <group col="4" attrs="{'invisible':[('backorder','!=',True)]}">
+		     	<field name="reverse_reason" attrs="{'required':[('backorder','=',True)]}"/>
+		     	<field name="backorder" invisible="1"/>
+		     </group>
+		     <notebook>
+		     <page string="Master Batch Details">
+		     	<group>
+		     	<field name="wizard_line" nolabel="1" context="{'group_by':'product_id'}">
+		        	<tree readonly="1" create="false" delete="false">
+		        		<field name="product_id" />
+		        		<field name="master_batch" />
+		        		<field name="batch_ids" widget="many2many_tags" readonly="1" string="Child Batches" />
+	         			<field name="lot_ids" />
+		        		<field name="done_qty" string="Quantity" />
+		        		<field name="qty_unit" />
+				</tree>
+		        	<form delete='false' >
+		        		<group col="4">
+		        		<field name="product_id" readonly="1"/>
+		        		<field name="master_batch" readonly="1"/>
+		        		<field name="lot_ids" widget="many2many_tags" 
+		        			options="{'no_create': True, 'no_open': True}" string='Transfer No.'/>
+	        			</group >
+	        			<group col="2">
+	        			<field name="batch_ids" widget="many2many_tags"  string="Child Batches"
+	        				options="{'no_create': True, 'no_open': True}"
+	        				 context="{'lot_id':lot_ids,'batch':batch_ids,
+		         			'store_wizard':True,'wizard_id':parent.id,'max_qty':max_qty}"/>
+	         			</group >
+	        			<group col="4">
+		        		<label for="max_qty" />
+		        		<div>
+		        			<field name="max_qty"  class="oe_inline" nolabel="1" readonly="1"/>
+		        			<label string="Batches"  class="oe_inline" />
+	        			</div>
+	        			<label for="batch_qty" />
+		        		<div>
+		        			<field name="batch_qty"  class="oe_inline" nolabel="1" readonly="1"/>
+		        			<label string="Batches"  class="oe_inline" />
+	        			</div>
+	        			<label for="done_qty" />
+		        		<div>
+		        			<field name="done_qty" string="Quantity" class="oe_inline" nolabel="1" readonly="1"/>
+		        			<field name="qty_unit" readonly="1"  class="oe_inline" nolabel="1"/>
+	        			</div>
+	        			<field name="id" invisible="1"/>
+		        		</group>
+		        	</form>
+        		</field>
+                    	</group>
+            	     </page>
+            	     <page string="Product Details">
+                    	<group>
+		     	<field name="wizard_product_line" readonly="1" nolabel="1">
+		        	<tree  delete='false' create="false">
+		        		<field name="product_id" />
+		        		<field name="qty_done" />
+		        		<field name="qty" string="Master Batch Quantity" />
+		        		<field name="qty_unit" />
+				</tree>
+		        	<form delete='false' >
+		        		<group col="4">
+		        			<field name="product_id" />
+		        			<field name="qty_done" />
+		        			<field name="qty" string="Master Batch Quantity" />
+		        			<field name="qty_unit" />
+		        		</group>
+		        	</form>
+        		</field>
+                    </group>
+                    </page>
+                    </notebook>
+                    <button class="btn-primary" type="object" name="generate_master_batch" string="Process"/>
+                    <button string="_Cancel" class="btn-default" special="cancel" />
+                </form>
+            </field>
+        </record>
+
+<!--outgoing product Wizard on (Dispatch button click) -->
+        <record id="store_locations_form_view_wizard_outgoing" model="ir.ui.view">
+            <field name="name">Location Form Outgoing</field>
+            <field name="model">stock.store.location.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Select Store Locations" create='false' delete='false' >
+                	<group col="4">
+                		<field name="locations" string="Location" help="Take Product from this Location for dispatching" readonly="1"/>
+                		<field name="picking" string="Operation Name" readonly="1"/>
+                		<field name="store_dest_id" string="Destination Location" readonly="1"
+                			attrs="{'invisible':[('store_dest_id','=',False)]}"/>
+                			
+                	</group>
+                    <group>
+                        <field name="wizard_line"  nolabel="1" >
+                        	<tree create="false" >
+                        		<field name="product_id" readonly="1"/>
+                        		<field name="master_batches" widget="many2many_tags" />
+                        		<field name="to_do_qty" string="To Do" readonly="1" sum="total"/>
+                        		<field name="pick_qty" string="Pick Quantity" readonly="1" sum="total"/>
+                        		<field name="done_qty" string="Done" readonly="1" sum="total"/>
+                        		<field name="to_do_unit" readonly="1"/>
+                        	</tree>
+                        	<form create="false">
+                        		<group col="4">
+                        			<field name="product_id" readonly="1"/>
+						<label for="to_do_qty"/>
+			    			<div>
+				    		     <field name="to_do_qty" class="oe_inline" nolabel="1" readonly="1"/>
+		    				     <field name="to_do_unit" class="oe_inline" nolabel="1" readonly="1"/>
+			    			</div>
+			    			<field name="packaging" readonly="1"/>
+					</group>
+				    	<group col="1">
+					    	<field name="master_batches" >
+						     <tree create="false" >
+							<field name="lot_id" readonly="1"/>
+							<field name="name" />
+							<field name="product_id" readonly="1"/>
+							<field name="total_quantity" readonly="1" sum="total"/>
+							<field name="picking_id" readonly="1"/>
+						     </tree>
+						     <form create="false">
+							     <group col="4">
+								<field name="lot_id" readonly="1"/>
+								<field name="name" readonly="1"/>
+								<field name="product_id" readonly="1"/>
+								<field name="picking_id" readonly="1"/>
+							     </group>
+							     <notebook >
+						   		<page string="Child batches" >
+								<field name="batch_id" readonly="1">
+								     <tree readonly="1">
+									<field name="lot_id" readonly="1"/>
+									<field name="name" />
+									<field name="approve_qty" string="Quantity" sum="approve_qty" readonly="1"/>
+									<field name="uom_id" readonly="1"/>
+									<field name="product_id" readonly="1"/>
+									<field name="sale_id" readonly="1"/>
+								     </tree>
+								     <form >
+									<field name="lot_id" />
+									<field name="name" />
+									<field name="approve_qty" sum="approve_qty"/>
+									<field name="uom_id" />
+									<field name="product_id" />
+									<field name="sale_id" />
+								     </form>
+								</field>
+								</page>
+							     </notebook>
+						     </form>
+					        </field>
+				    	</group>
+					<group col="4">
+						<label for="done_qty"/>
+			    			<div>
+				    		     <field name="done_qty" class="oe_inline" nolabel="1" readonly="1"/>
+		    				     <field name="qty_unit" class="oe_inline" nolabel="1" readonly="1"/>
+			    			</div>
+					</group>
+                        	</form>
+                	</field>
+        	    </group>
+        	    <group col="1">
+        	    	<h2 style="color:red;"><label string="You are Dispatching Partiall Picked Quantity, After process the Undispatched Picked Quantity is moved to Transit-IN area" attrs="{'invisible':[('show_label','=',False)]}"/></h2>
+        	    </group >
+        	    <group col="4">
+        	    	<field name="move_loc" invisible="1" widget="radio" attrs="{'invisible':[('show_label','=',False)]}"/>
+        	    	<field name="show_label" invisible="1" />
+        	    </group>
+        	    <group>
+                	<field name="dispatch_doc" widget="many2many_binary" />
+                	<!--field name="dispatch_doc_name" invisible="1"/-->
+                	<field name="note"/>
+                    </group>
+                    <button class="btn-primary" type="object" name="dispatch_process" string="Process"/>
+                </form>
+            </field>
+        </record>
+        
+<!--Inventory loss product create_batches for Logistics Persons-->
+        <record id="inventory_loss_batches_form_view_wizard" model="ir.ui.view">
+            <field name="name">Batch Creation Form </field>
+            <field name="model">stock.store.location.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Product Details" create='false' delete='false' >
+                     <group col="4">
+		     	<field name="picking" readonly="1"/>
+		     </group>
+		     <group col="1">
+		     	<p style="color:Gray"><b> Please Enter First batch Number</b></p>
+		     	<p style="color:Gray"><b> Last four digits should be Integer(0-9)</b></p>
+		     	<p style="color:Gray"><b> Number Should be Unique</b></p>
+		     	<p style="color:Gray"><b> Next Batch number Generated from incrementing last digit of Number</b></p>
+		     	<p style="color:Gray"><b> If number is not Provided then it takse default series</b></p>
+		     	<p style="color:Gray"><b> Batches are Generated only for Stockable Products</b></p>
+		     </group>
+		     <group>
+		     	<field name="wizard_product_line" nolabel="1">
+		        	<tree  delete='false' create="false" editable="top">
+		        		<field name="product_id" readonly="1"/>
+		        		<field name="batch_number" />
+		        		<field name="qty_done" string="Quantity" readonly="1"/>
+		        		<field name="qty_unit" readonly="1"/>
+		        		<field name="max_batches" readonly="1"/>
+		        		<field name="btch_unit" readonly="1"/>
+		        		<field name="pack_id" invisible="1"/>
+				</tree>
+		        	<form delete='false'>
+		        		<group col="4">
+		        			<field name="product_id" readonly="1"/>
+		        			<field name="batch_number" />
+		        			<field name="qty_done" string="Quantity" readonly="1"/>
+		        			<field name="qty_unit" readonly="1"/>
+		        			<field name="max_batches" readonly="1"/>
+		        			<field name="btch_unit" readonly="1"/>
+		        		</group>
+		        	</form>
+        		</field>
+		     </group>
+                    <button class="btn-primary" type="object" name="generate_child_batches" string="Process"/>
+                    <button string="_Cancel" class="btn-default" special="cancel" />
+                </form>
+            </field>
+        </record>
+
+<!--Production Batches selection for sending to input location -->
+        <record id="production_batches_selection_form_view_wizard" model="ir.ui.view">
+            <field name="name">Batch Seletion Form </field>
+            <field name="model">stock.store.location.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Product Details" create='false' delete='false' >
+                     <group col="4">
+		     	<field name="picking" readonly="1"/>
+		     </group>
+		     <group>
+		     	<field name="wizard_product_line" nolabel="1">
+		        	<tree readonly="1" create='false'>
+		        		<field name="product_id" readonly="1"/>
+		        		<field name="batch_ids" />
+		        		<field name="batch_qty" string="Quantity" readonly="1"/>
+		        		<field name="qty_unit" readonly="1"/>
+		        		<field name="batch_count" readonly="1"/>
+		        		<field name="btch_unit" readonly="1"/>
+		        		<field name="pack_id" invisible="1"/>
+				</tree>
+		        	<form >
+		        		<group col="4">
+		        			<field name="product_id" readonly="1"/>
+		        			<field name="batch_qty" string="Quantity" readonly="1"/>
+		        			<field name="qty_unit" readonly="1"/>
+		        			<field name="batch_count" readonly="1"/>
+		        			<field name="btch_unit" readonly="1"/>
+		        		</group>
+		        		<field name="batch_ids" domain="[('picking_id','=',pick_id.picking_id),('product_id','=',product_id)]">
+		        			<tree create='false' edit="false">
+							<field name="product_id" readonly="1"/>
+							<field name="name" string="Number" readonly="1"/>
+							<field name="lot_id" readonly="1"/>
+							<field name="product_qty" string="Quantity" attrs="{'readonly':[('logistic_state','!=','draft')]}"/>
+							<field name="uom_id" readonly="1"/>
+							<field name="logistic_state" readonly="1"/>
+						</tree>
+						<form readonly="1" >
+		 				 	<group col="4">
+								<field name="product_id" readonly="1"/>
+								<field name="name" string="Number" readonly="1"/>
+								<field name="lot_id" readonly="1"/>
+								<field name="convert_product_qty" string="Quantity" readonly="1"/>
+								<field name="uom_id" readonly="1"/>
+								<field name="produce_qty_date" string="date" readonly="1"/>
+								<field name="logistic_state" readonly="1"/>
+								<field name="store_id" readonly="1"/>
+							</group>
+						</form>
+					</field>
+		        	</form>
+        		</field>
+		     </group>
+                    <button class="btn-primary" type="object" name="production_process" string="Process"/>
+                    <button string="_Cancel" class="btn-default" special="cancel" />
+                </form>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+	<!-- add crm stage CH_N116-->
+	<record model="crm.stage" id="n_stage_lead0">
+		<field name="name">Awaiting</field>
+		<field name="probability">90</field>
+		<field name="on_change">1</field>
+		<field name="sequence">1</field>
+		<field name="type">opportunity</field>
+	</record>
+	
+	<!--#CH_N065 for scrap location-->
+	<record id="new_scrap_location" model="stock.location">
+            <field name="name">Scrap Location</field>
+            <field name="active">False</field>
+	    <field name="scrap_location">True</field>
+        </record>
+	<record id="seq_scrap_check" model="ir.sequence">
+            <field name="name">Scrap sequence</field>
+            <field name="code">scrap.sequence</field>
+            <field name="prefix">SCRP</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>	
+	</record>
+	<record id="new_picking_location2" model="stock.picking.type">
+            <field name="name">Scrap Check</field>
+	    <field name="code">internal</field>
+	    <field name="sequence_id" ref="seq_scrap_check" />
+            <field name="show_entire_packs">True</field>
+	    <field name="use_create_lots">True</field>
+	    <field name="use_existing_lots">True</field>
+	    <field name="n_scrap_ck">True</field>
+	    <field name="active">False</field>
+	    <field name="default_location_src_id" ref="new_scrap_location" />
+        </record>
+<!--end -->
+         <!-- Start Template for send summary report to customer -->
+         <!--record id="email_template_for_sale_order_summary" model="mail.template">
+		    <field name="name">Sale Order Summary to ${object.partner_id.name}</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">Sale Order Summary to ${object.partner_id.name}</field>
+		    <field name="lang">${object.name.lang}</field>
+		    <field name="model_id" ref="sale.model_sale_order"/>
+                    <field name="report_template" ref="stock_merge_picking.report_summary_aalmir_saleorder"/>
+                    <field name="report_name">Summary Report_${(object.name or '').replace('/','_')}_{object.partner_id.name}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html">
+		        <![CDATA[
+		    ]]>
+		    </field>
+	</record-->
+
+    <!-- End Template for send summary report to customer -->
+    </data>
+</openerp>

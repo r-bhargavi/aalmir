@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="request_payment_term_wizard_form_view" model="ir.ui.view">
+            <field name="name">request.payment.term.wizard.form.view</field>
+            <field name="model">request.payment.term.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Quotation">
+                     <group name="information">
+                        <field name="payment_term_id" invisible="1"/>  <!--CH_N062 invisible-->
+                        <field name="customer_id" readonly="1"/>
+                        <field name="customer_credit" string="Credit Limit Allow" readonly="1" invisible="context.get('from_purchase')"/>
+                        <field name="order_total" string="Advance % " />
+			<field name="n_remaining_amount" string="Remaining" />
+			<field name="currency_id" invisible="1" />
+			<field name="previous_pending" readonly="1"/> 
+                        <field name="not_match" invisible="1"/>
+                    </group>
+                    <group>
+                        <h4>
+                            <label style="color:red" attrs="{'invisible': [('not_match', '=', False)]}" string="Amount is greated then credit limit"/>
+                        </h4>
+                    </group>
+                    <group>
+                        <field name="name" />
+                        <field name="download_credit_profile" widget="url" invisible="context.get('from_purchase')"/>
+                        <field name="upload_credit_profile_name" invisible="1"/>
+                        <!--field name="n_upload_credit_profile" widget="many2many_binary"/-->
+			<field name="upload_credit_profile" invisible="context.get('from_purchase')">
+				<tree  editable="bottom" >
+					<field name="name" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+				</tree>
+			</field>
+                        <button string="Send Credit Profile" name="send_credit_profile" type="object" class="btn-primary" invisible="context.get('from_purchase')"/>
+                    </group>
+                     <footer>
+                       <button name='do_request_po' string='Request' type="object" class="btn-primary" invisible="not context.get('from_purchase')"/>
+                        <button string="Request" name="do_request" type="object" class="btn-primary" invisible="context.get('from_purchase')"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_request_payment_term_wizard" model="ir.actions.act_window">
+            <field name="name">Payment Request</field>
+            <field name="res_model">request.payment.term.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="request_payment_term_wizard_form_view"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

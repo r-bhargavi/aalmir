@@ -1,0 +1,76 @@
+@api.multi
+    def import_carton(self):
+    	import base64
+    	FILENAME = "/home/aalmir/"+str(self.name)
+    	with open(FILENAME, "wb") as f:
+            text = self.new_upload
+            f.write(base64.b64decode(text))
+            
+    	import xlrd
+	book = xlrd.open_workbook(FILENAME)
+	max_nb_row=book.sheet_by_index(0).nrows
+	f_row=[]
+        uom_type=[]
+        material_type=self.env['product.material.type'].search([('string','=','packaging')])
+        carton_type=self.env['product.raw.material.type'].search([('main_id','=',material_type.id),('string','=','carton')])
+        cat_id=self.env['product.category'].search([('cat_type','=','all')])
+        length=self.env['n.product.discription.value'].search([('name','=','Length')])
+        width=self.env['n.product.discription.value'].search([('name','=','Width')])
+        height=self.env['n.product.discription.value'].search([('name','=','Height')])
+        uom=self.env['product.uom'].search([('name','=','cm')],limit=1)
+        uom_categ=self.env['product.uom.categ'].search([('name','=','Weight')], limit=1)
+        p_uom_type=self.env['product.uom.type'].search([('string','=','pri_packaging')])
+        s_uom_type=self.env['product.uom.type'].search([('string','=','sec_packaging')])
+        uom_type.append((4,p_uom_type.id))
+        uom_type.append((4,s_uom_type.id))
+        print"yyyyyyyyyy",p_uom_type.name,s_uom_type.name , uom_type
+        product_data={}
+        product_spec1=product_spec2=product_spec3={}
+        product=False
+        product_name=''
+        description=self.env['n.product.discription']
+	for row in range(max_nb_row) :
+		if row == 0:
+			f_row = book.sheet_by_index(0).row_values(row)
+                        
+			continue
+		else:
+                   header=f_row
+                   i=0
+                   for rec in book.sheet_by_index(0).row_values(row):
+                       if len(header)>= i and header[i] !='':
+			  header_name=str(header[i]) 
+                       if header_name == 'Type':
+                          if i==0:
+                             product_name +=str(rec)+" "
+                             if product_data.get('message_follower_ids'):
+			        product_data.pop('message_follower_ids')
+                             product_data.update({'name':rec,'product_material_type':material_type.id,
+                                          'raw_material_type':carton_type.id,'categ_id':cat_id.id,
+                                          'matstrg':'packaging'})
+                             product=self.env['product.template'].create(product_data)
+                             product_id=self.env['product.product'].search([('product_tmpl_id','=',product.id)])
+                             product_uom=self.env['product.uom'].create({'name':str(rec) +','+str(carton_type.name),
+                                        'product_id':product_id.id,'product_type':carton_type.id,
+                                         'unit_type':uom_type, 'category_id':uom_categ.id})
+                       print"PPPPPPPPPPPPP",product,product_uom
+                       if header_name == 'LENGTH':
+                          product_name +=str(rec)+" "
+                          product_spec1.update({'value':rec,'attribute':length.id,
+                                     'product_id':product.id,'unit':uom.id})
+                          description.create(product_spec1)
+                       if header_name == 'WIDTH':
+                          product_spec2.update({'value':rec,'attribute':width.id,
+                                     'product_id':product.id,'unit':uom.id})
+                          description.create(product_spec2)
+                       if header_name == 'HEIGHT':
+                          product_spec3.update({'value':rec,'attribute':height.id,
+                                     'product_id':product.id,'unit':uom.id})
+                          description.create(product_spec3)
+                       if header_name == 'WEIGHT':
+                          product.write({'weight':rec,'initial_weight':rec})
+                       if header_name == 'Description':
+                          product_name +=str(rec)+" "
+                          product.write({'description_purchase':rec, 'name': product_name})
+                          product_name=''
+                       i +=1

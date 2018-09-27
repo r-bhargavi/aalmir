@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="inherit_product_uom_form_view">
+            <field name="name">product.uom</field>
+            <field name="model">product.uom</field>
+            <field name="inherit_id" ref="product.product_uom_form_view"/>
+            <field name="arch" type="xml">
+            	<field name="category_id" position="attributes">
+                    <attribute name="invisible">context.get('product_id', False)</attribute>
+                </field>
+                <field name="category_id" position="after">
+                    <field name="unit_type" widget="many2many_tags"/>
+                </field>
+                <field name="rounding" position="after">
+                    <field name="product_type" options="{'no_create': True, 'no_open': True}"
+                        domain="[('main_id.string','=','packaging')]"/>
+                    <field name="product_id" domain="[('raw_material_type','=',product_type)]"
+                     attrs="{'invisible':[('product_type','=',False)]}"
+                     options="{'no_create': True}"/>
+                </field>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="inherit_product_uom_tree_view">
+            <field name="name">product.uom</field>
+            <field name="model">product.uom</field>
+            <field name="inherit_id" ref="product.product_uom_tree_view"/>
+            <field name="arch" type="xml">
+            	<field name="category_id" position="after">
+                    <field name="unit_type"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="product_category_form_view_inherite" model="ir.ui.view">
+            <field name="name">product.category.form.aalmir.cust</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='type']" position="attributes" >
+                    <attribute name="type">1</attribute>
+                </xpath>
+                <field name="type" position="after">
+                    <field name="cat_type" widget="radio"/>
+                    <field name="active"/>
+                    <field name="sequence_rel"/>
+                </field>
+            </field>
+        </record>
+        
+   <!-- Search view Inherite -->     
+        <record id="product_template_search_view_api" model="ir.ui.view">
+            <field name="name">Product Template Search View API</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view" />
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                    <group expand="0" string="Group By">
+                        <filter string="Product Type" domain="[]" context="{'group_by':'product_material_type'}"/>
+                        <filter name="Category" string="Internal Category" domain="[]" context="{'group_by':'categ_id'}"/>
+                    </group>
+                </field>
+                <field name="name" position="replace">
+                 <field name="name" string="Product" filter_domain="['|','|',('default_code','ilike',self),('name','ilike',self),('internal_name','ilike',self)]"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="product_template_form_view_aalmir_name" model="ir.ui.view">
+            <field name="name">product.template.common.form.aalmir.name</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                <field name="name" position="replace">
+                    <field name="name" placeholder="Product Name"/>
+                    <!--field name="child_prod_name" placeholder="Product Name" attrs="{'invisible' : [('child_prod_name','=', False)]}"/-->
+                </field>
+            </field>
+        </record>
+
+        <record id="product_product_tree_view_aalmir_cust_2" model="ir.ui.view">
+            <field name="name">product.product.tree.aalmir.cust.2</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view" />
+            <field name="arch" type="xml">
+                <field name="attribute_value_ids" position="replace" />
+                <!--field name="name" position="replace">
+                    <field name="child_prod_name"/>
+                </field-->
+                <!--field name="default_code" position="after">
+                    <field name="external_product_number" invisible="1"/>
+                </field-->
+            </field>
+        </record>
+        
+        <!-- Pricelist Form-->
+        <record id="product_pricelist_form" model="ir.ui.view">
+            <field name="name">produc.pricelist.inherit</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="gt_sale_pricelist.product_pricelist_form"/>
+            <field name="arch" type="xml">
+            <page name="price_line" position="replace">
+            	<page string="Products" name="price_line">
+            		<field name="item_ids" nolabel="1" invisible="1">
+            			<tree string="Items" editable="bottom">
+            				<field name="product_tmpl_id" string="Description"/>
+            				<field name="qty" string="MOQ"/>
+					<field name="min_quantity" string="Quanitity"/>
+					<field name="price_discount" string="Discount(%)"/>
+					<field name="fixed_price"/>
+					<field name="floor_price" />
+            			</tree>
+            		</field>
+            		<field name="cus_products" nolabel="1" colspan="4">
+                            <tree string="Products" >
+                                <field name="product_type" widget="selection"/>
+                                <!--<field name="product_category_id" />-->
+                                <field name="existing_product" invisible="1"/>
+                                <field name="product_id" options="{'no_create': True}" attrs="{'readonly' : [('existing_product','=', False)]}" domain="[('categ_id','=',product_type )]"/>
+                                <field name="ext_product_number" />
+                                <field name="uom_id"  widget="selection"/>
+                                <field name="qty_available" readonly="1"/>
+                                <field name="product_packaging" readonly="1"/>
+                                <field name="valid_from" string="Validity"/>
+                                <field name="to_date" string="Upto"/>
+                                <!--<field name="price_calculator_id" options="{'no_create': True}" />-->
+                            </tree>
+                            <form string="Customer Products" groups="base.group_sale_salesman">
+                                <group colspan="4">
+                                    <group>
+                                        <field name="product_type" widget="selection" attrs="{'readonly': [('pkg_editable','=', True)]}"/>
+                                        <field name="existing_product" attrs="{'readonly': [('pkg_editable','=', True)]}" invisible='1'/>
+                                        <!--<field name="product_category_id" options="{'no_create': True}" attrs="{'invisible' : [('existing_product','=', True)]}"/>-->
+                                        <field name="product_id" options="{'no_create': True}" attrs="{'readonly' : [('existing_product','=', False)]}" domain="[('categ_id','=',product_type )]"/>
+                                        <field name="ext_product_number" />
+                                        <field name="product_name" attrs="{'invisible' : [('existing_product','=', True)], 'required' : [('existing_product','=', False)]}"/>
+                                        <field name="product_description" attrs="{'invisible' : [('existing_product','=', True)]}"/>
+                                        <field name="highest_price" invisible="1"/>
+                                        <field name="avg_price" invisible="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="lowest_price" required="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="floor_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="min_qty"/>
+                                    </group>
+                                    <group>
+                                        <!--<field name="payment_term_id" />-->
+                                        <field name="uom_id" domain="[('unit_type.string','=','product')]" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                                        <field name="bom_id" invisible="1"/>
+                                        <field name="type_of_packaging" attrs="{'readonly': [('pkg_editable','=', True)],'invisible':[('existing_product','=',True)]}" domain="[('unit_type.string','in',('raw_packaging','product_packaging'))]" options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="qty_per_package" attrs="{'readonly': [('pkg_editable','=', True)],'invisible':[('existing_product','=',True)]}"/>
+                                        <!--field name="package_uom_id" readonly="1" attrs="{'invisible': [('package_uom_id','=', False)]}"/ #CH_N055 fields are comented for add new field-->
+					<field name="product_packaging"  options="{'no_create': True, 'no_open': True}"
+						context="{'templ_id':product_id,'sale_line':True}"
+						attrs="{'readonly': [('pkg_editable','=', True)],'invisible':[('existing_product','=',False)]}"/> <!--#CH_N055 -->
+                                        <label string="Validity Period"/>
+                                        <div>
+                                        	<field name="valid_from"/> - <field name="to_date"/>
+                                        </div>
+
+					<field name="create_uid" attrs="{'invisible':[('create_uid','=',False)]}" string="created by" readonly="1"/>
+                                        <field name="create_date" attrs="{'invisible':[('create_date','=',False)]}" string="created on" readonly="1"/>
+					
+					<!--CH_N019 start add fields to show film data-->
+					<field name="n_product_type" readonly="1"/>
+                                        <field name="n_calculator_id" attrs="{'invisible': [('n_product_type','!=', 'film')]}" readonly="1"/>
+					<!-- CH_N019 end -->
+
+					<field name="qty" invisible="1"/>
+					<field name="pkg_editable" invisible="1"/>
+                                    </group>
+                                </group>
+                                <group name="pricebook" >
+	                            <field name="item_ids" nolabel="1" colspan="4" context="{'qty': qty, 'highest_price': avg_price}">
+	                                    <tree string="Items" editable="bottom">
+	                                    	<field name="do_term" options="{'no_create': True, 'no_open': True}"/>
+	                                        <field name="min_quantity" string="Disc. Qty From"/>
+	                                        <field name="qty" string="Disc. Qty To"/>
+	                                        <field name="fixed_price" string="Price"/>
+	                                        <field name="currency_id" invisible="1"/>
+	                                    </tree>
+	                                    <form create="0" edit="0">
+	                                    	<group col="4" readonly="1">
+	                                    		<field name="do_term"/>
+			                                <field name="min_quantity" string="Disc. Qty From"/>
+			                                <field name="qty" string="Disc. Qty To"/>
+			                                <field name="fixed_price" string="Price"/>
+			                                <field name="currency_id" invisible="1"/>
+	                                    	</group>
+	                                    </form>
+	                            </field>
+                                </group>
+                               <div class="oe_chatter">
+                                <field name="message_ids" widget="mail_thread"/>
+                            </div>
+                            </form>
+                            
+                        </field>
+		</page>
+            </page>
+         	</field>
+        </record>
+    </data>
+</openerp>

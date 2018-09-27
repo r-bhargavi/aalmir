@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="partner_payment_terms_almir" model="ir.ui.view">
+            <field name="name">Payment Term</field>
+            <field name="model">account.payment.term</field>
+            <field name="inherit_id" ref="gt_sale_pricelist.partner_payment_terms"></field>
+            <field name="arch" type="xml">
+               <xpath expr="//group" position="replace">
+                    <group>
+                       <group>
+                          <field name="name"/>
+                        <field name="active"/>
+			<field name="n_standard_term" groups="base.group_system,base.group_sale_manager,
+				account.group_account_manager" 
+                         attrs="{'invisible': [('n_new_request', '=',True)]}"/>
+			<field name="company_ids" widget="many2many_tags" groups="account.group_account_manager"/>
+			<field name="n_partner_id"  widget="many2many_tags" 
+                           options="{'no_create': True}" 
+                           attrs="{'invisible': ['|',('n_standard_term','=',True),('n_new_request', '=',True)]}"
+                           domain="[('company_type','=','company'),('customer','=',True)]"/>
+			
+			<field name="n_new_request" invisible= "1" groups="base.group_system,base.group_sale_manager,account.group_account_user"/>
+                      </group>
+                       <group attrs="{'invisible': [('n_new_request', '=',True)]}" >
+				<field name="advance_per"/>
+				<label for="payment_term_depend"/>
+				<div>
+				    <field name="on_delivery_per" nolabel="1" class="oe_inline" /> % On
+				    <field name="payment_term_depend" nolabel="1" class="oe_inline" required='1'/>
+				</div>
+				<label for="time_limit_value" string="Time Limit" attrs="{'invisible': [('payment_term_depend', '!=', 'credit')]}"/>
+				<div attrs="{'invisible': [('payment_term_depend', '!=', 'credit')]}">
+				    <field name="time_limit_value" nolabel="1" class="oe_inline"/>
+				    <field name="time_limit_type" nolabel="1" class="oe_inline"/> after
+				    <field name="payment_due" attrs="{'invisible': [('payment_term_depend', '!=', 'credit')]}" nolabel="1" class="oe_inline"/>
+				</div>
+                               <field name="n_purchase_term" groups="base.group_system,base.group_sale_manager,
+				account.group_account_manager"/>
+                              <field name="supplier_id"  widget="many2many_tags"
+                               options="{'no_create': True}" 
+                               attrs="{'invisible': ['|',('n_purchase_term','=',True),('n_new_request', '=',True)]}"
+                               domain="[('company_type','=','company'),('supplier','=',True)]"/>   
+			    </group>
+                    </group>
+		    <group col="4">
+			  <button name="payment_term_create"  string="Save" type="object" class="btn-primary" invisible="not context.get('show_term_save')"/>
+		   </group>
+		    <!--#CH_N040 add fields to marge in existing --> <!--CH_N043 code is commented for write marge code -->
+		    <!--group colspan="4" attrs="{'invisible': [('n_new_request', '=',True)]}">
+			<field name="n_payment_bool"/>
+			<field name="n_payment_term" domain="[('n_new_request','=',False)]" attrs="{'invisible': [('n_payment_bool', '=',False)]}" />
+			<button name="add_in_existing" type="object" string="Add In Existing" attrs="{'invisible': [('n_payment_bool', '=',False)]}"/>
+		   </group-->
+		 <!--#CH_N040 end<< -->
+                </xpath>
+		
+                <field name="line_ids" position="replace" >
+                    <field name="line_ids" invisible="1" />
+                </field>
+		<field name="note" position="replace" >
+                    <field name="note" invisible="1" />
+                </field>
+                  <label for="note" position="replace"/>
+                <xpath expr="//separator" position="replace" >
+                    <separator string="Terms" invisible="1" />
+                </xpath>
+                <xpath expr="//p[@class='text-muted']" position="replace">
+                    <p class="text-muted" invisible="1">
+                        The last line's computation type should be "Balance" to ensure that the whole amount will be allocated.
+                    </p>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="partner_payment_terms_almir_search_view" model="ir.ui.view">
+            <field name="name">partner.payment.terms.almir.search.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+                <search string="Payment Term" >
+                    <field name = "name" />
+                    <field name = "state" />
+                    <field name = "customer_id" />
+                    <separator/>
+		            <filter string="Requested" name="requested" domain="[('state','=','requested')]"/>
+		            <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+		            <filter string="Rejected" name="rejected" domain="[('state','=','rejected')]"/>
+		            <filter string="New" name="view" domain="[('view','=', True)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="State" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+ 	<!--CH_N043 start Marge view -->
+	<record id="account_payment_term_merge_view" model="ir.ui.view">
+            <field name="name">account.payment.term.requested.tree.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+                <form string="Marge In Existing Payment Term">
+		    <group col="4">
+		            <field name="n_payment_term" domain="[('n_new_request','=',False)]"/>
+			    <button name="n_merge_customer"  string="Save" type="object" class="btn-primary"/> <!--CH_N043 add button to marge-->
+		    </group>
+                </form>
+            </field>
+        </record>
+       <!--CH_N043  -->
+
+        <record id="account_payment_term_requested_tree_view" model="ir.ui.view">
+            <field name="name">account.payment.term.requested.tree.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Term" readonly="1" create="0" delete="0" default_order="requested_date desc">
+                    <field name="name" />
+                    <field name="quote_id" />
+                    <field name="customer_id" />
+                    <field name="credit_allowed" readonly="1"/>
+                    <field name="sales_person_id" groups="base.group_system,base.group_sale_manager,account.group_account_user"/>
+                    <field name="state" />
+                    <field name="requested_date" />
+                    <field name="credit_profile_doc_name" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+<!-- CH_N067 start -->
+         
+	<record id="account_payment_term_requested_form_view" model="ir.ui.view">
+            <field name="name">account.payment.term.requested.tree.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+		<form string="Payment Term" readonly="1">
+		<header>
+		    <button name="credit_increase_amount"  string="Credit Profile" type="object"  class="btn-primary"/>
+                    <button name="create_payment_term"  string="Approve" type="object" states="requested" class="btn-primary"/>
+		    <button name="merge_payment_term"  string="Merge" type="object" states="requested" class="btn-primary"/> 
+                    <button name="reject_payment_term" string="Reject" type="object" states="requested" class="btn-primary"/>
+		</header>
+		<sheet>
+		<group col="4">
+                    <field name="name" readonly="1"/>
+                    <field name="quote_id" readonly="1" attrs="{'invisible':[('quote_id','=',False)]}"/>
+                    <field name="customer_id" readonly="1"/>
+                    <field name="purchase_id" readonly="1" string='Purchase Order'
+                            attrs="{'invisible':[('purchase_id','=',False)]}"/>
+		    <field name="n_sale_amount" readonly="1" widget='monetary' options="{'currency_field': 'currency_id'}" string='Total Amount'/>
+                    <field name="sales_person_id" readonly="1" groups="base.group_system,base.group_sale_manager,account.group_account_user" />
+		    <field name="credit_allowed" readonly="1" widget='monetary' options="{'currency_field': 'currency_id'}"  attrs="{'invisible':[('purchase_id','!=',False)]}"/>
+                    <field name="requested_date" readonly="1"/>
+		    <field name="credit_required_amount" readonly="1" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+		    <field name="state" invisible="1"/>
+		    <field name="currency_id" invisible="1"/>
+		    <field name="credit_profile_doc_name" invisible="1"/>
+		</group>
+		<group attrs="{'invisible':[('purchase_id','!=',False)]}">
+                    <field name="credit_profile_doc" readonly="1">
+			<tree create="0">
+				<field name="name" invisible="1"/>
+				<field name="n_upload_doc" string="Document name" filename="name"/>
+			</tree>
+		    </field>
+		</group>
+
+		</sheet>
+                </form>
+            </field>
+        </record>
+<!--CH_N067 end-->
+        
+        <record id="account_payment_term_approved_tree_view" model="ir.ui.view">
+            <field name="name">account.payment.term.approved.tree.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Term" readonly="1" create="0" delete="0" default_order="approve_date desc">
+                    <field name="name" />
+                    <field name="quote_id"/>
+                    <button name="open_order" string="Open" type="object" class="oe_link,btn-primary" />
+                    <field name="customer_id" />
+                    <field name="sales_person_id" groups="base.group_system,base.group_sale_manager,account.group_account_user" />
+                    <field name="state" />
+                    <field name="requested_date" />
+                    <field name="credit_profile_doc_name" invisible="1"/>
+                    <!--field name="n_credit_profile_doc" readonly="1" filename="credit_profile_doc_name"/-->
+                    <field name="accountant_id" string="Approved By"/>
+                    <field name="approve_date" states="approved"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="account_payment_term_rejeted_tree_view" model="ir.ui.view">
+            <field name="name">account.payment.term.rejeted.tree.view</field>
+            <field name="model">account.payment.term.request</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Term" readonly="1" create="0" delete="0" default_order="rejected_date desc">
+                    <field name="name" />
+                    <field name="quote_id" />
+                    <button name="open_order" string="Open" type="object" class="oe_link,btn-primary" />
+                    <field name="customer_id" />
+                    <field name="sales_person_id" groups="base.group_system,base.group_sale_manager,account.group_account_user"/>
+                    <field name="state" />
+                    <field name="requested_date" />
+                    <field name="credit_profile_doc_name" invisible="1"/>
+                    <!--field name="n_credit_profile_doc" readonly="1" filename="credit_profile_doc_name" /-->
+                    <field name="accountant_id" string="Rejected By"/>
+                    <field name="rejected_date" states="rejected"/>
+                </tree>
+            </field>
+        </record>
+    <!-- Start Account Payment tree , form and action -->
+         <record id="view_account_payment_tree_inherit_aalmir" model="ir.ui.view">
+		<field name="name">account.payment.tree</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_tree"></field>
+		<field name="arch" type="xml">
+                   <field name='payment_method_id' position='attributes'>
+                      <attribute name='invisible'>1</attribute>
+                   </field> 
+                    <field name='partner_id' position='before'>
+                         <field name='payment_from' />
+                   </field>
+               </field>
+         </record>
+         <record id="view_account_payment_form_inherit_order" model="ir.ui.view">
+		<field name="name">account.payment.form</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_form"></field>
+		<field name="arch" type="xml">
+                   <field name="communication" position='attributes'>
+                      <attribute name='string'>Internal Note</attribute>
+                   </field>
+		  <field name="communication" position="after">
+                    
+		     <field name="sale_id" readonly='1' attrs="{'invisible':[('sale_id','=',False)]}"/> 
+                     <field name='internal_note'/>
+		  </field>
+                 <field name="journal_id" position="after">
+                      <label for='sale_amount' attrs="{'invisible':[('sale_id','=',False)]}"/>
+                     <div attrs="{'invisible':[('sale_id','=',False)]}">
+                       <field name='sale_amount'  readonly='1' class='oe_inline' nolabel='1'/>
+                      <field name='sale_currency_id' class='oe_inline' nolabel='1' readonly='1'/>
+                    </div>
+		  </field>
+                    <field name="state" position="before">
+                        <button name="print_advance_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': ['|',('state', '!=', 'posted'),('sale_id', '=',False)]}"/>
+                         <button name="print_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': [('sale_id', '!=',False)]}"/>
+                         <button name="print_sale_order" type="object" icon='fa-download' string="Download Quotation" class="btn-primary"  attrs = "{'invisible': ['|',('state', '!=', 'posted'),('sale_id', '=',False)]}"/>
+                    </field>
+                   
+                 <form position='inside'>
+                   <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                 </form>           
+ 
+	   </field>
+	</record>
+       <record id="account.action_account_payments" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'inbound', 'group_by':'payment_from'}</field>
+            <field name="domain">[('partner_type', '=', 'customer')]</field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+    <!--End Account Payment-->
+    </data>
+</openerp>

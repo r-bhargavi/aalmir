@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <openerp>
+    <data>
+	<template id="report_picking_list_all" >
+
+           <t t-call="report.html_container">
+               <t t-foreach="docs" t-as="doc">
+                <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+            		<t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+			<div class="page" style="font-family: Calibri;">
+            			<style>
+					.report_class {height:40px;
+						      border:1px solid #9999;
+					}
+
+				</style>
+				<div class="oe_structure"/>
+		         	<h2  style="font-family: Calibri;margin-left:280">
+					<span >Picking List (All Items) </span>
+				</h2>
+            
+		        	<div class="row" style='border:1px solid #9999;margin-left:2px;margin-right:2px'>
+					<div class="col-xs-3 table-bordered report_class" >
+					    	<p style="font-weight: bold;" >Picking List</p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class"  >
+					    	<p t-esc="doc.name"></p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class" t-if='doc.origin'>
+					   	<p style="font-weight: bold;" >Source Document</p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class" t-if='doc.origin'>
+						  <p t-esc="doc.origin"></p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class">
+					    	<p style="font-weight: bold;" >Commitment Date</p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class">
+					      	<p t-field="doc.sale_id.client_date" t-options ='{"format": "MM/dd/yyyy"}'/>
+					</div>
+					<div class="col-xs-3 table-bordered report_class">
+					    	<p style="font-weight: bold;" >Scheduled Date</p>
+					</div>
+					<div class="col-xs-3 table-bordered report_class">
+						<t t-if='doc.dispatch_date'>
+						      <p t-field="doc.dispatch_date" t-options ='{"format": "MM/dd/yyyy"}'/>
+					     	</t>
+					   	<t t-if='not doc.dispatch_date'>
+						      <p t-field="doc.min_date" t-options ='{"format": "MM/dd/yyyy"}'/>
+					     	</t>
+					</div>
+					
+						  
+		        	</div>  
+		        	<div class="row" style='border:1px solid #9999;margin-left:2px;margin-right:2px'>
+					<div class="col-xs-3 table-bordered report_class"  t-if='doc.check_partner'>
+						   <p style="font-weight: bold;" >Customer Address:</p>
+			       		</div>
+					<div class="col-xs-9 table-bordered report_class"  t-if='doc.check_partner'>
+					    <t t-esc="doc.partner_id.name"/>
+					    	<t t-if="doc.partner_id.street">
+					     		<t t-esc="doc.partner_id.street"/>,</t>
+						 <t t-if="doc.partner_id.street2"> 
+					   		<t t-esc="doc.partner_id.street2"/>,</t>
+						 <t t-if="doc.partner_id.city"> 
+					    		<t t-esc="doc.partner_id.city"/>,</t>
+						 <t t-if="doc.partner_id.state_id">
+						     	<t t-esc="doc.partner_id.state_id.name"/>,</t>
+						 <t t-if="doc.partner_id.country_id"> 
+					      		<t t-esc="doc.partner_id.country_id.name"/>.</t>
+						 <t t-if="doc.partner_id.zip"><span>P.O. Box </span> 
+					     		<t t-esc="doc.partner_id.zip"/></t>
+					</div>
+				</div>
+
+			       	<table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px">
+					<tr>
+						<td >SL#</td>
+						<td>Product</td> 
+					    	<td>Quantity</td>
+					    	<td>Units</td>
+					    	<td>Bin-Location</td> 
+					</tr>
+					       
+					<t t-set="count" t-value="0" />
+					<t t-foreach="get_details(doc)" t-as="line">
+						<t t-if="line.quantity !=0">
+		   				    <tr>
+							<td>
+								<t t-set="count" t-value="count+1" />
+								<t t-esc="count" />
+							</td>
+							<td>
+								<span t-if='line.product_id'/></td>
+							<td>
+								<t t-esc="line.quantity" /></td>
+						 	<td>
+								<t t-esc="line.uom_name " /></td>   
+						       	<td>
+								<span t-if='line.location'/></td>
+						    </tr>
+						</t>
+					</t>      
+		        	</table>
+			</div>
+    		   </t>
+               </t>
+	   </t>
+       </template>
+    </data>
+ </openerp>
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Sequences for sale.order -->
+        <record id="seq_quotation" model="ir.sequence">
+            <field name="name">Quotation</field>
+            <field name="code">sale.order.quotation</field>
+            <field name="prefix">/Q/%(month)s/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+       <record id="seq_crm_lead" model="ir.sequence">
+            <field name="name">CRM LEAD</field>
+            <field name="code">crm.lead</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</openerp>

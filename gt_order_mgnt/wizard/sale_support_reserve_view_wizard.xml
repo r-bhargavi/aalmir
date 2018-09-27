@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="sale_support_reserve_wizard_form_view" model="ir.ui.view">
+            <field name="name">Reserve Wizard</field>
+            <field name="model">sale.support.reserve.release.wizard</field>
+            <field name="arch" type="xml">
+            	<form string="Reserve">
+			<group col="1">
+				<h4 style="color:red" attrs="{'invisible':[('picking_policy', '!=','one')]}"> 
+                       			Your Delivery policy is 'Deliver all products at once'</h4>
+               			<h4 style="color:red" attrs="{'invisible':[('picking_policy', '!=','one')]}"> 
+                       			So operations are generated in Delivery Order when reserved quantity of all products in sales order is equal to Order Quantity</h4>
+                       		<field name="picking_policy" invisible="1"/>
+			</group>
+	       		<group name="res_data" col="4">
+	       		    <label for="avl_qty" help="Quantity is available in Delivery Send Location"/>
+	       		    <div>
+		            	<field name="avl_qty" readonly="1" class="oe_inline"/>
+		            	<field name="avl_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <label for="total_avl_qty" help="Quantity is in all Warehouse Storage Locations"/>
+	       		    <div>
+		            	<field name="total_avl_qty" readonly="1" class="oe_inline"/>
+		            	<field name="total_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <label for="res_qty" string="Reserve Qty"/>
+	       		    <div>
+		            	<field name="res_qty" class="oe_inline"/>
+		            	<field name="res_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <label for="order_qty" string="Ordered Qty"/>
+	       		    <div>
+		            	<field name="order_qty" readonly="1" class="oe_inline"/>
+		            	<field name="order_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <field name="packaging" readonly="1"/>
+		            <field name="sale_line" invisible="1"/>
+		            <field name="res_date" invisible="1"/>
+			    <field name="product_id" invisible="1"/>
+		            <field name="contract_id"  invisible="1"/>
+			    <field name="status"  invisible="1"/>
+		        </group>
+		        <footer>
+		            <button name="reserve" type="object" string="Reserve" class="oe_highlight" />
+		        </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="sale_support_release_wizard_form_view" model="ir.ui.view">
+            <field name="name">Release Wizard</field>
+            <field name="model">sale.support.reserve.release.wizard</field>
+            <field name="arch" type="xml">
+            	<form string="Release">
+		        <group name="res_data" col="4">
+		            <label for="avl_qty" string="Reserve Qty"/>
+	       		    <div>
+		            	<field name="avl_qty" readonly="1" class="oe_inline"/>
+		            	<field name="avl_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <label for="order_qty" string="Ordered Qty"/>
+	       		    <div>
+		            	<field name="order_qty" readonly="1" class="oe_inline"/>
+		            	<field name="order_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <label for="res_qty" string="Release Qty"/>
+	       		    <div>
+		            	<field name="res_qty" class="oe_inline"/>
+		            	<field name="res_uom" readonly="1" nolabel="1" class="oe_inline"/>
+		            </div>
+		            <field name="packaging" readonly="1"/>
+		            <field name="sale_line" invisible="1"/>
+		            <field name="res_date" invisible="1"/>
+			    <field name="product_id" invisible="1"/>
+			    <field name="status"  invisible="1"/>
+		        </group>
+		        <footer>
+			    <button name="release" type="object" string="Release" class="oe_highlight" />
+		        </footer>
+	    	</form>
+            </field>
+        </record>
+    </data>
+</openerp>

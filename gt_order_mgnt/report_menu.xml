@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report 
+            id="report_invoice_g"
+            string="Aalmir Invoice"
+            model="account.invoice" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_invoice_aalmir" 
+            name="gt_order_mgnt.report_invoice_aalmir" 
+        />
+         <report 
+            id="report_picking_g"
+            string="Aalmir Delivery"
+            model="stock.picking" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_delivery_aalmir" 
+            name="gt_order_mgnt.report_delivery_aalmir" 
+        />
+          <report 
+            id="report_workorder_g"
+            string="Operation Report"
+            model="mrp.production.workcenter.line" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_mrp_workorder" 
+            name="gt_order_mgnt.report_mrp_workorder" 
+            menu="False"
+        />
+        <report 
+            id="report_workorder_g_form"
+            string="Work Order Form"
+            model="mrp.production.workcenter.line" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_mrp_workorder_form" 
+            name="gt_order_mgnt.report_mrp_workorder_form" 
+            menu="False"
+        />
+       <report 
+            id="report_workorder_batch_no_barcode"
+            string="Batch No. Barcode"
+            model="mrp.production.workcenter.line" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_workorder_batch_number_barcode" 
+            name="gt_order_mgnt.report_workorder_batch_number_barcode" 
+            menu="False"        />
+        <report 
+            id="report_batch_no_barcode"
+            string="Batch No. Barcode"
+            model="mrp.order.batch.number" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_batch_number_barcode" 
+            name="gt_order_mgnt.report_batch_number_barcode" 
+        />
+        <report 
+            id="report_invoice_vendor1"
+            string="Aalmir Vendor Invoice"
+            model="account.invoice" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_invoice_aalmir_vendor" 
+            name="gt_order_mgnt.report_invoice_aalmir_vendor" 
+        />
+        <report 
+            id="report_picking_grt"
+            string="Aalmir"
+            model="stock.picking" 
+            report_type="qweb-pdf"
+            menu="False"
+            file="gt_sale_quotation.delivery_report" 
+            name="gt_sale_quotation.delivery_report" 
+        />
+         <report 
+            id="report_payment_sale_report_new"
+            string="Advance Payment Receipt"
+            model="sale.order" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_payment_sale_report" 
+            name="gt_order_mgnt.report_payment_sale_report" 
+        />
+         <report 
+            id="report_payment_account_new"
+            string="Payment Receipt"
+            model="account.payment" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_payment_account" 
+            name="gt_order_mgnt.report_payment_account" 
+        />
+    </data>
+</openerp>

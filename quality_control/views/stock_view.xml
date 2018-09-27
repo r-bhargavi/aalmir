@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+	<record id="qc_stock_location_form_inherit" model="ir.ui.view">
+		<field name="name">Stock.Location</field>
+		<field name="model">stock.location</field>
+		<field name="inherit_id" ref="stock.view_location_form"></field>
+		<field name="arch" type="xml">
+		  <field name="return_location" position="after">
+			  <field name="quality_ck_loc" readonly="1" attrs="{'invisible':[('quality_ck_loc','!=',True)]}" />
+		  </field>
+		  <!--field name="return_location" position="attributes">
+			  <attribute name="invisible">[('quality_ck_loc','=',True)]</attribute>
+		  </field>
+		  <field name="scrap_location" position="attributes">
+			  <attribute name="invisible">[('quality_ck_loc','=',True)]</attribute>
+		  </field-->
+		</field>
+	</record>
+	
+	<record id="qc_product_tmpl_form_inherit" model="ir.ui.view">
+		<field name="name">Product Template</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="api_raw_material.product_template_form_view_api_inherite_gt_order"></field>
+		<field name="arch" type="xml">
+		  <group name='weight' position='inside'>
+			  <field name="check_quality"  />
+			  <field name="sample_id"  attrs="{'invisible':[('check_quality','=',False)]}"/>
+		  </group>
+		</field>
+	</record>
+
+    </data>
+</openerp>

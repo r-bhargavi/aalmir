@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report 
+            id="report_quotation_b"
+            string="Aalmir Quotation / Order"
+            model="sale.order" 
+            report_type="qweb-pdf"
+            file="gt_sale_quotation.report_quotation_aalmir1" 
+            name="gt_sale_quotation.report_quotation_aalmir1" 
+        />
+    </data>
+</openerp>

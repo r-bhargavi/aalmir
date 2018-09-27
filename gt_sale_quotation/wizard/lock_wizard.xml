@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<odoo>
+        <record id="lock_wizard_view" model="ir.ui.view">
+            <field name="name">lock.wizard.view</field>
+            <field name="model">lock.wizard</field>
+            <field name="arch" type="xml">
+                <form >
+                    <div>
+                        <label string= "Are you sure you want to lock this Quotation"  />
+                    </div>
+                     <footer>
+                        <button string='Ok' name="done" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="lead_won_wizard_view" model="ir.ui.view">
+            <field name="name">lead.won.view</field>
+            <field name="model">lead.won</field>
+            <field name="arch" type="xml">
+                <form string="Quotation to Confirm">
+                    <div>
+                        <label string= "Select Quotation for Confirm"  /> <field name="sale_id" options="{'no_create': True}" domain="[('opportunity_id', '=', lead_id), ('state', 'in', ['draft', 'sent']), ('lock', '=', True)]"/>
+                    </div>
+                    <field name="lead_id" invisible="1"/>
+                     <footer>
+                        <button string='Ok' name="done" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+		<record model="ir.actions.act_window" id="action_lead_won_wizard">
+            <field name="name">Quotation to Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">lead.won</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        
+        
+        <record id="crm_lead_won_wizard_view" model="ir.ui.view">
+            <field name="name">crm.lead.won.view</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="gt_aalmir_coldcalling.crm_case_form_view_oppor_cust1"/>
+            <field name="arch" type="xml">
+            	<xpath expr="//button[@name='action_set_won']" position="attributes">
+            		<attribute name="name">%(gt_sale_quotation.action_lead_won_wizard)d</attribute>
+            		<attribute name="type">action</attribute>
+            		<attribute name="context">{'active_id': active_id}</attribute>
+            		<attribute name="attrs">{'invisible': ['|','|',('check_quote', '=', False),('active', '=', False),('probability', '=', 100)]}</attribute>
+            	</xpath>
+            	<xpath expr="//field[@name='stage_id']" position="after">
+            		<field name="check_quote" invisible="1"/>
+            	</xpath>
+            </field>
+         </record>
+        
+         
+</odoo>

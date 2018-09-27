@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    <!--Product uom-->
+        <record id="product_uom_gram" model="product.uom">
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
+            <field name="name">gm</field>
+            <field name="factor" eval="1000"/>
+            <field name="uom_type">smaller</field>
+        </record>
+           
+       <record id="product_uom_meter" model="product.uom">
+            <field name="category_id" ref="product.uom_categ_length"/>
+            <field name="name">Meter</field>
+            <field name="factor" eval="1.0"/>
+        </record>
+        
+        <record id="product_uom_cm" model="product.uom">
+            <field name="category_id" ref="product.uom_categ_length"/>
+            <field name="name">cm</field>
+            <field name="factor" eval="100"/>
+            <field name="uom_type">smaller</field>
+        </record>
+        
+        <record id="product_uom_mm" model="product.uom">
+            <field name="category_id" ref="product.uom_categ_length"/>
+            <field name="name">mm</field>
+            <field name="factor" eval="100"/>
+            <field name="uom_type">smaller</field>
+        </record>
+        
+        <record id="product_uom_micron" model="product.uom">
+            <field name="category_id" ref="product.product_uom_categ_unit"/>
+            <field name="name">micron</field>
+            <field name="factor" eval="1.0"/>
+            <field name="rounding" eval="0.001"/>
+        </record>
+        
+        <record id="product_uom_percentage" model="product.uom">
+            <field name="category_id" ref="product.product_uom_categ_unit"/>
+            <field name="name">Percentage(%)</field>
+            <field name="factor" eval="1.0"/>
+            <field name="rounding" eval="0.001"/>
+        </record>
+        
+        <record id="product_uom_bags" model="product.uom">
+            <field name="category_id" ref="product.product_uom_categ_unit"/>
+            <field name="name">Bags</field>
+            <field name="factor" eval="100"/>
+            <field name="uom_type">smaller</field>
+        </record>
+     </data>
+     
+     
+</openerp>

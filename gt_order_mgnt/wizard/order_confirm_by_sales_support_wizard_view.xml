@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="order_confirm_by_sales_person_wizard_form_view" model="ir.ui.view">
+            <field name="name">Order_Confirm_Sales_Support_wizard</field>
+            <field name="model">order.confirm.by.sales.support.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Quotation">
+                    <group>
+                        <group>
+                            <field name="payment_term_id" options="{'no_create': True}" readonly="1"/>
+                            <field name="payment_term_depend" invisible="1"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <group>
+                      <group name="information" string="Credit Information">
+                        <field name="customer_id" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+
+                        <field name="customer_credit" string="Credit allowed" readonly="1" widget='monetary' options="{'currency_field': 'currency_id'}" help="Customer Credit Allow Amount"/>
+                        <field name="customer_pending_total_invoice" widget='monetary' help="Total Credit Pending Amount not included Current credit pending Amount" string="Total Due Amount"/>
+                       <field name="uninvoice_saleorder" string="Yet To Be invoiced" widget='monetary' options="{'currency_field': 'currency_id'}" help="Total Uninvoice Sale Order Amount (Invoice minus when invoice state is validate )"/>
+                        <field name="order_total" readonly="1" string="Current Order Credit" widget='monetary' options="{'currency_field': 'currency_id'}" help="Current Sale Order Amount.if any credit paid than subtract from this amount"/>
+                       <field name="total_credit_pending" string="Total Customer Credit (include current)"
+                        help="Total Credit Pending Amount + Current Sale order Pending Amount + Total Uninvoice sale Order Amount" widget='monetary'/>
+                       </group>
+                       
+                       <group string="Forecasting">
+                         <field name="customer_delivery_date" readonly="1" help="Customer Delivery Date"/>
+                        <field name="customer_pending_invoice" widget='monetary' 
+                            help="Total Customer Credit pending paid in expected Customer Delivery Date" options="{'currency_field': 'currency_id'}"/>
+                        <field name="total_sale_pending_amount" widget='monetary' 
+                         help="Total Customer Sale order Amount.if credit paid than subtract from this invoice" options="{'currency_field': 'currency_id'}"/>
+                        
+                       </group>
+                      
+                   </group>
+                   <h4  style="color:red" attrs="{'invisible': [('has_limit', '=', False)]}">
+                             Total Customer Credit (include current) is greater than credit limit.
+                    </h4>
+                    <h4  style="color:red" attrs="{'invisible': ['|',('credit_expr', '=', False),('cr_state', '=', 'approve')]}">
+                             Customer Credit date expired.
+                    </h4>
+                    
+                    <group>
+			<h4 style="color:red" attrs="{'invisible': [('cr_state', '!=', 'reject')]}">Your credit request is rejected </h4>
+		    </group>
+		    
+	    	   <label string="Your credit request is approved," style="color:green;" attrs="{'invisible': ['|',('cr_state', '!=', 'approve'),('stop_delivery', '!=',True)]}"/>
+	    	   <label string="But delivery order is blocked" style="color:red;" attrs="{'invisible': ['|',('cr_state', '!=', 'approve'),('stop_delivery', '!=',True)]}"/>
+                   
+                   <group>
+			<field name="cr_state" string="Credit Request Status" attrs="{'invisible': ['|',('n_force_confirm','=',True),('cr_state', '=', False)]}" readonly="1"/>
+                        <field name="match_payment_term" attrs="{'invisible': [('cr_state', '!=', 'approve'),'|',('has_limit', '=', True),('credit_expr', '=', True)]}"/>
+                        <field name="document_match"  attrs="{'invisible': [('cr_state', '!=', 'approve'),'|',('has_limit', '=', True),('credit_expr', '=', True)]}"/>
+                        <field name="warehouse_id"  readonly="1" attrs="{'invisible': [('cr_state', '!=', 'approve'),'|',('has_limit', '=', True),('credit_expr', '=', True)]}"/>
+                        <field name="invoice_policy" 
+                             attrs="{'invisible': ['|',('invoice_count', '=', 1),('has_limit', '=', True)]}" 
+                            /> 
+                        <field name="invoice_count"  invisible="1"/>
+                   </group>
+                    
+                   <field name="stop_delivery" invisible="1"/>
+                   <group>
+                            <field name="cr_note" attrs="{'invisible': [('cr_state', '!=', 'reject')]}" readonly="1" />
+                           <field name="n_force_confirm" invisible="1" />
+			   <field name="has_limit" invisible="1"/>
+                          <field name="credit_expr"  invisible="1"/>
+                   </group>
+                   <footer>
+                        <button string="Request Unblock" name="request_credit" type="object" class="btn-primary" attrs="{'invisible': [('has_limit', '=', False)]}"/>
+
+                        <button string="Confirm" name="confirm" type="object" class="btn-primary" attrs="{'invisible': ['|',('n_force_confirm', '=', True),('has_limit', '=', True)]}"/>
+                        <button string="Force Confirm" name="confirm" type="object" class="btn-primary" context="{'force_confirm' : True}" attrs="{'invisible': ['|',('n_force_confirm', '=', False),('has_limit', '=', True)]}"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+<field name="n_force_confirm" invisible="1"/>
+<field name="has_limit" invisible="1"/>
+                        <field name="credit_expr" invisible="1"/>
+                   </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_order_confirm_by_sales_person" model="ir.actions.act_window">
+            <field name="name">Order_Confirm</field>
+            <field name="res_model">order.confirm.by.sales.support.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="order_confirm_by_sales_person_wizard_form_view"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</openerp>

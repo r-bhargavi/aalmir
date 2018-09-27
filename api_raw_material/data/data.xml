@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    	<!--Virutal Raw material Location for all warehosue -->
+    	<record id="virtual_rm_location" model="stock.location">
+            <field name="name">Virtual Raw-Material Location</field>
+            <field name="active">True</field>
+        </record>
+        
+        
+       <!--For FILM  -->
+	<record id="virtual_film_location" model="stock.location">
+            <field name="name">Virtual Film Location</field>
+            <field name="active">True</field>
+        </record>
+        <record id="seq_raw_material_F" model="ir.sequence">
+            <field name="name">raw Sequence 1</field>
+            <field name="code">film.raw.material</field>
+            <field name="prefix">VFRM</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="send_film_rm_picking" model="stock.picking.type">
+            <field name="name">Send Film RM</field>
+	    <field name="code">internal</field>
+	    <field name="sequence_id" ref="seq_raw_material_F" />
+            <field name="show_entire_packs">True</field>
+	    <field name="use_create_lots">True</field>
+	    <field name="use_existing_lots">True</field>
+	    <field name="default_location_dest_id" ref="virtual_film_location" />
+        </record>
+        
+        <record id="receive_film_location" model="stock.location">
+            <field name="name">Film Raw Material</field>
+            <field name="active">True</field>
+        </record>
+        <record id="seq_raw_material_F2" model="ir.sequence">
+            <field name="name">raw Sequence 2</field>
+            <field name="code">raw.mat2</field>
+            <field name="prefix">RFRM</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="receive_film_rm_picking" model="stock.picking.type">
+            <field name="name">Film Receive RM</field>
+	    <field name="code">internal</field>
+	    <field name="sequence_id" ref="seq_raw_material_F2" />
+            <field name="show_entire_packs">True</field>
+	    <field name="use_create_lots">True</field>
+	    <field name="use_existing_lots">True</field>
+	    <field name="default_location_src_id" ref="virtual_film_location" />
+	    <field name="default_location_dest_id" ref="receive_film_location" />
+        </record>
+        
+        <!--For Injection  -->
+	<record id="virtual_injection_location" model="stock.location">
+            <field name="name">Virtual Injection Location</field>
+            <field name="active">True</field>
+        </record>
+        <record id="seq_raw_material_I" model="ir.sequence">
+            <field name="name">raw Sequence 1</field>
+            <field name="code">injection.raw.material</field>
+            <field name="prefix">VIRM</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="send_injection_rm_picking" model="stock.picking.type">
+            <field name="name">Send Injection RM</field>
+	    <field name="code">internal</field>
+	    <field name="sequence_id" ref="seq_raw_material_I" />
+            <field name="show_entire_packs">True</field>
+	    <field name="use_create_lots">True</field>
+	    <field name="use_existing_lots">True</field>
+	    <field name="default_location_dest_id" ref="virtual_injection_location" />
+        </record>
+        
+        <record id="receive_injection_location" model="stock.location">
+            <field name="name">Injection Raw Material</field>
+            <field name="active">True</field>
+        </record>
+        <record id="seq_raw_material_I2" model="ir.sequence">
+            <field name="name">raw Sequence 2</field>
+            <field name="code">raw.mat2</field>
+            <field name="prefix">RIRM</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="receive_injection_rm_picking" model="stock.picking.type">
+            <field name="name">Injection Receive RM</field>
+	    <field name="code">internal</field>
+	    <field name="sequence_id" ref="seq_raw_material_I2" />
+            <field name="show_entire_packs">True</field>
+	    <field name="use_create_lots">True</field>
+	    <field name="use_existing_lots">True</field>
+	    <field name="default_location_src_id" ref="virtual_injection_location" />
+	    <field name="default_location_dest_id" ref="receive_injection_location" />
+        </record>
+        
+       <!--start Create Warehouses for Grinding and Scrap -->
+         <!--record id="grinding_warehouse_api1" model="stock.warehouse">
+            <field name="name">Grinding Warehouse</field>
+	    <field name="code">GRDWH</field>
+        </record>
+        <record id="scrap_warehouse_api12" model="stock.warehouse">
+            <field name="name">Scrap Warehouse</field>
+	    <field name="code">SCPWH</field>
+        </record-->
+       <!-- End Warehouse fro grinding and scrap-->
+    </data>
+</openerp>

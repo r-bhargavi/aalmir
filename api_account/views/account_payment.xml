@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--  Produce -->
+       <record id="view_account_payment_form_inherit" model="ir.ui.view">
+		<field name="name">account.payment.form</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_form"></field>
+		<field name="arch" type="xml">
+			 <field name="communication" position="after">
+                              <field name="doc_name"  invisible="1" />
+		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')]}"/>
+		         </field>
+		         <field name="journal_id" position="after">
+		              <field name="pay_type" invisible="1"/>
+		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
+                              <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
+		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
+		              		<tree editable="top">
+		              			<field name="bank_name" required="1"/>
+						<field name="cheque_no" required="1" />
+						<field name="cheque_date" required="1"/>
+						<field name="branch_name" />
+		                                <field name="amount" required="1" sum="total"/>
+		                                <field name="reconcile_date" attrs="{'required':[('cheque_status','=','cleared')],'readonly':[('cheque_status','!=','cleared')]}"/>
+		                                <field name="cheque_status" invisible="1"/>
+		              		</tree>
+		              </field>
+			</field>
+		</field>
+	</record>
+
+	<record id="account_invoice_form_inherite" model="ir.ui.view">
+		<field name="name">Account Invoice</field>
+		<field name="model">account.invoice</field>
+		<field name="inherit_id" ref="account.invoice_form"></field>
+		<field name="arch" type="xml">
+		  <xpath expr="//notebook" position="inside">
+			<page string="Payment Documents" attrs="{'invisible':[('payment_documents','=',[])]}">
+				<field name="payment_documents">
+					<tree create="0">
+                                               <field name="create_date"/>	
+						<field name="name" />
+						<field name="uploaded_document" />
+                                                <field name="amount"/>
+					</tree>
+				</field>
+			</page>
+		  </xpath>
+		</field>
+	</record>
+        <record id="invoice_supplier_form_inherit_new" model="ir.ui.view">
+		<field name="name">Account Invoice.New</field>
+		<field name="model">account.invoice</field>
+		<field name="inherit_id" ref="account.invoice_supplier_form"></field>
+		<field name="arch" type="xml">
+                       <field name="date"  position="after">
+                         <field name='refund_bool' invisible='1'/>
+                       </field>
+                       
+                  <xpath expr="//sheet/div/label[1]" position="before">
+                        
+                       <div  class="oe_button_box"  name='button_box'>
+                           <button name="open_refund_invoice"
+                                type="object"
+                                context="{'purchase':True}"
+                                class="oe_stat_button"
+                                attrs="{'invisible':['|',('refund_amount','=',0),('type','in',('out_refund', 'in_refund'))]}"
+                                icon="fa-pencil-square-o">
+                              <field name='refund_amount' widget="statinfo" string="Refund"/>
+                               </button>
+                       </div>
+                 </xpath>
+		  <xpath expr="//notebook" position="inside">
+			<page string="Payment Documents" attrs="{'invisible':[('payment_documents','=',[])]}">
+				<field name="payment_documents">
+					<tree create="0">
+                                               <field name="create_date"/>	
+						<field name="name" />
+						<field name="uploaded_document" />
+                                                <field name="amount"/>
+					</tree>
+				</field>
+			</page>
+                        <button name="%(account.action_account_invoice_refund)d" position='attributes'>
+                         <attribute name='attrs'>{'invisible':[('refund_bool','!=',False)]}</attribute>
+                         <attribute name="class">oe_highlight</attribute>
+                         <attribute name="groups">account.group_account_invoice</attribute>
+                      </button>
+                  
+		  </xpath>
+                   <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+                        <attribute name='string'>VAT</attribute>  
+                  </xpath>
+               
+                  <field name="amount_tax" position="attributes">
+                	<attribute name="string">VAT</attribute>
+                   </field>
+                   
+		</field>
+	</record>
+	<record id="view_account_payment_invoice_form_inherite" model="ir.ui.view">
+		<field name="name">Account payment</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_invoice_form"></field>
+		<field name="arch" type="xml">
+		    <button name="post" position="replace">
+		  	<button string='Register Payment' name="post" type="object" class="btn-primary"/>
+		    </button>
+                    <field name="communication" position='attributes'>
+                      <attribute name='string'>Internal Note</attribute>
+                   </field>
+		    <field name="communication" position="after">
+			  <field name="doc_name"  invisible="1" />
+			  <field name="uploaded_document" colspan="2" filename="doc_name" 
+                             string="Upload Document" attrs="{'readonly':[('state','!=','draft')]}"/>
+                          <field name='internal_note'/>
+		    </field>
+		    <field name="currency_id" position="replace">
+			<field name="currency_id" invisible="1"/>
+		    </field>
+		    
+		    <field name="journal_id" position="after">
+		              <field name="pay_type" invisible="1"/>
+		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
+                              <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
+		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
+		              		<tree editable="top">
+		              			<field name="bank_name"/>	
+						<field name="cheque_no" />
+						<field name="cheque_date" required="1"/>
+						<field name="branch_name" />
+		                                <field name="amount" required="1" sum="total"/>
+		                                 <field name="reconcile_date" attrs="{'required':[('cheque_status','=','cleared')],'readonly':[('cheque_status','!=','cleared')]}"/>
+		                                <field name="cheque_status" invisible="1"/>
+		              		</tree>
+		              </field>
+			</field>
+			
+		</field>
+	</record>
+
+	<record model="ir.ui.view" id="account_cheque_tree_view">
+		<field name="name">Bank Cheque Details</field>
+	    		<field name="model">bank.cheque.details</field>
+		    	<field name="arch" type="xml">
+		    	<tree string='Bank Cheques'>
+		    		<field name="cheque_no" />
+		    		<field name="cheque_date" />
+		    		<field name="partner_id" />
+		    		<field name="bank_name" />
+		        	<field name="journal_id" />
+		       		<field name="payment_id"/>
+		        	<field name='amount' total="sum"/>
+		        	<field name='reconcile_date' />
+		        	<field name='cheque_status' />
+		    	</tree>
+	    	</field>
+	</record>
+    
+       <record id="view_invoice_line_form_inherit_aalmir" model="ir.ui.view">
+            <field name="name">account.invoice.line.form</field>
+            <field name="model">account.invoice.line</field>
+             <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                 <field name="invoice_line_tax_ids" position="attributes">
+                	<attribute name="string">VAT</attribute>
+                </field>
+            </field>
+      </record>
+    </data>
+</openerp>
+

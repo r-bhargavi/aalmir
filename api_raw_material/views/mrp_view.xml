@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<record id="api_mrp_production_workcenter_inherit" model="ir.ui.view">
+		<field name="name">mrp.production.workcenter.line.form</field>
+		<field name="model">mrp.production.workcenter.line</field>
+		<field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_form_view_inherit"></field>
+		<field name="arch" type="xml"> 
+
+             		<notebook position='inside'>
+               			<page string='Raw Material Details' name='Raw Material Details' attrs="{'invisible':[('raw_materials_id','=',[])]}">
+                                    
+				     <field name='raw_materials_id' nolabel='1' attrs="{'invisible':[('raw_materials_id','=',[])]}" readonly="1">
+				         <tree>
+				            <field name='product_id'/>
+				            <field name='qty' />
+				            <field name='requested_qty' sum='total'/>
+				            <!--field name='proceed_qty' /-->
+				            <field name='receive_qty' sum='total'/>
+				            <field name='consumed_qty' sum='total'/>
+				            <field name='remain_received' sum='total'/>
+				            <field name='remain_consumed' sum='total'/>
+				            <field name='uom_id' />
+				            <field name='original_qty' invisible='1'/>
+                                            <field name='next_order_id'/>
+				         </tree>
+				     </field>
+			       </page>
+			       
+			       <page string='Shifts Details' name='Shifts Details' attrs="{'invisible':[('wo_shift_raw_line','=',[]),('wo_shift_line','=',[]),('rm_picking_ids','=',[])]}">
+			       	     <!--button name="shift_rm_wizard" string="RM Request" type="object"  
+                   class="oe_highlight"  attrs="{'invisible': [('state','not in',('ready','pause','hold','startworking'))]}"/-->
+           		<!--Shifts of Raw Material Process -->     
+                   		     <field name='wo_shift_raw_line' nolabel='1' readonly="1" attrs="{'invisible':[('wo_shift_raw_line','=',[]),('process_id','!=','raw')]}">
+				         <tree >
+				            <field name='name'/>
+				            <field name='raw_start_time' />
+				            <field name='raw_end_time' />
+				            <field name="raw_hours" widget="float_time"/>
+				            <field name="raw_qty" />
+				            <field name="raw_uom"/>
+				            <field name='used_work_id'/>
+				            <field name='request_id'/>
+				            <!--field name='rec_picking_id' stirng="Delivery No."/-->
+				            <field name='status' invisible="1"/>
+				            <field name='wo_state' invisible="1"/>
+				         </tree>
+				         
+				         <form>
+				           <group col="4">
+				            <field name='name'/>
+				            <field name='product'/>
+				            <label for="raw_qty" string="Shift Qty" />
+				            <div>
+				            	<field name='raw_qty' class="oe_inline" />
+				            	<field name='raw_uom' class="oe_inline" />
+			            	    </div>
+				            <field name='raw_start_time' />
+				            <field name='raw_end_time' />
+				            <field name='request_id'/>
+				            <field name='status' invisible="1"/>
+				          </group>
+				          <h4 attrs="{'invisible':[('status','!=','hold')]}">Raw-Material used in Workorder is not Planned.</h4>
+				          <notebook>
+				          <page string="Products Details" attrs="{'invisible':[('wo_raw_shift_product','=',[])]}">
+				             <field name='wo_raw_shift_product' nolabel='1' readonly="1">
+						<tree>
+						    <field name='product'/>
+						    <field name='qty' string="Total Qty" />
+						    <field name='required_qty'/>
+						    <field name='available_qty'/>
+						    <field name='uom' />
+				         	</tree>
+			         	     </field>
+			         	   </page>
+			         	   <page string="History of date scheduling" attrs="{'invisible':[('date_history','=',[])]}">
+				 	       <field name='date_history' nolabel='1' readonly="1">
+							<tree>
+							    <field name='start_time'/>
+							     <field name='end_time'/>
+						 	</tree>
+						 	<form>
+						 	    <field name='start_time'/>
+						 	    <field name='end_time'/>
+						 	</form>
+					 	   </field>
+				 	   </page>
+				 	   
+				 	   <page string="Delivery Details" attrs="{'invisible':[('rec_picking_id','=',[])]}">
+				 	       <field name='rec_picking_id' nolabel='1' readonly="1">
+							<tree>
+							    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+							    <field name='next_prev_picking_id'/>
+						 	</tree>
+						 	<form>
+						 	    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+							    <field name='next_prev_picking_id'/>
+						 	</form>
+				 	       </field>
+				 	   </page>
+				 	   
+				 	   </notebook>
+				         </form>
+				     </field>
+		<!--Shifts of NON Raw Material Process -->     
+				     <field name='wo_shift_line' nolabel='1' readonly="1" attrs="{'invisible':['|',('wo_shift_line','=',[]),('process_id','=','raw')]}">
+				         <tree>
+				            <field name='name'/>
+				            <field name='start_time' />
+				            <field name='end_time' />
+				            <field name="hours" widget="float_time"/>
+				            <field name="wo_qty" />
+				            <field name="wo_uom"/>
+				            <!--field name='used_work_id'/-->
+				            <field name='request_id'/>
+				            <!--field name='rec_picking_id' stirng="Delivery No."/-->
+				            <field name='status'/>
+				            <field name='wo_state' invisible="1"/>
+				            <button type="object" string="Request" class="oe_highlight" name='allow_picking' attrs="{'invisible':['|',('status','!=','draft'),('wo_state','not in',('ready','pause','hold','startworking'))]}"/>
+                     			    <button type="object" string="Re-Schedule" class="oe_highlight" name='change_date' attrs="{'invisible':['|',('status','in',('start','end','receive','cancel')),('wo_state','not in',('ready','pause','hold','startworking'))]}"/>
+                     			    <button type="object" string="Cancel" class="oe_highlight" name='cancel_picking' attrs="{'invisible':['|',('status','not in',('request')),('wo_state','not in',('ready','pause','hold','startworking'))]}"/>
+				         </tree>
+				         
+				         <form>
+				           <group col="4">
+				            <field name='name'/>
+				            <field name='product'/>
+				            <label for="qty" string="Shift Qty" />
+				            <div>
+				            	<field name='qty' class="oe_inline" />
+				            	<field name='uom' class="oe_inline" />
+				            	(<field name='wo_qty' class="oe_inline" />
+				            	<field name='wo_uom' class="oe_inline" />)
+			            	    </div>
+			            	    
+				            <field name='start_time' />
+				            <field name='end_time' />
+				            <field name='request_id'/>
+				            <field name='status' invisible="1"/>
+				          </group>
+				          <h4 attrs="{'invisible':[('status','!=','hold')]}">Raw-Material used in Workorder is not Planned.</h4>
+				          <notebook>
+				           <page string="Products Details" attrs="{'invisible':[('wo_shift_product','=',[])]}">
+				             <field name='wo_shift_product' nolabel='1' readonly="1">
+						<tree>
+						    <field name='product'/>
+						    <field name='qty' string="Total Qty" />
+						    <field name='required_qty'/>
+						    <!--field name='stock_qty' string='Requested qty'/-->
+						    <field name='available_qty'/>
+						    <field name='uom' />
+				         	</tree>
+			         	     </field>
+			         	   </page>
+			         	   <page string="History of date scheduling" attrs="{'invisible':[('date_history','=',[])]}">
+				 	       <field name='date_history' nolabel='1' readonly="1">
+							<tree>
+							    <field name='start_time'/>
+							     <field name='end_time'/>
+						 	</tree>
+						 	<form>
+						 	    <field name='start_time'/>
+						 	    <field name='end_time'/>
+						 	</form>
+					 	   </field>
+				 	   </page>
+				 	   <page string="Delivery Details" attrs="{'invisible':[('rec_picking_id','=',[])]}">
+				 	       <field name='rec_picking_id' nolabel='1' readonly="1">
+							<tree>
+							    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+							    <field name='next_prev_picking_id'/>
+						 	</tree>
+						 	<form>
+						 	    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+							    <field name='next_prev_picking_id'/>
+						 	</form>
+				 	       </field>
+				 	   </page>
+				 	   </notebook>
+				         </form>
+				     </field> 
+                                     
+				     <field name="rm_picking_ids" readonly="1" attrs="{'invisible':[('rm_picking_ids','=',[])]}">
+				     	<tree>
+			     			<field name='name'/>
+			    			<field name='min_date'/>
+			    			<field name='state' />
+			    			<field name='next_prev_picking_id'/>
+		    			</tree>
+				     </field>
+			       </page>
+             		</notebook>
+        	</field>
+	</record>
+ 	<record id="api_order_mgnt_workorder_form_view_inherite" model="ir.ui.view">
+		<field name="name">mrp.production.workcenter.line.form</field>
+		<field name="model">mrp.production.workcenter.line</field>
+		<field name="inherit_id" ref="gt_order_mgnt.mrp_production_workcenter_form_view_inherit_aalmir_ext"></field>
+		<field name="arch" type="xml"> 
+			<button name='open_calendar' position="attributes">
+				<attribute name="attrs">{'invisible':['|',('state','not in',('draft','pause')),('process_type','=','raw')]}</attribute>
+			</button>
+		</field>
+	</record>	
+
+     <record id="mrp_production_form_view_aalmir_ext123" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
+        <field name="arch" type="xml">
+	<!--CH_N048 -->
+              <field name="user_id" position="after">
+
+			       <label for='wastage_allow' string="Allowed Wastage Qty"/>
+				<div>
+				    <field name="wastage_allow" class="oe_inline" nolabel="1" readonly="1" />
+				    <field name="allow_wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+				   <button name="wastage_request" string="Request More RM" 
+				    states='ready,in_production' type="object" class="oe_inline oe_highlight"/>
+				</div>
+			       <label for='total_wastage_qty' string="Produced Wastage Qty" attrs="{'invisible':[('total_wastage_qty','=',0)]}" />
+				<div attrs="{'invisible':[('total_wastage_qty','=',0)]}">
+				    <field name="total_wastage_qty" class="oe_inline" nolabel="1" 
+				                    readonly="1"/>
+				    <field name="wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+				</div>
+                                <field name='requested_wastage_qty' invisible='1'/>
+                                <label for='remain_wastage_qty'  attrs="{'invisible':[('total_wastage_qty','=',0)]}" />
+                                <div attrs="{'invisible':[('total_wastage_qty','=',0)]}">
+				    <field name="remain_wastage_qty" class="oe_inline" nolabel="1" 
+				                    readonly="1"/>
+				    <field name="remain_wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+				    <button name="wastage_request" string="Use RM"  context="{'use_raw':True}"
+				    states='ready,in_production' type="object" class="oe_inline oe_highlight"/> 
+				</div>
+                 </field>
+              <xpath expr="//field[@name='product_lines']" position='replace'>
+                   <group colspan="4" attrs="{'invisible':['|',('raw_request', '=',False),('state','not in',('confirmed','ready'))]}" >
+                      <field name='raw_request' invisible='1'/>
+                     <div >
+                         <label string='Raw Materials Request sent to Logistic Department.' style='color:green;margin-top:30px;font-weight: bold'  class="oe_inline"/>
+                     </div>
+                   </group>
+                      
+                     <field name="product_lines"  readonly='1'>
+                        <tree editable='bottom' >
+                           <field name='product_id' />
+                           <field name='product_uom' string='Unit' />
+                           <field name='product_qty' string='Total Required Qty' invisible='1'/>
+                           <field name='required_qty' />
+                           <field name='extra_qty'/>
+                           <field name='request_qty' />
+                           <field name='receive_qty'/>
+                           <field name='consumed_qty'/>
+                           <field name='remain_consumed'/>
+                           <field name='remain_received'/>
+                        </tree>
+                     </field>
+                    <button name='RM_Request_Mo' type='object' string='RM Request' class='oe_highlight'
+                  attrs="{'invisible':['|',('raw_request', '=',True),('state','not in',('confirmed','ready'))]}"/>
+                     
+                    <notebook style='margin-top:20px'>
+                       <page string="Raw Material Delivery's" attrs="{'invisible':[('delivery_ids','=',[])]}">
+		            <field name='delivery_ids' readonly="1" attrs="{'invisible':[('delivery_ids','=',[])]}">
+		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done') and min_date &lt; current_date" string="Picking list">
+				    <field name="name"/>
+				    <field name="date" invisible="1"/>
+				    <field name="min_date"/>
+				    <field name="backorder_id"/>
+				    <field name="state"/>
+				</tree>
+		            </field>
+                     </page>
+                     <page string="Raw Material Requests" attrs="{'invisible':[('material_request_id','=',[])]}">
+                            <field name='wastage_batch_ids' readonly='1'>
+                               <tree>
+                                  <field name='name'/>
+                                  <field name='product_qty'/>
+                                  <field name='uom_id'/>
+                                  <field name='used_type'/>
+                                   <field name='request_state' readonly='1'/>
+                                   <field name='wastage_product'/>
+                               </tree>
+                               <form >
+                                 <group col="4">
+                                  <field name='name'/>
+                                  <field name='product_qty'/>
+                                  <field name='uom_id'/>
+                                  <field name='used_type'/>
+                                   <field name='request_state' readonly='1'/>
+                                   <field name='wastage_product'/>
+                                 </group>
+                               </form>
+                            </field>
+		            <field name='material_request_id' readonly="1" attrs="{'invisible':[('material_request_id','=',[])]}">
+		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done')">
+				    <field name="name"/>
+				    <field name="request_date"/>
+				    <field name="request_type"/>
+				    <field name="state"/>
+				</tree>
+				<form>
+                                  <group col="4">
+				    <field name="name"/>
+				    <field name="request_date"/>
+				    <field name="request_type"/>
+				    <field name="state"/>
+                                 </group>
+				</form>
+		            </field>
+                     </page>
+                      <page string="Wastage RM Requests" attrs="{'invisible':[('wastage_batch_ids','=',[])]}">
+                            <field name='wastage_batch_ids' readonly='1'>
+                               <tree>
+                                  <field name='create_date'/>
+                                  <field name='name'/>
+                                  <field name='product_qty' string='Wastage Qty'  sum='total'/>
+                                  <field name='uom_id'/>
+                                  <field name='used_type'/>
+                                   <field name='request_state' readonly='1'/>
+                                   <field name='wastage_product'/>
+                               </tree>
+                              <form string='Wastage Request Details'>
+				    <group>
+                                        <group>
+                                          <field name='create_date'/>
+		                          <field name='name'/>
+		                          <field name='product_qty' string='Wastage Qty'  sum='total'/>
+		                          <field name='uom_id'/>
+                                        </group>
+                                      <group>
+		                          <field name='used_type'/>
+		                           <field name='request_state' readonly='1'/>
+		                           <field name='wastage_product'/>
+                                    </group>
+                                 </group>
+				</form>
+                            </field>
+		            
+                     </page>
+                   </notebook>
+               </xpath>
+         </field>
+    </record>
+  
+    </data>
+</openerp>

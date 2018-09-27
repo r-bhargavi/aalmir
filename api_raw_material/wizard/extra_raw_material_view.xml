@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    <record id="extra_raw_material_from" model="ir.ui.view">
+        <field name="name">Extra Raw material</field>
+        <field name="model">mrp.extra.raw.material</field>
+        <field name="arch" type="xml">
+            <form string="Raw Material Request">
+                  <group colspan="4">
+                      <field name='production_id' readonly="1"/>
+                      <field name='remain_qty' invisible="not context.get('use_raw')"/>
+                      <label for='wastage_qty' string="Wastage Qty"/>
+		     <div>
+		        <field name="wastage_qty" class="oe_inline" nolabel="1" readonly="1"/>
+			 <field name="wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                      <label for='required_qty' string="Required Qty" invisible="context.get('use_raw')"/>
+		     <div invisible="context.get('use_raw')">
+		        <field name="required_qty" class="oe_inline" nolabel="1"/>
+			 <field name="required_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                      <field name='reason' invisible="context.get('use_raw')" required="not context.get('use_raw')"/>
+                     <field name='note' invisible="context.get('use_raw')"/>
+                     <field name='document' invisible="context.get('use_raw')"/>
+                 </group>
+                 <!--separator string="Raw Material For Wastage Qty" colspan="4"/-->
+                  <group colspan="4">
+                    <field name="used_raw_matrial_ids" nolabel="1" invisible="not context.get('use_raw')"
+                        context="{'wastage_qty':remain_qty, 'uom_id':wastage_uom_id, 'wastage':True}">
+                        <tree editable='bottom'>
+                         <field name='qty'/>
+                         <field name='uom_id' readonly='1'/>
+                         <field name='used_type' required="1"/>
+                       </tree>
+                     </field>
+                     <field name="extra_product_ids" nolabel="1" invisible="context.get('use_raw')">
+                        <tree editable="bottom" >
+                          <field name="product_id" domain="['|',('product_material_type.string', '=','packaging'),('product_material_type.string', '=','raw')]" required='1'/>
+                          <field name='qty' />
+                          <field name='uom_id'/>
+                        </tree>
+                     </field>
+                  </group>
+               <footer>
+                    <button type="object" string="Request" class="oe_highlight"  name="extra_rawmaterials" />
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel' special='cancel' />
+               </footer>
+            </form>
+        </field>
+    </record>
+
+    </data>
+</openerp>

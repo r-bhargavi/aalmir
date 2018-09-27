@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+    <data>
+         <template id="assets_backend" name="drpdk_theme" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <link rel='stylesheet' href='/gt_sale_pricelist/static/src/css/base.css'/>
+
+            </xpath>
+        </template>
+
+        <record id="material_tree_view" model="ir.ui.view">
+            <field name="name">Material Tree View</field>
+            <field name="model">material.details</field>
+            <field name="arch" type="xml">
+                <tree string="Material Details" editable="top">
+                    <field name="name" domain="[('purchase_ok','=',True)]"/>
+                    <field name="kg_price"/>
+                    <field name="density"/>
+                    <field name="product_type" widget="many2many_tags"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="material_view_action" model="ir.actions.act_window">
+            <field name="name">Material Details</field>
+            <field name="res_model">material.details</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='material_menu' name='Material Details' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="2" action="material_view_action"/>
+
+        <record id="product_tree_view" model="ir.ui.view">
+            <field name="name">Film Converisont Tree View</field>
+            <field name="model">product.type</field>
+            <field name="arch" type="xml">
+                <tree string="Film Converison Details" editable="top">
+                    <field name="name" domain="[('sale_ok','=',True)]"/>
+                    <field name="price_per_kg"/>
+                    <field name="calculation_for_print_area"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="product_view_action" model="ir.actions.act_window">
+            <field name="name">Film Converison Details</field>
+            <field name="res_model">product.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='film_converison_menu' name='Film Converison' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="3" action="product_view_action"/>
+
+         <record id="bag_type_tree_view" model="ir.ui.view">
+            <field name="name">Bag Type Tree View</field>
+            <field name="model">bag.type</field>
+            <field name="arch" type="xml">
+                <tree string="Bag Type Details" editable="top">
+                    <field name="name"/>
+                    <field name="conversion_charge"/>
+                    <field name="extra_weight"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="bag_type_view_action" model="ir.actions.act_window">
+            <field name="name">Bag Type Details</field>
+            <field name="res_model">bag.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='bag_type_menu' name='Bag Type' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="4" action="bag_type_view_action"/>
+
+        <record id="printing_tree_view" model="ir.ui.view">
+            <field name="name">Printing Type Tree View</field>
+            <field name="model">printing.type</field>
+            <field name="arch" type="xml">
+                <tree string="Printing Type Details" editable="top">
+                    <field name="name"/>
+                    <field name="cost"/>
+                    <field name="plates"/>
+                    <!--<field name="exceed_per"/>-->
+                </tree>
+            </field>
+	    </record>
+
+
+         <record id="printing_view_action" model="ir.actions.act_window">
+            <field name="name">Printing Type Details</field>
+            <field name="res_model">printing.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='printing_type_menu' name='Printing Type' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="5" action="printing_view_action"/>
+
+
+        <record id="delivery_location_tree_view" model="ir.ui.view">
+            <field name="name">Delivery Location Tree View</field>
+            <field name="model">delivery.location</field>
+            <field name="arch" type="xml">
+                <tree string="Delivery Location Details" editable="top">
+                    <field name="name"/>
+                    <field name="km1"/>
+                    <field name="km2"/>
+                    <field name="km3"/>
+                </tree>
+            </field>
+	    </record>
+
+
+         <record id="delivery_location_view_action" model="ir.actions.act_window">
+            <field name="name">Delivery Location Details</field>
+            <field name="res_model">delivery.location</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='delivery_location_menu' name='Delivery Location' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="6" action="delivery_location_view_action"/>
+
+        <record id="packing_tree_view" model="ir.ui.view">
+            <field name="name">Packing Tree View</field>
+            <field name="model">packing.details</field>
+            <field name="arch" type="xml">
+                <tree string="Packing" editable="top">
+                    <field name="name"/>
+                    <field name="cost"/>
+                </tree>
+            </field>
+	    </record>
+
+
+         <record id="packing_view_action" model="ir.actions.act_window">
+            <field name="name">Packing </field>
+            <field name="res_model">packing.details</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='packing_location_menu' name='Packing' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="7" action="packing_view_action"/>
+
+        <record id="micron_tree_view" model="ir.ui.view">
+            <field name="name">Micron Tree View</field>
+            <field name="model">microns.details</field>
+            <field name="arch" type="xml">
+                <tree string="Microns" editable="top">
+                    <field name="name"/>
+                    <field name="microns1"/>
+                    <field name="microns2"/>
+                    <field name="microns3"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="micron_view_action" model="ir.actions.act_window">
+            <field name="name">Microns</field>
+            <field name="res_model">microns.details</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='microns_menu' name='Microns' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="8" action="micron_view_action"/>
+
+        <record id="ink_type_tree_view" model="ir.ui.view">
+            <field name="name">Ink Type Tree View</field>
+            <field name="model">ink.type</field>
+            <field name="arch" type="xml">
+                <tree string="Ink Type" editable="top">
+                    <field name="name"/>
+                    <field name="ink_price_per_kg"/>
+                    <field name="ink_price"/>
+                    <field name="ink_printing_plates"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="inktype_view_action" model="ir.actions.act_window">
+            <field name="name">Ink Type</field>
+            <field name="res_model">ink.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='inktype_menu' name='Ink Type' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="9" action="inktype_view_action"/>
+
+        <record id="discount_type_tree_view" model="ir.ui.view">
+            <field name="name">Discount Type Tree View</field>
+            <field name="model">discount.type</field>
+            <field name="arch" type="xml">
+                <tree string="Discount Eligiblity" editable="top">
+                    <field name="qty_from"/>
+                    <!--<field name="qty_to" invisible="1"/>-->
+                    <field name="discount"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="discounttype_view_action" model="ir.actions.act_window">
+            <field name="name">Discount Eligiblity</field>
+            <field name="res_model">discount.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='discounttype_menu' name='Discount Eligiblity' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="10" action="discounttype_view_action"/>
+
+        <record id="stretch_film_tree_view" model="ir.ui.view">
+            <field name="name">Stretch Film Tree View</field>
+            <field name="model">stratch.calculator</field>
+            <field name="arch" type="xml">
+                <tree string="Stretch Film Configuration" editable="top">
+                    <field name="thickness"/>
+                    <field name="weight_each_roll_in_kg"/>
+                    <field name="pcs_ctn"/>
+                    <field name="kg_ctn"/>
+                    <field name="price_ctn"/>
+                </tree>
+            </field>
+	    </record>
+
+         <record id="stretch_film_view_action" model="ir.actions.act_window">
+            <field name="name">Stretch Film Configuration</field>
+            <field name="res_model">stratch.calculator</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='stretch_film_menu' name='Stretch Film Configuration' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="11" action="stretch_film_view_action"/>
+
+	<!--menuitem id="menu_sale_pricelists" name="Pricelists"
+            parent="base.menu_base_partner" sequence="90" groups="base.group_configuration"/-->
+            
+       <!--record id="product.menu_product_pricelist_action2" model="ir.ui.menu">
+	    <field name="parent" ref="base.menu_base_partner"/>
+	    <field name="sequence">90</field>
+	</record-->
+	
+	<record id="product.menu_product_pricelist_main" model="ir.ui.menu">
+	    <field name="name">Calculator</field>
+	</record>
+
+        <record id="inclusions_film_tree_view" model="ir.ui.view">
+        	<field name="name">Inclusions Film Tree View</field>
+        	<field name="model">inclusions.details</field>
+        	<field name="arch" type="xml">
+                	<tree string="Inclusions Film Details" editable="top">
+                    		<field name="name"/>
+                    		<field name="itype"/>
+                    		<field name="inclusions"/>
+                	</tree>
+        	</field>
+        </record>
+
+        <record id="inclusions_film_view_action" model="ir.actions.act_window">
+            <field name="name">Inclusions Film Details</field>
+            <field name="res_model">inclusions.details</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='inclusions_film_menu' name='Inclusions Details' groups="pricelist_user" parent="product.menu_product_pricelist_main" sequence="12" action="inclusions_film_view_action"/>
+	
+    </data>
+</openerp>

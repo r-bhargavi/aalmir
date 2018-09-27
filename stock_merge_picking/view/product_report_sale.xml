@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+     <template id="report_product_wise">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                 <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+                  <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+                    <div class="page" style="font-family: Calibri;">  
+                        <div class="oe_structure"/>
+                         <h1 align="center" style="font-family: Calibri;" >
+                           <t t-if="doc.filter_option =='product' and doc.product_status == 'delivery' and doc.report_type == 'detail'">
+                              <span>Delivery Wise Report(Detailed)</span>
+                           </t>
+			   <t t-if="doc.filter_option =='product' and doc.product_status == 'delivery' and doc.report_type =='summary'">
+                              <span>Delivery Wise Report(Summary)</span>
+                           </t>
+
+                           <t t-if="doc.filter_option =='product' and doc.product_status == 'sale'  and doc.report_type in ('detail','summary')">
+                              <span>Sale Order Wise Report</span>
+                           </t> 
+                            <t t-if="doc.filter_option =='product' and doc.product_status == 'invoice'  and doc.report_type in ('detail','summary')">
+                              <span>Invoice Wise Report</span>
+                           </t> 
+                           <t t-if="doc.filter_option =='customer'">
+                              <span>Customer Wise Report</span>
+                           </t>
+                           <t t-if="doc.filter_option =='lpo'">
+                              <span>LPO Number Wise Report</span>
+                           </t>
+                           </h1>
+                         <table class="table table-bordered" style="border: 1px solid #9999; margin-top: 30px;width:100%">
+                       <t t-if='doc.date_from and doc.date_to'>
+                        <tr >
+                            <td style="font-weight: bold;">From Date</td>
+                            <td> 
+                              <t t-esc="time.strftime('%d/%m/%Y',time.strptime(doc.date_from,'%Y-%m-%d %H:%M:%S'))" />
+                            </td>
+                            <td style="font-weight: bold;">To Date</td>
+                            <td> 
+                              <t t-esc="time.strftime('%d/%m/%Y',time.strptime(doc.date_to,'%Y-%m-%d %H:%M:%S'))" />
+                            </td>
+                        </tr>
+                       </t>
+                         <tr t-if='doc.partner_id'>
+                            <td style="font-weight: bold;" width="25%">Customer Name</td>
+                            <td colspan="3" width="75%"><t t-esc="doc.partner_id and doc.partner_id.name or ''"/></td>
+                        </tr>
+                        <tr t-if='doc.partner_id'>
+                            <td style="font-weight: bold;" width="25%">Address</td>
+                                <td colspan="3" width="75%">
+                                    <t t-if="doc.partner_id.street"><t t-esc="doc.partner_id.street"/>,</t>
+                                    <t t-if="doc.partner_id.street2"> <t t-esc="doc.partner_id.street2"/>,</t>
+                                    <t t-if="doc.partner_id.city"> <t t-esc="doc.partner_id.city"/>,</t>
+                                    <t t-if="doc.partner_id.state_id"> <t t-esc="doc.partner_id.state_id.name"/>,</t>
+                                    <t t-if="doc.partner_id.country_id"> <t t-esc="doc.partner_id.country_id.name"/></t>
+                                    <t t-if="doc.partner_id.zip"> <t t-esc="doc.partner_id.zip"/></t>
+                                </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='product' and doc.report_type == 'summary' and  doc.product_status == 'invoice'">
+                       <tr>
+                          <td><b>Sr No.</b></td>
+                           <td><b>Product Name</b></td>
+                           <td><b>Invoiced Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Invoiced Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                        </tr>
+                          <t t-set="count" t-value="0" />
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                             <tr>
+                              <td>
+                                    <t t-set="count" t-value="count+1" />
+                                    <t t-esc="count" />
+                               </td>
+                               <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.qty_invoiced'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                              
+                               <td><sapn t-esc='line.total_amount'/></td>
+                            </tr>
+                      </t>
+                     <tr>
+                       <td colspan='5' style='text-align:right'><b>Total Invoiced</b></td><td><b><span t-esc='doc.total_invoiced'/></b></td>
+                       <td></td><td></td><td></td>
+                      </tr>
+                   </table>
+                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='product' and doc.report_type == 'summary' and  doc.product_status == 'delivery'">
+                       <tr>
+                          <td><b>Sr No.</b></td>
+                           <td><b>Product Name</b></td>
+                           <td><b>Delivered Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Delievered Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                        </tr>
+                          <t t-set="count" t-value="0" />
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                             <tr>
+                              <td>
+                                    <t t-set="count" t-value="count+1" />
+                                    <t t-esc="count" />
+                               </td>
+                               <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.qty_delivered'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                              
+                               <td><sapn t-esc='line.total_amount'/></td>
+                            </tr>
+                      </t>
+                     <tr>
+                       <td colspan='5' style='text-align:right'><b>Total Delivered</b></td><td><span t-esc='doc.total_delivered'/></td>
+                       <td></td><td></td><td></td>
+                      </tr>
+                   </table>
+                 <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='product' and doc.report_type =='detail' and  doc.product_status == 'delivery'">
+                       <tr>
+                           <td><b>Product Name</b></td>
+                           <td><b>Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>Delivery No.</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Ordered Qty</b></td>
+                           <td><b>Delievered Qty</b></td>
+                           <td><b>Remaining Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                     
+                        </tr>
+                      <!--t t-foreach='doc.product_ids' t-as='product'-->
+                          
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                            <!--t t-if='product.id == line.product_id.id'-->
+                             <tr>
+                              <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td>
+                                  <t t-foreach='line.delivery_ids' t-as='oper'>
+                                   <span t-esc='oper.name'/>
+                                  </t>
+                                </td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.qty_ordered'/></td>
+                               <td><sapn t-esc='line.qty_delivered'/></td>
+                               <td><sapn t-esc='line.qty_remaining'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                               <td><sapn t-esc='line.total_amount'/></td>
+                               
+                            </tr>
+                           <!--/t-->
+                         </t>
+                      <!--/t-->
+                     <tr>
+                       <td colspan='5' style='text-align:right'><b>Total</b></td><td><b><span t-esc='doc.total_ordered'/></b></td>
+                       <td><b><span t-esc='doc.total_delivered'/></b></td>
+                       <td><b><span t-esc='doc.total_remaining'/></b></td>
+                       <td></td><td></td>
+                        <td><b><span t-esc='doc.total_amount'/></b></td>
+                      </tr>
+                   </table>
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='product' and doc.report_type in ('detail','summary' )and doc.product_status == 'sale'">
+                       <tr>
+                           <td><b>Product Name</b></td>
+                           <td><b>Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Ordered Qty</b></td>
+                           <td><b>Delievered Qty</b></td>
+                           <td><b>Remaining Qty</b></td>
+                           <td><b>Invoiced Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                        </tr>
+                      <!--t t-foreach='doc.product_ids' t-as='product'-->
+                          
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                            <!--t t-if='product.id == line.product_id.id'-->
+                             <tr>
+                              <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.qty_ordered'/></td>
+                               <td><sapn t-esc='line.qty_delivered'/></td>
+                               <td><sapn t-esc='line.qty_remaining'/></td>
+                               <td><sapn t-esc='line.qty_invoiced'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                               <td><sapn t-esc='line.total_amount'/></td>
+                               
+                            </tr>
+                           <!--/t-->
+                         </t>
+                      <!--/t-->
+                     <tr>
+                       <td colspan='4' style='text-align:right'><b>Total</b></td><td><b><span t-esc='doc.total_ordered'/></b></td>
+                       <td><b><span t-esc='doc.total_delivered'/></b></td>
+                       <td><b><span t-esc='doc.total_remaining'/></b></td>
+                       <td><b><span t-esc='doc.total_invoiced'/></b></td>
+                       <td></td><td></td>
+                        <td><b><span t-esc='doc.total_amount'/></b></td>
+                      </tr>
+                   </table>
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='product' and doc.report_type =='detail' and doc.product_status == 'invoice'">
+                       <tr>
+                           <td><b>Product Name</b></td>
+                           <td><b>Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>Invoice No.</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Invoiced Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                        </tr>
+                      <!--t t-foreach='doc.product_ids' t-as='product'-->
+                          
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                            <!--t t-if='product.id == line.product_id.id'-->
+                             <tr>
+                              <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td>
+                                  <t t-foreach='line.invoice_ids' t-as='inv'>
+                                   <span t-esc='inv.number'/>
+                                  </t>
+                                </td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.qty_invoiced'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                               <td><sapn t-esc='line.total_amount'/></td>
+                               
+                            </tr>
+                           <!--/t-->
+                         </t>
+                      <!--/t-->
+                     <tr>
+                       <td colspan='5' style='text-align:right'><b>Total</b></td>
+                       <td><b><span t-esc='doc.total_invoiced'/></b></td>
+                       <td></td><td></td>
+                        <td><b><span t-esc='doc.total_amount'/></b></td>
+                      </tr>
+                   </table>
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='customer'">
+                       <tr>
+                           <td><b>Order Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Order Amount</b></td>
+                           <td><b>Ordered Qty</b></td>
+                           <td><b>Delievered Qty</b></td>
+                           <td><b>Remaining Qty</b></td>
+                           <td><b>Invoiced Qty</b></td>
+                        </tr>
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                             <tr>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td><sapn t-esc='line.lpo_number'/></td>
+                               <td><sapn t-esc='line.sale_id.amount_total'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                               <td><sapn t-esc='line.qty_ordered'/></td>
+                               <td><sapn t-esc='line.qty_delivered'/></td>
+                               <td><sapn t-esc='line.qty_remaining'/></td>
+                               <td><sapn t-esc='line.qty_invoiced'/></td>
+                            </tr>
+                         </t>
+                        <tr>
+                       <td colspan='4' style='text-align:right'><b>Total</b></td>
+                       <td><b><span t-esc='doc.total_ordered'/></b></td>
+                       <td><b><span t-esc='doc.total_delivered'/></b></td>
+                       <td><b><span t-esc='doc.total_remaining'/></b></td>
+                       <td><b><span t-esc='doc.total_invoiced'/></b></td>
+                      </tr>
+                   </table>
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;width:100%" t-if="doc.filter_option =='lpo'">
+                       <tr>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Customer Name</b></td>
+                           <td><b>Product Name</b></td>
+                           <td><b>Order Date</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>Ordered Qty</b></td>
+                           <td><b>Delievered Qty</b></td>
+                           <td><b>Remaining Qty</b></td>
+                           <td><b>Invoiced Qty</b></td>
+                           <td><b>Unit</b></td>
+                           <td><b>Unit Price</b></td>
+                           <td><b>Total Amount</b></td>
+                        </tr>
+                          
+                         <t t-foreach='doc.product_line' t-as='line'> 
+                             <tr>
+                              <td><sapn t-esc='line.lpo_number'/></td>
+                              <td><sapn t-esc='line.sale_id.partner_id.name'/></td>
+                              <td>[<span t-esc='line.product_id.default_code'/>] <span t-esc='line.product_id.name'/></td>
+                               <td><sapn t-esc="time.strftime('%d/%m/%Y',time.strptime(line.order_date,'%Y-%m-%d %H:%M:%S'))" /></td>                               
+                               <td><sapn t-esc='line.sale_id.name'/></td>
+                               <td><sapn t-esc='line.qty_ordered'/></td>
+                               <td><sapn t-esc='line.qty_delivered'/></td>
+                               <td><sapn t-esc='line.qty_remaining'/></td>
+                               <td><sapn t-esc='line.qty_invoiced'/></td>
+                               <td><sapn t-esc='line.product_uom.name'/></td>
+                                <td><sapn t-esc='line.price_unit'/><span t-esc='line.sale_id.report_currency_id.symbol'/></td>
+                              <td><sapn t-esc='line.total_amount'/></td>
+                            </tr>
+                      </t>
+                    <tr>
+                       <td colspan='5' style='text-align:right'><b>Total</b></td>
+                        <td><b><span t-esc='doc.total_ordered'/></b></td>
+                        <td><b><span t-esc='doc.total_delivered'/></b></td>
+                        <td><b><span t-esc='doc.total_remaining'/></b></td>
+                        <td><b><span t-esc='doc.total_invoiced'/></b></td>
+                        <td></td><td></td>
+                        <td><b><span t-esc='doc.total_amount'/></b></td>
+                      </tr>
+                   </table>
+                  <b><span t-esc="user.company_id.report_note"/></b>
+                    </div>       
+                  </t>
+
+              </t>
+              </t>
+    </template>
+    
+ </data>
+</openerp>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+	<record id="requests_to_account" model="account.journal">
+            <field name="name">Request Records</field>
+            <field name="code">REQ</field>
+            <field name="type">request</field>
+            <!--field name="show_on_dashboard" eval="False"/-->
+        </record>
+     </data>
+</openerp>
+

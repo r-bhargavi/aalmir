@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+     <!--Inherite to add VAT in Customer & Supplier -->
+         <record id="partner_view_inherit_vat" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+            	<field name="ref" position='before'>
+            		<field name="employee" />
+            		<field name="vat"/>
+            		<field name="validate_vat_number" readonly="1" widget ="url"/>
+            	</field>
+            </field>
+         </record>
+	
+        <record id="view_customer_product_tree_view_config" model="ir.ui.view">
+            <field name="name">view.customer.product.tree.view.config</field>
+            <field name="model">customer.product</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Products" editable="1">
+                    <field name="product_type" widget="selection"/>
+                    <field name="existing_product" />
+                    <field name="product_id" options="{'no_create': True}" attrs="{'readonly' : [('existing_product','=', False)]}" domain="[('categ_id','=',product_type )]"/>
+                    <field name="int_product_number" readonly="1"/>
+                    <field name="product_id" invisible="1"/>
+                    <field name="ext_product_number" />
+                    <field name="product_description" />
+                    <field name="product_tmpl_id" />
+                    <field name="uom_id" domain="[('name','in', ['kg','pcs'])]" widget="selection"/>
+                    <field name="bom_id" invisible="1" />
+                    <field name="type_of_packaging" />
+                    <field name="qty_per_package" />
+                    <field name="product_packaging" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_customer_product_search_view" model="ir.ui.view">
+            <field name="name">view.customer.product.search.view</field>
+            <field name="model">customer.product</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_id"/>
+                    <field name="int_product_number"/>
+                    <field name="ext_product_number"/>
+                    <field name="product_description"/>
+                    <field name="product_type"/>
+                    <field name="type_of_packaging"/>
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" name="groupby_customer_id" domain="[]" context="{'group_by':'customer_id'}"/>
+                        <filter string="Product Category" name="groupby_product_category" domain="[]" context="{'group_by':'product_type'}"/>
+                        <filter string="Type of Package" name="groupby_package" domain="[]" context="{'group_by':'type_of_packaging'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+         <record model="ir.actions.act_window" id="action_customer_product_tree_view_config">
+            <field name="name">Custome Proucts</field>
+            <field name="res_model">customer.product</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_customer_product_tree_view_config"/>
+            <field name="search_view_id" ref="view_customer_product_search_view"/>
+        </record>
+        
+        <menuitem name="Customer Products" id="customer_product" groups="base.group_no_one" parent="base.menu_sale_config" action="action_customer_product_tree_view_config" sequence="50"/>
+               
+        <record id="view_customer_product_tree_validation" model="ir.ui.view">
+            <field name="name">view.customer.product.tree.view.validation</field>
+            <field name="model">customer.product</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Products" editable="1" options="{'no_create': True}">
+                    <field name="product_type" readonly="1"/>
+                    <field name="existing_product" readonly="1"/>
+                    <field name="product_id" readonly="1" options="{'no_create': True}" />
+                    <field name="int_product_number" readonly="1"/>
+                    <field name="product_id" invisible="1"/>
+                    <field name="ext_product_number" readonly="1"/>
+                    <field name="product_description" readonly="1"/>
+                    <field name="product_tmpl_id" readonly="1"/>
+                    <field name="uom_id" readonly="1"/>
+                    <field name="bom_id" invisible="1"/>
+                    <field name="type_of_packaging" readonly="1"/>
+                    <field name="qty_per_package" readonly="1"/>
+                    <field name="product_packaging" readonly="1"/>
+                    <field name="valid_from" readonly="1"/>
+                    <field name="to_date"/>
+                </tree>
+            </field>
+        </record>
+        
+         <record model="ir.actions.act_window" id="action_customer_product_tree_view_expiring">
+            <field name="name">Expiring Proucts</field>
+            <field name="res_model">customer.product</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_customer_product_tree_validation"/>
+        </record>
+        
+         <record model="ir.actions.act_window" id="action_customer_product_tree_view_expired">
+            <field name="name">Expired Products</field>
+            <field name="res_model">customer.product</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_customer_product_tree_validation"/>
+        </record>
+        
+        
+        <record model="ir.ui.view" id="crm_team_salesteams_view_kanban">
+            <field name="name">crm.team.kanban</field>
+            <field name="model">crm.team</field>
+            <field name="inherit_id" ref="sale.crm_team_salesteams_view_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[contains(@class, 'o_kanban_manage_view')]" position="inside">
+                    <div groups="base.group_sale_manager">
+                        <a  name="action_exp_prod" type="object"><field name="exp_prod"/> - Expiring Products</a>
+                    </div>
+                    <div groups="base.group_sale_manager">
+                        <a style="color:red;" name="action_expd_prod" type="object"><field name="exp_prods"/> - Expired Products</a>
+                    </div>
+            	</xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

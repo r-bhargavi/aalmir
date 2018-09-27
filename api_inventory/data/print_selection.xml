@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+    	<record id="print_selection_0" model="print.selection.value">
+            <field name="name">Clear Selection</field>
+            <field name="value">clr</field>
+            <field name="description">This will UnSelect all Selected Data</field>
+            <field name="print_type">delivery</field>
+            <field name="active">1</field>
+        </record>
+        
+	<record id="print_selection_1" model="print.selection.value">
+            <field name="name">Selected</field>
+            <field name="value">any</field>
+            <field name="description">This will Print Selected Data</field>
+            <field name="print_type">delivery</field>
+            <field name="active">0</field>
+        </record>
+        
+        <record id="print_selection_2" model="print.selection.value">
+            <field name="name">Select All</field>
+            <field name="value">all</field>
+            <field name="description">This will Print All Data</field>
+            <field name="print_type">delivery</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="print_selection_3" model="print.selection.value">
+            <field name="name">From</field>
+            <field name="value">from</field>
+            <field name="description">This will Print All Data from First Selection</field>
+            <field name="print_type">delivery</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="print_selection_4" model="print.selection.value">
+            <field name="name">To</field>
+            <field name="value">to</field>
+            <field name="description">This will Print All Data To last Selected Records</field>
+            <field name="print_type">delivery</field>
+            <field name="active">1</field>
+        </record>
+        
+        <record id="print_selection_5" model="print.selection.value">
+            <field name="name">Select Range</field>
+            <field name="value">range</field>
+            <field name="description">This will Print All Data In Between selected range</field>
+            <field name="print_type">delivery</field>
+            <field name="active">1</field>
+        </record>
+    </data>
+</openerp>
+

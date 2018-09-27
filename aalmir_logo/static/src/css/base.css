@@ -1,0 +1,148 @@
+
+/* fix size of text field */
+.openerp input, .openerp textarea, .openerp select {
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  background: white;
+  resize: none;
+}
+.fc-event-inner {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+        border:2px solid rgb(155, 155, 162);
+	}
+.btn-primary, .oe_highlight, .o_main{
+    /*  .oe_button, .btn-sm remove classes */
+	color: #fff !important;
+  	background-color: #0496AD !important;
+  	border-color:#04616F;
+}
+.btn-primary:hover, .oe_highlight:hover, .o_main:hover{
+	color: #fff !important;
+  	background-color: #348896 !important;
+  	border-color:#04616F;
+}
+.o_stat_value{
+	color: #000 !important;
+}
+.oe_active{
+	background-image: linear-gradient(to bottom, #5adcf1, #0496ad)  !important;
+}
+.openerp ul.oe_form_status li.oe_active > .arrow span{
+	background: -webkit-gradient(linear, left top, right bottom, from(#5adcf1), to(#0496ad)) !important;
+}
+.openerp .oe_form .oe_form_required input:not([disabled]):not([readonly]), .openerp .oe_form .oe_form_required select:not([disabled]):not([readonly]), .openerp .oe_form .oe_form_required textarea:not([disabled]):not([readonly]) {
+    background-color: #C9EBF1 !important;
+}
+
+/* new css */
+.openerp .oe_make_bold{
+  color: #4c4c4c !important;
+  font-weight: bold !important;
+}
+
+/* label classes iherite */
+.openerp .ui-widget-content a {
+  color: #348896  
+}
+.openerp .oe_stat_button .o_button_icon {
+  color: #348896 !important;
+  font-size: 24px;
+  padding: 0px 3px;
+  width: 37px;
+  text-align: center;
+}
+.openerp .oe_tag_dark {
+  background: #348896 !important;
+  color: #eee;
+}
+
+.openerp .oe_secondary_menu_section {
+  font-weight: bold;
+  margin-left: 8px;
+  color: #348896 !important;
+}
+.openerp .oe_secondary_menu_section > .oe_menu_leaf {
+  font-weight: bold;
+  color: #348896 !important;
+}
+
+.openerp .oe_searchview .oe-autocomplete ul li.oe-selection-focus {
+  background-color: #348896 !important;
+  color: white;
+}
+.openerp .oe_horizontal_separator {
+  font-weight: bold;
+  font-size: 20px;
+  margin: 15px 0px 10px 0px;
+  color: #348896 !important;
+}
+
+.openerp .oe_fileupload .oe_add button.oe_attach {
+  width: 24px;
+  background: transparent;
+  color: #348896 !important;
+  box-shadow: none;
+  border: none;
+  text-shadow: none;
+}
+
+.openerp .oe_fileupload .oe_add .oe_attach_label {
+  color: #348896 !important;
+  margin-left: -3px;
+}
+
+.openerp .oe_form_field_many2one .oe_m2o_cm_button {
+  line-height: 27px;
+  float: right;
+  padding-left: 2px;
+  font-size: 19px;
+  color: #348896 !important;
+  cursor: pointer;
+}
+
+.openerp ul.oe_form_status_clickable li > .label {
+  color: #348896 !important;
+}
+
+.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
+  background-color: #348896 !important;
+  color: white;
+  border-radius: 0;
+}
+.openerp .nav-pills > li.active a:hover, .openerp .nav-pills > li.active a:focus, .openerp a.list-group-item.active a:hover, .openerp a.list-group-item.active a:focus {
+  background-color: #348896 !important;
+}
+.openerp .nav-pills > li.active .badge, .openerp a.list-group-item.active .badge {
+  background-color: white;
+  color: #348896 !important;
+  text-shadow: none;
+}
+.openerp .badge {
+  font-weight: normal;
+  font-size: 11px;
+  background-color: #348896 !important;
+}
+
+.ui-menu .ui-state-focus, .ui-menu .ui-state-active {
+  background: #348896 !important;
+  border: 1px solid #348896 !important;
+}
+
+/* for length of float no in tree view */
+.openerp .oe_list_content td.oe_number {
+  text-align: right !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 100px;
+}
+
+
+.openerp .oe_form_field_image_api img{ 
+    max-width: 100% !important;
+    max-height: 100% !important;
+ }

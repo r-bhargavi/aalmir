@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report 
+            id="report_summary_aalmir"
+            string="Summary Report"
+            model="sale.order" 
+            report_type="qweb-pdf"
+            file="stock_merge_picking.report_summary_aalmir_saleorder" 
+            name="stock_merge_picking.report_summary_aalmir_saleorder" 
+        />
+        <report 
+            id="report_approve_aalmir"
+            string="Approve Report"
+            model="sale.order.quantity.increase" 
+            report_type="qweb-pdf"
+            file="stock_merge_picking.report_approve_aalmir_saleorder" 
+            name="stock_merge_picking.report_approve_aalmir_saleorder" 
+        />
+       <report 
+            id="report_product_report"
+            string="Product Report"
+            model="product.report" 
+            report_type="qweb-pdf"
+            menu="False"
+            file="stock_merge_picking.report_product_wise" 
+            name="stock_merge_picking.report_product_wise" 
+        />
+        <record id="report_product_report" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="stock_merge_picking.paperformat_reportsummary"/>
+        </record>
+     <report 
+            id="report_invoice_report"
+            string="Invoice  Report"
+            model="product.report" 
+            report_type="qweb-pdf"
+            menu="False"
+            file="stock_merge_picking.report_invoice_wise" 
+            name="stock_merge_picking.report_invoice_wise" 
+        />
+        <record id="report_invoice_report" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="stock_merge_picking.paperformat_reportsummary"/>
+        </record>
+     <report
+            id="sale_xlsx"
+            model="sale.order.line"
+            string="Sale XLS Report"
+            menu="False"
+            report_type="xlsx"
+            name="export_sale_xls.sale_report_xls.xlsx"
+            file="export_sale_xls.sale_report_xls.xlsx"
+            attachment_use="False"
+        />
+      <report
+            id="invoice_xlsx"
+            model="account.invoice"
+            string="Invoice XLS Report"
+            menu="False"
+            report_type="xlsx"
+            name="export_invoice_xls.invoice_report_xls.xlsx"
+            file="export_invoice_xls.invoice_report_xls.xlsx"
+            attachment_use="False"
+        />
+    </data>
+</openerp>

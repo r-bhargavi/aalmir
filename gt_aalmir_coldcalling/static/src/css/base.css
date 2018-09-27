@@ -1,0 +1,4 @@
+.openerp .oe-control-panel .oe-cp-sidebar {
+  display: none;
+  float: right;
+}

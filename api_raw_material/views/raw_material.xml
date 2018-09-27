@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	     <!--start view for extra raw material request -->
+     <record id="mrp_production_rawmaterial_request_tree" model="ir.ui.view">
+        <field name="name">mrp.raw.material.request.tree</field>
+        <field name="model">mrp.raw.material.request</field>
+        <field name="arch" type="xml">
+            <tree string="Raw Material Request">
+             <field name='name'/>
+             <field name='production_id' readonly="1" string="Manufacturing No."/>
+             <field name='product_id' readonly="1"/>
+             <field name="wastage_qty"/>
+             <field name="required_qty"/>
+             <field name="required_uom_id" string="Unit"/>
+             <field name='reason' readonly="1"/>
+             <field name='state'/>
+          </tree>
+        </field>
+     </record>
+     
+     <record id="mrp_production_rawmaterial_request_form" model="ir.ui.view">
+        <field name="name">Raw Material Request Form</field>
+        <field name="model">mrp.raw.material.request</field>
+        <field name="arch" type="xml">
+            <form string="Raw Material Request">
+              <header>
+                    <button name="approve_state" type="object" string="Approve" class="oe_edit_only oe_highlight" 
+                     		attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="reject_state" type="object" string="Reject" class="oe_edit_only oe_highlight"
+                     		attrs="{'invisible':[('state','!=','draft')]}"/>
+		    <button type="object" string="Cancel" class="oe_edit_only oe_highlight" name='cancel_state'
+                      		attrs="{'invisible':[('state','in',('reject','cancel'))]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approve,reject,cancel"/>
+              </header>
+              <sheet>
+                 <h2 attrs="{'invisible':[('mo_cancel','=',False)]}" style='color:red'>
+                         Manufacturing order Cancelled by Manufacturing Department..
+                 </h2>
+                <group>
+                 
+                  <group>
+                      <field  name='mo_cancel' invisible='1'/>
+                      <field name='name' readonly="1"/>
+                      <field name='production_id' string="Manufacturing No." readonly="1"/>
+                      <label for='wastage_allow' string="Allowed Wastage Qty" attrs="{'invisible':[('wastage_allow','=',0)]}"/>
+			<div attrs="{'invisible':[('wastage_allow','=',0)]}">
+			    <field name="wastage_allow" class="oe_inline" nolabel="1" 
+		                            readonly="1" />
+			    <field name="allow_wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+			</div>
+                      <label for='wastage_qty' string="Wastage Qty" attrs="{'invisible':[('wastage_qty','=',0)]}"/>
+		     <div attrs="{'invisible':[('wastage_qty','=',0)]}">
+		        <field name="wastage_qty" class="oe_inline" nolabel="1" readonly="1"/>
+			 <field name="wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                      <label for='required_qty' string="Required Qty" attrs="{'invisible':[('required_qty','=',0)]}" />
+		     <div attrs="{'invisible':[('required_qty','=',0)]}">
+		        <field name="required_qty" class="oe_inline" nolabel="1" readonly="1"/>
+			 <field name="required_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                      <field name='delivery_id' attrs="{'invisible':[('delivery_id','=',False)]}" readonly="1"/>
+                     <field name='note_mgnr' attrs="{'readonly':[('state','in',('approve','reject'))],'invisible':[('request_type','=','normal')]}"/>
+                     <field name='request_type' invisible="context.get('send')" readonly='1'/>
+                     <field name='source_location' domain="[('actual_location','=',True)]" required="1" options="{'no_open':True,'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                  </group>
+                  <group >
+                      <field name='product_id' readonly="1" attrs="{'invisible':[('product_id','=',False)]}"  />
+                      <field name='request_date'/>
+                      <field name='reason' attrs="{'invisible':[('request_type','=','normal')]}"/>
+                      <field name='note' readonly="1" string="Production Remark"
+                      			attrs="{'invisible':[('request_type','=','normal')]}"/>
+                      <field name='document' readonly="1" attrs="{'invisible':[('request_type','=','normal')]}"/>
+                     
+                  </group>
+                </group>
+                  
+                <notebook >
+                     <page string='Raw Material Details'>
+                         <field name="request_line_ids" nolabel="1" attrs="{'readonly':[('state', '!=', 'approve')]}" >
+		                <tree editable="bottom"  >
+		                  <field name="product_id" readonly="1"/>
+		                  <field name='qty'  readonly="1"/>
+		                  <field name='total_available_qty' readonly="1"/>
+                                  <field name='available_qty'/>
+                                  <!--button name="reserve_do" type="object"  attrs="{'invisible':['|',('reserve_status','!=','approve'),('available_qty','&lt;=',0)]}" class="oe_highlight oe_edit_only" string="Reserve" /-->
+		                  <field name='uom_id' readonly="1"/>
+		                  <!--field name='pending_qty' readonly="1"/>
+		                  <field name='reserve_qty' readonly="1"/>
+		                  <button name="open_history" icon="fa-history" string="History" type="object" attrs="{'invisible':[('res_ids', '=', [])]}"/>
+				  <button name="release_do" string="Release" type="object" attrs="{'invisible':['|',('reserve_status','not in ',('approve','reserve')),('reserve_qty','&lt;=',0.0)]}" class="btn-primary oe_edit_only"/>
+				  <field name='res_ids' invisible="1"/>
+				  <field name='reserve_status' invisible="1"/-->
+                                  <field name='required_date' attrs="{'readonly':[('rm_type','not in',('mo','po'))],'required':[('rm_type','in',('mo','po'))]}"/>
+                                  <field name='rm_type' attrs="{'readonly':['|',('po_request_id','!=',False),('production_id','!=',False)]}"/>
+                                  <button name='schedule_mo' type='object' string='Create MO/PO' class='oe_highlight oe_edit_only' attrs="{'invisible':[('rm_type','=','stock')]}"/>
+                                    
+                                 <field name='production_id' attrs="{'invisible':[('production_id','=',False)]}"/>
+                                 <field name='po_request_id' attrs="{'invisible':[('po_request_id','=',False)]}"/>
+		                 <!--button name='back_schedule' type='object' string='Back' class='oe_highlight'
+                                    attrs="{'invisible':[('po_request_id','=',False),('production_id','=',False)]}"/-->
+		                </tree>
+		                <form reaonly="true">
+		                	<group col="4">
+		                		<field name="product_id" readonly="1"/>
+						 <field name='qty'  readonly="1"/>
+						 <field name='total_available_qty' readonly="1"/>
+				                 <field name='available_qty'/>
+						 <field name='uom_id' readonly="1"/>
+						 <!--field name='reserve_qty' readonly="1"/>
+						 <field name='pending_qty' readonly="1"/>
+						 <field name='reserve_status' readonly="1"/-->
+				                 <field name='required_date' attrs="{'readonly':[('rm_type','not in',('mo','po'))]}"/>
+				                 <field name='rm_type' attrs="{'readonly':['|',('po_request_id','!=',False),('production_id','!=',False)]}"/>
+				                <field name='production_id' attrs="{'invisible':[('production_id','=',False)]}"/>
+				                <field name='po_request_id' attrs="{'invisible':[('po_request_id','=',False)]}"/>
+			                </group>
+			                <!--group col="2">
+				                <field name='res_ids' readonly="1"/>
+		                	</group-->
+		                </form>
+                     </field>
+                     </page>
+                     
+                    <page string='Scheduled Raw Materials Delivery' attrs="{'invisible':[('shift_request_line','=',[])]}" >
+                    	 <field name='shift_request_line' nolabel='1' readonly="1">
+				 <tree>
+				    <field name='workorder_id'/>
+				    <field name='stock_qty' />
+				    <field name='uom' />
+				    <field name='date'/>
+				    <field name='picking_ids' />
+				    <field name='status' invisible="1"/>
+				    <button name="create_picking" string="Transfer" type="object" attrs="{'invisible':['|','|',('status','!=','request'),('state','!=','approve')]}" class="oe_edit_only btn-primary"/>
+				    <field name='state' invisible="1"/>
+				 </tree>
+				 <form readonly="1">
+				    <group col="4">
+					    <field name='workorder_id'/>
+					    <field name='product'/>
+					    <field name='stock_qty' />
+					    <field name='uom' />
+					    <field name='date'/>
+					    <field name='request_id'/>
+					    <!--field name='picking_id' />
+					    <field name='send_picking_status'/-->
+				    </group>
+				        <notebook>
+				        <page string="Product Details">
+				    	<field name='sub_product' nolabel='1' readonly="1">
+						<tree>
+						    <field name='product'/>
+						    <field name='stock_qty'/>
+						    <field name='uom' />
+				         	</tree>
+				         	<form>
+						    <field name='product'/>
+						    <field name='stock_qty'/>
+						    <field name='uom' />
+				         	</form>
+		         	   	</field>
+		         	   	</page>
+		         	   	<page string="Delivery Details" attrs="{'invisible':[('picking_ids','=',[])]}">
+				 	       <field name='picking_ids' nolabel='1' readonly="1">
+							<tree>
+							    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+						 	</tree>
+						 	<form>
+						 	    <field name='name'/>
+							    <field name='min_date'/>
+							    <field name='state' />
+						 	</form>
+				 	       </field>
+		         	   	</page>
+				  	</notebook>		         	   	
+				 </form>
+                    	 </field>
+                    </page>
+                    <page string="Delivery Details" attrs="{'invisible':[('picking_ids','=',[])]}">
+	 	       <field name='picking_ids' nolabel='1' readonly="1">
+				<tree>
+				    <field name='name'/>
+				    <field name='min_date'/>
+				    <field name='state' />
+			 	</tree>
+	 	       </field>
+	 	   </page>
+                </notebook>
+              </sheet>
+             
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+     <record model="ir.actions.act_window" id="rawmaterial_request_action">
+        <field name="name">Raw Material Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.raw.material.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+     <menuitem action="rawmaterial_request_action" id="menu_raw_material_request" name="Raw Material Request"
+            parent="stock.menu_stock_inventory_control" sequence="1"/>
+     <!-- end view for extra raw material request -->
+     <!-- Wastage from mo request to supervissior view-->
+     <record id="mrp_wastage_btach_tree" model="ir.ui.view">
+        <field name="name">Mrp Wastage Batch Number</field>
+        <field name="model">mrp.order.batch.number</field>
+        <field name="arch" type="xml">
+            <tree string="Wastage Request" create='0'>
+                   <field name='create_date' readonly="1"/>
+                   <field name='name' readonly="1" string='Batch No.'/>
+                   <field name='production_id' readonly='1'/>
+                   <field name='product_qty' string='Wastage Qty' readonly="1" sum='total'/>
+                   <field name='uom_id' readonly='1' string='Unit'/>
+                   <field name='used_type' readonly='1'/>
+                   <field name='request_state' readonly='1'/>
+                   <field name='wastage_product' context="{'wastage':True,'used_type':used_type}"
+                                required='1'  attrs="{'readonly':[('request_state','!=','draft')]}"
+                                options="{'no_create': True, 'no_open': True}" />
+                    <button name="approve_request" type="object" string="Approve" class="oe_highlight" 
+                     		attrs="{'invisible':[('request_state','!=','draft')]}" />
+                   <button type='object' name='cancel_wastage' string='Cancel'
+                               attrs="{'invisible':[('request_state','!=','draft')]}" class='oe_highlight'/>
+            </tree>
+        </field>
+    </record>
+
+     <!--record id="mrp_wastage_request_tree" model="ir.ui.view">
+        <field name="name">Mrp Wastage Request Tree</field>
+        <field name="model">mrp.wastage.request</field>
+        <field name="arch" type="xml">
+            <tree string="Wastage Request">
+               <field name='name' />
+               <field name='production_id'/>
+               <field name='used_type' />
+               <field name='state'/>
+            </tree>
+        </field>
+    </record>
+    <record id="mrp_wastage_request_form" model="ir.ui.view">
+        <field name="name">Mrp Wastage Request Form</field>
+        <field name="model">mrp.wastage.request</field>
+        <field name="arch" type="xml">
+            <form string="Wastage Request">
+              <header>
+                  <button name="approve_request" type="object" string="Approve" class="oe_highlight" 
+                     		states='draft'/>
+                   <button name="cancel_request" type="object" string="Cancel" class="oe_highlight" 
+                     		states='draft'/>
+                   <field name="state" widget="statusbar" statusbar_visible="draft,approve,cancel"/>  
+              </header>
+              <sheet>
+                <group>
+                  <group>
+                      <field name='name' readonly="1"/>
+                      <field name='production_id' string="Manufacturing No." readonly="1"/>
+                      <field name='used_type' readonly='1'/>
+                  </group>
+                  <group >
+                  </group>
+                </group>
+                  
+                <notebook >
+                     <page string='Request Details'>
+                         <field name="batch_ids" nolabel="1" >
+		           <tree editable='bottom'>
+                               <field name='name' readonly="1" string='Batch No.'/>
+                               <field name='product_qty' string='Wastage Qty' readonly="1" />
+                               <field name='uom_id' readonly='1' string='Unit'/>
+                               <field name='used_type' readonly='1'/>
+                               <field name='request_state' readonly='1'/>
+                               <field name='wastage_product' context="{'wastage':True,'used_type':used_type}"
+                                required='1'  attrs="{'readonly':[('request_state','!=','draft')]}"
+                                options="{'no_create': True, 'no_open': True}" />
+                               <button type='object' name='cancel_wastage' string='Cancel'
+                               attrs="{'invisible':[('request_state','!=','draft')]}" class='oe_highlight'/>
+                           </tree>   
+                          </field>
+                     </page>
+                  
+                </notebook>
+              </sheet>
+               <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+     <record model="ir.actions.act_window" id="wastage_request_action">
+        <field name="name">Mrp Wastage Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.wastage.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record-->
+    <record model="ir.actions.act_window" id="batch_wastage_request_action">
+        <field name="name">Mrp Wastage Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.order.batch.number</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name='domain'>[('used_type','in',('scrap','grinding'))]</field>
+    </record>
+    <menuitem action="batch_wastage_request_action" id="menu_wastage_request_batch" name="Wastage Request"
+            parent="stock.menu_stock_inventory_control" sequence="0"/>
+     <!--menuitem action="wastage_request_action" id="menu_wastage_request" name="Wastage Request"
+            parent="stock.menu_stock_inventory_control" sequence="1"/-->
+     <!-- end wastage request form-->
+    </data>
+</openerp>

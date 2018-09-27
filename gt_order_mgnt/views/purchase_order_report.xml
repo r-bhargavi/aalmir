@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+       <template id="report_purchaseorder_document_ext" inherit_id="purchase.report_purchaseorder_document">
+           <xpath expr="//t[@t-call='report.external_layout']" position="replace">
+                <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+                    <div class="page" style="font-family: Calibri;">
+                            <style>
+				.report_class {height:30px;
+                                               padding-top: 5px;
+					      border:1px solid #9999;
+				}
+                                .noborder td, .noborder th {
+                                                 border: none !important;
+                                  }
+				</style>
+                        <div class="oe_structure"/>
+                         <h2 style="font-family: Calibri;margin-left:340">
+				<span>Purchase Order</span>
+				
+			    </h2>
+            <div class="row" style="border:1px solid #9999;margin-left:2px;margin-right:2px">
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;">Purchase Order No.</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p t-esc="o.name"/>
+                        </div>
+                        <!-- DO Date with Multiple condition-->
+                            <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;"> Date</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                           <p t-esc="time.strftime('%d/%m/%Y',time.strptime(o.date_order,'%Y-%m-%d %H:%M:%S'))"/>
+                        </div>
+                        <!--div class="col-xs-3 table-bordered report_class" t-if="o.partner_id">
+                              <p style="font-weight: bold;">To</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.partner_id">
+                           <span t-esc="o.partner_id.name"/>
+                        </div-->
+                        <div class="col-xs-3 table-bordered report_class">
+                           <p style="font-weight: bold;">Supplier</p>
+        		</div>
+                	<div class="col-xs-9 table-bordered report_class">
+                          <span t-esc="o.partner_id.name"/><!--t t-if="o.partner_id.street">
+                                           <t t-esc="o.partner_id.street"/>,</t>
+		                         <t t-if="o.partner_id.street2"> 
+                                           <t t-esc="o.partner_id.street2"/>,</t>
+		                         <t t-if="o.partner_id.city_id"> 
+                                            <t t-esc="o.partner_id.city_id.name"/>,</t>
+		                         <t t-if="o.partner_id.state_id">
+                                             <t t-esc="o.partner_id.state_id.name"/>,</t>
+		                         <t t-if="o.partner_id.country_id"> 
+                                              <t t-esc="o.partner_id.country_id.name"/>.</t>
+		                         <t t-if="o.partner_id.zip"> <span>P.O. Box </span>
+                                             <t t-esc="o.partner_id.zip"/></t-->
+			</div>
+                         <div class="col-xs-3 table-bordered report_class" t-if="o.attend_id">
+                              <p style="font-weight: bold;">Attn.</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.attend_id">
+                           <span t-esc="o.attend_id.name"/>
+                        </div>
+                        <t t-if="o.attend_id">
+		                 <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Phone Number</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+                                  <t t-if='o.attend_id.phone'>
+		                    <p t-esc="o.attend_id.phone"/>
+                                 </t>
+                                <t t-if='not o.attend_id.phone'>
+		                    <p t-esc="o.partner_id.phone"/>
+                                 </t>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Email</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+                                  <t t-if='o.attend_id.email'>
+		                     <p t-esc="o.attend_id.email"/>
+                                 </t>
+                                    <t t-if='not o.attend_id.email'>
+		                     <p t-esc="o.partner_id.email"/>
+                                 </t>
+		                </div>
+                         </t>
+                        <t t-if="not o.attend_id">
+		                 <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Phone Number</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+		                    <p t-esc="o.partner_id.phone"/>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+		                    <p style="font-weight: bold;">Email</p>
+		                </div>
+		                <div class="col-xs-3 table-bordered report_class">
+		                    <p t-esc="o.partner_id.email"/>
+		                </div>
+                         </t>
+                        <div class="col-xs-3 table-bordered report_class">
+                            <p style="font-weight: bold;">Currency</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class">
+                          <p t-esc="o.currency_id.name"/>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.date_planned">
+                            <p style="font-weight: bold;">Receiving Date</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.date_planned">
+                           <p t-esc="time.strftime('%d/%m/%Y',time.strptime(o.date_planned,'%Y-%m-%d %H:%M:%S'))"/> 
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.vendor_vat_bool">
+                            <p style="font-weight: bold;">Vendor TRN</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.vendor_vat_bool">
+                           <p t-esc="o.vendor_vat"/>
+                        </div> 
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.show_delivery_term">
+                            <p style="font-weight: bold;">Terms of Delivery</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if="o.show_delivery_term">
+                           <p t-esc="o.incoterm_id.name"/>
+                        </div>
+                        
+   </div>
+    <div class="row" style="border:1px solid #9999;margin-left:2px;margin-right:2px">
+        <t t-if="o.show_delivery_address">
+        	<div class="col-xs-3 table-bordered report_class">
+                           <p style="font-weight: bold;">Delivery Location</p>
+                        </div>
+                        <div class="col-xs-9 table-bordered report_class">
+                         <t t-if="o.picking_type_id.warehouse_id.partner_id.street">
+                                           <t t-esc="o.picking_type_id.warehouse_id.partner_id.street"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.street2"> 
+                                           <t t-esc="o.picking_type_id.warehouse_id.partner_id.street2"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.city_id"> 
+                                            <t t-esc="o.picking_type_id.warehouse_id.partner_id.city_id.name"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.state_id">
+                                             <t t-esc="o.picking_type_id.warehouse_id.partner_id.state_id.name"/>,</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.country_id"> 
+                                              <t t-esc="o.picking_type_id.warehouse_id.partner_id.country_id.name"/>.</t>
+		                         <t t-if="o.picking_type_id.warehouse_id.partner_id.zip"> <span>P.O. Box </span>
+                                             <t t-esc="o.picking_type_id.warehouse_id.partner_id.zip"/></t>
+        	</div>
+        </t>
+    	</div>
+ 
+                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:5px">
+                        <tr>
+                            <td><b>SL#</b></td>
+                            <td><b>Item Description</b></td> 
+                            <t t-if="o.show_product_schedule">
+                             <td><b>Receiving Date</b></td>
+                            </t>
+                            <td><b>Quantity</b></td>
+                           <td><b>Units</b></td>
+                           <td><b>Unit Price</b></td>
+                          <td><b>Total</b></td>
+                        </tr>
+                       
+                        <t t-set="count" t-value="0"/>
+                        <t t-foreach="o.order_line" t-as="line">
+                          <t t-if="line.product_id">
+                           <tr>
+                                <td>
+                                    <t t-set="count" t-value="count+1"/>
+                                    <t t-esc="count"/>
+                                </td>
+                                <td>
+                                     <span t-field="line.name"/>
+                                  
+                                </td>
+                                <t t-if="o.show_product_schedule">
+                                  <td> <span t-esc="time.strftime('%d/%m/%Y',time.strptime(line.date_planned,'%Y-%m-%d %H:%M:%S'))"/> </td>
+                               </t>
+                                <td><t t-esc="line.product_qty"/></td>
+                                 <td>
+                                    <t t-esc="line.product_uom.name "/></td>   
+                                <td>                                 
+                                        <span t-esc="'%.4f'%line.price_unit"/>
+                                  
+                                </td>
+                                <td>
+                                  <span t-esc="'%.4f'%line.price_subtotal"/>
+                                </td>
+                            </tr>
+                        </t>
+                       </t>      
+                    </table>
+                      <div class="row">
+                            <div class="col-xs-8">
+		                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:1px;width:577px;">
+				        <tr> 
+		                            <t t-if="not o.amount_tax">
+		                              <td rowspan="2" style="height:112px;text-transform:uppercase;"><h4><b><span t-esc="o.amount_total_text"/></b></h4>
+		                               <t t-if="o.amount_tax">
+		                                   <p style="margin-top:15px"><strong>TRN Number:</strong> <span t-esc="o.report_company_name.vat"/></p>
+		                               </t>
+		                             </td>
+		                            </t> 
+		                           <t t-if="o.amount_tax">
+		                              <td rowspan="2" style="height:130px;text-transform:uppercase;"><h4><b><span t-esc="o.amount_total_text"/></b></h4>
+		                               <t t-if="o.amount_tax">
+		                                   <p style="margin-top:15px"><strong>TRN Number:</strong> <span t-esc="o.report_company_name.vat"/></p>
+		                               </t>
+		                             </td>
+		                            </t> 
+		                           </tr>
+		                    </table>
+		           </div>
+
+		           <div class="col-xs-4">
+	                     <table class="table table-bordered" style="border: 1px solid #9999;margin-top:1px;border-left:None;">
+		                     <tr>
+				            <td style="width:30%"><b>Gross</b></td>
+				            <td style="width:70%">  <span t-esc="'%.4f'%o.amount_untaxed"/><span t-field="o.currency_id.symbol"/> </td>
+		                      </tr>
+                                   <tr>
+				            <td style="width:30%"><b>VAT
+                                                 <t t-set="count" t-value="0"/>
+							<t t-foreach="o.order_line" t-as="line">
+							   <t t-if="count == 0">
+							    <t t-foreach="line.taxes_id" t-as="tax">
+								     (<span t-esc="tax.amount"/>%)
+							    </t>
+							   </t>
+							   <t t-set="count" t-value="count+1"/>
+						</t>
+                                             </b></td>
+				           <td style="width:70%"><span t-esc="'%.4f'%o.amount_tax"/> <span t-field="o.currency_id.symbol"/></td>
+		                   </tr>
+                                   <tr>
+				            <td style="width:30%"><b>Net</b></td>
+				           <td style="width:70%"><span t-esc="'%.4f'%o.amount_total"/>
+                                           <span t-field="o.currency_id.symbol"/></td>
+		                   </tr>
+                              </table>
+		            </div>
+                      </div>
+
+                       <div class="row">
+                        <table class="table noborder" style="width:97%;margin-left:10px">
+		                <tr>
+                                   <td style="width:32%">
+                                         <t t-if="o.payment_term_id">
+                                          <strong>Payment Terms:</strong>
+                              <br/>
+                              <t t-if="o.milestone_ids">
+                                 <t t-foreach="o.milestone_ids" t-as="ml">
+		                   <span t-esc="ml.value"/>%   <span t-esc="ml.term_name_id.name"/>
+		                    <br/>       
+		                  </t>
+                              </t>
+                              <t t-if="not o.milestone_ids">
+                                 <span t-esc="o.payment_term_id.name"/>
+                              </t>
+                            </t>
+                            </td>
+                           <t t-if="o.warranty">
+                              <td style="width:32%">
+                               
+                             <strong>Warranty:</strong>
+                                 <p t-esc="o.warranty"/>
+                             </td>
+                           </t>
+                                <t t-if="o.vendor_instruction">
+                                   <td style="width:32%">
+                                   <strong>Instruction </strong>
+                                  
+                                    <br/>
+                                     <p t-esc="o.vendor_instruction"/> 
+                                    </td>
+                                  </t>
+                                 </tr>
+                                <t t-if="o.vendor_remark">
+                                      <tr><td colspan='3'>
+                                        <strong>Terms and Conditions </strong>
+                                        <br/>
+                                         <span t-esc="o.vendor_remark"/>     
+                                          </td></tr>
+                                    </t>
+                             </table>
+                       </div>
+                  <!--t t-if='o.vendor_remark'>
+		         <p><b>Terms and Conditions</b></p>
+		         <div class="row">
+		              <table class="table table-bordered" style="border: 1px solid #9999;width:97%;margin-left:10px;">
+				<tr> 
+		                    <td>
+				       <span t-esc='o.vendor_remark'></span>            
+		                    </td> 
+		                </tr>   
+				</table>
+		              
+		         </div>     
+              </t-->
+            <div class="row ">
+                       
+                          <table class="table noborder backgroundimage" style="position:absolute;z-index:1000;width:97%;margin-left:10px;margin-top:-135px">
+                                <tr><td colspen='3'>  <p> <b>Approved By</b></p></td></tr>
+                                <t t-if="o.show_stamp">  
+                                      <img t-att-src="'data:image/png;base64,'+o.report_company_name.stamp_image" style="margin-left:220px;margin-top:-20px;width:280px;height:175px"/>
+                              </t>
+                               <t t-if=" not o.show_stamp">  
+                                      <p style="margin-top:135px"/>
+                              </t>
+		                <tr>
+                                 <td style="vertical-align:bottom;width:32%;"> 
+                                    <t t-if="o.default_signature1">
+		                        <t t-if="o.management_user.signature_image">
+                                      <img t-att-src="'data:image/png;base64,'+o.management_user.signature_image" width="100px" height="70px"/>
+		                       </t>
+		                       <t t-if="not o.management_user.signature_image">
+		                           <t t-if="o.management_user.digital_signature">
+                                               <img t-att-src="'data:image/png;base64,'+o.management_user.digital_signature" width="100px" height="70px"/>
+                                           </t>
+		                       </t>
+		                   </t>   
+				        <t t-if="o.management_name_bool">
+                                          <p t-esc="o.management_user.name"/>
+                                        </t>
+		                          <strong><p t-esc="o.management_name"/></strong>
+                                </td>
+                                 <td style="vertical-align:bottom;width:32%">
+                                    <t t-if="o.default_signature2">
+                                        <t t-if="o.procurement_user.signature_image">
+                                           <img t-att-src="'data:image/png;base64,'+o.procurement_user.signature_image" width="100px" height="70px"/>
+		                       </t>
+		                       <t t-if="not o.procurement_user.signature_image">
+                                           <t t-if="o.procurement_user.digital_signature">
+                                               <img t-att-src="'data:image/png;base64,'+o.procurement_user.digital_signature" width="100px" height="70px"/>
+                                           </t>
+		                       </t>
+		                  </t>     
+                                            <t t-if="o.procurement_name_bool">
+
+                                                <p t-esc="o.procurement_user.name"/>
+                                            </t>
+		                        <strong><p t-esc="o.procurement_name"/></strong>
+                                </td>
+                                <td style="vertical-align:bottom;width:32%">
+                                  <t t-if="o.default_signature3">
+                                         <t t-if="o.inventory_user.signature_image">
+                                           <img t-att-src="'data:image/png;base64,'+o.inventory_user.signature_image" width="100px" height="70px"/>
+		                       </t>
+		                       <t t-if="not o.inventory_user.signature_image">
+		                            <t t-if="o.inventory_user.digital_signature">
+                                                <img t-att-src="'data:image/png;base64,'+o.inventory_user.digital_signature" width="100px" height="70px"/>
+                                            </t>
+		                       </t>
+		                    </t>    
+                                          <t t-if="o.inventory_name_bool">
+                                            <p t-esc="o.inventory_user.name"/>
+                                          </t>
+		                         <strong><p t-esc="o.inventory_name"/></strong>
+                                </td>  
+                           </tr>
+                          <!--tr>
+                               <td colspan="3">
+                                 <b><span t-esc="o.company_id.report_note"/></b>
+                                </td>
+                           </tr-->
+                          
+                            </table>
+                        
+                           
+		     </div>
+                        <b><span t-esc="o.company_id.report_note"/></b> 
+                    </div>
+                   
+                   </t>
+          </xpath>
+       </template>
+    
+   </data>
+</openerp>

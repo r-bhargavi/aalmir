@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+         <record id="pricelist_user" model="res.groups">
+            <field name="name">Pricelist User</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="category_id" ref="base.module_category_usability"/>
+        </record>
+        <record id="pricelist_accountant" model="res.groups">
+            <field name="name">Pricelist Accountant</field>
+            <field name="category_id" ref="base.module_category_usability"/>
+            <field name="implied_ids" eval="[(4, ref('pricelist_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+       <!-- <record id="calendar.calendar_event_rule_employee" model="ir.rule">
+            <field ref="calendar.model_calendar_event" name="model_id"/>
+            <field name="name">All Calendar Event for employees</field>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field eval="[(6,0,ref('base.group_sale_salesman_all_leads'))]" name="groups"/>
+        </record> -->
+
+    </data>
+</openerp>

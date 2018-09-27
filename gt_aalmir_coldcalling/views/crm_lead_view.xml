@@ -1,0 +1,350 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+       <record model="ir.ui.view" id="view_users_form_ext">
+            <field name="name">res.users.form</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="arch" type="xml">
+             <field name="partner_id" position="after">
+               <field name="salesperson_target" attrs="{'invisible': [('salesperson_bool','!=', True)]}"/> 
+               <field name="monthly_target" attrs="{'invisible': [('salesperson_bool','!=', True)]}"/>
+               <field name="salesperson_bool" />
+             </field>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="crm_lead_form_view_customization">
+            <field name="name">crm.lead.form.view.customization</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads" />
+            <field name="arch" type="xml">
+                <field name="stage_id" position="replace">
+                    <field name="stage_id" widget="statusbar" clickable="True"
+                            domain="['&amp;', ('team_ids', '=', team_id), '|', ('type', '=', type), ('type', '=', 'both')]"
+                            options="{'fold_field': 'fold'}"
+                            on_change="onchange_stage_id(stage_id)" invisible="1"/>
+                </field>
+                <field name="function" position="replace">
+                    <field name="function" invisible="1"/>
+                </field>
+                <field name="user_id" position="replace">
+                    <field name="category" /> <!--#CH_N037 make required -->
+                    <field name="is_sales_person" invisible="1"/>
+                    <field name="user_id" on_change="on_change_user(user_id, context)"
+                                context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_sale_salesman_all_leads'], 'team_id': team_id}" attrs="{'readonly': [('is_sales_person','=', True)]}"/>
+                </field>
+                <field name="user_id" position="after">
+                    <button string="Assign To Sales Person" name="%(action_assign_to_other_salesman)d" type="action" style="margin-left: 155px" colspan="2" attrs="{'invisible': [('is_sales_person','=', False)]}"/>
+                </field>
+                <button name="action_set_lost" position="replace">
+                    <button name="action_set_lost" string="Irrelevant" type="object" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}" />
+                </button>
+                <button name="%(crm.action_crm_lead2opportunity_partner)d" position="replace">
+                    <button name="%(crm.action_crm_lead2opportunity_partner)d" string="Convert to Opportunity" type="action"
+                            help="Convert to Opportunity" class="oe_highlight" context="{'from_opp_form': True}" attrs="{'invisible' : [('active', '=', False)]}"/>
+                </button>
+                <div class="label label-danger pull-right" attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}" position="replace">
+                    <div class="label label-danger pull-right" attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}">Irrelevant</div>
+                </div>
+                <field name="team_id" position="replace">
+                    <field name="team_id" widget="selection" domain="[('use_leads','=',True)]" invisible="1"/>
+                </field>
+                <field name="opt_out" position="replace" />
+                <field name="medium_id" position="replace" />
+                <xpath expr="//notebook/page[@name='extra']/group" position="inside">
+                    <group string="Irrelevant" attrs="{'invisible':[('active','=',True)]}">
+                        <field name="irrelevant_reason_id" readonly="1"/>
+                        <field name="irr_reason_description" readonly="1"/>
+                    </group>
+                </xpath>
+		<xpath expr="//notebook/page[@name='extra']/group/group[2]" position="replace">
+                    <group string="Tracking" name="categorization">
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True,'no_open': True}"/>
+                                    <field name="campaign_id" options="{'no_create': True,'no_open': True}" context="{'n_user':user_id}"/> <!--#CH_N037 add option to avoid create and edit -->
+                                    <field name="medium_id" options="{'no_create': True,'no_open': True}" invisible="1" /> <!--#CH_N037 add option to avoid create and edit --><!--#CH_N039 invisible fileds-->
+                                    <field name="source_id" options="{'no_create': True,'no_open': True}" /> <!--#CH_N037 add option to avoid create and edit -->
+                                    <field name="referred"/>
+                     </group>
+                </xpath>
+		 <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <!--button name="action_mail_sent" string="Send Mail" type="object" 
+                            class='oe_highlight' style="float:left;margin-left:590px;margin-top:15px;position:absolute;"/-->
+                   </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="crm_case_form_view_oppor_cust1">
+            <field name="name">crm.case.form.view.oppor.cust1</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes"> <!--CH_N032 add attribute -->
+                    <attribute name="required">1</attribute>
+                    <attribute name="domain">[('company_type','=','company')]</attribute>
+                    <!--attribute name="options">{'no_create':True}</attribute-->
+                </field>
+                <field name="email_from" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </field>
+                <field name="phone" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </field>
+                <field name="opt_out" position="replace" />
+                <field name="medium_id" position="replace" />
+                <field name="user_id" position="replace">
+                    <field name="category" domain="[('cat_type','in',('film','injection'))]" options="{'no_open':True,'no_create':True}" required="1"/>  <!--CH_N038 add readonly attribute -->
+                    <field name="is_sales_person" invisible="1"/>
+                    <field name="user_id" on_change="on_change_user(user_id, context)"
+                                context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_sale_salesman_all_leads'], 'team_id': team_id}" attrs="{'readonly': [('is_sales_person','=', True)]}"/>
+                    <field name="is_contract" readonly="1" attrs="{'invisible':[('is_contract','=',False)]}"/>
+                    <field name="contract_name" readonly="1" attrs="{'invisible':[('is_contract','=',False)]}"/>
+                </field>
+                <field name="user_id" position="after">
+		<field name="is_assing_button" invisible="1"/>
+                    <button string="Assign To Sales Person" name="%(action_assign_to_other_salesman)d" type="action" style="margin-left: 155px" colspan="2" attrs="{'invisible': ['|',('is_sales_person','=', False),('is_assing_button','=',False)]}"/>
+                </field>
+                <field name="last_activity_id" position="replace"/>
+                <label for="next_activity_id" position="replace"/>
+                <field name="date_deadline" position="replace"/>
+                <div class="o_row mr16" position="replace"/>
+                <field name="title_action" position="replace"/>
+		<button name="%(sale_crm.sale_action_quotations_new)d" position="replace" /> <!--CH_N037 add to hide button -->
+		<button name="%(sale_crm.sale_action_quotations_new)d" position="replace" /> <!--CH_N037 add to hide button -->
+                <button name="log_next_activity_done" position="replace"/>
+                <button name="cancel_next_activity" position="replace"/>
+                 <field name="stage_id" widget="statusbar" position="replace">
+                      <field name="stage_id" widget="statusbar"  options="{'fold_field': 'fold'}"
+                            domain="['&amp;', ('team_ids', '=', team_id), '|', ('type', '=', type), ('type', '=', 'both')]"
+                            attrs="{'invisible': [('active', '=', False)]}"/>
+                 </field>
+                   <button name="action_set_won" position="replace">
+                       <button name="action_set_won" string="Won"
+                                type="object" class="oe_highlight o_wow" invisible="1"
+                                attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}"/>
+                   </button>
+                   <button name="%(crm.crm_lead_lost_action)d" position="replace">
+                        <field name="stage_name" invisible="1" />
+                       <button name="%(crm.crm_lead_lost_action)d" string="Lost"
+                                type="action" class="oe_highlight"
+                                context="{'default_lead_id': active_id, 'from_opp': True}"
+                                attrs="{'invisible': ['|', ('active', '=', False), ('stage_name', 'not in', ['Open','Quoted'])]}"/>
+
+			<!--CH_N037 add new quotation button start -->
+			<button string="New Quotation" name="%(sale_crm.sale_action_quotations_new)d" type="action" class="oe_highlight"
+		            context="{'search_default_partner_id': partner_id, 
+		                      'default_partner_id': partner_id, 
+		                      'default_team_id': team_id,
+		                      'default_user_id': uid,
+		                       'from_lead' : id}"
+		            attrs="{'invisible' : [('stage_name', 'in', ['Won','Lost','Awaiting'])]}"/>
+			<!--CH_N037 end -->
+                   </button>
+                 
+                <field name="team_id" position="replace">
+                    <field name="team_id" widget="selection" domain="[('use_leads','=',True)]" invisible="1"/>
+                </field>      
+<!--                <notebook position="inside">
+                    
+                </notebook>-->
+                <!--<notebook position="inside">
+                    <page string="Next Activity" name="activity">
+                         <group>
+                                <field name="last_activity_id" invisible="1"/>
+                                <label for="next_activity_id"/>
+                                <div>
+                                    <div class="o_row mr16">
+                                        <field name="next_activity_id"
+                                               options="{'no_create': True, 'no_open': True}"
+                                               domain="['|',('team_id','=',False),('team_id','=',team_id), ('name','!=','Email')]"
+                                               on_change="onchange_next_activity_id(next_activity_id)"/>
+                                        <field name="meeting_or_task" invisible="1" />
+                                        <span class="oe_form_field"
+                                              attrs="{'invisible': ['|', ('next_activity_id', '=', False), ('date_action', '=', False)]}">&#160;on&#160;</span>
+                                        <field name="date_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" placeholder="Choose a date..."/>
+                                        <field name="date_due_action" attrs="{'invisible': [('meeting_or_task', '=', False)]}" placeholder="Choose a date..."/>
+                                        <div attrs="{'invisible': ['|', ('last_activity_id', '=', False), ('next_activity_id', '!=', False)]}">
+                                            <button name="log_next_activity_1" type="object" class="btn-link" attrs="{'invisible': [('next_activity_1','=',False)]}">
+                                                <field name="next_activity_1" readonly="1"/>
+                                            </button>
+                                            <span attrs="{'invisible': [('next_activity_2','=',False)]}">|</span>
+                                            <button name="log_next_activity_2" type="object" class="btn-link" attrs="{'invisible': [('next_activity_2','=',False)]}">
+                                                <field name="next_activity_2" readonly="1"/>
+                                            </button>
+                                            <span attrs="{'invisible': [('next_activity_3','=',False)]}">|</span>
+                                            <button name="log_next_activity_3" type="object" class="btn-link" attrs="{'invisible': [('next_activity_3','=',False)]}">
+                                                <field name="next_activity_3" readonly="1"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <field name="title_action" placeholder="e.g. Discuss proposal"
+                                           attrs="{'invisible': [('next_activity_id', '=', False)]}" colspan="4"/>
+                                    <div class="o_row">
+                                        <field name="activity_assign_to" attrs="{'invisible': [('meeting_or_task', '=', False)]}" widget="many2many_tags"/>
+                                        <div attrs="{'invisible': [('next_activity_id', '=', False)]}">
+                                            <button name="log_next_activity_done" string="Done" type="object" class="btn-link"/>
+                                            <button name="cancel_next_activity" string="Cancel" type="object" class="btn-link"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <field name="date_deadline"/>
+                            </group>
+                    </page>
+                </notebook>-->
+                <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <!--button name="action_mail_sent" string="Send Mail" type="object" 
+                            class='oe_highlight' style="float:left;margin-left:590px;margin-top:15px;position:absolute;" /-->
+                   </xpath>
+            </field>
+        </record>
+        
+        <record id="view_crm_case_leads_filter_aalmir" model="ir.ui.view">
+            <field name="name">view.crm.case.leads.filter.aalmir</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_leads_filter" />
+            <field name="arch" type="xml">
+                <filter name="archived" position="replace">
+                    <filter string="Irrelevant" name="archived" domain="[('active', '=', False)]"/>
+                </filter>
+                <group expand="0" position="inside">
+                     <filter string="Irrelevant Reason" name="groupby_irrelevant_reason" domain="[('active', '=', False)]" context="{'group_by':'irrelevant_reason_id'}"/>
+                </group>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="crm.crm_lead_all_leads">
+        <field name="name">Inquiries</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,graph,pivot,calendar,form</field>
+        <field name="domain">['|', ('type','=','lead'), ('type','=',False), ('stage_id','!=', False), ('stage_2','in',[False,'qualified'])]</field>
+        <field name="view_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="search_view_id" ref="crm.view_crm_case_leads_filter"/>
+        <field name="context">{
+                'default_type':'lead',
+                'search_default_type': 'lead',
+                'stage_type':'lead',
+                'needaction_menu_ref': 'crm.menu_crm_opportunities',
+                'search_default_to_process':1,
+            }
+        </field>
+        <field name="help" type="html">
+            <p>
+                Use leads if you need a qualification step before creating an
+                opportunity or a customer. It can be a business card you received,
+                a contact form filled in your website, or a file of unqualified
+                prospects you import, etc.
+            </p><p>
+                Once qualified, the lead can be converted into a business
+                opportunity and/or a new customer in your address book.
+            </p>
+        </field>
+    </record>
+    
+    <record id="view_crm_case_opportunities_filter_aalmir" model="ir.ui.view">
+            <field name="name">CRM - Opportunities Search</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter" />
+            <field name="arch" type="xml">
+                <filter name="assigned_to_me" position="replace">
+                    <filter string="My Leads" name="assigned_to_me"
+                            domain="[('user_id', '=', uid)]"
+                            help="Leads that are assigned to me"/>
+                </filter>
+            </field>
+    </record>
+    
+    <menuitem name="Inquiries" id="crm.menu_crm_leads" parent="menu_sales_lead" sequence="1"
+            action="crm.crm_lead_all_leads" groups="crm.group_use_lead"/>
+    
+        <record id="crm.action_your_pipeline" model="ir.actions.server">
+            <field name="name">Pipelines</field>
+            <field name="model_id" ref="crm.model_crm_team"/>
+            <field name="state">code</field>
+            <field name="code">action = self.action_your_pipeline(cr, uid, context=context)</field>
+            <field eval="True" name="condition"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="crm.crm_lead_opportunities_tree_view">
+            <field name="name">Pipelines</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar</field>
+            <field name="domain">[('type','=','opportunity'), ('stage_id.name','!=','Merge')]</field>
+            <field name="context">{
+                    'stage_type': 'opportunity',
+                    'default_type': 'opportunity',
+                    'default_user_id': uid,
+                    'from_lead_menu' : True}
+            </field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo helps you keep track of your sales pipeline to follow
+                    up potential sales and better forecast your future revenues.
+                </p><p>
+                    You will be able to plan meetings and phone calls from
+                    opportunities, convert them into quotations, attach related
+                    documents, track all discussions, and much more.
+                </p>
+            </field>
+        </record>
+    
+        <menuitem id="crm.menu_crm_opportunities" action="crm.action_your_pipeline" name="Pipelines" parent="menu_sales_lead" sequence="2"/>
+        
+        <menuitem id="crm.crm_lead_menu_activities" name="Next Activities" sequence="5"
+        parent="base.menu_sales" action="crm.crm_lead_action_activities"  groups="make_invisible"/>
+
+        <!-- Removed sales team and addes sales person in tree view of lead and opportunites-->
+
+         <record model="ir.ui.view" id="crm_case_tree_view_leads_inherit">
+            <field name="name">crm.case.tree.view.inehrit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_leads" />
+            <field name="arch" type="xml">
+                <field name="user_id" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </field>
+                <field name="team_id" position="replace">
+                    <field name="write_date" />
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="crm_case_tree_view_oppor_inherit">
+            <field name="name">crm.case.tree.view.oppor.inehrit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_oppor" />
+            <field name="arch" type="xml">
+                <field name="team_id" position="replace">
+                    <field name="write_date" />
+                </field>
+            </field>
+        </record>
+        
+
+ <record model="ir.ui.view" id="mail_wizard_invite_form_ext">
+            <field name="name">Add Followers</field>
+            <field name="model">mail.wizard.invite</field>
+            <field name="inherit_id" ref="mail.mail_wizard_invite_form" />
+            <field name="arch" type="xml">
+               <field name="partner_ids" position="replace">
+                   <field name="partner_ids" widget="many2many_tags_email" domain="[('is_user','=', True)]"
+                                placeholder="Add contacts to notify..." options="{'no_quick_create':True,'no_create_edit':True}"
+                                context="{'force_email':True, 'show_email':True}"
+                                invisible="context.get('mail_invite_follower_channel_only')"/>
+               </field>
+            </field>
+   </record>
+
+	
+    </data>
+</openerp>

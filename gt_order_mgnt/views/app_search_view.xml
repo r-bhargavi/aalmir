@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!--Inherite view to change the App search view -->
+	    <record id="app_inherit_search_view" model="ir.ui.view">
+	      <field name="name">App search view</field>
+	      <field name="model">ir.module.module</field>
+	      <field name="inherit_id" ref="base.view_module_filter"/>
+	      <field name="arch" type="xml">
+ 		<xpath expr="//search" position="inside">
+			  <filter name="author" string="API" domain="[('author','ilike','Aalmir Plastic Industries')]"/>
+        	</xpath>
+	      </field>
+	    </record>
+	    
+	    
+	    <record id="inherite_app_module_tree1" model="ir.actions.act_window">
+		<field name="name">Apps</field>
+		<field name="res_model">ir.module.module</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">kanban,tree,form</field>
+		<field name="context">{'search_default_author':'Aalmir Plastic Industries'}</field>
+		<field name="search_view_id" ref="base.view_module_filter"/>
+            	<field name="help" type="html">
+		      <p><b>No module found!</b></p>
+		      <p>You should try others search criteria.</p>
+	        </field>
+	    </record>
+	    
+	    <record id="base.menu_module_tree" model="ir.ui.menu">
+		    <field name="action" ref="inherite_app_module_tree1" />
+	    </record>
+    </data>
+</openerp>

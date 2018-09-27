@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--Picking Confirmation -->
+ 	<record id="view_stock_return_picking_form_inherite" model="ir.ui.view">
+            <field name="name">stock Opeartion</field>
+            <field name="model">stock.return.picking</field>
+            <field name="inherit_id" ref="stock.view_stock_return_picking_form"/>
+            <field name="arch" type="xml">
+            	<xpath expr="/form/group[1]" position="after">
+    			<group >
+    				<field name="reverse_type" />
+		                <field name="master_ids" attrs="{'invisible': [('reverse_type', '!=','master_batches')]}">
+		                    <tree edit="0" create="0">
+		                        <field name="product_id" readonly="1"/>
+		                        <field name="quantity" readonly="1"/>
+		                        <field name="unit_id" readonly="1"/>
+		                    </tree>
+		                    <form edit="0" create="0">
+		                        <field name="product_id" readonly="1"/>
+		                        <field name="quantity" readonly="1"/>
+		                        <field name="unit_id" readonly="1"/>
+		                    </form>
+		                </field>
+                    	
+		                <field name="batche_ids" attrs="{'invisible': [('reverse_type', '!=','child_batches')]}">
+		                    <tree edit="0" create="0">
+		                        <field name="product_id" readonly="1"/>
+		                        <field name="quantity" readonly="1"/>
+		                        <field name="unit_id" readonly="1"/>
+		                    </tree>
+		                    <form edit="0" create="0">
+		                        <field name="product_id" readonly="1"/>
+		                        <field name="quantity" readonly="1"/>
+		                        <field name="unit_id" readonly="1"/>
+		                    </form>
+		                </field>
+                    	</group>
+                    	<group attrs="{'invisible': [('reverse_type', '!=','new_batches')]}">
+		                <h2><label string="You Have batches History Please select Other option To Process" style="color:red;" attrs="{'invisible': [('batch_exist', '=',True)]}"/></h2>
+		                <h2><label string="After process New Child and Master Batches are Created According to Packaging" style="color:red;"/></h2>
+			  	<field name="batch_exist" invisible="1" />
+                    	</group>
+                   </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
+
+              	
+

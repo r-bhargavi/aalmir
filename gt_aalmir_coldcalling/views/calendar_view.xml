@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <record model="ir.ui.view" id="view_calendar_event_form_aalmir">
+        <field name="name">view.calendar.event.form.aalmir</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='allday']" position="after">
+                <field name="lead_id" attrs="{'invisible': [('lead_id','=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_calendar_event_form_popup">
+        <field name="name">Meetings Dialog</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form_popup" />
+        <field name="arch" type="xml">
+            <field name="attendee_status" position="after">
+                <group name="lead_info" attrs="{'invisible' : [('cold_calling_reminder','=', False)]}">
+                    <field name="cold_calling_reminder" invisible="1"/>
+                    <field name="lead_id" invisible="1"/>
+                    <field name="last_contacted" readonly="1"/>
+                    <field name="name" string="Company Name"/>
+                    <field name="contact_name" string="Name"/>
+                    <field name="phone" widget="phone"/>
+                    <field name="mobile"/>
+                    <field name="email_from"/>
+                    <field name="comment_id" invisible="1"/>
+                    <field name="comment_name"/>
+                </group>
+            </field>
+           
+        </field>
+    </record>
+    
+    <record id="view_calendar_reminder_search_almir" model="ir.ui.view">
+        <field name="name">CRM - Cold Calling Search</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search" />
+        <field name="arch" type="xml">
+            <field name="partner_ids" position="after">
+                <field name="lead_id"/>
+                <field name="cold_calling_reminder"/>
+            </field>
+            <filter name="message_needaction" position="after">
+                <filter string="My Cold Calling Reminder" name="coldcalling_reminder" domain="[('user_id','=',uid), ('cold_calling_reminder','=', True), ('lead_id.user_id','=', uid)]" help="My Reminders"/>
+            </filter>
+        </field>
+    </record>
+      
+    </data>
+</openerp>

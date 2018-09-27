@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+	<!--View shows in Production Transfer from Pickig View-->
+    <record id="transfer_batch_production_wizard" model="ir.ui.view">
+        <field name="name">Batch Production view</field>
+        <field name="model">production.batches.produce</field>
+        <field name="type">form</field>
+	<field name="arch" type="xml">
+            <form>
+            	<group col="4">
+            		<field name="product_id" readonly="1" />
+			<label for="qty" string="Quantity"/>
+			<div >
+				<field name="qty" readonly="1" nolabel="1" class="oe_inline"/>
+				<field name="qty_unit" readonly="1" nolabel="1"  class="oe_inline"/>
+			</div>
+			<field name="employee_name" domain="[('category_ids','=','Machine Operator'),('department_id','=','Manufacturing')]" options="{'no_create': True, 'no_open': True}"/>
+			<field name="date" />
+			<field name="remark" />
+		</group>
+		<group >
+            		<field name="document_ids" widget='many2many_binary' options="{'no_create': True, 'no_open': True}"/>
+		</group>
+		<group >
+            		<field name="produce_batches" >
+            			<tree create='false' edit='false'>
+            				<field name="product_id" readonly="1"/>
+					<field name="name" string="Number" readonly="1"/>
+					<field name="lot_id" readonly="1"/>
+					<field name="product_qty" string="Quantity" sum="Total"/>
+					<field name="uom_id" readonly="1"/>
+					<field name="produce_qty_date" string="date" readonly="1"/>
+            			</tree>
+            			<form readonly="1">
+            				<field name="product_id" readonly="1"/>
+					<field name="name" string="Number" readonly="1"/>
+					<field name="lot_id" readonly="1"/>
+					<field name="convert_product_qty" string="Quantity"/>
+					<field name="uom_id" readonly="1"/>
+					<field name="produce_qty_date" string="date" readonly="1"/>
+            			</form>
+			</field>
+		</group>
+              	<button name="produce_batch" string="Produce" type="object" class="btn-primary"/>
+              	<button string="_Cancel" class="btn-default" special="cancel" />
+            </form>
+	</field>
+    </record> 
+    
+    	<!--View To Split Batch-->
+    <record id="mrp_batch_spit_wizard" model="ir.ui.view">
+        <field name="name">Batch Split view</field>
+        <field name="model">mrp.batch.split.wizard</field>
+        <field name="type">form</field>
+	<field name="arch" type="xml">
+            <form>
+            	<group col="4">
+            		<field name="product_id" readonly="1" />
+            		<field name="batch_id" readonly="1" />
+			<label for="qty" string="Quantity"/>
+			<div >
+				<field name="qty" readonly="1" nolabel="1" class="oe_inline"/>
+				<field name="qty_unit" readonly="1" nolabel="1"  class="oe_inline"/>
+			</div>
+			<field name="new_number" readonly='1'/>
+			<field name="split_qty" />
+		</group>
+              	<button name="split_batch" string="Split" type="object" class="btn-primary"/>
+              	<button string="_Cancel" class="btn-default" special="cancel" />
+            </form>
+	</field>
+    </record>         
+        
+    </data>
+</openerp>
+

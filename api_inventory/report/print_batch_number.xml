@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+	<template id="production_batch_number_print">
+	    <t t-call="report.html_container">
+		<t t-foreach="docs" t-as="o">
+		        <div class="page" style="font-family: Calibri;">
+	                  	   <table class="table table-condensed" style="border-bottom: 3px solid black !important;">
+	                  	   	<t t-set="count" t-value="0" />
+	                  	   	<t t-set="data_val" t-value="0" />
+	                  	   	<t t-set="count_val" t-value="get_print_data(docs)" />
+	                  	   	<tr t-foreach="(len(count_val)/5)+1" t-as="l"  style="height:105px">
+	                  	   		<t t-set="data_val" t-value="get_barcode_data(count_val,count)" />
+	                  	   		<td valign="bottom" style="vertical-align:bottom !important;">
+	                  	   			<t t-if="data_val">
+ <p t-esc="data_val" style="margin-left:35px;line-height:0px !important;"/>
+							<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', data_val, 600, 100)" style="width:150px;height:30px" />
+							<!--p t-esc="data_val" style="margin-left:35px"/-->
+							<t t-set="count" t-value="count+1" />
+							</t>
+						</td>
+						<t t-set="data_val" t-value="get_barcode_data(count_val,count)" />
+	                  	   		<td valign="bottom" style="vertical-align:bottom !important;">
+	                  	   			<t t-if="data_val">
+ <p t-esc="data_val" style="margin-left:35px;line-height:0px !important;"/>
+							<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', data_val, 600, 100)" style="width:150px;height:30px" />
+							<!--p t-esc="data_val" style="margin-left:35px"/-->
+							<t t-set="count" t-value="count+1" />
+							</t>
+						</td>
+						<t t-set="data_val" t-value="get_barcode_data(count_val,count)" />
+	                  	   		<td valign="bottom" style="vertical-align:bottom !important;">
+	                  	   			<t t-if="data_val">
+ <p t-esc="data_val" style="margin-left:35px;line-height:0px !important;"/>
+							<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', data_val, 600, 100)" style="width:150px;height:30px" />
+							<!--p t-esc="data_val" style="margin-left:35px"/-->
+							<t t-set="count" t-value="count+1" />
+							</t>
+						</td>
+						<t t-set="data_val" t-value="get_barcode_data(count_val,count)" />
+	                  	   		<td valign="bottom" style="vertical-align:bottom !important;">
+	                  	   			<t t-if="data_val">
+ <p t-esc="data_val" style="margin-left:35px;line-height:0px !important;"/>
+							<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', data_val, 600, 100)" style="width:150px;height:30px" />
+							<!--p t-esc="data_val" style="margin-left:35px"/-->
+							<t t-set="count" t-value="count+1" />
+							</t>
+						</td>
+						<td valign="bottom" style="vertical-align:bottom !important;">
+	                  	   			<t t-if="data_val">
+ <p t-esc="data_val" style="margin-left:35px;line-height:0px !important;"/>
+							<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', data_val, 600, 100)" style="width:150px;height:30px" />
+							<!--p t-esc="data_val" style="margin-left:35px"/-->
+							<t t-set="count" t-value="count+1" />
+							</t>
+						</td>
+					</tr>
+	                  	   </table>
+	        	</div>
+		</t>
+	    </t>
+	</template>
+	
+	<report 
+            id="action_print_production_batch"
+            string="Production_batches"
+            model="stock.pack.operation" 
+            report_type="qweb-pdf"
+            file="api_inventory.production_batch_number_print" 
+            name="api_inventory.production_batch_number_print" 
+        />
+</data>
+</openerp>
+

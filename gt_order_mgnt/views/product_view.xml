@@ -1,0 +1,757 @@
+<?xml version="1.0"?>
+<odoo>
+     <!-- Start Inherit Product tree view -->
+	<record id="product_template_tree_view_inherite" model="ir.ui.view">
+		<field name="name">product Template Tree view</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_tree_view"/>
+		<field name="arch" type="xml">
+                      <field name="type" position='replace' />
+                      <field name="volume" position='replace' />
+                      <field name="create_date" position='replace'>
+		     		<field name="qty_reserved"/>
+		     		<field name="uom_id" invisible="not context.get('msq')"/>
+		     		<field name="reordering_min_qty" string="Minimum Stock Qty" invisible="not context.get('msq')"/>
+                      </field>
+                      <field name="standard_price" position='attributes'>
+                      		<attribute name='group'>gt_order_mgnt.group_sale_support</attribute>
+                      </field>
+                </field>
+        </record>
+      <!-- End Inherit Tree view -->
+ 
+	<record id="order_view_reserve_product_qty_tree" model="ir.ui.view">
+            <field name="name">reserve.product_qty</field>
+            <field name="model">n.reserve.productqty</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Order Lines" create="false">
+                    <field name="product_id"/>
+                    <field name="order_id"/>
+                    <field name="order_partner_id"/>
+                    <field name="line_id" invisible="1"/>
+                    <field name="salesman_id"/>
+                    <field name="reserve_qty" string="Qty" sum="Total" />
+		    <field name="sale_reserve_qty" invisible="1"/>
+                    <field name="qty_delivered" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Stoc Quant inherite -->
+	<record id="view_stock_quant_tree_inherite_api" model="ir.ui.view">
+		<field name="name">Stock Quant</field>
+		<field name="model">stock.quant</field>
+		<field name="inherit_id" ref="stock.view_stock_quant_tree"/>
+		<field name="arch" type="xml">
+                      <field name="reservation_id" position='attributes'>
+			     <attribute name="invisible">0</attribute>
+                      </field>
+                </field>
+           </record>
+      <!-- End Inherit Tree view -->
+      
+	<record id="product_packaging_view_inherite" model="ir.ui.view">
+		<field name="name">Product Packaging</field>
+		<field name="model">product.packaging</field>
+		<field name="inherit_id" ref="product.product_packaging_form_view"/>
+		<field name="arch" type="xml">
+		    <field name="name" position="attributes">
+		    	   <attribute name="invisible">1</attribute>
+		    </field>
+		    <field name="qty" position="after">
+		    	<field name="pkgtype" required="1" />
+			<field name="unit_id" domain="[('unit_type.string','!=','product')]" required="1" options="{'no_create': True, 'no_open': True}"/>
+			<field name="uom_id" string="Packaging Type" required="1" options="{'no_create': True, 'no_open': True,'create':False}"/>
+		    </field>
+		</field>
+	</record>
+
+        <record id="product_packaging_tree_view_aalmir" model="ir.ui.view">
+		<field name="name">Product Packaging Tree</field>
+		<field name="model">product.packaging</field>
+		<field name="inherit_id" ref="product.product_packaging_tree_view"/>
+                <field name="arch" type="xml">
+		    <field name="qty" position="after">
+		    	<field name="pkgtype" />
+			<field name="unit_id" />
+			<field name="uom_id"/>
+                        <field name='product_tmpl_id'/>
+		    </field>
+		</field>
+	</record>
+	<record id="product_template_form_view_procurement_inherite" model="ir.ui.view">
+		<field name="name">Product Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+		<field name="arch" type="xml">
+		       <button name="%(stock.action_view_change_product_quantity)d" position="attributes">
+			     <attribute name="class">oe_highlight</attribute>
+		     	     <attribute name="invisible">1</attribute>
+			     <attribute name="groups">stock.group_stock_manager</attribute>
+		       </button>
+		       <button  name="%(stock.act_make_procurement)d" position="attributes">
+			     <attribute name="class">oe_highlight</attribute>
+			     <attribute name="groups">stock.group_stock_manager</attribute>
+		       </button>
+		       <button  name="%(stock.act_make_procurement)d" position="after">
+			     <button name="make_manufacture" groups="stock.group_stock_manager" string="Manufacture Request" type="object" class="oe_highlight"/>
+		       </button>
+		</field>
+	</record>
+
+	<record id="product_template_only_form_view_api_inherit_package" model="ir.ui.view">
+		<field name="name">Product Form Package</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="arch" type="xml">
+
+			<field name="packaging_ids"  position="replace"/>
+			<field name="default_code" position="replace" />
+                    	<field name="barcode" position="replace" />
+
+		</field>
+	</record>
+	<!--record id="product_template_form_view_invoice_policy_inheriten" model="ir.ui.view">
+		<field name="name">Product Invoice Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="sale.product_template_form_view_invoice_policy"/>
+		<field name="arch" type="xml">
+			<field name="invoice_policy" position="replace"/>
+   		</field>
+	</record-->
+	<record id="product_template_form_view_purchase_inheriten" model="ir.ui.view">
+		<field name="name">Product Purchase Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="purchase.view_product_supplier_inherit"/>
+		<field name="arch" type="xml">
+			<field name="purchase_method" position="replace"/>
+   		</field>
+	</record>
+	<record id="product_template_form_view_stock_inherite" model="ir.ui.view">
+		<field name="name">Product Invoice Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="stock.view_template_property_form"/>
+		<field name="arch" type="xml">
+			<field name="tracking" position="attributes">
+                   		<attribute name="invisible">1</attribute>
+                   	</field>
+                   	<!--xpath expr="separator[@name='']" position="replace"/-->
+          		<field name="description_picking" position="attributes">
+                   		<attribute name="invisible">1</attribute>
+           		</field>
+   		</field>
+	</record>
+    <!--Change in Product view -->
+	<record id="product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">New Product Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_form_view"/>
+		<field name="arch" type="xml">
+		   <xpath expr="//form/sheet/notebook/page[2]/group/group/field[@name='company_id']" position="replace">
+                   </xpath>
+                   <xpath expr="//form/sheet/notebook/page[2]/group/group/field[@name='categ_id']" position="replace">
+                   </xpath>
+                   <xpath expr="//form/sheet/notebook/page[2]/group/group[2]/div/field[@name='weight']" position="replace">
+                   </xpath>
+                   <xpath expr="//form/sheet/notebook/page[2]/group/group[2]/div/field[@name='volume']" position="replace">
+                   </xpath>
+                   <xpath expr="//form/sheet/notebook/page[2]/field[@name='seller_ids']" position="replace">
+                   </xpath>
+
+                   <field name="description_sale" position="replace" />
+                   <field name="description_purchase"  position="replace"/>
+                   <field name="message_follower_ids" position="replace" />
+                   <xpath expr="//page[2]" position="attributes">
+                      <attribute name="invisible">1</attribute>
+                   </xpath>
+                   <xpath expr="//page[3]" position="attributes">
+                      <attribute name="invisible">1</attribute>
+                   </xpath>
+            	   <page name="notes"  position="attributes">
+                   	<attribute name="invisible">1</attribute>
+            	   </page>
+            	   <page  groups="account.group_account_invoice" position="attributes">
+                   	<attribute name="group">account.group_account_manager</attribute>
+            	   </page>
+		   <field name="taxes_id" position="replace" />
+                   <field name="supplier_taxes_id"  position="replace"/>
+                   <field name="property_account_creditor_price_difference" position="replace" />
+
+		   <button name="toggle_active" position="replace">
+		   	<button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" groups="base.group_sale_manage">
+                                <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;active&quot;}"/>
+                    	</button>
+		   </button>
+    	   <!--Add Action buttons -->          
+		   <div name="button_box" position="inside"> 
+		   	<button class="oe_stat_button" name="open_production_request" type="object" icon="fa-chain" attrs="{'invisible':['|',('sale_ok','=',False),('matstrg', 'not in',('product','component','packaging'))]}" groups="mrp.group_mrp_manager,gt_order_mgnt.group_sale_support">
+                        <field string="Production Request" name="production_count" widget="statinfo"/>
+                    </button>
+		   	<button class="oe_stat_button" name="open_trialform" type="object" attrs="{'invisible':['|',('trial_form_count','=',0),('sale_ok','!=',True)]}" >
+                        <field string="Trial Form" name="trial_form_count" widget="statinfo"/>
+                    </button>
+		   	<button class="oe_stat_button" name="action_view_reserve" type="object" icon="fa-building" attrs="{'invisible':['|',('sale_ok','=',False),('matstrg', 'not in',('product','component','packaging'))]}">
+                        <field string="On Reserve" name="qty_reserved" widget="statinfo" />
+                    </button>
+		   </div>
+		   
+		   <div name="options" position="before"> 
+          	   	<field name="product_material_type" required="1" options="{'no_create': True, 'no_open': True}" placeholder="Product Material Type" attrs="{'readonly':[('code_access','!=',False),('default_code', '!=',False)]}"/>
+                        <field name="raw_material_type" attrs="{'invisible':[('matstrg', 'not in',('raw','asset','packaging'))],'readonly':[('code_access','!=',False),('default_code', '!=',False)],'required':[('matstrg', 'in',('raw','asset','packaging'))]}" domain="[('main_id','=',product_material_type)]" options="{'no_create': True, 'no_open': True}" placeholder="Sub Material Type"/>
+                        <field name="matstrg" invisible="1"/> 
+                        <field name="rawstrg" invisible="1"/>
+		   </div>
+		   
+		   <div name="options" position="after"> 
+               		<label for="progress_rate" class="oe_inline"/>
+               		<field name="progress_rate" widget="progressbar" nolabel="1" class="oe_inline"/> 
+       			<label for="progress_value" attrs="{'invisible':[('progress_value','=',False)]}" class="oe_inline"/>
+               		<field name="progress_value" class="oe_inline"/> 
+                       <button type='object' name='create_Product_uom' string='Create UOM'
+                        class='oe_highlight oe_inline' 
+                        attrs="{'invisible':['|',('packaging_uom_id','!=',False),('matstrg', '!=','packaging')]}"/>
+                       <label for="'packaging_uom_id" class="oe_inline"  readonly='1'
+                                string='Product Packaging UOM'
+                                attrs="{'invisible':[('packaging_uom_id','=',False)]}"/>
+                        <field name='packaging_uom_id' class="oe_inline" readonly='1'
+                             attrs="{'invisible':[('packaging_uom_id','=',False)]}"/>
+        	   </div>
+        	   
+                   <field name="type" position="after">
+                   	  <field name="categ_id" string="Internal Category" options="{'no_create': True, 'no_open': True}" context="{'product_type':product_material_type,'sub_type':raw_material_type}" attrs="{'readonly': [('code_access', '!=',False),('default_code', '!=',False)]}" />
+                   	  <label for="default_code" />
+                   	  <div>
+                   	  	<field name="default_code" attrs="{'invisible': [('asset_code', '!=',False)],'readonly':[('code_access','!=',False)]}" nolabel="1" class="oe_inline"/>
+                   	  	<field name="code_access" groups="base.group_system" nolabel="1" class="oe_inline"/>
+           	  	  </div>
+                   	  <field name="asset_code" readonly="1" attrs="{'invisible': [('asset_code', '=',False)]}"/>
+			  <field name="product_hs_code"/>
+			  <field name="barcode" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}" widget="BarCode128" readonly="1"/>
+			  <field name="asset_type" widget='radio' attrs="{'invisible':[('matstrg', '!=','asset')],'required':[('matstrg', '=','asset')]}"/> 
+			  <field name="asset_customer" attrs="{'invisible':[('asset_type', '!=','client')],'required':[('asset_type', '=','client')]}"/>
+		  </field>
+		  <!--field name="type" position="attributes">
+		  	<attribute name="invisible">1</attribute>
+	  	  </field-->
+
+		  <field name="uom_id" position="replace">
+		  	<field name="internal_name" />
+		  	<field name="n_product_type" readonly="1" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>
+                        <label for="n_calculator_id" string="Product Descriptions" attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}"/>
+                    	<div attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}">
+                        	<field name="n_calculator_id" readonly="1"  nolabel="1" class="oe_inline"/>
+                        	<button type="object" name="open_filmcalculator" class="oe_inline oe_edit_only"  nolabel="1"  icon="gtk-go-forward" help="Open Film Calculator"/>
+                    	</div>
+                    	<field name="hide_calculator" invisible="1"/>
+                    	
+			<field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom"  attrs="{'readonly':[('code_access', '=', True)]}" options="{'no_create': True, 'no_open': True}" context="{'product_uom':True,'sale_ok':sale_ok,'purchase_ok':purchase_ok}"/>
+                        <field name="production_rqst_id" invisible="1"/>
+            	  	<field name="route_from_categ_ids" widget="many2many_tags" readonly="1" attrs="{'invisible':[('route_from_categ_ids', '=', [])]}"/>
+			<field name="nbr_reordering_rules" invisible="1"/>
+		  </field>
+		  <field name="uom_po_id" position="replace"/>
+	<!--New Pages added -->  
+
+		<notebook position="inside">
+		<page string="Product Specs/Value">
+		     <group name="Part Details" colspan="4" attrs="{'invisible':[('rawstrg','!=','part')]}">
+		        <separator string="Part Details" colspan="4" />
+			<field name="machine_id" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"  domain="[('raw_material_type','=','machine')]" colspan="2"/>
+		     </group>
+		     <group name="Printing Plate Details" colspan="4" attrs="{'invisible':[('rawstrg','!=','plate')]}">
+		     	<separator string="Printing Plate Details" colspan="4" />
+		     	<field name="plate_product_id" options="{'no_create': True, 'no_open': True}"/>
+		     </group>
+		     <group name="Machine Details" col="4" attrs="{'invisible':[('rawstrg','!=','machine')]}">
+		        <separator string="Machine Details" colspan="4" />
+		        <field name="machinary_id" />
+		     </group>
+		     <group attrs="{'invisible':['|','|',('matstrg','in',('raw','asset','packaging')),('purchase_ok','!=',True),('sale_ok','!=',True)]}">
+		     		<label for="n_production_tolerance" /> 
+		     		<div>
+   			    		<field name="n_production_tolerance" required="1" attrs="{'readonly':[('code_access', '=', True)]}" class="oe_inline"/>
+		    		</div>
+		     </group>
+		     <group >
+                          <group name='weight'>
+			    	
+                          </group>
+                           <group string='Weight'   attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}">
+                                <label for="initial_weight" string="Product Weight"  attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}" /> 
+                		<div class="o_row" name="weight1" attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}">
+                            		<field name="initial_weight" /><label string="Kg"/>
+                        	</div>
+                                <label for="weight" string="Net Weight" invisible='1' attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}"/>
+                        	<div class="o_row" name="weight" invisible='1'>
+                            		<field name="weight"/><label string="Kg"/>
+                        	</div>
+                                  
+                                <!--label for="length" attrs="{'invisible':[('matstrg','!=','packaging')]}"/>
+                        	<div class="o_row" name="length" attrs="{'invisible':[('matstrg','!=','packaging')]}">
+                            		<field name="length"/><label string="CM"/>
+                        	</div>
+                                 <label for="width" attrs="{'invisible':[('matstrg','!=','packaging')]}"/>
+                        	<div class="o_row" name="width" attrs="{'invisible':[('matstrg','!=','packaging')]}">
+                            		<field name="width"/><label string="CM"/>
+                        	</div>
+                                 <label for="height" attrs="{'invisible':[('matstrg','!=','packaging')]}"/>
+                        	<div class="o_row" name="height" attrs="{'invisible':[('matstrg','!=','packaging')]}">
+                            		<field name="height"/><label string="CM"/>
+                        	</div-->
+                              
+                            </group>
+		     </group>
+		     <separator string="Packaging"/> 
+                      <!--group attrs="{'invisible':[('matstrg','!=','product')]}">
+                          <group>
+                             <field name='primary_packaging_type' 
+                                             domain="[ ('unit_type.string','=','pri_packaging')]"
+                                             options="{'no_create': True, 'no_open': True}"/>
+                                <field name='primary_packaging_product'
+                                              domain="[('matstrg','=','packaging')]"
+                                              options="{'no_create': True, 'no_open': True}" />
+                                <label for="primary_weight" />
+		                <div  class="o_row"  name="primary_weight" >
+		                    <field name="primary_weight"/> <label string="Kg" />
+		                </div>
+
+                         </group>
+                         <group>
+                              <field name='secondary_packaging_type' 
+                                             options="{'no_create': True, 'no_open': True}"
+                                             domain="[ ('unit_type.string','=','sec_packaging')]"/>
+                                   <field name='secondary_packaging_product'
+                                             options="{'no_create': True, 'no_open': True}"
+                                             domain="[('matstrg','=','packaging')]"/>
+                               <label for="secondary_weight" />
+		               <div  class="o_row" name="secondary_weight" >                                        
+		                    <field name="secondary_weight" /><label string="Kg" />
+		               </div>
+                         </group>
+                      </group-->
+		     <label for='packaging_ids' string="Primary Packaging Weight=(Primary Qty * Product Weight)+ Primary Packaging Type Product Weight" style='color:red'/>
+                           <br></br>
+		     <label for='packaging_ids' string="Secondary Packaging Weight=(Primary Packaging Weight * Secondary Qty)+ Secondary  Packaging Type Product Weight" style='color:red'/>
+		     <field name="packaging_ids" nolabel="1">
+				 <tree string="Packaging" editable="bottom">
+				        <field name="name" string="Name" invisible="1"/>
+				        <field name="pkgtype" required="1"/>
+					<field name="qty" string="Quantity" required="1"/>
+				        <field name="unit_id" required="1" 
+                                            options="{'no_create': True, 'no_open': True}"
+                              		    context="{'packg_unit':True,'pkg_type':pkgtype,'parent_uom':parent.uom_id,
+                                              		'uom_id':uom_id,'packaging_data':parent.packaging_ids}"/>
+				        <field name="uom_id" string="Packaging Type" 
+                                        		context="{'material_type':parent.product_material_type,
+                                        		'pkg_type':pkgtype,'packg_type':True,
+                                        		'unit_id':unit_id}" 
+                                        	options="{'no_create': True, 'no_open': True}"/>
+                                       <field name='weight' readonly='1'/>
+			        </tree>
+		     </field>
+		     <separator string="Product Specification" colspan="6"/> 
+		     <field name="discription_line">
+			   <tree editable="bottom">
+				<field name="attribute" required="1"/>
+				<field name="value" required="1" string="Product Specs/Value"/>
+				<field name="unit" context="{'attribute':True,'attrs_id':attribute}" options="{'no_open':True,'no_create':True}"/>
+			   </tree>
+		     </field>
+		     <separator string="Product Documents" colspan="6" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>  
+		     <field name="product_upload" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}">
+		     	   <tree editable="bottom">
+				<field name="name" required="1"/>
+				<field name="n_upload_doc" required="1" string="Document" filename="name"/>
+				<field name="customer_id" invisible="1"/>
+                        	<field name="create_uid" string="Upload User"/>
+				<field name="create_date" string="Upload Date"/>
+			   </tree>
+		     </field>	
+		</page>
+		
+		<page string="Costing Details" groups="base.group_sale_salesman,gt_order_mgnt.group_sale_support">
+		      <group col="4" >
+		      	   <field name="lowest_price" widget='monetary' options="{'currency_field': 'currency_id'}"  attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>
+		      	   <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"  attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}" groups="base.group_sale_manager,account.group_account_manager"/>
+			   
+			   <label for="list_price" help="Sale Reception price"/>
+	                   <div >
+		                    <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"  attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)],'readonly':[('rental','=',True)]}" class="oe_inline"/>
+				    <field name="rental" groups="gt_order_mgnt.group_sale_Reception_price"/>
+		           </div>
+                     </group>
+                     
+                     <field name="currency_id" invisible="1"/>
+                     <separator string="Description on Quotations" colspan="4"/>
+                     <field name="description_sale" colspan="4" nolabel="1" 
+                                        placeholder="This note will be displayed on the quotations."/>
+		     <separator string="Pricelist" col="6"/>
+		     <field name="customer_pricelist_ids" readonly="1" nolabel="1" >
+        		   <tree string="Pricelist Items" delete='false' create='false' editable="bottom">
+                                    <field name="pricelist_id" string="Pricelist" />
+                                    <field name="avg_price" string="Price" />
+                                    <field name="currency_id"/>
+                                    <field name="product_packaging"/>
+                           </tree>
+                           <form readonly="1">
+                                    <field name="pricelist_id" string="Pricelist" />
+                                    <field name="avg_price" string="Price" />
+                                    <field name="currency_id"/>
+                                    <field name="product_packaging"/>
+                                    <field name="item_ids"/>
+                           </form>
+		     </field>
+		     <separator string="Sale Order Documents" colspan="6" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}" />
+
+		     <field name="n_upload" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}">
+        		   <tree create="0">
+					<field name="name" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="customer_id" />
+		                        <field name="sale_id_product" string='Sale order No.'/>
+					<field name="create_uid" string="Upload User"/>
+					<field name="create_date" string="Upload Date"/>
+        		   </tree>
+		     </field>
+		</page>
+
+		<page name="manufacture" string="Manufacturing Details" attrs="{'invisible':[('matstrg','in',('raw','asset'))]}" groups="mrp.group_mrp_manager,gt_order_mgnt.group_sale_support">
+			<separator string="Manufacturing Process Details" colspan="4"/>
+		         <field name="process_ids">
+		             <tree editable="bottom">
+		                   <field name='process_id' domain="[('cate_id','=',parent.categ_id)]" invisible='1'/>
+		                   <field name="workcenter_id" required='1' domain="[('cate_id','=',parent.categ_id)]"/>
+                                   <!--field name='machine_type_ids' widget='many2many_tags' string="Machine Type"/>
+		                   <field name="machine" context="{'order_machine': True,'machine_type_ids':machine_type_ids}" required='1' /-->
+		                   <field name='time_option'/>
+		                   <field name="capacity_per_cycle_option"/>
+		                   <field name="unit_id" readonly='1'/>
+		                   <field name='hour'/>
+		                   <field name='minute'/>
+		                   <field name='second'/>
+		                   <field name="time_cycle" string="Time for 1 cycle (hour)" invisible="1"/>
+		                   <field name="capacity_per_cycle" invisible="1"/>
+		             </tree>
+		         </field> 
+		         <separator string="Instruction for Manufacturing" colspan="4"/>
+                            <field name="description_mrp" nolabel="1" 
+                                        placeholder="This note will be displayed on Manufacturing." colspan="4"/>
+		</page>
+		
+		<page string="Purchase Details"  attrs="{'invisible':[('purchase_ok','!=',True)]}"  groups="gt_order_mgnt.group_sale_support,purchase.group_purchase_user">
+		   	<group col="4">
+		   	    <field name="uom_po_id" groups="product.group_uom" options="{'no_create': True, 'no_open': True}" domain="[('unit_type.string','in',('product','purchase'))]" />
+	   	       </group>
+                            <separator string="Description for Vendors" colspan="4" />
+                            <field name="description_purchase" nolabel="1"
+                                placeholder="This note will be displayed on requests for quotation.(rfq)" colspan="4"/>
+                            <separator string="Vendors" />
+                   	    <field name="seller_ids" context="{'default_product_tmpl_id': context.get('product_tmpl_id', active_id)}" groups="base.group_sale_salesman,gt_order_mgnt.group_sale_support,purchase.group_purchase_user"/>
+		</page>
+
+		<page string="Logistics Details" groups="stock.group_stock_user">
+			<separator string="Description for Logistics" colspan="4" />
+		   	<field name="description_picking" nolabel="1"
+                                placeholder="Description for Pickings (Rack, Row and Case Information)" colspan="4"/>
+		</page>
+
+		<page string="Settings" groups="base.group_configuration">
+		    <group col="4">
+		    	<!--field name="type" /-->
+		   	 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+		   	 <field name="purchase_method" widget="radio" />
+		   	 <field name="tracking" on_change="onchange_tracking(tracking)" widget="radio" attrs="{'invisible':[('type', 'in', ['service', 'digital'])]}" groups="stock.group_production_lot"/>
+   	 	    </group>
+		</page>
+		</notebook>
+	   </field>
+	</record>
+	
+	<record id="purchase_product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Template Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="purchase.view_product_template_purchase_buttons_from"/>
+		<field name="arch" type="xml">
+                    	<button name="%(purchase.action_purchase_line_product_tree)d" position="attributes">
+                    		<attribute name="attrs">{'invisible':[('purchase_ok','=',False)]}</attribute>
+                    		<attribute name="type">object</attribute>
+                    		<attribute name="name">action_view_po</attribute>
+            		</button>
+		</field>
+	</record> 
+	
+	<record id="procurment_product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Template Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="procurement.product_template_view_form_procurement_button"/>
+		<field name="arch" type="xml">
+            		<button name="%(procurement.procurement_order_action_product_template_stat)d" position="attributes">
+            			<attribute name="groups">gt_order_mgnt.group_api_no_user</attribute>
+    			</button>
+		</field>
+	</record> 
+	
+	<record id="mrp_product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Template Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="mrp.product_template_form_view_bom_button"/>
+		<field name="groups_id" eval="[(4, ref('mrp.group_mrp_user'))]"/>
+		<field name="arch" type="xml">
+                    	<button name="%(mrp.template_open_bom)d" position="attributes">
+                    		<attribute name="attrs">{'invisible':['|',('sale_ok','=',False),('matstrg','not in',('product','component','packaging'))]}</attribute>
+            		</button>
+                    	<button name="action_view_mos" position="attributes">
+                    		<attribute name="attrs">{'invisible':['|',('sale_ok','=',False),('matstrg','not in',('product','component','packaging'))]}</attribute>
+            		</button>
+		</field>
+	</record> 
+	
+	<record id="stock_product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Template Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+		<field name="arch" type="xml">
+                    	<button name="%(stock.action_stock_level_forecast_report_template)d" position="attributes">
+                    		<attribute name="attrs">{'invisible':[('matstrg','not in',('product','component','packaging','raw'))]}</attribute>
+            		</button>
+                    	<!--button name="action_view_stock_moves" position="attributes">
+                    		<attribute name="attrs">{'invisible':[('matstrg','not in',('product','component','packaging'))]}</attribute>
+                    	</button-->
+                    	<button name="action_view_routes" position="attributes">
+                    		<attribute name="attrs">{'invisible':[('matstrg','not in',('product','component','packaging','raw'))]}</attribute>
+                    		<attribute name="groups">mrp.group_mrp_manager,stock.group_stock_user</attribute>
+                    	</button>
+		</field>
+	</record> 
+	
+	<record id="mrp_product_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Form</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="mrp.product_product_form_view_bom_button"/>
+		<field name="arch" type="xml">
+                    	<button name="action_view_bom" position="replace"/>
+                    	<button name="%(mrp.act_product_mrp_production)d" position="replace"/>
+		</field>
+	</record> 
+	
+	<record id="stock_product_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Form</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="stock.product_form_view_procurement_button"/>
+		<field name="arch" type="xml">
+                    	<button name="%(stock.product_open_quants)d" position="replace"/>
+                    	<button name="%(stock.action_stock_level_forecast_report_product)d" position="replace"/>
+                    	<button name="%(stock.act_product_stock_move_open)d" position="replace"/>
+		</field>
+	</record>
+	
+	<record id="sales_product_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Form</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="sale.product_form_view_sale_order_button"/>
+		<field name="arch" type="xml">
+                    	<button name="%(sale.action_product_sale_list)d" position="replace"/>
+		</field>
+	</record>
+	<record id="procurement_product_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Form</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="procurement.product_product_view_form_procurement_button"/>
+		<field name="arch" type="xml">
+                    	<button name="%(procurement.procurement_order_action_product_product_stat)d" position="replace"/>
+		</field>
+	</record>
+	<record id="product_product_form_inheriten" model="ir.ui.view">
+		<field name="name">Product product Form</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="product.product_normal_form_view"/>
+		<field name="arch" type="xml">
+			<field name="default_code" position="replace"/>
+    			<field name="barcode" position="replace"/>
+   		</field>
+	</record>
+	
+	<!--Inherite to change in vendor information in product form  -->
+	<record id="purchase_product_supplierinfo_form_api_inherite" model="ir.ui.view">
+		<field name="name">Product Supplier Form</field>
+		<field name="model">product.supplierinfo</field>
+		<field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+		<field name="arch" type="xml">
+                       <form position='replace'>
+                          <form string="Vendor Information">
+                            <header>
+                                <button name="approved_send" string="Approved" type="object"
+                                   class="oe_highlight" attrs="{'invisible':[('state','!=','request')]}"
+                                    groups='gt_order_mgnt.group_manager_mail'/>  
+                                
+                                 <field name="state" widget="statusbar"
+                                  statusbar_visible="request,approved,rejected"/>
+                            </header>
+                            <sheet>
+				    <group>
+				        <group string="Vendor">
+				            <field name="name" context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" options="{'no_create': True}"
+                                     domain="[('supplier','=',True),('company_type','=','company')]"/>
+				            <field name="product_name"/>
+				            <field name="product_code"/>
+				            <field name="product_id" domain="[('product_tmpl_id', '=', product_tmpl_id)]" invisible="1"/>
+				            <label for="delay"/>
+				            <div>
+				                <field name="delay" class="oe_inline"/> days
+				            </div>
+				        </group>
+				        <group string="Price List">
+				            <field name="product_tmpl_id" string="Product" invisible="context.get('visible_product_tmpl_id', True)"/>
+				            <label for="min_qty"/>
+				            <div>
+				                <field name="min_qty" class="oe_inline"/>
+				                <field name="product_uom" class="oe_inline" groups="product.group_uom"/>
+				            </div>
+                                           <label for="new_price" />
+				            <div>
+				                <field name="new_price" class="oe_inline"/>
+                                                <button type='object' name='request_send'
+                                           class='oe_highlight oe_inline' string='Send Request' 
+                                           attrs="{'invisible':['|',('state','!=','approved'),('new_price','=',0.0)]}"/>
+				            </div>	
+				            <label for="price"/>
+				            <div>
+				                <field name="price" class="oe_inline"/><field name="currency_id" class="oe_inline" groups="base.group_multi_currency" options="{'no_create': True}"/>
+				            </div>
+				            <label for="date_start" string="Validity"/>
+				            <div><field name="date_start" class="oe_inline"/> to <field name="date_end" class="oe_inline"/></div>
+				        </group>
+				        <group string="Other Information" groups="base.group_multi_company">
+				            <field name="company_id" options="{'no_create': True}"/>
+				        </group>
+				    </group>
+                                 </sheet>
+                                   <div class="oe_chatter">
+				    <!--field name="message_follower_ids" widget="mail_followers"/-->
+				    <field name="message_ids" widget="mail_thread"/>
+				   </div>
+				</form>
+		             
+                       </form>
+                           
+		</field>
+	</record> 
+	
+	<record id="product_attribute_from_view" model="ir.ui.view">
+		<field name="name">Attribute value form</field>
+		<field name="model">n.product.discription.value</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+			<form string="Attribute Form">
+				<group col="4">
+				<field name="name" />
+				<field name="units" widget="many2many_tags"  options="{'no_open':True,'no_create':True}"/>
+				</group>
+			</form>
+		</field>
+	</record>
+	
+	<record id="create_manufacturing_order_from_view" model="ir.ui.view">
+		<field name="name">Make manufacture Order</field>
+		<field name="model">make.manufacture.order</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+		   <form string="Manufacture Form">
+			<group >
+                            <group >
+				<field name="product_id" options="{'no_open':True,'no_create':True}" readonly="1"/>
+				<field name="unit" options="{'no_open':True,'no_create':True}" readonly="1"/>
+				<field name="date" />
+			  </group>
+                            <group >
+                                <field name="packaging" options="{'no_open':True,'no_create':True}" context="{'product_id':product_id,'stock_mrp_request':True}"/>
+				<field name="quantity" />
+                                <field name='request_type' required='1'/>
+                                <field name='production_id' 
+                                 domain="[('product_id','=',product_id),('sale_id','!=',False)]"
+                                  options="{'no_create': True, 'no_open': True}"
+                                attrs="{'invisible':[('request_type','!=','sale')],'required':[('request_type','=','sale')]}"/>
+                                <field name='sale_id' attrs="{'invisible':[('production_id','=',False)]}" readonly='1'/>
+                                 
+                            </group >
+                        </group >
+			<group>
+				<field name="note" />
+			</group>
+			<button name="process" string="Process" type="object" class="oe_highlight"/>
+		    </form>
+		</field>
+	</record>
+	
+      <!-- Start Inherit Procurement Button Wizard Form-->
+           <record id="view_make_procurment_wizard_api_inherite" model="ir.ui.view">
+		<field name="name">Procurement Request</field>
+		<field name="model">make.procurement</field>
+		<field name="inherit_id" ref="stock.view_make_procurment_wizard"/>
+		<field name="arch" type="xml">
+                  <field name="route_ids" groups="stock.group_adv_location" position='attributes'>
+                       <attribute name='invisible'>1</attribute>
+                  </field>
+                  <field name="warehouse_id"  position='attributes'>
+                       <attribute name='invisible'>1</attribute>
+                  </field>
+                 <p class="oe_gray"  position='attributes'>
+                       <attribute name='invisible'>1</attribute>
+                  </p>
+                  <button name="make_procurement" position='replace'>
+                    <button name="purchaserequest" string="send" type="object" class="btn-primary"/>
+                  </button>
+                </field>
+           </record>
+      <!--End Inherit Procurement Button Wizard Form -->
+	
+	<record id="api_stock_warehouse_orderpoint_inherite" model="ir.ui.view">
+		<field name="name">MSQ Inherite Form</field>
+		<field name="model">stock.warehouse.orderpoint</field>
+		<field name="inherit_id" ref="stock.view_warehouse_orderpoint_form"/>
+		<field name="arch" type="xml">
+			<field name="group_id"  position='attributes'>
+                       		<attribute name='invisible'>1</attribute>
+			</field>
+			<field name="location_id"  position='attributes'>
+				<attribute name='invisible'>1</attribute>
+			</field>
+			<field name="product_max_qty"  position='attributes'>
+				<attribute name='invisible'>1</attribute>
+			</field>
+			<field name="qty_multiple"  position='attributes'>
+				<attribute name='invisible'>1</attribute>
+			</field>
+			<field name="lead_days"  position='attributes'>
+				<attribute name='readonly'>1</attribute>
+			</field>
+			<field name="lead_type"  position='attributes'>
+				<attribute name='readonly'>1</attribute>
+			</field>
+			<button name="%(stock.do_view_procurement_op)d" position="replace"/>
+                </field>
+           </record>
+           
+           <record id="api_stock_warehouse_orderpoint_tree_inherite" model="ir.ui.view">
+		<field name="name">MSQ Inherite Tree</field>
+		<field name="model">stock.warehouse.orderpoint</field>
+		<field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree"/>
+		<field name="arch" type="xml">
+			<field name="product_max_qty"  position='attributes'>
+				<attribute name='invisible'>1</attribute>
+			</field>
+                </field>
+           </record>
+           
+    <!-- Inherit Supplier pricelist action for add context group by vendor-->
+         <record id="product.product_supplierinfo_type_action" model="ir.actions.act_window">
+		<field name="name">Supplier Pricelist</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">product.supplierinfo</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="context">{'visible_product_tmpl_id':False,'group_by':'name'}</field>
+	  </record>
+	 
+    <!-- End-->
+</odoo>

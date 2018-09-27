@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="channel_dashboard_purchase_kanban_view" model="ir.ui.view">
+        <field name="name">Custom Purchase Dashboard View</field>
+    	<field name="model">custom.purchase.dashboard</field>
+    	<field name="arch" type="xml">
+	<kanban class="oe_background_grey o_kanban_dashboard o_account_kanban" create="false">
+            <field name="color"/>
+            <field name="name"/> 
+            <field name='status_dashboard'/>
+            <templates>
+                <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(0)}">
+                            <t t-value="JSON.parse(record.status_dashboard.raw_value)" t-set="po_detail"/>
+                            <t t-value="record.name.raw_value" t-set="purchase_type"/>
+                            <t t-call="JournalTop"/>
+                            <div class="container o_kanban_card_content o_visible">
+                                <div class="row">
+                                   <t t-if="purchase_type== 'Purchase Request'" t-call="purchase_request"/>
+                                   <t t-if="purchase_type== 'Purchase Requisition'" t-call="purchase_requisition"/>
+                                   <t t-if="purchase_type== 'Purchase Order'" t-call="purchase_order"/>
+				</div><t t-call="JournalBodyGraph"/>
+                            </div><div class="container o_kanban_card_manage_pane o_invisible">
+                            </div>
+                        </div>
+                    </t>
+                   <t t-name="purchase_request">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Purchase Requests</b>
+                            <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'request_new':True}" type="object">New Request -
+                                              <span t-esc='po_detail.new_rqst'/>
+					     </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'request_prq':True}" type="object">Purchase Requisition -
+                                               <span t-esc='po_detail.prq_rqst'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'request_reject':True}" type="object">Rejected -
+                                              <span t-esc='po_detail.reject_rqst'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'request_done':True}" type="object">Done -
+                                             <span t-esc='po_detail.done_rqst'/>
+					     </a>
+					</a>
+		           </div>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Pending Purchase Requests</b>
+                            <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'request_pending':True}" type="object">Pending Request -
+                                              <span t-esc='po_detail.pending_rqst'/>
+					     </a>
+					</a>
+		           </div>
+                        </div>
+                    </t> 
+                    <t t-name="purchase_requisition">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Purchase Requisitions</b>
+                          <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'prq_new':True}" type="object">New Requisitions -
+                                             <span t-esc='po_detail.new_tender_count'/>
+					     </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'prq_cofirmed':True}" type="object">Confirmed -
+                                            <span t-esc='po_detail.progress_tender_count'/>  
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'prq_done':True}" type="object">Done -
+                                            <span t-esc='po_detail.po_tender_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'prq_cancel':True}" type="object">Cancelled -
+                                             <span t-esc='po_detail.cancel_tender_count'/>
+					     </a>
+					</a>
+		           </div>
+                        </div>
+                    </t>
+        
+		    
+          
+	           <t t-name="purchase_order">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Purchase Orders</b>
+                          <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_new':True}" type="object">Draft PO -
+                                              <span t-esc='po_detail.new_po_count'/>
+					     </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_sent':True}" type="object">Sent Draft PO -                                           
+                                              <span t-esc='po_detail.sent_po_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_awaiting':True}" type="object">Awaiting -                                           
+                                              <span t-esc='po_detail.awaiting_po_count'/>
+					     </a>
+					</a>
+                                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_rejected':True}" type="object">Rejected -                                           
+                                              <span t-esc='po_detail.rejected_po_count'/>
+					     </a>
+					</a>
+                                      <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_approved':True}" type="object">Approved -                                           
+                                              <span t-esc='po_detail.approved_po_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_order':True}" type="object">Purchase Order -
+                                             <span t-esc='po_detail.progress_po_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_order_sent':True}" type="object">Sent PO -
+                                             <span t-esc='po_detail.po_sent_po_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_done':True}" type="object">Done -
+                                             <span t-esc='po_detail.done_po_count'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_cancel':True}" type="object">Cancelled -
+                                              <span t-esc='po_detail.cancel_po_count'/>
+					     </a>
+					</a>
+		           </div>
+                          
+                        </div>
+                      <div class="col-xs-6 o_kanban_primary_left">
+                          <b>Purchase Orders Completed Details</b>
+                          <div class="row">
+		                        <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_today':True}" type="object">Todays -
+                                              <span t-esc='po_detail.today_po_completed'/>
+					     </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_tomorrow':True}" type="object">Tomorrow-                                           
+                                              <span t-esc='po_detail.tomorrow_po_completed'/>
+					     </a>
+					</a>
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_week':True}" type="object">Week -
+                                             <span t-esc='po_detail.week_po_completed'/>
+					     </a>
+					</a>
+                                       
+                                       <a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_purchase" context="{'purchase_month':True}" type="object">Month -
+                                              <span t-esc='po_detail.month_po_completed'/>
+					     </a>
+					</a>
+		           </div>
+                          
+                        </div>
+                    </t>
+                  <t t-name="JournalTop">
+                        <div class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <div class="o_primary">
+                                    <field name="name"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_manage_button_section">
+                                <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
+                            </div>
+                        </div>
+                    </t>
+                      
+                   <!--End Work Order Plannind -->
+		    <t t-name="JournalBodyGraph">
+                        <div class="o_kanban_graph_section">
+                            <field name="kanban_dashboard_graph" t-att-graph_type="'line'" widget="dashboard_graph"/>
+                        </div>
+                    </t>
+            </templates>
+        </kanban>
+    </field>
+    </record>
+       <record id="custom_purchase_dashboard_action_ext" model="ir.actions.act_window">
+	    <field name="name">Dashboard</field>
+	    <field name="res_model">custom.purchase.dashboard</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">kanban</field>
+      </record>
+      <menuitem id="menu_dashboard_purchase" name="Dashboard"
+            parent="base.menu_purchase_root" sequence="0" action="custom_purchase_dashboard_action_ext" groups="purchase.group_purchase_user"/>
+    </data>
+</openerp>  

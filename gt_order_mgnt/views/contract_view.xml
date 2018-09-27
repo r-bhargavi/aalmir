@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <record id="seq_contract_sequence" model="ir.sequence">
+            <field name="name">Manufacturing Request</field>
+            <field name="code">customer.contract</field>
+            <field name="prefix">CC</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+     </record>
+     
+        <record id="contract_sale_wizard" model="ir.ui.view">
+            <field name="name">contract.sale.wizard.view</field>
+            <field name="model">contract.sale.wizard</field>
+            <field name="arch" type="xml">
+              <form>
+                    <group>
+                            <group col="4">
+                              <field name='delivery_term' required="1" options="{'no_create': True, 'no_open': True}" attrs="{'readonly':[('validate_bool','=',True)]}"/>
+                              <field name='delivery_date' required="1" attrs="{'readonly':[('validate_bool','=',True)]}"/>
+                              <field name='contract_id' invisible='1'/>
+                            </group>
+                    </group>
+                    
+                  <field name='sale_line' attrs="{'readonly':[('validate_bool','=',True)]}" options="{'no_create': True}">
+                      <tree string='Sale order line ' editable='Bottom' create='0'>
+                      	   <field name='check'/>
+                           <field name='product_id' readonly='1'/>
+                           <field name='qty'/>
+                           <field name='remaining_qty' readonly='1'/>
+                   	    <field name='contract_qty' invisible='1'/>
+                           <field name='uom_id' readonly='1'/>
+                           <field name='sale_price' readonly='1' />
+                           <field name='product_packaging' readonly='1'/>
+                           <field name='line_id' invisible='1'/>
+                      </tree>
+                      <form readonly="1">
+                      	<group col="4">
+                      	   <field name='check'/>
+                           <field name='product_id' readonly='1'/>
+                           <field name='qty'/>
+                           <field name='remaining_qty' readonly='1'/>
+                   	    <field name='contract_qty' invisible='1'/>
+                           <field name='uom_id' readonly='1'/>
+                           <field name='sale_price' readonly='1' />
+                           <field name='product_packaging' readonly='1'/>
+                           <field name='line_id' invisible='1'/>
+                           </group>
+                      </form>
+                  </field>
+                  <field name='validate_bool' invisible='1'/>
+                 <footer>
+                   <button type='object' name='product_validate' string='Validate' class='oe_highlight' attrs="{'invisible':[('validate_bool','=',True)]}"/>
+                   <!--button name="cancel" type='special'  string='Cancel' class='oe_highlight'/-->
+		   <button type='object' name='send_back' string='Edit' class='oe_highlight' attrs="{'invisible':[('validate_bool','=',False)]}"/>
+		   <button type='object' name='create_sale_order' string='Sale Order' class='oe_highlight' attrs="{'invisible':[('validate_bool','=',False)]}"/>
+                 </footer>
+               </form>
+            </field>
+        </record>
+
+         <record id="customer_contract_form_view" model="ir.ui.view">
+            <field name="name">customer.contract.form.view</field>
+            <field name="model">customer.contract</field>
+            <field name="arch" type="xml">
+                <form string="Contract">
+                   <header> 
+                     <button name="lock_cotract" string="Lock" attrs="{'invisible':[('state','!=','draft')]}" type="object" class="btn-primary"/>
+                      <button name="unlock_cotract" string="Unlock" states='contract' type="object" class="btn-primary" groups='base.group_sale_manager'/>
+                     <button name="copy_new_contract_mgt" attrs="{'invisible':[('state','=','draft')]}" string="Renew" type="object"  class="btn-primary"/>
+                     <button name="open_contract_history" attrs="{'invisible':[('state','=','draft')]}"  string="History" type="object" class="btn-primary"/>
+                     <button name="add_product_wizard" attrs="{'invisible':[('state','in',('draft','done'))]}"  string="Add Product" type="object" class="btn-primary"/>
+                     <button name="status_operation_wizard" attrs="{'invisible':[('state','in',('draft','done'))]}"  string="Stop/Cancel Product" type="object" class="btn-primary"/>
+                     
+                     <field name="state"  widget="statusbar"/>
+                   </header>
+                  
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_sales_history" type="object" class="oe_stat_button" icon="fa-list-alt"
+                            string="sales Order"></button>
+                        <button name="open_delivery_history" type="object" class="oe_stat_button"
+                           icon="fa-truck" string="Delivery Order"></button>
+                        <br></br>
+                        <button name="open_invoice_history" type="object" class="oe_stat_button" 
+                         	icon="fa-pencil-square-o" string="Invoice "></button>
+                        
+                       <button name="open_production_request_history" type="object" class="oe_stat_button"  
+                       			icon="fa-building-o" string="Production Request"></button>
+                       <br></br>
+                       <button name="open_mrp_history" type="object" class="oe_stat_button"
+                           icon="fa-industry" string="Manufaturing"> </button>
+                        <button name="open_PO_history" type="object"  class="oe_stat_button" icon="fa-shopping-cart"
+                            string="Purchase Order"> </button>
+                    </div>
+                    <div class="oe_title">
+                            <label for="name" class="oe_edit_only" string="Contract Number"/>
+                            <h1><field name="name" placeholder="Internal Number" readonly="1"/></h1>
+                            <label for="contract_name" class="oe_edit_only" />
+                            <h1><field name="contract_name" attrs="{'readonly':[('state','!=','draft')]}" placeholder="Contract Name" required="1"/></h1>
+                    </div>
+                    <group name="basic_info">
+                    <group>
+                        <field name="contract_id" readonly="1" attrs="{'invisible':[('contract_id','=',False)],'readonly':[('state','!=','draft')]}"/>
+                        <field name="customer_id" required="1"  domain="[('company_type','=','company'),('customer','=',True)]" options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="invoice_id"  options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="delivery_id" options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="payment_term_id" attrs="{'readonly':[('state','!=','draft')]}" required="1" context="{'n_partner_id':customer_id,'is_contract':True}" options="{'no_create': True}" />
+                       <field name="visible_request_button" invisible="1" />
+                       <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>	
+                        <!--field name="pipeline_id"/-->
+                        <!--field name="quotation_currency_id" required="1" options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}"/-->
+			<field name="tax_bool" attrs="{'readonly':[('state','!=','draft')]}"/>
+			<field name="customer_vat" attrs="{'readonly':[('state','!=','draft')],'required':[('tax_bool','=',True)],'invisible':[('tax_bool','!=',True)]}"/>
+                    </group>
+                    <group >
+                        <field name="lpo_base" invisible="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="schedule_base" invisible="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="issue_date" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="expiry_date" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="pricelist_id" domain="[('customer','=',customer_id),('contract_use', '=',True)]" options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+			<field name="external_number" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="user_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_create': True}"/>
+  -                  </group>
+                   <!--group string="LPO Detail" attrs="{'invisible':[('lpo_base','=',False)]}">
+                        <field name="lpo_document"/>
+                        <field name="lpo_number" />
+                        <field name="lpo_receipt_date" />
+                        <field name="lpo_issue_date"/>
+                    </group-->
+                    <group>
+                       <field name="uploaded_documents" widget="many2many_binary" options="{'no_create': True}"/>
+                    </group>
+        	    </group>
+                    <group>
+            		<field name="order_confirm_documents" nolabel="1" readonly="1">
+             			<tree>
+		                       <field name="create_date"/>
+					<field name="n_sale_order"/>
+		                       <field name="lpo_issue_date"/>
+		                       <field name="lpo_receipt_date"/>
+		                       <field name="lpo_name" />
+		                       <field name="lpo_number"/>
+		                       <field name="lpo_document" filename="lpo_name"/>
+             			</tree>
+				<form>
+					<group col="4">
+				               <field name="create_date"/>
+						<field name="n_sale_order"/>
+				               <field name="lpo_issue_date"/>
+				               <field name="lpo_receipt_date"/>
+				               <field name="lpo_name" />
+				               <field name="lpo_number"/>
+				               <field name="lpo_document" filename="lpo_name"/>
+					</group>
+             			</form>
+			</field>
+                    </group>
+                    <!-- <group name="price_date">
+                            <group >
+                                <field name="contract_qty" string="Total Contract Qty"/>
+                                 <field name="remaining_qty"/>
+                                 <field name="price" required="1"/> 
+                            </group>
+                            <group >
+                               
+                            </group>
+                    </group>-->
+                    
+                      
+                    <group string="Contract Schedule Products" attrs="{'invisible':[('schedule_base','=',False)]}">
+                           <field name="schedule_ids" nolabel="1" colspan="4">
+                              <tree editable="bottom">
+                                 <field name="select_bool" invisible="1"/>
+
+                                  <field name="product_id"  context="{'contract_product': True,'pricelist_id':parent.pricelist_id}"/>
+
+		                  <field name="product_qty" />
+		                  <field name="schedule_date" />
+                                  <field name="note"/>
+                                  <field name="event_id" readonly="1"  attrs="{'invisible':[('select_bool','!=',True)]}"/>
+                                 <button type="object" name="create_calenar_event" string="Event Create" 
+                                    attrs="{'invisible':[('select_bool','=',True)]}"/>
+                              </tree>
+                           </field>
+                        </group>
+                          <group string=" Products">
+                            
+                            <field name="contract_line" nolabel="1" colspan="4" options="{'no_create': True}" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Products" create="0" editable="bottom" colors="green:state=='completed';red:state=='process';blue:state=='draft'" >
+                                     <field name="state" />
+                                     <field name="product_type"/>
+                                     <field name="product_id"/>
+                                     <field name="ext_product_number"/>
+                                     <field name="uom_id"/>
+                                     <field name="product_packaging"/>
+                                     <field name="sale_price" readonly="1"/>
+                                     <field name="qty_avl_open"/>
+                                     <button name="reserve_do_contract" type="object"   class="oe_highlight" string="Reserve" invisible="1" />
+                                     <field name="qty_avl" invisible="1"/>
+                                     <field name="contract_qty"/>
+                                     <field name="reserve_qty"/>
+                                     <field name="reserve_from_stock" invisible="1"/>
+                                     <field name="total_reserved_qty" invisible="1"/>
+                                     <field name="order_qty"/>
+                                     <field name="sale_qty"/>
+                                     <field name="remaining_qty"/>
+                                     <field name="product_msq" readonly="1"/>
+                                     <field name="total_pr_qty"/>
+                                     <field name="production_bool" invisible="1"/>
+                                     <button name="create_production_request" type="object" 
+                                           attrs="{'invisible':['|',('state','not in',('draft','process')),('production_bool','=',False)]}" string="production Request" 
+                                 icon="fa-cogs" />
+                                </tree>
+                            </field>
+
+                        </group>
+                           <group>
+                                  <button type="object" name="sale_order_wizard" string="Create sale Order" class="oe_highlight" attrs="{'invisible':[('state','in',('draft','done'))]}"/>
+                              </group>
+                     <div class="oe_chatter">
+                         <!--field name="message_follower_ids" widget="mail_followers"/-->
+                           <field name="message_ids" widget="mail_thread"/>
+                      </div>
+                </form>
+            </field>
+        </record>
+        
+        <record id="customer_contract_tree_view" model="ir.ui.view">
+            <field name="name">customer.contract.tree.view</field>
+            <field name="model">customer.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contract">
+                    <field name="name" />
+                   <field name="contract_name"/>
+                    <field name="customer_id" />
+                    <field name="payment_term_id" />
+                    <field name="issue_date" />
+                    <field name="expiry_date" />
+                    <field name="user_id"/>
+                    <field name="contract_id" string="Old Contract NO."  attrs="{'invisible':[('contract_id','=',False)]}"/>
+                </tree>
+            </field>
+        </record>
+      
+      <record id="contract_add_product_wizard" model="ir.ui.view">
+            <field name="name">contract add product wizard view</field>
+            <field name="model">contract.add.product.wizard</field>
+            <field name="arch" type="xml">
+              <form string='Add New products'>
+              	  <field name='contract_id' invisible='1'/>
+              	  <field name="product_line" >
+              	      <tree string="Products" editable="top" create="0">
+		           <field name='product_id' readonly='1'/>
+		           <field name='qty'/>
+	              </tree>
+	              <form readonly='1'>
+		           <field name='product_id' readonly='1'/>
+		           <field name='qty' required="1"/>
+	              </form>
+	          </field>
+           	<footer>
+                   <button type='object' name="add_product" string='ADD' class='oe_highlight'/>
+                </footer>
+              </form>
+            </field>
+        </record>
+        
+        <record id="contract_product_operation_wizard" model="ir.ui.view">
+            <field name="name">contract product operation wizard view</field>
+            <field name="model">contract.add.product.wizard</field>
+            <field name="arch" type="xml">
+              <form string='Operations on Products'>
+              	  <field name='contract_id' invisible='1'/>
+              	  <li>Stop : Product is not available for any further Process </li>
+              	  <li>Cancel : Product is not available for Process , You can cancel product which are not processed </li>
+              	  <field name="product_line" >
+              	      <tree string="Products" editable="top" create="0">
+		           <field name='product_id' readonly='1'/>
+		           <field name='prv_status' readonly='1'/>
+		           <field name='status'/>
+	              </tree>
+	              <form readonly='1'>
+		           <field name='product_id' readonly='1'/>
+		           <field name='status' required="1"/>
+	              </form>
+	          </field>
+           	<footer>
+                   <button type='object' name="operation_validate" string='Validate' class='oe_highlight'/>
+                </footer>
+              </form>
+            </field>
+        </record>
+        
+        <record id="customer_contract_search_view" model="ir.ui.view">
+            <field name="name">customer.contract.search.view</field>
+            <field name="model">customer.contract</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" />
+                    <field name="customer_id" />
+                    <field name="user_id"/>
+                    <field name="payment_term_id" />
+                    <field name="lead_time" />
+                    <field name="expiry_date"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Customer" domain="[]" context="{'group_by':'customer_id'}"/>
+                        <filter string="Payment Term" domain="[]" context="{'group_by':'payment_term_id'}"/>
+                        <filter string="SalesPerson" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Week"  domain="[('expiry_date','&lt;=', (context_today() + relativedelta(weeks=0,day=7, weekday=-1)).strftime('%%Y-%%m-%%d')),('expiry_date','&gt;=',(context_today() - relativedelta(weeks=1, weekday=0)).strftime('%%Y-%%m-%%d'))]" context="{'group_by':'expiry_date'}"/>
+                      <filter string="Month"  domain="[('expiry_date','&lt;=', (context_today() + relativedelta(weeks=0,day=7, weekday=-1)).strftime('%%Y-%%m-%%d')),('expiry_date','&gt;=',(context_today() - relativedelta(weeks=5, weekday=0)).strftime('%%Y-%%m-%%d'))]" context="{'group_by':'expiry_date'}"/>
+                   
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_cutomer_contracts">
+            <field name="name">Contracts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">customer.contract</field>
+            <field name="search_view_id" ref="customer_contract_search_view"/>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem action="action_cutomer_contracts" id="menu_customer_contract" name="Contracts" parent="gt_order_mgnt.menu_sale_support_sales" sequence="10"/>
+        <menuitem action="gt_sale_quotation.sale_order_trail_action" id="menu_sale_order_trail" parent="gt_order_mgnt.menu_sale_support" sequence="7" />
+	
+    <!--Dashboard view for Contract MOQ -->
+	<record id="customer_contract_line_tree_view" model="ir.ui.view">
+            <field name="name">contract Dashboard Tree View</field>
+            <field name="model">contract.product.line</field>
+            <field name="arch" type="xml">
+                <tree string="Contract" readonly="1">
+                    <field name="cont_id" />
+                    <field name="partner_id" />
+                    <field name="product_id"/>
+                    <field name="uom_id"/>
+                    <field name="contract_qty" />
+                    <field name="remaining_qty"/>
+                    <field name="qty_avl_open"/>
+                    <field name="product_msq"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>

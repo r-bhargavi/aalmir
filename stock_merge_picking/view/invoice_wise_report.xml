@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+     <template id="report_invoice_wise">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                 <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+                  <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+                    <div class="page" style="font-family: Calibri;">  
+                        <div class="oe_structure"/>
+                         <h1 align="center" style="font-family: Calibri;">
+                            <t t-if="doc.filter_by  in ('all','customer')">
+                              <span>Invoice Report</span>
+                             </t> 
+                             <t t-if="doc.filter_by =='submission'">
+                                <span>Invoice Submission</span>
+                             </t>   
+                             <t t-if="doc.filter_by =='running_sale'">
+                                <span>Running Sale Orders</span>
+                             </t>
+                           </h1>
+                       <table class="table table-bordered" style="border: 1px solid #9999; margin-top: 30px;width:100%" t-if="doc.filter_by =='running_sale'">
+                         <tr t-if='doc.partner_id'>
+                            <td style="font-weight: bold;" width="25%">Customer Name</td>
+                            <td colspan="3" width="75%"><t t-esc="doc.partner_id and doc.partner_id.name or ''"/></td>
+                        </tr>
+                        <tr t-if='doc.partner_id'>
+                            <td style="font-weight: bold;" width="25%">Address</td>
+                                <td colspan="3" width="75%">
+                                    <t t-if="doc.partner_id.street"><t t-esc="doc.partner_id.street"/>,</t>
+                                    <t t-if="doc.partner_id.street2"> <t t-esc="doc.partner_id.street2"/>,</t>
+                                    <t t-if="doc.partner_id.city"> <t t-esc="doc.partner_id.city"/>,</t>
+                                    <t t-if="doc.partner_id.state_id"> <t t-esc="doc.partner_id.state_id.name"/>,</t>
+                                    <t t-if="doc.partner_id.country_id"> <t t-esc="doc.partner_id.country_id.name"/></t>
+                                    <t t-if="doc.partner_id.zip"> <t t-esc="doc.partner_id.zip"/></t>
+                                </td>
+                        </tr>
+                    </table>
+                        <t t-if="doc.filter_by =='submission'">
+                         <div class="col-xs-12" style="margin-top:5px;margin-left:-25px">
+                            <div class='col-xs-4'>
+                              <p ><b>Date: <span ><t t-esc="time.strftime('%Y-%m-%d')" /></span></b></p>
+                             <p ><b>To: <span ><span t-esc="doc.partner_id.name" /></span></b></p>
+		             <p ><b>Dear Sir,</b></p>
+                              <p style='margin-left:30px'>Please acknowledge receipt below original Invoice and Delivery
+                            </p>
+                          </div>
+                         <div class='col-xs-4'>
+                              <p><b>Received By: ____________________ </b></p><br></br>
+                              <p><b>Received Date: _______/_______/___________ </b></p><br></br>
+                              <p><b>Sign: ___________________________</b></p>
+                          </div>
+                          <div class='col-xs-4'>
+                              <p><b>Submitted By: ____________________ </b></p><br></br>
+                              <p><b>Submitted Date: _______/_______/___________ </b></p><br></br>
+                              <p><b>Sign: ___________________________</b></p>
+                          </div>
+                        </div> 
+                        
+                      </t>
+                        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by in ('all','customer')">
+                       <tr>
+                           <td><b>Invoice Date</b></td>
+                           <td><b>Invocie No.</b></td>
+                           <td><b>Customer Name</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Sales Person</b></td>
+                           <td><b>Payment Due Date</b></td>
+                           <td><b>Total Amount</b></td>
+                           <td><b>Due Amount</b></td>
+                           <td><b>Currency</b></td>
+                          
+                           <td><b>Status</b></td>
+                        </tr>
+                        <t t-set="val" t-value="get_view(doc)"/> 
+                          <t t-if='val'>
+		                 <t t-foreach='val' t-as='line'> 
+		                     <tr style='page-break-inside: auto'>
+		                      <td><span t-esc="line['date']"/></td>
+		                       <td><span t-esc="line['number']"/></td>                               
+		                       <td><sapn t-esc="line['customer']"/></td>
+		                       <td><sapn t-esc="line['sale']"/></td>
+		                       <td><sapn t-esc="line['lpo']"/></td>
+		                       <td><sapn t-esc="line['salesperson']"/></td>
+		                       <td><sapn t-esc="line['due_date']"/></td>
+		                       <td><sapn t-esc="line['total']"/></td>
+		                       <td><sapn t-esc="line['due']"/></td>
+		                       <td><sapn t-esc="line['currency']"/></td>
+		                       <td><sapn t-esc="line['state']"/></td>
+		                    </tr>
+		                 </t>
+                            </t>
+                      <tr>
+                         <t t-set="total" t-value="get_total(doc)"/>
+                         <t t-set="due" t-value="get_total_due(doc)"/> 
+                         <td colspan='7' style='text-align:right'><b>Total</b></td>
+                         <td><b><span t-esc='total'/></b></td>
+                         <td><b><span t-esc='due'/></b></td><td></td><td></td>
+                     </tr>
+                   </table>
+                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout:fixed;"  t-if="doc.filter_by =='submission'">
+                       <tr>
+                           <td><b>Invoice Date</b></td>
+                           <td><b>Invocie No.</b></td>
+                           <td><b>Sale Order</b></td>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Total Amount</b></td>
+                           <td><b>Currency</b></td>
+                        </tr>
+                        <t t-set="val" t-value="get_view(doc)"/> 
+                          <t t-if='val'>
+		                 <t t-foreach='val' t-as='line'> 
+		                     <tr style='page-break-inside: auto'>
+		                      <td><span t-esc="line['date']"/></td>
+		                       <td><span t-esc="line['number']"/></td>                               
+		                       <td><sapn t-esc="line['sale']"/></td>
+		                       <td><sapn t-esc="line['lpo']"/></td>
+		                       <td><sapn t-esc="line['total']"/></td>
+		                       <td><sapn t-esc="line['currency']"/></td>
+		                    </tr>
+		              </t>
+                         </t>
+                      <tr>
+                       <t t-set="total" t-value="get_total(doc)"/> 
+                      <td colspan='4' style='text-align:right'><b>Total</b></td>
+                      <td><b><span t-esc='total'/></b></td><td></td>
+                     </tr>
+                   </table>
+
+                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by == 'running_sale'">
+                       <tr>
+                           <td><b>Order Date</b></td>
+                           <td><b>Sale Order No.</b></td>
+                          <t t-if='not doc.partner_id'>
+                           <td><b>Customer Name</b></td>
+                          </t>
+                           <td><b>LPO No.</b></td>
+                           <td><b>Sales Person</b></td>
+                           <td><b>Opportunity</b></td>
+                           <td><b>Total Amount</b></td>
+                           <td><b>Converted Amount</b></td>
+                           <td><b>Currency</b></td>
+                           <td><b>Invoice status</b></td>
+                           <!--td><b>Total Deliveries No.</b></td>
+                           <td><b>Total Invoice No.</b></td>
+                           <td><b>Status</b></td-->
+                        </tr>
+                        <t t-set="val" t-value="get_sale(doc)"/> 
+                         <t t-if='val'>
+		                 <t t-foreach='val' t-as='line'> 
+		                     <tr style='page-break-inside: auto'>
+		                      <td><span t-esc="line['date']"/></td>
+		                      <td><span t-esc="line['name']"/></td>   
+                                     <t t-if='not doc.partner_id'>                           
+		                       <td><sapn t-esc="line['customer']"/></td>
+                                     </t>
+		                       <td><sapn t-esc="line['lpo']"/></td>
+		                       <td><sapn t-esc="line['salesperson']"/></td>
+		                       <td><sapn t-esc="line['opportunity']"/></td>
+		                       <td><sapn t-esc="line['amount_total']"/></td>
+		                       <td><sapn t-esc="line['convert_amount']"/></td>
+		                       <td><sapn t-esc="line['currency']"/></td>
+                                       <td><sapn t-esc="line['invoice_val']"/></td>
+                                       <!--td><span t-esc="line['delivery_ids']"/></td>
+                                       <td><span t-esc="line['invoice_no']"/></td>
+		                       <td><sapn t-esc="line['state']"/></td-->
+		                    </tr>
+                                   <tr t-if="line['delivery_ids']">
+                                     <td colspan='2'><b>Total Deliveries No.</b></td>
+                                     <td colspan='8' t-if='not doc.partner_id'>
+                                       <span t-esc="line['delivery_ids']"/>
+                                    </td>
+                                     <td colspan='7' t-if='doc.partner_id'>
+                                      <span t-esc="line['delivery_ids']"/>
+                                    </td>
+                                     </tr>
+                                   <tr t-if="line['invoice_no']">
+                                     <td colspan='2'><b>Total Invoice No.</b></td>
+                                     <td colspan='8' t-if='not doc.partner_id'><span t-esc="line['invoice_no']"/>
+                                    </td>
+                                     <td colspan='7' t-if='doc.partner_id'>
+                                      <span t-esc="line['invoice_no']"/>
+                                    </td>
+                                     </tr>
+		                </t>	
+                          </t>
+                   </table>
+
+                   <!--table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px" t-if="doc.filter_by =='submission'">
+                          <tr>
+                            <td>Generated By</td>
+                            <td> Remarks</td>
+                          
+                        </tr>
+                         <tr>
+                             <td style="height:70px;width:35%">
+                                 <span t-esc='user.name'/><br></br>
+                                 <span t-esc="time.strftime('%d-%m-%Y')"/>
+                                 <span t-field="user.company_id and user.company_id.stamp_image" t-field-options='{"widget": "image"}'/>
+                               </td>
+                            <td  style="height:70px:width:65%" > 
+                              <p>Please Acknowledge the receipt of this documents for <span t-esc='doc.partner_id.name'/></p>
+                              <span>Received By: ____________________ </span><br></br><br></br>
+                              <span>Date: ____/____/________ </span><br></br><br></br><br></br><br></br>
+                              <span>Sign: _____________________</span>
+  
+                            </td>
+                         </tr>
+                   </table-->
+                   <b><span t-esc="user.company_id.report_note"/></b>
+                    </div>       
+                  </t>
+
+              </t>
+              </t>
+    </template>
+    
+ </data>
+</openerp>

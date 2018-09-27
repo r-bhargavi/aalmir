@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+	<!-- Import Product quantity -->
+        <record id="product_store_import_data" model="ir.ui.view">
+            <field name="name">Product Store Ddata Import</field>
+            <field name="model">product.store.data.import</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Product Import Data">
+                        <group col="4">
+                                <field name="new_upload" filename="name"/>
+                                <field name="name" invisible="1"/>
+                                <field name="location" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="region" required="1" domain="[('location_type','in',('store','transit_in')),('location_id','=',location)]" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="download_file" widget="url"/>
+			</group>
+			<h2><label string="Error In file Import" style="color:red;" attrs="{'invisible': [('import_status', '!=','error')]}"/></h2>
+			<h2><label string="File Import Successfull" style="color:red;" attrs="{'invisible': [('import_status', '!=','done')]}"/></h2>
+			<field name="import_status" invisible="1"/>
+			<button name="import_data" string="Import"  class="btn-primary" type="object"/>
+            	</form>
+            </field>
+        </record>
+        
+        <!--Import Product Quantity in manufacturing transfer -->
+        <record id="product_import_manufacturing_transfer" model="ir.ui.view">
+            <field name="name">Product Store Ddata Import</field>
+            <field name="model">product.store.data.import</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+        	<form string="Product Import Data">
+                        <group col="4">
+                                <field name="new_upload" filename="name"/>
+                                <field name="name" invisible="1"/>
+                                <field name="picking_id" invisible="1" options="{'no_create': True, 'no_open': True}"/>
+			</group>
+			<button name="manufacturing_product_import" string="Import"  class="btn-primary" type="object"/>
+        	</form>
+            </field>
+        </record>
+    </data>
+</openerp>

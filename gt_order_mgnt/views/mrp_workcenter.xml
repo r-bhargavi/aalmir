@@ -1,0 +1,1683 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- start Wizard view for shift request -->
+         <record id="mrp_work_order_shiftrequest_form" model="ir.ui.view">
+        <field name="name">mrp.work.order.shiftrequest.form</field>
+        <field name="model">mrp.work.order.shiftrequest</field>
+        <field name="arch" type="xml">
+            <form>
+               <group>
+                 <field name='production_id' readonly='1'/>
+                 <field name='order_id' readonly='1' string='Work Order No.'/>
+                 <field name='sequence' invisible='1'/>
+                  <field name='workcenter_id' readonly='1'/>
+                 <label for='wk_required_qty' string="Required Qty"/>
+		 <div>
+			<field name="wk_required_qty" class="oe_inline" nolabel="1" readonly="1"/>
+			<field name="wk_required_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+		 </div>
+                 <field name='remain_qty' string="Remaning Qty" invisible='1'/>
+                 <field name='shift_request' widget="radio"/>
+                 <field name='shift_check' invisible='1'/>
+                 <field name='next_order_id' 
+                  attrs="{'invisible':[('shift_request','!=','next')],'required':[('shift_request','=','next')]}"
+                   context="{'order':True, 'order_id':order_id, 'sequence':sequence,
+                         'production':production_id}"/>
+                 
+                 
+                 <field name='request_line_ids' string='Shift Details'
+                    context="{'mo_rqty':remain_qty, 'order_id':order_id, 'uom':wk_required_uom}"
+                    attrs="{'invisible':[('shift_request','!=','custom')],'required':[('shift_request','=','custom')]}">
+                    <tree editable='bottom'>
+                        <field name="qty"/>
+                        <field name='uom' readonly='1'/>
+                        <field name="hour"/>
+		        <field name="date_planned"/>
+                        <field name='date_planned_end'/>
+                        <field name='order_id' readonly='1' string='Work Order No.' invisible='1'/>
+                        
+                     </tree>
+                  </field>
+               </group>
+               <group>
+                 <h4 attrs="{'invisible':[('shift_check','=',False)]}" style='color:red'
+                    >Shifts is not created in next process.</h4>
+               </group>
+               <footer>
+                    <button type="object" string="Generate" class="oe_highlight"  name="create_jobcard"/>
+                     <button type="object" string="Cancel" class="oe_highlight" name='cancel' special='cancel'/>
+               </footer>
+            </form>
+        </field>
+   </record>
+
+     <!--Start Work Order schedule form-->
+     <record id="mrp_work_order_schedule_form" model="ir.ui.view">
+        <field name="name">mrp.production.workcenter.line.schedule.form</field>
+        <field name="model">mrp.production.workcenter.line.schedule</field>
+        <field name="arch" type="xml">
+            <form>
+               <group>
+                 <group>
+                    <field name='production_id' invisible='1'/>
+                    <field name='order_id' readonly='1' string='Work Order No.'/>
+                    <field name='workcenter_id' readonly='1'/>
+                    <field name='machine_type_ids' widget='many2many_tags' string="Machine Type" invisible='1'/>
+                    <field name="machine" context="{'order_machine': True,'machine_type_ids':machine_type_ids}" />
+                    <field name='date_planned' attrs="{'invisible':[('machine','=',False)]}"/>
+                    <field name='date_planned_end' attrs="{'invisible':[('machine','=',False)]}"/>
+                    <field name='hour' widget='float_time' attrs="{'invisible':[('machine','=',False)]}"/>
+                    <field name='time_efficiency' attrs="{'invisible':[('machine','=',False)]}"/>
+                 </group>
+                  <group >
+                     
+                 </group>
+               </group>
+                  
+                <group>
+                
+                 <field name='work_ids' nolabel='1' readonly='1' attrs="{'invisible':[('machine','=',False)]}">
+                    <tree  default_order="date_planned_end">
+                        <field name="name"/>
+                        <field name="production_id"/>
+                        <field name='machine' readonly='1'/>
+		        <field name="date_planned"/>
+                        <field name='date_planned_end'/>
+		        <field name="product"/>
+		        <field name="qty"/>
+		        <field name="uom"/>
+		        <field name="workcenter_id" />
+		        <field name="cycle"/>
+		        <field name="hour" widget="float_time"/>
+		        <field name="state"/>
+                        
+                    </tree>
+                 </field>
+                </group>
+              <!--group>
+                  <field name='machine_schedule_ids'>
+                   <tree  default_order="date_planned_end">
+                    <field name='order_id' readonly='1' string='Work Order No.'/>
+                    <field name='machine'/>                      
+                    <field name='date_planned_end'/>
+                   </tree>
+                  </field> 
+                
+                </group-->
+               <footer>
+                    <button type="object" string="Set Machine" class="oe_highlight"  name="Datechange"/>
+                     <button type="object" string="Cancel" class="oe_highlight" name='cancel' special='cancel'/>
+               </footer>
+            </form>
+        </field>
+   </record>
+  <!-- End Work Order Schedule form-->
+
+
+   <!--Start Work Order Pause form-->
+     <record id="mrp_work_order_pause_form" model="ir.ui.view">
+        <field name="name">mrp.order.machine.pause.form</field>
+        <field name="model">mrp.order.machine.pause</field>
+        <field name="arch" type="xml">
+            <form>
+               <group>
+                 <group string="Fill Informations">
+                    <field name='pause_reason' widget='radio'/>
+                     <field name="reason" required='1'/>
+                     <field name='bool_check' invisible='1'/>
+                      <field name='document' />
+                      <field name='document_name' invisible='1' />
+                      
+                 </group>
+                  <group string="Current Operation Informations">
+                      <field name='production_id' readonly="1"/>
+                       <field name="order_id" readonly="1"/>
+                       <field name='machine' readonly="1"/>
+                       <field name="user_id" readonly="1"/>
+                 </group>
+               </group>
+               <footer>
+                    <button type="object" string="Pause" class="oe_highlight" 
+                     attrs="{'invisible': [('bool_check','=',True)]}" name="OrderPause"/>
+                    
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel' 
+                    attrs="{'invisible': [('bool_check','=',True)]}" special='cancel'/>
+               </footer>
+            </form>
+        </field>
+   </record>
+  <!-- End Work Order Pause  form-->
+   <!--Start Machine Product Produce form-->
+     <record id="mrp_work_order_machine_produce_form" model="ir.ui.view">
+        <field name="name">mrp.order.machine.produce.form</field>
+        <field name="model">mrp.order.machine.produce</field>
+        <field name="arch" type="xml">
+            <form>
+                  <h2 style='color:red' attrs="{'invisible': [('warning_bool','=',False)]}">
+                   Your Produce Qty is Greater Than Work order Required Qty.
+                 </h2>
+               <group>
+                 <group string="Fill Informations">
+                     <field name='warning_bool' invisible='1'/>
+                     <label for='product_qty' string="Produced Qty"/>
+		     <div>
+		        <field name="product_qty" class="oe_inline" nolabel="1" />
+			 <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                     <field name='produce_date' />
+                     <field name='user_id' context="{'operator':True, 'order_id':order_id}" invisible='1'
+                      options="{'no_create': True, 'no_open': True}"  widget='many2many_tags' />
+                      <field name='employee_ids' widget='many2many_tags'  required='1'
+                         options="{'no_create': True, 'no_open': True}"
+                         context="{'employee':True, 'user_ids':user_id}"/>
+                     <field name='supplier_batch_no' invisible="not context.get('supplier_batch')"
+                           required="context.get('supplier_batch')"/>
+
+                     <field name='previous_batch_id' options="{'no_create': True}" 
+                     domain="[('remain_used_qty','!=',0)]"
+                     attrs="{'invisible': [('previous_order_ids','=',[])], 'required':[('previous_order_ids','!=',[])]}"
+                 context="{'prev':True, 'previous_order_ids':previous_order_ids}" />
+
+                      <label for='previous_batch_qty' attrs="{'invisible': [('previous_batch_id','=',False)]}"/>
+                      <div attrs="{'invisible': [('previous_batch_id','=',False)]}">
+                         <field name='previous_batch_qty'  class='oe_inline' nolabel='1' readonly='1'/>
+                         <field name='previous_uom_id' class='oe_inline' nolabel='1' readonly='1'/>
+                      </div>
+                     <field name="batch_id" domain="[('order_id','=',order_id)]" string='Current Batch No' readonly='1'/>
+                     <field name='bool_check' invisible='1'/>
+                     <field name="remark" />
+                     <field name='document'  />
+                     <field name='document_name' invisible='1'/>
+                 </group>
+                  <group string="Current Operation Informations">
+                      <field name='production_id' readonly="1"/>
+                      <field name='previous_order_id' attrs="{'invisible': [('previous_order_id','=',False)]}" readonly="1" invisible='1'/>
+                       <field name='previous_order_ids' widget='many2many_tags' readonly="1"/>
+                       <field name="order_id" readonly="1"/>
+                       <field name="product_id" readonly="1"/>
+                       <field name='machine' readonly="1"/>
+                      
+                       <!--field name="wastage_bool"/-->
+                       <label for='wastage_qty' string="Wastage Qty"/>
+		        <div >
+		           <field name="wastage_qty" class="oe_inline" nolabel="1"/>
+			   <field name="wastage_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+		        </div>
+                       <field name="wastage_reason"/>
+                 </group>
+               </group>
+                    <h2  attrs="{'invisible': [('bool_check','=',False)]}" style="color:red">
+                   Are you sure want to Produce Qty in Batch?</h2>
+                   <group string='To Consume' invisible="not context.get('raw_material')">
+                      <field name='produced_line_id' nolabel="1" readonly='1'>
+                         <tree >
+                             <field name="product_id" />
+		             <field name='product_qty' />
+                             <field name='receive_qty' />
+                             <field name='consumed_qty' /> 
+                             <field name='remain_consumed' />
+		             <field name='uom_id'/>
+                         
+                        </tree>
+                      </field>
+                   </group>
+               
+               <footer>
+                    <button type="object" string="Confirm" class="oe_highlight" 
+                     name="confirmation" attrs="{'invisible': [('bool_check','=',True)]}"/>
+                    <button type="object" string="Produce" class="oe_highlight" 
+                     name="orderProduceqty" attrs="{'invisible': [('bool_check','=',False)]}"/>
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel' attrs="{'invisible': [('bool_check','=',False)]}"/>
+               </footer>
+            </form>
+        </field>
+   </record>
+  <!-- End Machine Product Produce form-->
+  
+  <!--Start Machine Change form-->
+     <!--record id="mrp_work_order_machine_change_form" model="ir.ui.view">
+        <field name="name">mrp.order.machine.change.form</field>
+        <field name="model">mrp.order.machine.change</field>
+        <field name="arch" type="xml">
+            <form>
+               <group string="Current Working Informations">
+                 <group>
+                    <field name="production_id" readonly="1"/>
+                      <field name="order_id" readonly="1"/>
+                      <field name='workcenter_id' readonly="1" invisible='1'/>
+                     <field name="machine" readonly="1"/>
+                     <field name='machine_type_ids' widget='many2many_tags' string="Machine Type"
+                          readonly="1" invisible='1'/>
+                    <field name='change_type' widget='radio'/>
+                   
+                 </group>
+                  <group>
+                     
+                 </group>
+               </group>
+               <group>
+                 
+                 <group>
+                    <separator string="Swap Order" colspan="4"  attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','change')]}"/>
+                     <separator string="Machine Change" colspan="4"  attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','swap')]}"/>
+                      <field name="free_machine" context="{'order_machine': True,'machine_type_ids':machine_type_ids}"
+                             attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','swap')]}"/>
+                    <field name="change_production_id" domain="[('id','!=',production_id)]"
+                      attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','change')]}"/>
+                     <field name="change_order_id"  attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','change')]}"
+                       domain="[('production_id','=',change_production_id),
+                                ('workcenter_id','=',workcenter_id) ]"/>
+                     <field name="change_machine" 
+                      attrs="{'invisible': ['|',('change_type','=',False),('change_type','=','change')]}" />
+                    <field name="reason" attrs="{'invisible': [('change_type','=',False)]}"/>
+                        <label for='date_start' string='Scheduled Date'/>
+                         <div>
+                          <field name="date_start" class='oe_inline' nolabel='1'/>
+                          <button name="check_machineavailability" icon='fa-check-circle' type="object" 
+                   class="oe_highlight oe_inline"   help='Check Schedule Date Availability from other orders'/>
+                        </div>
+                 </group>
+                  <group>
+                     
+                       
+                 </group>
+               
+               </group>
+                
+               <footer>
+                    <button type="object" string="Change" class="oe_highlight" name="changemachine"/>
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel' special='cancel'/>
+               </footer>
+            </form>
+        </field>
+   </record-->
+  <!-- End Machine Change form-->
+  
+  <!--Start Employee form-->
+     <record id="view_employee_form_aalmir_ext" model="ir.ui.view">
+        <field name="name">hr.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"></field>
+        <field name="arch" type="xml">
+          <field name="message_follower_ids" position="replace">
+          </field>
+        </field>
+   </record>
+  <!-- End Employee form-->
+<!-- start  Routing workcenter -->
+   <menuitem id="mrp.menu_view_resource_search_mrp"
+            action="mrp.mrp_workcenter_action"
+            groups="mrp.group_mrp_routings"
+            name='Process'
+            parent="mrp.menu_mrp_bom"
+            sequence="102"/>
+    <record id="mrp_routing_workcenter_form_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.routing.workcenter.form</field>
+        <field name="model">mrp.routing.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_routing_workcenter_form_view"></field>
+        <field name="arch" type="xml">
+            <!--field name="workcenter_id" position="after">
+                   <field name='machine_type_ids' widget='many2many_tags' string="Machine Type"/>
+                 <field name="machine" context="{'order_machine': True,'machine_type_ids':machine_type_ids}" />
+            </field-->
+           <field name="cycle_nbr" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="hour_nbr" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="company_id" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+            <field name="workcenter_id" position="attributes">
+              <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+           </field>
+           <field name="sequence" position="replace">
+            <field name="sequence"/>
+           </field>
+           <field name="name" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+        </field>
+
+     </record>
+   <record id="mrp_routing_workcenter_tree_view_ext" model="ir.ui.view">
+        <field name="name">mrp.routing.workcenter.tree</field>
+        <field name="model">mrp.routing.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_routing_workcenter_tree_view"></field>
+        <field name="arch" type="xml">
+            <tree position='attributes'>
+               <attribute name='editable'>Bottom</attribute>
+            </tree>
+            <!--field name="workcenter_id" position="after">
+                 <field name='machine_type_ids' widget='many2many_tags' string="Machine Type"/>
+                 <field name="machine" />
+            </field-->
+            <field name='sequence' position='replace'>
+              <field name='sequence'/>
+            </field>
+           <field name="cycle_nbr" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="name" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="hour_nbr" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="company_id" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+            
+        </field>
+        
+     </record>
+   <record id="mrp_routing_form_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.routing.form</field>
+        <field name="model">mrp.routing</field>
+        <field name="inherit_id" ref="mrp.mrp_routing_form_view"></field>
+        <field name="arch" type="xml">
+            
+           <xpath expr="//page[1]" position="attributes">
+              <attribute name="string">Process Operations</attribute>
+           </xpath>
+          <xpath expr="//field[@name='company_id']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+         <field name="code" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+        </field>
+     </record>
+     <record id="mrp_routing_tree_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.routing.tree</field>
+        <field name="model">mrp.routing</field>
+        <field name="inherit_id" ref="mrp.mrp_routing_tree_view"></field>
+        <field name="arch" type="xml">
+            
+         <field name="code" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+        </field>
+     </record>
+   <!-- End Routing workcenter -->
+
+   <!-- Start change in  workcenter name in work order filter--> 
+   <record id="view_mrp_production_workcenter_form_view_filter_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.production.workcenter.line.filter</field>
+        <field name="model">mrp.production.workcenter.line</field>
+        <field name="inherit_id" ref="mrp_operations.view_mrp_production_workcenter_form_view_filter"></field>
+        <field name="arch" type="xml">
+            <filter  context="{'group_by':'workcenter_id'}" position='attributes'>
+               <attribute name='string'>Process</attribute>
+            </filter>
+        </field>
+     </record>
+  <!-- End change in  workcenter name in work order filter--> 
+  <!-- start Work order -->
+   <record id="mrp_production_workcenter_tree_view_inherit_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.production.workcenter.line.form</field>
+        <field name="model">mrp.production.workcenter.line</field>
+        <field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_tree_view_inherit"></field>
+        <field name="arch" type="xml">
+           <field name="workcenter_id" position="after">
+             <field name="machine"/>
+             <field name='shift_required'/>
+             <field name='shift_produced'/>
+             <field name='total_product_qty' string='Produced Qty'/>
+             <field name='total_uom_id' string='Unit'/>
+             <!--field name='total_wastage_qty' string='Wastage(Kg)'/-->
+           </field>
+            <field name="qty" position="attributes">
+             <attribute name="invisible">1</attribute>
+           </field>
+           <field name="production_id" position="before">
+               <field name='wk_planned_status'/>
+           </field>
+           <field name="production_id" position="attributes">
+             <attribute name="string">MO No.</attribute>
+           </field>
+           <field name="uom" position="attributes">
+             <attribute name="invisible">1</attribute>
+           </field>
+            <field name="cycle" position="attributes">
+             <attribute name="invisible">1</attribute>
+           </field>
+            <field name="hour" position="attributes">
+             <attribute name="invisible">1</attribute>
+           </field>
+          <field name="date_planned" position="attributes">
+             <attribute name="string">Start Date</attribute>
+           </field>
+          <field name="date_planned" position="after">
+             <field name="date_planned_end"/>
+             <field name="date_start" string='Actual Start Date'/>
+           </field>
+        </field>
+    </record>
+    
+    <record id="mrp_production_workcenter_form_view_inherit_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.production.workcenter.line.form</field>
+        <field name="model">mrp.production.workcenter.line</field>
+        <field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_form_view_inherit"></field>
+        <field name="arch" type="xml"> 
+
+             <button name="button_start_working" position="replace">
+             	<button name="button_start_working" string="Start" states="ready" class="oe_highlight"/>
+                <button type='object' name='split_order' string='Split' class='oe_highlight' invisible="context.get('mo_cal')" attrs="{'invisible':['|','|',('process_type','=','raw'),('state','not in',('draft','ready','pause')),('wk_rm_qty','&lt;=',0)]}"/>
+                <button type='object' name='split_order' string='Change Machine' class='oe_highlight' invisible="context.get('mo_cal')"  context="{'change':True}"
+                	attrs="{'invisible':['|',('state','not in',('pause')),('wk_rm_qty','&lt;=',0)]}"/>
+                <button name="machine_maintenance" string="Maintenance Request" type="object" class="oe_highlight"
+                   	  		attrs="{'invisible': [('state','not in',('pause','startworking'))]}"/>
+                <button name="print_order" string="Progress Report" type="object"  class="oe_highlight"
+                  			states='startworking,pause,done' />
+                <button name="print_form" icon='fa-download'  string="Job Card" type="object"  class="oe_highlight"
+                    			attrs="{'invisible':['|',('state','=','draft'),('batch_ids','=',[])]}" />
+                <button name="change_state" string="Lock" type="object" context="{'ready':True}" 
+                   			class="oe_highlight"  attrs="{'invisible': [('state','!=','draft')]}"/>
+           	<button name="change_state" string="Unlock" type="object"   context="{'draft':True}" 
+                   			class="oe_highlight"  attrs="{'invisible': [('state','!=','ready')]}"/>
+             </button>
+                
+                  <xpath expr="//form/sheet/group" position='before'>
+                    <label for='maintenance_id' string='Machine Under Maintenance Process...'
+                      style="color:red" 
+                       attrs="{'invisible': ['|',('maintenance_id', '=',False),('machine_breakdown', '=',False)]}" invisible='1'/>
+                     <div>
+                         <label for='maintenance_id' string='Machine Under Maintenance Process...'
+                      style="color:red"  class="oe_inline" 
+                       attrs="{'invisible': ['|',('maintenance_id', '=',False),('machine_breakdown', '=',False)]}"/>
+                           <field name="maintenance_id" readonly="1"  nolabel='1' class="oe_inline"
+                          attrs="{'invisible': ['|',('maintenance_id', '=',False),('machine_breakdown', '=',False)]}"/>
+                     </div>
+                   
+                  </xpath>
+                  <button name="button_resume" position='replace'>
+                   
+                    <button name="button_resume" string="Resume"
+                       attrs="{'invisible': ['|',('state','!=','pause'),('machine_breakdown', '=',True)]}"
+                        class="oe_highlight"/>
+                   
+                 </button>
+           
+                 <button name="button_pause" position='replace'>
+                    <button name="action_pause_order" string="Stop" type="object"  states="startworking"  
+                       class="oe_highlight"/>
+                     <!--attribute name='string'>Stop</attribute>
+                     <attribute name='class'>oe_highlight</attribute-->
+                 </button>
+                  
+                 <button name="button_start_working" position='attributes'>
+                     <attribute name='string'>Start</attribute>
+                     <attribute name='invisible'>context.get('mo_cal')</attribute>
+                 </button>
+                  <button name="button_cancel" position='attributes'>
+                     <attribute name='class'>oe_highlight</attribute>
+                      <attribute name='invisible'>context.get('mo_cal')</attribute>
+                 </button>
+                  <field name='state' position='replace'>
+                      <field name="state" widget="statusbar" 
+                        invisible="context.get('mo_cal')" statusbar_visible="draft,startworking"/>
+                  </field>
+                 <header position='after'>
+                  <h2 style="margin-left:470px;color:green" invisible="not context.get('mo_cal')"
+                 >Select Machine in Work Order</h2>
+                
+                 </header>
+                 <xpath expr="//form/sheet/group[1]" position="before">
+                        <h2 style="margin-left:40px;color:red" attrs="{'invisible':[('hold_order','=','active')]}" >Work Order Hold By Production Manager.</h2>
+                       <div class="oe_button_box" name="button_box">
+                        <button name="open_maintenace" type="object" class="oe_stat_button" icon="fa-cog"
+                             attrs="{'invisible':[('maintenace_count','=',0)]}" >
+                            <field name="maintenace_count" widget="statinfo" string="Maintenace"/>
+                        </button>
+                    </div>
+                 </xpath>
+            <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+                       
+              </xpath>
+             <notebook position='inside'>
+                <page string="Instruction">
+                   <group>
+                    <group>
+                      
+                      <field name='issue_bool' invisible='1'/>
+                      <label for='req_product_qty' string="Required Batchs No." />
+		      <div>
+	                <field name="req_product_qty" class="oe_inline" nolabel="1"
+                                readonly='0'/>
+                         <!--attrs="{'readonly':['|',('req_product_qty','!=',0),('extra_bool','=',True)]}"-->
+                        <field name='batch_unit' class="oe_inline" nolabel="1" readonly='1'/>
+                     
+			
+		     </div>
+                       <label for='each_batch_qty' string="Each Batch Qty" />
+                         <div>
+		                 <field name='each_batch_qty' class="oe_inline" nolabel="1"
+                                  attrs="{'readonly':[('batch_ids','!=',[])]}"/>
+                                <field name="req_uom_id"  class="oe_inline" nolabel="1" 
+                                  attrs="{'readonly':[('batch_ids','!=',[])]}" options="{'no_create': True, 'no_open': True}"/>
+                                <span  attrs="{'invisible':[('process_type','!=','cutting')]}" nolabel="1">/</span>
+                                 <field name='cutting_pac_qty' class="oe_inline" nolabel="1" attrs="{'invisible':[('process_type','!=','cutting')]}" readonly='1'/>
+		                <!--button type='object' name='issue_batchnumber'  string='Issue Batch Number' 
+		                 attrs="{'invisible':[('issue_bool','=',True)]}" class='oe_inline oe_highlight' /-->
+		        </div>
+                     </group>
+
+                      <group>  
+                           
+                            
+                         <field name="remark" string='Instruction By supervisor'/>
+                          <label for='total_wastage_qty' string="Total Wastage Qty" 
+                            attrs="{'invisible':[('total_wastage_qty','=',0)]}"/>
+		            <div attrs="{'invisible':[('total_wastage_qty','=',0)]}">
+				  <field name="total_wastage_qty" class="oe_inline" nolabel="1" 
+                                    readonly="1"/>
+				  <field name="wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		            </div>
+                       </group>
+                      
+                   </group>
+                       
+                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
+                        <button name="select_all" string="All" icon='fa-check'  type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
+                 <group>
+                     <field name='batch_ids' nolabel='1' 
+                           attrs="{'invisible':[('batch_ids','=',[])]}" readonly='1'>
+                        <tree editable='bottom'>
+                          <field name='print_bool' invisible='1'/>
+                           <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
+                               class="oe_highlight" attrs="{'invisible':[('print_bool','=',True)]}" />
+                           <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
+                               class="oe_highlight"  attrs="{'invisible':[('print_bool','=',False)]}"/>
+                           <!--field name='create_date' string='Created Date'/-->
+                           <field name='name' string='Current Batch No.' readonly='1'/>      
+                           <field name='req_product_qty' sum='total'/>
+                           <field name='product_qty' readonly='1' string="Produced Qty" sum='total'/>
+                           <field name='wastage_qty' sum='total'/>
+                           <field name='uom_id'/>
+                           <!--field name='user_id'/-->
+                           <field name='employee_name'/>
+                           <field name='equal_qty' invisible='1'/>
+                           <field name='supplier_batch_no'/>
+                           <button string='Edit' name='edit_batch' type='object'  attrs="{'invisible':['|',('state','in',('draft','ready','cancel','hold', 'done')),('product_qty','=',0)]}"
+                             icon='fa-pencil-square-o' context="{'edit_qty':True}"/>
+                           <button name="change_produceqty" string="Issue"  type="object" 
+                                  context="{'issue':True}" class="oe_highlight"  
+                                  attrs="{'invisible':['|',('product_qty','!=',0),('state','in',('draft','ready','cancel','hold','done'))]}"/>
+                           <button name="change_produceqty" string="Add More" type="object"  
+                           class="oe_highlight"   context="{'more':True}"
+                            attrs="{'invisible':['|',('equal_qty','=',True),('product_qty','=',0)]}"/>
+                          <button name="print_batch_barcode" string="Print" type="object"  
+                           class="oe_highlight"  icon='fa-print'/> 
+                         <field name='state'  invisible='1'/>
+                        </tree>
+                     </field>
+                    </group>
+                     <group colspan="4">
+                         <field name="extra_bool" invisible='1'/>
+                         <label for='extra_batch' string='Issue Extra Batch No.' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}"/>
+                       <div>
+                         <field name='extra_batch' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}" class='oe_inline'/>
+                         <button type='object' name='extra_batchnumber'  string='Issue' 
+                         attrs="{'invisible':['|',('issue_bool','=',False),('extra_bool','=',True)]}" class='oe_inline oe_highlight' />
+                       </div>
+                      </group>
+ 
+                    <group>
+                    
+
+
+                    <separator string="Previous Batch Details With Product Qty" colspan="4"
+                    attrs="{'invisible':[('batch_no_ids_prev','=',[])]}"/>
+                     <field name='batch_no_ids_prev' nolabel='1' readonly='1' attrs="{'invisible':[('batch_no_ids_prev','=',[])]}" >
+                         <tree>
+                            <field name='name' string="Batch No." attrs="{'invisible':[('product_qty','=',0)]}"/>
+                            <field name='order_id' string='Previous Operation No.'
+                              attrs="{'invisible':[('product_qty','=',0)]}"/>
+                            <field name='req_product_qty' attrs="{'invisible':[('product_qty','=',0)]}"/>
+                            <field name='product_qty' string="Produced Qty" sum='total'
+                              attrs="{'invisible':[('product_qty','=',0)]}"/>
+                            <field name='uom_id' string='Unit' attrs="{'invisible':[('product_qty','=',0)]}"/>
+                         </tree>
+                        <form string='Previous Batch Details With Product Qty'>
+				    <group>
+                                        <group>
+                                           <field name='name' string="Batch No." attrs="{'invisible':[('product_qty','=',0)]}"/>
+				            <field name='order_id' string='Previous Operation No.'
+				              attrs="{'invisible':[('product_qty','=',0)]}"/>
+				            <field name='req_product_qty' attrs="{'invisible':[('product_qty','=',0)]}"/>
+                                        </group>
+                                      <group>
+		                         <field name='product_qty' string="Produced Qty"
+                              attrs="{'invisible':[('product_qty','=',0)]}" sum='total'/>
+                            		<field name='uom_id' string='Unit' attrs="{'invisible':[('product_qty','=',0)]}"/>
+                                    </group>
+                                 </group>
+		        </form>
+                     </field>
+                    <separator string="Produced Qty In Current Operation with users" colspan="4"
+                        attrs="{'invisible':[('total_product_qty','=',0)]}"/>
+                     <field name='produce_ids' nolabel='1' readonly='1' 
+                           attrs="{'invisible':[('total_product_qty','=',0)]}">
+                        <tree>
+                          <field name='previous_batch_id'/>
+                           <field name='batch_id' string='Current Batch No'/>
+                            <field name='product_qty' string="Produced Qty"/>
+                             <field name='uom_id' string='Unit'/>
+                            <field name="create_uid" string='User Name'/>
+                            <field name='remark'/>
+                            <field name='produce_date'/>
+                            <field name='document'/>
+                        </tree>
+                        <form string='Produced Qty In Current Operation with users'>
+				    <group>
+                                        <group>
+                                          <field name='previous_batch_id'/>
+				           <field name='batch_id' string='Current Batch No'/>
+				            <field name='product_qty' string="Produced Qty"/>
+				             <field name='uom_id' string='Unit'/>
+                                        </group>
+                                      <group>
+		                         <field name="create_uid" string='User Name'/>
+				            <field name='remark'/>
+				            <field name='produce_date'/>
+				            <field name='document'/>
+                                    </group>
+                                 </group>
+		        </form>
+                     </field>
+                   </group>
+                </page>
+
+                <page string='Machine Schedule ' attrs="{'invisible':[('machine','=',False)]}">
+                     <group>
+                        <group string="Planned Date">
+                             <label for='date_planned' string='Scheduled Date'/>
+		             <div>
+		                  <field name="date_planned" class='oe_inline' nolabel='1'/>
+		                  <button name="schedule_date_workorder" string="Adjust Date" type="object" 
+		                       attrs="{'invisible': [('state','in',('cancel','done'))]}" 
+		                      help="click to Update manufacture complete date"  class="btn-primary" />
+		             </div>
+                            <field name="date_planned_end"/>
+                        </group>
+
+                        <group string="Duration">
+                            <field name="cycle" />
+                            <field name="hour" widget="float_time"/>
+                        </group>
+                    </group>
+                       <field name='m_schedule_ids' nolabel='1' attrs="{'invisible':[('m_schedule_ids','=',[])]}">
+                         <tree>
+                              <field name='name' string='Work Order No.'/>
+			      <field name="date_planned" string='Scheduled Start Date'/>  
+			      <field name="date_planned_end" string='Scheduled End Date'/>
+			      <field name="production_id"/>
+                              <field name='workcenter_id'/>
+                              <field name="machine" />
+			      <field name="product"/>
+			      <field name="qty" string="Required Qty"/>
+			      <field name="uom"/>
+			      <field name="cycle"/>
+			      <field name="hour" widget="float_time"/>
+			      <field name="state"/>
+			 </tree>
+                     </field>
+                </page>
+
+               <page string='Product Specs Details' name='Product Specs Details' attrs="{'invisible':[('product_sepcification_ids','=',[])]}">
+                     <field  name='product_sepcification_ids' nolable='1' >
+                          <tree  editable='bottom'>
+                            <field name='attribute'/>
+                            <field name='value' />
+                            <field name='unit'/>
+                         </tree>
+                     </field>
+               </page>
+
+                <page string='Pause Timing' attrs="{'invisible':[('pause_ids','=',[])]}">
+                        <field name='pause_ids' nolabel='1' readonly='1' attrs="{'invisible':[('pause_ids','=',[])]}">
+                        <tree string='Pause Details'>
+                            <field name="user_id"/>
+                            <field name='reason'/>
+                            <field name="date_start"/>
+                            <field name='date_end'/>
+                            <field name="duration" widget='float_time'/>
+                            <field name='state'/>
+                        </tree>
+                        <form string='Pause Details'>
+                          <group col="4">
+                            <field name="user_id"/>
+                            <field name='reason'/>
+                            <field name="date_start"/>
+                            <field name='date_end'/>
+                            <field name="duration" widget='float_time'/>
+                            <field name='state'/>
+                         </group>
+                        </form>
+
+                     </field>
+                  </page>
+               <page string='Job Card Details ' attrs="{'invisible':[('jobcard_ids','=',[])]}">
+                     <field name='jobcard_ids' nolabel='1' attrs="{'invisible':[('jobcard_ids','=',[])]}">
+                         <tree>
+                              <field name='name' string='Job Card No.'/>
+                              <field name="production_id"/>
+                              <field name='workcenter_id'/>
+			      <field name="date_planned" string='Scheduled Start Date'/>  
+			      <field name="date_planned_end" string='Scheduled End Date'/>
+                              <field name='hour'/>
+			      <field name="product"/>
+			      <field name="qty" string="Required Qty"/>
+			      <field name="uom"/>
+			 </tree>
+                     </field>
+      
+              </page>  
+               <page string='Split Details ' attrs="{'invisible':[('split_work_ids','=',[])]}">
+                     <field name='split_work_ids' nolabel='1' >
+                      
+                     </field>
+      
+              </page>
+             
+             </notebook>
+             <xpath expr="//page/group[1]" position="replace">
+                   <group>
+                       
+                        <group string="Actual Production Date">
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_finished" readonly="1"/>
+                            <field name="delay" widget="float_time"/>
+                        </group>
+                        
+                    </group>
+             </xpath>
+           
+             <xpath expr="//form/sheet/group[1]" position="replace">
+                 <group>
+                    <group>
+                      <field colspan="2" name="name" attrs="{'readonly':[('production_id','!=',False)]}"/>
+                      <field name="workcenter_id" attrs="{'readonly':[('production_id','!=',False)]}"/>
+                      <field name="production_id" on_change="onchange_production_id(production_id)" 
+                       attrs="{'readonly':[('production_id','!=',False)]}"/>
+                      <field name="production_state" attrs="{'readonly':[('production_id','!=',False)]}"/>
+                      <field name="sequence" attrs="{'readonly':[('production_id','!=',False)]}"/>
+                      <field name='machine_breakdown' invisible='1'/>
+                      <field name="process_id" readonly="1"/>
+                      <field name='process_type' invisible='1'/>
+                       <field name="user_ids" widget='many2many_tags' context="{'machines_name': True,'machine_id':machine}"    options="{'no_create': True, 'no_open': True}" invisible='1'/>
+<!-- attrs="{'invisible':[('machine','=',False)],'required':[('machine','!=',False)],'readonly':[('state','!=','draft')]}"/-->
+                       <field name='employee_ids' widget='many2many_tags' 
+                        
+                         options="{'no_create': True, 'no_open': True}"
+                         context="{'employee':True, 'user_ids':user_ids}"/>
+                       <field name='partner_id' options="{'no_create': True, 'no_open': True}"  readonly='1'/>
+                       <field name="product"/>
+                       <label for="qty" string='Manufacturing Qty'/>
+                       <div>
+                        <field name='qty' class="oe_inline" nolable='1' />
+                        <field name='uom' readonly='1' class="oe_inline" nolable='1' widget="selection"/>
+                      </div>
+                         <!--label for="mrp_sec_qty" string="Required Quantity"
+                             attrs="{'invisible':[('process_type','not in',('raw','film','cutting'))]}"/>
+		            <div  attrs="{'invisible':[('process_type','not in',('raw','film','cutting'))]}">
+		                <field name="mrp_sec_qty" class="oe_inline" style="width:94px;" readonly='1'/>
+		                <field name="mrp_sec_uom" style="width:100px;" readonly='1'/>
+		            </div>
+		             <label for="mrp_third_qty" attrs="{'invisible':[('process_type','!=','ptube')]}"
+                               string="Required Qty((Pcs*(L+T+B))/100)" />
+		            <div attrs="{'invisible':[('process_type','!=','ptube')]}">
+		                <field name="mrp_third_qty" class="oe_inline" style="width:94px;" help="Pcs * (Lenght + Top + Bottom)/100" readonly='1'/>
+		                
+		                <field name="mrp_third_uom" style="width:100px;" readonly='1' />
+		            </div>
+		            <label for="mrp_third_qty_sheet" attrs="{'invisible':[('process_type','!=','psheet')]}"
+                              string="Required Qty((Pcs*(W+L+R))/100)" />
+		            <div attrs="{'invisible':[('process_type','!=','psheet')]}">
+		                <field name="mrp_third_qty_sheet" class="oe_inline" style="width:94px;" help="Pcs * (Width + Left + Right)/100" readonly='1'/>
+		                <field name="mrp_third_uom_sheet" style="width:100px;" readonly='1' />
+		            </div-->
+                         <label for='wk_required_qty' string="Required Qty"/>
+		            <div>
+				  <field name="wk_required_qty" class="oe_inline" nolabel="1" readonly="1"/>
+				  <field name="wk_required_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+		            </div>
+                         <label for='total_product_qty' string="Produced Qty"/>
+		            <div>
+				  <field name="total_product_qty" class="oe_inline" nolabel="1" readonly="1"/>
+				  <field name="total_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		            </div>
+                          
+                         <field name="mo_date_request" readonly="1" string='Required by Date'/>
+                        <field name='mo_date_planned' readonly="1"/>
+                        <field name="mo_date_completed" readonly="1"/>
+                        <field name='workorder_type' readonly="1" invisible='1'/>
+                    </group>
+                    <group>
+                     <field name='wk_planned_status' invisible='1'/>
+                     <field name='wk_rm_qty' invisible='1'/>
+                     <field name='machine_type_ids' widget="many2many_tags" invisible='1'/>
+                     
+                     <field name='machine_capacity_type' invisible='1'/>
+                    <field name='machine_show' invisible='1'/>
+                    <field name='hold_order' widget='radio' invisible='1'/>
+                    <field name='order_last' invisible='1'/>
+                    <label for="machine" string='Machine'  />
+                    <div>
+                      <field name='machine' context="{'order_machine': True,'machine_type_ids':machine_type_ids}"
+                          class="oe_inline" string='Machine'  options="{'no_create': True, 'no_open': True}"
+                           attrs="{'invisible':[('machine_show','=',False)],'readonly':[('state','!=','draft')]}"/>
+                        <h4  attrs="{'invisible':[('not_ok','=',False)]}" style="color:red;" 
+                               >Process is not define in Product. </h4>
+                        <button type='object' name='open_calendar' string='Set Schedule' class="oe_inline oe_highlight" nolable='1' invisible="context.get('mo_cal')"/>
+                    </div>
+                    <!--button name="open_workorders" type="object"  string="Order" icon="fa-folder-open-o"/-->
+                   <field name='capacity_type'  class="oe_inline" string='Applicable Capacity'
+                       options="{'no_create': True}" 
+                 attrs="{'invisible':['|',('information_types','=','custom'),('machine_capacity_type','!=','machine'),],
+                          
+                          'required':['&amp;',('machine_capacity_type','=','machine'),('information_types','=','default')]}"
+                     
+                           nolable='1'  domain="[('machine','=',machine)]"/>
+                   <field name='information_types' widget='radio' attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)],'readonly':[('state','!=','draft')]}"/>
+                   <!--field name='wk_capacity_type' widget='radio'  invisible="context.get('mo_cal')"
+                    attrs="{'invisible':[('machine','=',False)]}"/-->
+                   <!--field name='order_line_ids' string='Next Work Orders' readonly='1'>
+                       <tree>
+                          <field name='order_id' invisible='1'/>
+                          <field name='own_id' string='Work Order No.' context="{'own':True , 'back_order_id':order_id}"/>
+                       </tree>
+                     </field-->
+                    <!--field name='next_order_id' invisible="context.get('mo_cal')"
+                         attrs="{'invisible':[('wk_capacity_type','!=','next')]}"
+                        context="{'order':True, 'order_id':id, 'sequence':sequence,
+                         'production':production_id}"/-->
+                   <field name='not_ok' class="oe_inline" nolable='1' invisible='1'/>
+                  <!--label for="not_ok" string='Next order Status' attrs="{'invisible':[('next_order_id','=',False)]}"/>
+                    <div attrs="{'invisible':[('next_order_id','=',False)]}">
+                       <field name='next_id' class="oe_inline" nolable='1'/>
+                       <h4  attrs="{'invisible':[('not_ok','=',False)]}" style="color:red;" 
+                      >Machine is not select in Next Order. </h4>
+                      <h4  attrs="{'invisible':[('not_ok','=',True)]}" style="color:green;" 
+                      >Machine is select in Next Order. </h4>
+                    </div>
+                    <field name='invisible_bool'/-->
+                   <field name="time_option"  attrs="{'invisible':['|','|',('process_type','=','raw'),('information_types','=','custom'),('machine','=',False)],'readonly':['|',('state','!=','draft'),('information_types','=','default')]}"/>
+                   <label for="capacity_per_cycle" string='Capacity Per Cycle' attrs="{'invisible':[('machine','=',False)]}"/>
+                    <div attrs="{'invisible':[('machine','=',False)]}" >
+                        <field name='capacity_per_cycle' attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}" class="oe_inline" nolable='1'/>
+                        <field name='capacity_unit' readonly='1' class="oe_inline" nolable='1'/>
+                    </div>
+                   <!--field name='capacity_per_cycle_change'/-->
+                   <field name='capacity_per_cycle_kg_current' string='From Next Order' invisible='1' />
+                   <field name='capacity_per_cycle_kg' invisible='1'/>
+                   <field name='time_efficiency' invisible="1" 
+                       attrs="{'invisible':[('machine','=',False)]}"/>
+                    <field name="m_change" invisible="1"/>
+                     
+                    <!--field name="working_machine" readonly="1" attrs="{'invisible': [('m_change', '=',False)]}"/-->
+                    <label for="p_hour" string='Duration(HH:MM:SS)' 
+                      attrs="{'invisible':[('machine','=',False)]}"/>
+                          <div class="address_format" attrs="{'invisible':[('machine','=',False)]}">
+				 <field name='p_hour' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
+				 <field name='p_minute' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
+				  <field name='p_second' style="width: 25%" attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
+			    </div>
+                       <label for="shift_time" string='Shift Time'  
+                          attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}"/>
+                    <div attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}" >
+                        <field name='shift_time' class="oe_inline" nolable='1'
+                        attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')]}"/>
+                        <!--button name='shiftrequest' type='object' string='Generate Shift' class="oe_inline oe_highlight" nolable='1' attrs="{'invisible':[('machine','=',False)]}"/-->
+                        
+                    </div>
+                       <field name="shift_required" 
+                        readonly="1" attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}"/>
+                        <field name='shift_produced' readonly="1" 
+                           attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}"/>
+                        <field name='shift_child_order_id' readonly='1' 
+                           attrs="{'invisible':[('shift_child_order_id','=',False)]}"/>
+                        <field name='shift_order_id' readonly='1' attrs="{'invisible':[('shift_order_id','=',False)]}"/>
+                        <field name='parent_id' readonly='1' attrs="{'invisible': [('parent_id', '=',False)]}" />
+                        <label for='shift_base_qty' string="Each Shift Base Qty" attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}"/>
+		            <div attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}">
+				  <field name="shift_base_qty" class="oe_inline" nolabel="1" readonly="1"/>
+				  <field name="shift_base_uom"  class="oe_inline" nolabel="1" readonly="1"/>
+		            </div>
+    			 <field name='next_order_id' readonly='1' attrs="{'invisible':[('next_order_id','=',False)]}"/>
+                    <!--label for="duration"/>
+                            <div>
+                                <button style="pointer-events: none;background-color:#777777;" class="oe_inline label label-default">
+                                    <field name="duration" widget="mrp_time_counter"/>
+                                </button>
+                            </div-->                    
+                    </group>
+                 </group>
+             </xpath>
+         
+        </field>
+
+     </record>
+  <!-- End Work order -->
+  <!-- start mrp workcenter xml -->
+    <record id="mrp_workcenter_tree_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.workcenter.form</field>
+        <field name="model">mrp.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_workcenter_tree_view"></field>
+        <field name="arch" type="xml">
+           <field name="resource_type" position="after">
+              <!--field name="capacity_per_cycle" string="Capacity Per Cycle" /-->
+                <!--field name="machine"/-->
+               <field name="product_uom_id" string="Product Unit"/>
+               <field name="cate_id" string="Category" />
+               <!--field name="process_id"/-->
+               <field name="product_ids" widget='many2many_tags'/>
+          </field>
+           <field name="company_id" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="code" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+        </field>
+     </record>
+     <record id="mrp_workcenter_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.workcenter.form</field>
+        <field name="model">mrp.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_workcenter_view"></field>
+        <field name="arch" type="xml">
+           <xpath expr="//form" position="inside">
+              <div class="oe_chatter">
+		    <field name="message_ids" widget="mail_thread"/>
+		</div>
+           </xpath>
+            <xpath expr="//page[1]/group/group[2]" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[1]/group/group[1]" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+            <field name="company_id" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+           <field name="code" position="attributes">
+              <attribute name="invisible">1</attribute>
+           </field>
+              <field name="name" position="before">
+               <field name='process_id' required='1' options="{'no_create': True, 'no_open': True}" />
+           </field>
+            <field name="code" position="after">
+                    <field name='machine_type_ids' widget='many2many_tags' required='1'
+                         options="{'no_create': True, 'no_open': True}" />
+                    <!--field name="machine" domain="[('machine_type','=',machine_type)]"/--> 
+                    <field name='print_option' invisible="1"/>    
+                   <!--field name="machine_ids" widget='many2many_tags'/-->
+            </field>
+            <field name="calendar_id" position="attributes">
+               <attribute name="invisible">1</attribute>
+            </field>
+            <field name="calendar_id" position="after">
+                    <field name='shift_time' invisible="1"/>
+                    <field name='product_qty' invisible="1"/>
+                    <field name="cate_id" string="Category" options="{'no_create': True, 'no_open': True}" 
+                    domain="[('cat_type','in',('film','injection'))]"/>
+                    <!--field name='machine_type'/>
+                    <field name="process_id" domain="[('cate_id','=',cate_id)]" options="{'no_create': True,}"-->
+                    <field name="product_uom_id" string="Unit" required='1' context="{'process_packaging':True}"
+                         options="{'no_create': True, 'no_open': True}" />
+                    <field name="product_ids" widget='many2many_tags' domain="[('categ_id','=',cate_id)]" readonly="1"/>
+                       
+
+            </field>
+            <!--field name="capacity_per_cycle" position="replace">
+               <label for='time_option' string="Production Output"/>
+                <div>
+                   <field name="time_option"   class="oe_inline" nolabel="1"/>
+                 </div>
+               <label for='capacity_per_cycle' string="Capacity Per Cycle"/>
+                 <div>
+                  <field name="capacity_per_cycle_time" class="oe_inline" nolabel="1" invisible="1"/>
+                  <field name="capacity_per_cycle"  class="oe_inline" nolabel="1" />
+                  <field name='unit_ids'  class="oe_inline" nolabel="1" />
+                 </div>
+            </field-->
+           <field name="time_cycle" position="attributes">
+		 <attribute name="invisible">1</attribute>
+	    </field>
+            <field name="capacity_per_cycle" position="attributes">
+		 <attribute name="invisible">1</attribute>
+	    </field>
+            <field name="time_start" position="attributes">
+		 <attribute name="string">Loading Time(in hour)</attribute>
+	    </field>
+            <field name="time_stop" position="attributes">
+		 <attribute name="string">Unloading Time(in hour)</attribute>
+	  </field>
+          <notebook position="inside">
+            <page string="Process Schedule Details">
+                <field name="work_ids" readonly="1">
+                    <tree>
+                        <field name='name'/>
+                        <field name="date_planned" string='Scheduled Start Date'/>  
+                        <field name="date_planned_end" string='Scheduled End Date'/>
+                        <field name="date_start" readonly="1" string='Actual Start Date'/>
+                        <field name="date_finished" readonly="1" string='Actual End Date'/>
+		        <field name="production_id"/>
+		        <field name="product"/>
+		        <field name="qty" string="Required Qty"/>
+                        <field name="total_product_qty" string="Produced Qty"/>
+		        <field name="uom"/>
+                        <field name="machine" />
+		        <field name="cycle"/>
+		        <field name="hour" widget="float_time"/>
+		        <field name="state"/>
+		    </tree>
+                </field>
+            </page>
+          </notebook>
+        </field>
+    </record>
+<!--end Mrp workcenter xml -->
+  <!-- Strat Machine Type Tree View Menu -->
+     <record id="machine_type_tree_view" model="ir.ui.view">
+            <field name="name">machine.type.tree</field>
+            <field name="model">machinery.type</field>
+            <field name="arch" type="xml">
+                <tree string="Machine Type" editable='top'>
+                     <field name="name" />
+                    <field name='is_human'/>
+               
+               </tree>
+           </field>
+     </record>
+
+ <!-- End Machine Type Tree View Menu-->
+        <record id="machines_view_form" model="ir.ui.view">
+            <field name="name">machines.form</field>
+            <field name="model">machinery</field>
+            <field name="arch" type="xml">
+                <form string="Machines">
+                    <!--group colspan="4" col="6">
+                        <separator string="Machine Details"
+                            colspan="6" />
+                    </group-->
+                    <group>
+                         <group>
+                           <field name='machine_type_ids' widget='many2many_tags' required='1'
+                               options="{'no_create': True}"/>
+                           <field name="name" />
+		           <!--field name="product"   widget='many2many_tags'/>
+		           <field name='product_uom_id'  string="Unit"/-->
+			   <field name="weight" string="Machine Weight (KG)"/>
+                           <field name='status' readonly="1" invisible='1'/>
+                           <field name='serial_no'/>
+                            <field name='assets_no'/>
+                                <field name="machine_user_ids" widget="many2many_tags" string="Machine Users"
+                                   options="{'no_create': True, 'no_open': True}" required="1" 
+                                   domain="[('employee_ids','!=',False)]"/>
+                               <field name='employee_ids' widget="many2many_tags"/>
+                          </group>
+                          
+                          <group string="Capacity Information">
+                              <field name='capacity_type' widget='radio' required='1'/>
+                              <field name="time_efficiency" attrs="{'invisible':[('capacity_type','!=','product')]}"/>
+                              <field name="time_start" widget="float_time"/>
+                              <field name="time_stop" widget="float_time"/>
+                              <field name='shift_time'/>
+                              <field name='capacity_ids' string='Capacities Details' attrs="{'invisible':[('capacity_type','!=','machine')]}">
+                                 <tree editable='bottom'>
+                                   <field name='name' required='1'/>
+                                    <field name='capacity_per_cycle' required='1'/>
+		                     <field name='hour' />
+		                     <field name='minute'/>
+		                     <field name='second'/>
+                                     <field name='time_option' invisible='1'/>
+                                 </tree>   
+                              </field>
+                             
+                             <!--<field name='capacity_per_cycle'/>
+                             <field name='hour'/>
+                             <field name='minute'/>
+                             <field name='second'/>-->
+                              
+                              
+                         </group>
+                        </group>
+                         <group>
+                         <group>
+                          
+                         </group>
+                    </group>
+                    <separator string="Analysis Information"
+                        colspan="4" /> 
+                    <notebook colspan="4">
+                        <page string="Machine Schedule Details">
+				<field name="work_ids" readonly='1'>
+				    <tree >
+                                        <field name='name'/>
+				        <field name="date_planned" string='Scheduled Start Date'/>
+				        <field name="date_planned_end" string='Scheduled End Date'/>
+				        <field name="date_start" readonly="1" string='Actual Start Date'/>
+				        <field name="date_finished" readonly="1" string='Actual End Date'/>
+					<field name="production_id"/>
+					<field name="product"/>
+					<field name="qty" string="Required Qty"/>
+				        <field name="total_product_qty" string="Produced Qty"/>
+					<field name="uom"/>
+				        <field name="machine" invisible='1'/>
+					<field name="cycle"/>
+					<field name="hour" widget="float_time"/>
+					<field name="state"/>
+				    </tree>
+				</field>
+			    </page>
+                        <page string="Additional Details">
+                           <group>
+                                 <group>
+                                    <separator string="Current Details"
+                                        colspan="4" />
+                                    <field name="ownership" />
+                                    <field name="power" />
+                                    <field name="mac" />
+                                    <!--field name="phone" />
+                                    <field name="ambit" />
+                                    <field name="salvage_value" /-->
+                                </group>
+                                <group>
+                                    <separator string="Manufacture Details"
+                                    colspan="4" />
+                                    <field name="manufacturer" />
+                                    <field name="year" />
+                                    <field name="model" />
+                                    <!--field name="model_type" /-->
+                                </group>
+                                <group>
+                                    <separator string="Extra Information"
+                                        colspan="4" />
+                                    <field name="note"/>
+                                    <!--field name="card" />
+                                    <field name="cardexp" /-->
+                                </group>
+                                <group>
+                                    <separator string="Insurance"
+                                        colspan="4" />
+                                    <field name="insurance" />
+                                    <field name="policy" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Financial Details">
+                        <group>
+                            <group>
+                                <separator string="Purchase Info" colspan="4"  />
+                                <field name="purch_date" />
+                                <field name="purch_partner" options="{'no_create': True, 'no_open': True}" />
+                                <field name="purch_inv" options="{'no_create': True, 'no_open': True}"
+                                  domain="[('type','in',('in_invoice', 'in_refund'))]" />
+                                <field name="purch_cost" />
+                                <field name="purch_cycles" />
+                                <!--field name="enrolldate" /-->
+                            </group>
+                            <group>
+                                <separator string="Financial Details" colspan="4" />
+                                <field name="deprecperc" />
+                                <field name="deprecperiod" />
+                                <field name="assetacc" options="{'no_create': True, 'no_open': True}" />
+                                <field name="depracc" options="{'no_create': True, 'no_open': True}" />
+                            </group>
+                        </group>
+                        <!--group>
+                            <separator string="Warranty Expiry"/>
+                            <newline/>
+                            <field name="warrexp" />
+                            <field name="warrexpcy" />
+                        </group-->
+                        </page>
+                        <!--page string="Machine Users">
+                            <field name="users">
+                              <tree string="Machine Users" editable='bottom'>
+				    <field name="m_user"/>
+				    <field name="start_date"  />
+				    <field name="end_date" />
+				</tree>
+                            </field>
+                        </page-->
+                        <page string="Maintenance">
+                           <separator string="Maintenance Details" colspan="4" />
+                            <group>
+                               <field name="maintenance_ids" nolabel='1' readonly='1'>
+                                  <tree>
+                                         <field name="name"/>
+					  <field name="requested_by"/>
+					  <field name="requested_date"/>
+					  <field name="production_id"/>
+					  <field name="workorder_id"/>
+					  <field name="machine_id"/>
+					  <field name="user_ids" widget="many2many_tags" />
+					  <field name="schedule_date"/>
+					 <field name="state"/>
+                                  </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="machine_view_tree" model="ir.ui.view">
+            <field name="name">machine.tree</field>
+            <field name="model">machinery</field>
+            <field name="arch" type="xml">
+                <tree string="Machines">
+                     <field name="name" />
+                    <field name='conflict_count' invisible='1'/>
+                     <!--field name="product"/>
+                    <field name="product_categ"/>
+                    <field name="capacity_per_cycle"/>
+                    <field name='product_uom_id' />
+                    <field name="time_cycle"  widget="float_time" string="Time for 1 cycle (hour)"/-->
+                    <field name="weight" string="Machine Weight (KG)"/>
+                    <field name="model"/>
+                    <field name="year" />
+                    <field name="manufacturer"/>
+                    <!--field name="company"  /-->
+                    <!--field name="model_type"/-->
+                    <!--field name="serial"/-->
+                    <!--field name="salvage_value"/-->
+                </tree>
+            </field>
+        </record>
+      <record id="machine_kanban_view" model="ir.ui.view">
+            <field name="name">machinery.kanban</field>
+            <field name="model">machinery</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="name"/>
+                    <field name='conflict_count'/>
+                    <field name='status'/>
+                    <field name='time_efficiency'/>
+                    <field name='running_workorder_id'/>
+                    <field name='running_production_id'/>
+                     <field name="shft_rq"/>
+                     <field name="shft_pr"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                          
+                             <div t-attf-class="oe_kanban_card oe_kanban_global_click" >
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <strong><span><t t-esc="record.name.value"/></span></strong>
+                                      <a name='action_planning_workorders' type="object"> 
+                                        <strong><span>Total Scheduled</span></strong>
+                                      </a> 
+                                      <t t-esc="record.status.value"/>
+                                     <t t-if="record.status.value == 'Active'">
+                                        <t t-if="record.time_efficiency.value == 1">
+                                          <img src="/gt_order_mgnt/static/src/img/100%.gif" width='180px'/>
+                                        </t>
+                                        <t t-if="record.time_efficiency.value &lt; 0.90 and record.time_efficiency.value &gt; 0.80 ">
+                                          <img src="/gt_order_mgnt/static/src/img/80%.gif" width='180px'/>
+                                        </t>
+                                       <t t-if="record.time_efficiency.value &lt; 1 and record.time_efficiency.value &gt; 0.90 ">
+                                          <img src="/gt_order_mgnt/static/src/img/90%.gif" width='180px'/>
+                                        </t>
+                                    </t> 
+                                    <t t-if="record.status.value == 'InActive' or record.status.value == 'Pause'">
+                                      <img src="/gt_order_mgnt/static/src/img/0.JPG" width='180px'/>
+                                    </t>
+                                    <t t-if="record.status.value == 'Maintenance'">
+                                      <img src="/gt_order_mgnt/static/src/img/maintenance.gif" width='180px'/>
+                                    </t>
+                                    </div>
+                                    <div class="col-xs-6">
+                                    <t t-if='record.running_workorder_id.value'>
+                                     <strong><a name='action_currentorder' type='object'>
+                                           Running Order:<span style='color:blue'>
+                                          <field name='running_workorder_id'/>
+                                         <span>Shift Detais</span>
+                                         </span>
+                                          </a>
+                                          <field name="shft_pr" widget="gauge" 
+                                               style="width:120px;height:90px;cursor:pointer;" 
+                                              options="{'max_field':'shft_rq'}"> 
+                                           </field>
+                                          </strong>
+                                     </t>
+                                     <t t-if='record.running_production_id.value'>
+                                     <a name='action_currentMo' type='object'>
+                                         <strong>Running MO:<span style='color:blue'> 
+                                        <field name='running_production_id'/>
+                                       </span>
+                                      </strong>
+                                     </a>
+                                    </t>
+                                   <t t-if='record.conflict_count.value != 0'>
+                                     <a name='action_conflict_workorders' type="object"> 
+                                        <strong><span class="pull-right text-right" style='color:red'>
+                                        <t t-esc='record.conflict_count.value'/> Conflict Work Orders</span></strong>
+                                     </a>
+                                   </t>
+                                     <!--img src="/gt_order_mgnt/static/src/img/100%.gif" width='120px'/-->
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6 text-muted">
+                                        <span></span>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <!--span t-attf-class="pull-right text-right label #{['draft', 'cancel'].indexOf(record.state.raw_value) > -1 ? 'label-default' : ['none'].indexOf(record.state.raw_value) > -1 ? 'label-danger' : ['confirmed'].indexOf(record.state.raw_value) > -1 ? 'label-warning' : ['done'].indexOf(record.state.raw_value) > -1 ? 'label-success' : 'label-primary'}"><t t-esc="record.state.value"/></span-->
+                                    </div>
+                                </div>
+                            </div>
+                     
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record id="machine_view_search" model="ir.ui.view">
+            <field name="name">machine.search</field>
+            <field name="model">machinery</field>
+            <field name="arch" type="xml">
+                <search string="Search machinery">
+                   <field name="product"/>
+                   <field name="serial"/>
+                   <field name="manufacturer"/>
+                   <field name="model"/>
+                   <!--field name="model_type"/-->
+                   <field name="serial_char"/>
+                   <group expand="0" string="Group By">
+                       <!--filter string="Model type" context="{'group_by' : 'model_type'}"/-->
+                       <filter string="Model" context="{'group_by' : 'model'}"/>
+                       <filter string="Product" context="{'group_by' : 'product'}"/>
+                       <!--filter string="Product category" context="{'group_by' : 'product_categ'}"/-->
+                       <filter string="Manufacturer" context="{'group_by' : 'manufacturer'}"/>
+                   </group>
+               </search>
+            </field>
+        </record>
+        <record id="machines_maintenance_tree" model="ir.ui.view">
+            <field name="name">Machine.maintenance.tree</field>
+            <field name="model">machine.maintenance</field>
+            <field name="arch" type="xml">
+               <tree string="Machine Maintenance">
+                  <field name="name" />
+                  <field name="requested_by" />
+                  <field name="requested_date" />
+                  <field name="production_id" />
+                  <field name="workorder_id" />
+                  <field name="machine_id"/>
+                  <field name="user_ids" widget="many2many_tags" />
+                  <field name="schedule_date"  />
+                 <field name="state"/>
+               </tree>
+            </field>
+       </record>
+       <record id="machines_maintenance_form" model="ir.ui.view">
+            <field name="name">Machine.maintenance.form</field>
+            <field name="model">machine.maintenance</field>
+            <field name="arch" type="xml">
+                <form string="Machines"> 
+                  <header>
+                     <button name="send_request" string="Send Request" type="object" class="oe_highlight" states="draft"/>     
+                     <button name="request_progress" string="Start Work" type="object" class="oe_highlight" states="new"/>
+                    <button name="request_repaired" string="Maintenance Completed" type="object" class="oe_highlight" states="new,progress"/>
+                    <!--button name="request_scrap" string="Request Scrap" type="object" states="new,progress" class="oe_highlight" /-->
+                     <button name="request_cancel" string="Cancel Request" type="object" class="oe_highlight"
+                      states='draft,new,progress'/>
+                     <field name="state" widget="statusbar" statusbar_visible="new,progress,repaired,cancel"/>
+                  </header>
+                   <sheet>
+                      <group>
+                            <group>
+                                <field name="name" />
+                                <field name="requested_by" />
+                                <field name="requested_date" />
+                                <field name="production_id" />
+                                <field name="workorder_id" />
+                                <field name="machine_id"/>
+                                <field name='maintenance_type'/>
+                                <field name='required_date'
+                           attrs="{'required': [('urgent', '=',True)],'readonly': [('state', '!=','draft')]}"/>
+                                <field name='urgent' attrs="{'readonly': [('state', '!=','draft')]}" />
+                                <field name="note"  attrs="{'readonly': [('state', '!=','draft')]}"/>
+                            </group>
+                            <group>
+                                  <field name="user_ids" widget="many2many_tags" attrs="{'invisible': [('state', '=','draft')], 'readonly':[('state','!=','new')], 'required':[('state','not in',('draft'))]}"/>
+                                  <field name="schedule_date"  
+                                    attrs="{'invisible': [('state', '=','draft')],'required':[('state','not in',('draft'))]}"/>
+                                   <field name="finish_date"  
+                                     attrs="{'invisible': [('state', '=','draft')],'required':[('state','not in',('draft'))]}"/>
+                                  <field name="reason" 
+                                    attrs="{'invisible': [('state', '=','draft')],'required':[('state','not in',('draft'))]}"/>
+                            </group>
+                        </group>
+                      
+                   </sheet>
+                    <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+       </record>
+<!-- start Process Type -->
+      <record id="process_type_tree" model="ir.ui.view">
+            <field name="name">mrp.workcenter.process.tree</field>
+            <field name="model">mrp.workcenter.process</field>
+            <field name="arch" type="xml">
+               <tree string="Process Type" editable='top'>
+                  <field name="name" required="1"/>
+                  <field name='code' required="1"/>
+                  <field name="process_type"  required="1"/>
+               
+               </tree>
+            </field>
+       </record>
+      <record id="process_type_form" model="ir.ui.view">
+            <field name="name">mrp.workcenter.process.form</field>
+            <field name="model">mrp.workcenter.process</field>
+            <field name="arch" type="xml">
+                <form string="Process Type"> 
+                  <sheet>
+                     <group>
+                       <group>
+                          <field name="name" />
+                          <field name='code' required='1'/>
+                          <!--field name="machine_type" />
+                          <field name="machine" domain="[('machine_type','=',machine_type)]" invisible="1"/-->
+                       </group>
+                       <group>
+                            <!--field name="cate_id" string="Category" domain="[('cat_type','in',('film','injection'))]"/>
+                            <field name="workcenter_id"/>
+                            <field name="unit_id"/-->
+                            <field name="process_type" required='1'/>
+                           
+                       </group>
+                    </group>
+                  </sheet>
+                </form>
+
+            </field>
+      </record>
+<!-- End Process Type-->
+     <record id="machine_type_form_action" model="ir.actions.act_window">
+            <field name="name">Machines Type</field>
+            <field name="res_model">machinery.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+      <record id="machines_maintenance_action" model="ir.actions.act_window">
+            <field name="name">Machine Maintenance</field>
+            <field name="res_model">machine.maintenance</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="machine_form_action" model="ir.actions.act_window">
+            <field name="name">Machines</field>
+            <field name="res_model">machinery</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+        </record>
+         <record id="process_type_action" model="ir.actions.act_window">
+            <field name="name">Process Type</field>
+            <field name="res_model">mrp.workcenter.process</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+         
+         <menuitem id="menu_machine_type"
+            name="Machine Type"
+            action="machine_type_form_action"
+            parent="mrp.menu_mrp_bom"
+            sequence="103"/>
+          <menuitem id="menu_machines"
+            name="Machines"
+            action="machine_form_action"
+            parent="mrp.menu_mrp_bom"
+            sequence="104"/>
+         <menuitem id="mrp.menu_mrp_routing_action"
+          action="mrp.mrp_routing_action"
+          parent="mrp.menu_mrp_bom"
+          groups="mrp.group_mrp_routings"
+          sequence="105"/>
+           
+
+         <menuitem id="menu_machines_maintenance"
+            name="Machine Maintenance"
+            action="machines_maintenance_action"
+            parent="mrp.menu_mrp_configuration"
+            sequence="42"/>
+        <menuitem id="menu_process_type"
+            name="Process Type"
+            action="process_type_action"
+            parent="mrp.menu_mrp_bom"
+            sequence="101"/>
+ <!-- start wastage view for mrp production -->
+        <!--record id="mrp_work_order_wastage_tree_aalmir" model="ir.ui.view">
+		<field name="name">mrp.order.batch.number.tree</field>
+		<field name="model">mrp.order.batch.number</field>
+		<field name="arch" type="xml">
+		    <tree string="MRP Produced Wastage">
+		       <field name='name' string="Batch No"/>
+		        <field name='production_id' />
+		        <field name='wastage_qty' string="Wastage Qty" sum="total" />
+		        <field name='uom_id' />
+		    </tree>
+		  </field>
+       </record-->
+       
+        <record id="mrp_work_order_wastage_form_aalmir" model="ir.ui.view">
+        <field name="name">mrp.order.batch.number.form</field>
+        <field name="model">mrp.order.batch.number</field>
+        <field name="arch" type="xml">
+            <form string="MRP Produced Wastage">
+               <header>
+                     <button name="print_batch_barcode" string="Barcode" icon='fa-print' type="object"  
+                           class="oe_highlight" invisible="context.get('edit_qty')"/>
+               </header>
+               <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_batches" type="object" class="oe_stat_button" icon="fa-list-alt"
+                            string='Total batches' invisible="context.get('edit_qty')">
+                            <!--field name="maintenace_count" widget="statinfo" string="Maintenace"/-->
+                        </button>
+                    </div>
+               <group>
+                   <group>
+                    <field name='name' readonly='1' string="Batch No"/>
+                    <field name='production_id' readonly='1'/>
+                    <field name='produce_qty_date'  string='Produced Date'/>
+                    <field name='order_id' readonly='1' string='Work Order No.'/>
+                      <field name='employee_name'  readonly="not context.get('edit_qty')"/>
+                   <!--field name='user_id' context="{'operator':True, 'order_id':order_id}"
+                      options="{'no_create': True, 'no_open': True}" 
+                          readonly="not context.get('edit_qty')"/--> 
+                    <field name='supplier_batch_no' readonly="not context.get('edit_qty')"/>
+                    <field name='remark' readonly="not context.get('edit_qty')"/>
+                    <field name='document' readonly="not context.get('edit_qty')"/>
+               </group>
+                     <group >
+                        <label for='wastage_allow' string="Allowed Wastage Qty"/>
+			<div>
+			    <field name="wastage_allow" class="oe_inline" nolabel="1"   readonly="1" />
+			    <field name="allow_wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+			</div>
+                         <label for='wastage_qty' string="Total Produced Wastage Qty(kg)"/>
+			<div>
+			    <field name="wastage_qty" class="oe_inline" nolabel="1"  
+                                  readonly="not context.get('edit_qty')" />
+			    <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+			</div>
+                         <field name='reason' readonly="not context.get('edit_qty')" 
+                           string='Wastage Reason'/>
+                         <label for='product_qty' string="Produced Qty"/>
+			<div >
+			    <field name="product_qty" class="oe_inline" nolabel="1"
+                              readonly="not context.get('edit_qty')" />
+			    <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+			</div>
+                    </group>
+              </group>
+             </sheet>
+                 <footer>
+                     <button name='save_batch' type='object' string='Save' class="oe_highlight"
+                         invisible="not context.get('edit_qty')"/>
+                     <button type="object" string="Cancel" class="oe_highlight" name='cancel' 
+		            special='cancel' invisible="not context.get('edit_qty')"/>
+                </footer>
+            </form>
+        </field>
+   </record>
+       <!--record model="ir.actions.act_window" id="mrp_work_order_wastage_aalmir_action">
+        <field name="name">MRP Wastage</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.order.batch.number</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field> 
+        <field name='domain'>[('wastage_qty','&gt;',0)]</field>
+      
+    </record-->
+      
+     <!--menuitem action="mrp_work_order_wastage_aalmir_action" id="menu_work_order_wastage_aalmir" 
+             name="MRP Wastage" parent="mrp.menu_mrp_configuration"  sequence="44"/-->
+     <!-- End wastage view for mrp production -->
+     <!-- start work order maintenance view-->
+            <record id="work_order_maintenance_form" model="ir.ui.view">
+            <field name="name">mrp.work.order.maintenance.form</field>
+            <field name="model">mrp.work.order.maintenance</field>
+            <field name="arch" type="xml">
+                <form string="Machines"> 
+                      <group>
+                            <group>
+                                <field name="production_id" />
+                                <field name="workorder_id" />
+                                <field name="machine_id"/>
+                              
+                            </group>
+                            <group>
+                                 <field name='maintenance_type'/>
+                                 <field name="required_date" />
+                                <field name="urgent" />
+                                <field name="note"/>
+                            </group>
+                        </group>
+                     <footer>
+		            <button type="object" string="Send Request" class="oe_highlight" 
+		             name="send_maintenancerequest"/>
+		            <button type="object" string="Cancel" class="oe_highlight" name='cancel' 
+		            special='cancel'/>
+                     </footer>
+                </form>
+            </field>
+       </record>
+     <!-- end work order maintenance view -->
+  
+        
+</odoo>
+

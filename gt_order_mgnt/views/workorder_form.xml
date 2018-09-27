@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    <template id="report_mrp_workorder_form">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+                    <t t-set="doc" t-value="doc.with_context({})" />
+                    <div class="page" style="font-family: Calibri;">
+                        <div class="oe_structure"/>
+                        <h2 align="center" style="font-family: Calibri;">
+				<span >Job Card - <span t-esc='doc.workcenter_id.name'/></span>
+				
+			    </h2>
+                         <table class="table table-bordered" style="border: 1px solid #9999; margin-top: 30px">
+                        <tr >
+                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Work Order Informations</th>
+                        </tr>
+                        <tr>
+                            <td width="25%" style="font-weight: bold;">Work Order No.</td>
+                            <td width="25%"><t t-esc="doc.name" /></td>
+                            <td width="25%" style="font-weight: bold;">Planned Date</td>
+                            <td width="25%"><t t-esc="doc.date_planned" /></td>
+                        </tr>
+                        <tr>
+                            <td width="25%" style="font-weight: bold;" t-if='doc.production_id'>Manufacturing No.</td>
+                            <td width="25%" t-if='doc.production_id'><t t-esc="doc.production_id.name" /></td>
+                            <td width="25%" style="font-weight: bold;" t-if='doc.machine'>Machine Name</td>
+                            <td width="25%" t-if='doc.machine'><t t-esc="doc.machine.name" /></td>
+                        </tr>
+                       <tr>
+                            <td style="font-weight: bold;" t-if="doc.workcenter_id">Process Name</td>
+                            <td t-if="doc.product"><t t-esc="doc.workcenter_id.name"/></td>
+                            <td style="font-weight: bold;" t-if="doc.production_id">BOM Code</td>
+                            <td t-if="doc.production_id"><t t-esc="doc.production_id.bom_id.master_id.name"/></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;" t-if="doc.product">Product Name</td>
+                            <td t-if="doc.product"><t t-esc="doc.product.name"/></td>
+                            <td style="font-weight: bold;" t-if="doc.wk_required_qty"> Required Qty</td>
+                            <td t-if="doc.wk_required_qty"><span t-esc="doc.wk_required_qty" /><span t-esc="doc.uom.name" /></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;" t-if='doc.shift_required'>Shift Required</td>
+                            <td t-if='doc.shift_required'><t t-esc="'%.2f'% doc.shift_required" /></td>
+                            <td style="font-weight: bold;" t-if='doc.shift_base_qty'>Each Shift Base Qty</td>
+                            <td t-if='doc.shift_base_qty'><t t-esc="doc.shift_base_qty" /></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Start Time</td>
+                            <td ></td>
+                            <td style="font-weight: bold;">Finish Time</td>
+                            <td ></td>
+                        </tr>
+                        <!--tr>
+                            <td style="font-weight: bold;" t-if='doc.user_ids'>Assign To</td>
+                            <td t-if='doc.user_ids'><t t-foreach='doc.user_ids' t-as="user">
+                              <span t-field='user.name'/><br></br>
+                             </t></td>
+                            
+                        </tr-->
+                    </table>
+                    
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px" t-if="doc.batch_ids">
+                      <tr >
+                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="10">Total Batches</th>
+                        </tr>
+                        <tr>
+                           <td>Seq.</td>
+                            <td>Operator Name</td>
+                            <td>Batch No.</td>
+                            <td>Supplier batch/Previous batch No.</td>
+                            <td>Required Qty</td>
+                            <td>Produced Qty</td> 
+                            <td>Wastage Qty</td> 
+                           <td>Checked</td>
+                        </tr>
+                        <t t-set="count" t-value="0" />
+                        <t t-foreach="doc.batch_ids" t-as="l">
+                          <t t-if='l.print_bool == 1 and l.product_qty == 0'>
+                            <tr>
+                                <td>
+                                    <t t-set="count" t-value="count+1" />
+                                    <t t-esc="count" />
+                                </td>
+                               
+                                <td>
+                                    <t t-foreach='doc.employee_ids' t-as='emp'>
+                                      <span t-field="emp.name" /><br></br>
+                                    </t>
+                                  </td>
+                                <td>
+                                        <span t-field="l.name" />
+                                  
+                                </td>
+                                <td><span t-esc="l.prev_batch_id.name"/>
+                                    <span t-field='l.supplier_batch_no'/>
+                                </td>
+                               
+                                <td><span t-esc="l.req_product_qty" /><span t-field='l.uom_id.name'/>
+                                </td>
+                                <td><!--span t-esc="l.product_qty"/><span t-field='l.uom_id.name'/--></td>
+                                <td><!--span t-esc="l.wastage_qty" /><span t-field='l.uom_id.name'/--></td>
+                                <td><input type="checkbox" /></td>
+                            </tr>
+                        </t>
+                        </t>
+                    </table>  
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px" t-if="doc.remark">
+                      <tr>
+                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="1">Instruction By Supervisor</th>
+                        </tr>
+                      <tr>
+                          <td><span t-esc='doc.remark'/></td>
+                         
+                      </tr>
+
+                     </table>
+                     <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;" t-if="doc.raw_materials_id">
+                      <tr>
+                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Raw Material Details</th>
+                        </tr>
+                      <tr>
+                         <td>Seq.</td>
+                          <td>Raw Material</td>
+                          <td>Qty</td>
+                          <td>Unit</td>
+                      </tr>
+                      <t t-set="count" t-value="0" />
+                        <t t-foreach="doc.raw_materials_id" t-as="l">
+
+                            <tr>
+                                <td>
+                                    <t t-set="count" t-value="count+1" />
+                                    <t t-esc="count" />
+                                </td>
+                                <td><span t-esc='l.product_id.name'/></td>
+                                <td><span t-esc="'%.2f'% l.report_qty"/></td>
+                               <td><span t-field='l.uom_id.name'/></td>
+                            </tr>
+                        </t>
+
+                     </table>
+
+		         <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;" t-if="doc.product_sepcification_ids">
+		              <tr>
+		                    <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Product Specification Details</th>
+		                </tr>
+		              <tr>
+		                 <td>Seq.</td>
+		                  <td>Attribute</td>
+		                  <td>Value</td>
+		                  <td>Unit</td>
+		              </tr>
+		              <t t-set="count" t-value="0" />
+		                <t t-foreach="doc.product_sepcification_ids" t-as="l">
+
+		                    <tr>
+		                        <td>
+		                            <t t-set="count" t-value="count+1" />
+		                            <t t-esc="count" />
+		                        </td>
+		                        <td><span t-esc='l.attribute.name'/></td>
+		                        <td><span t-esc="l.value" /></td>
+		                       <td><span t-field='l.unit.name'/></td>
+		                    </tr>
+		                </t>
+
+		             </table>
+                     <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px">
+                        <tr>
+                           <td>Wastage Qty</td>
+                            <td colspan="2">Remark       </td>
+                            <td colspan="2">Date &amp; Signature </td>
+                            
+                        </tr>
+                       
+                            <tr>
+                                <td>
+                                   <span t-esc="doc.total_wastage_qty" /><span t-field='doc.wastage_uom_id.name'/>
+                                </td>
+                                <td colspan="2">
+                                   <div style="height:150px">    
+                                   </div>
+                                </td>
+                                <td colspan="2">
+                                   <div style="height:150px"> 
+                                      <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>    
+                                   </div>
+                                </td>
+                               
+                            </tr>
+                     
+                    </table>
+
+
+                   </div>
+                </t>
+             </t>
+          </t>
+       </template>
+
+ </data>
+</openerp>

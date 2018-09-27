@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_invoice_merge" model="ir.ui.view">
+            <field name="name">Consolidate Partner Invoice</field>
+            <field name="model">invoice.merge</field>
+            <field name="arch" type="xml">
+                <form string="Consolidate Partner Invoice" version="7.0">
+                    <group>
+                        <separator
+                            string="Are you sure you want to merge these invoices ?"
+                            colspan="4" />
+                  </group>
+                 
+                    <group name="options">
+                        <field name="partner_id"  options="{'no_create': True}" required="1" readonly="1"/>
+                        <field name="sale_id" required="1" domain="[('partner_id', '=', partner_id)]" 
+                            readonly="1" options="{'no_create': True}"/>
+                         <field name="sale_id_name" invisible="1"/>
+                        <field name="keep_references"/>
+                        <field name="date_invoice"/>
+                    </group>
+                   <group>
+                     <field name="invoice_ids" domain="[('origin','=',sale_id_name), ('state', '=', 'draft')]" nolabel="1" options="{'no_create': True}"/>
+                   </group>
+                    <group>
+                     <separator
+                            
+                            colspan="4" />
+                           <p>
+				Please note that:<br/><br/>
+				Invoices will only be merged if:<br/>
+				* Invoices are in draft<br/>
+				* Invoices belong to the same partner<br/>
+				* Invoices are have same company, partner, address, currency, journal, salesman, account, type<br/><br/>
+				Lines will only be merged if:<br/>
+				* Invoice lines are exactly the same except for the product,quantity and unit<br/>
+                            </p>
+                    </group>
+                    <footer>
+                        <button name="merge_invoices" string="Consolidate Invoices"
+                            type="object" class="oe_highlight" />
+                        or
+                        <button string="Cancel" class="oe_link"
+                            special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window name="Consolidate Invoice" res_model="invoice.merge" src_model="account.invoice" 
+		view_mode="form" target="new" multi="True" key2="client_action_multi" id="action_view_invoice_merge" />
+    <!--<menuitem action="action_view_invoice_merge" id="menu_sale_invoice_merge"
+			parent="stock.menu_stock_warehouse_mgmt" sequence="101" />-->
+    <!--menuitem action="action_view_invoice_merge"
+            id="menu_sale_invoice_merge" parent="gt_order_mgnt.menu_sale_support"
+            sequence="5" /-->
+      <record id="sale_form_view_merge_do_invoice" model="ir.ui.view">
+                    <field name="name">sale.form.view</field>
+                    <field name="model">sale.order</field>
+                    <field name="inherit_id" ref="gt_sale_quotation.view_order_form_custom_aalmir_print" />
+                    <field name="arch" type="xml">
+                       
+                       <xpath expr="//header/button[@name='action_cancel']" position="after">
+                         
+                           <button type="action" string="Consolidate Invoice" name="%(action_view_invoice_merge)d" 
+                           class="btn-primary"  groups="gt_order_mgnt.group_sale_support"
+                           attrs="{'invisible':['|',('invoice_count' ,'=',1),('invoice_count' ,'=',0)]}" invisible="1"/>
+
+                       </xpath>
+                   </field>
+                </record>
+    </data>
+</openerp>
+

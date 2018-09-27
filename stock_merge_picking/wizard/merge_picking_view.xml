@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+               
+		<record id="merge_picking_form_init" model="ir.ui.view">
+			<field name="name">Consolidate Picking</field>
+			<field name="model">stock.picking.merge.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Consolidated Picking">
+					<separator colspan="4" string="Picking target to Consolidate into" />
+                                       <group>
+                                        <field name="partner_id" required="1" options="{'no_create': True}" readonly="1"/>
+                                          <field name="sale_id" string="Sale Order" required="1" readonly="1"
+                                          options="{'no_create': True}" domain="[('partner_id', '=', partner_id)]"/>
+					<field name="target_picking_id" required="1" options="{'no_create': True}"
+				domain="[('state','&lt;&gt;','cancel'), ('sale_id','=', sale_id)]" />
+                                       </group>
+                                        
+					<group col="2" colspan="4">
+						<button icon="gtk-cancel" special="cancel" string="Do not merge" />
+						<button name="do_target" string="Choose Target" type="object"
+							icon="gtk-go-forward" />
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<act_window id="action_merge_picking" name="Consolidate Delivery Orders"
+			res_model="stock.picking.merge.wizard" src_model="stock.picking"
+			view_type="form" view_mode="form" target="new" view_id="merge_picking_form_init"/>
+
+		<!--<menuitem action="action_merge_picking" id="menu_stock_moves_merge_picking"
+			parent="stock.menu_stock_warehouse_mgmt" sequence="100" />-->
+               <!--menuitem action="action_merge_picking"
+                   id="menu_stock_moves_merge_picking" parent="gt_order_mgnt.menu_sale_support"
+                      sequence="6" /-->
+
+		<record id="merge_picking_form_target" model="ir.ui.view">
+			<field name="name">Consolidate Picking</field>
+			<field name="model">stock.picking.merge.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Consolidate Picking">
+                                       <group>
+                                         <field name="target_picking_id_sale_id" required="1"  string="Sale Order" readonly="1" />
+                                         <field name="target_picking_id" required="1" readonly="1" />
+					<field name="target_picking_id_state" invisible="1" />					
+					<field name="target_picking_id_location_id" invisible="1" />
+					<field name="target_picking_id_location_dest_id" invisible="1" />
+					<field name="target_picking_id_company_id" invisible="1" />
+                                        <field name="target_picking_id_partner_id" invisible="1"/>
+                                       </group>
+					
+					<separator colspan="4" string="Pickings to merge into the target" />
+                                         <field name="picking_ids" colspan="4" nolabel="1"
+						domain="[('id','&lt;&gt;',target_picking_id),
+                                                        ('sale_id','=',target_picking_id_sale_id),
+						        ('company_id','=',target_picking_id_company_id),
+						        ]"  options="{'no_create': True}"/>
+					<!--<0.000field name="picking_ids" colspan="4" nolabel="1"
+						domain="[('id','&lt;&gt;',target_picking_id),
+                                                        ('sale_id','=',target_picking_id_sale_id),
+						        ('partner_id','=', target_picking_id_partner_id),
+						        ('location_id','=',target_picking_id_location_id),
+						        ('location_dest_id','=',target_picking_id_location_dest_id),
+						        ('company_id','=',target_picking_id_company_id),
+						        ]" />-->
+					<group col="2" colspan="4">
+						<button icon="gtk-cancel" special="cancel" string="Do not merge" />
+						<button name="do_check" string="Check" type="object"
+							icon="gtk-go-forward" />
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<record id="merge_picking_form_checked" model="ir.ui.view">
+			<field name="name">Consolidate Picking</field>
+			<field name="model">stock.picking.merge.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Merge Picking">
+					<field name="target_picking_id" required="1" readonly="1" />
+					<separator colspan="4" string="Pickings to merge into the target" />
+					<field name="picking_ids" colspan="4" nolabel="1" readonly="1" />
+					<separator colspan="4" string="Please verify and check to merge" />
+					<field name="commit_merge" />
+					<group col="2" colspan="4">
+						<button icon="gtk-cancel" special="cancel" string="Do not merge" />
+						<button name="do_merge" string="Merge" type="object"
+							icon="terp-accessories-archiver+" />
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<record id="merge_picking_form_done" model="ir.ui.view">
+			<field name="name">Consolidate Picking</field>
+			<field name="model">stock.picking.merge.wizard</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Merge Picking">
+					<separator colspan="4" string="Consolidate completed." />
+					<button icon="gtk-cancel" special="cancel" string="Close" />
+				</form>
+			</field>
+		</record>
+
+         	<record id="sale_form_view_merge_do_delivery" model="ir.ui.view">
+                    <field name="name">sale.form.view</field>
+                    <field name="model">sale.order</field>
+                    <field name="inherit_id" ref="gt_sale_quotation.view_order_form_custom_aalmir_print" />
+                    <field name="arch" type="xml">
+                       
+                       <xpath expr="//header/button[@name='action_cancel']" position="after">
+                           <button type="action" string="Consolidate Delivery" name="%(action_merge_picking)d" groups="gt_order_mgnt.group_sale_support"
+                           class="btn-primary" attrs="{'invisible':['|',('delivery_count' ,'=',1),('delivery_count' ,'=',0)]}" invisible="1"/>
+                       </xpath>
+                   </field>
+                </record>
+
+	</data>
+</openerp>

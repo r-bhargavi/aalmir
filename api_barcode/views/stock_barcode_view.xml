@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        
+         <record id="inherite_bin_location" model="ir.ui.view">
+            <field name="name">BIN-Location View</field>
+            <field name="model">n.warehouse.placed.product</field>
+            <field name="inherit_id" ref="api_inventory.product_stock_location_from"/>
+            <field name="arch" type="xml">
+             <field name='button_box' position="after">
+                    <field name="barcode" widget="BarCode128" readonly='1' style="margin-left:-17px;"
+                       attrs="{'invisible':[('barcode','=',False)]}"/>
+                <!--field name="ean_sequence_id" domain="[('barcode_sequence', '=', 1)]" invisible='1'
+                        context="{'default_name': name and 'EAN ' + name or 'EAN', 'default_barcode_sequence': 1}"
+                        class="oe_edit_only" /-->
+              </field>
+           </field>
+         </record>
+    </data>
+</openerp>
+

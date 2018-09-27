@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <record id="product_template_form_view_api_inherite_wastage" model="ir.ui.view">
+		<field name="name">Wastage Product Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_form_view"/>
+		<field name="arch" type="xml">
+                  <div name="button_box" position="inside"> 
+		   	<button class="oe_stat_button" name="open_wastage" type="object" icon="fa-recycle"
+                         attrs="{'invisible':[('matstrg', 'not in',('grinding','scrap'))]}">
+                        <field name='total_wastage_qty' string="Wastage Info"  widget="statinfo"/>
+                    </button>
+                  </div>
+                </field>
+       </record>
+       <record id="product_template_form_view_api_inherite_gt_order" model="ir.ui.view">
+		<field name="name">Wastage Product Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="gt_order_mgnt.product_template_form_view_api_inherite"/>
+		<field name="arch" type="xml">
+                   <group name='weight' position='inside'>
+                       
+                                    <field name='check_produced_wastage' attrs="{'invisible':[('matstrg', 'not in',('product','component','packaging'))]}"/>
+                                      <separator string='Wastage Type' colspan="4"  attrs="{'invisible':[('check_produced_wastage','=',False)]}"/>
+				      <label for='check_grinding'  
+                                         attrs="{'invisible':[('check_produced_wastage','=',False)]}"/>
+				      <div class="o_row"  attrs="{'invisible':[('check_produced_wastage','=',False)]}">
+				           <field name="check_grinding"  class="oe_inline"/>
+				           <field name="grinding_product_id"  class="oe_inline" 
+				      attrs="{'invisible':[('check_grinding','=',False)], 'required':[('check_grinding','=',True)]}"
+				      domain="[('product_material_type.string','=','grinding')]"
+				       options="{'no_create': True, 'no_open': True}"/>
+				      </div>
+				       <label for='check_scrap'
+                                             attrs="{'invisible':[('check_produced_wastage','=',False)]}"/>
+				      <div class="o_row" attrs="{'invisible':[('check_produced_wastage','=',False)]}">
+				           <field name="check_scrap"  class="oe_inline"/>
+				           <field name="scrap_product_id"  class="oe_inline" 
+				         attrs="{'invisible':[('check_scrap','=',False)],'required':[('check_scrap','=',True)]}"
+				          domain="[('product_material_type.string','=','scrap')]"
+				          options="{'no_create': True, 'no_open': True}"/>
+				      </div>
+                           
+                       
+                    </group>
+                </field>
+       </record>
+    </data>
+</openerp>

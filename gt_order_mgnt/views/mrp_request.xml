@@ -1,0 +1,1131 @@
+<?xml version="1.0"?>
+<odoo>
+   <!-- Start Mrp Hold with Work Orders-->
+          <record id="mrp_production_hold_form" model="ir.ui.view">
+		<field name="name">mrp.production.hold.form</field>
+		<field name="model">mrp.production.hold</field>
+		<field name="arch" type="xml">
+		    <form string="Hold Manufacturing Order">
+		          <group colspan="4">
+		              <field name='production_id' readonly='1'/> 
+		              <field name='reason' />
+		              <field name='document'/>
+                              <field name='reminder_date' required="not context.get('active')" invisible="context.get('active')"/>
+		         </group>
+		        
+		       <footer>
+		            <button type="object" string="Hold MO" class="oe_highlight" 
+		             name="hold_mo" invisible="context.get('active')"/>
+		            <button type="object" string="Active MO" class="oe_highlight" 
+		             name="active_mo" invisible="not context.get('active')"/>
+		            <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+		             special='cancel' />
+		       </footer>
+		    </form>
+		</field>
+	    </record>
+    <!-- End Mrp Hold with Work Orders-->
+     <!-- Start Mrp RM schedule form -->
+         <!--record id="mrp_production_rm_schedule_form" model="ir.ui.view">
+        <field name="name">mrp.production.rm.schedule.form</field>
+        <field name="model">mrp.production.rm.schedule</field>
+        <field name="arch" type="xml">
+            <form string="Raw Material Schedule Form">
+                  <group colspan="4">
+                      <field name='production_id' readonly='1'/> 
+                      <label for='product_qty' string="Manufacturing Qty"/>
+                      <div>
+		        <field name="product_qty" class="oe_inline" nolabel="1" readonly='1'/>
+			 <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		      </div>
+                      <field name='remain_qty' invisible='1'/>
+                      <field name='request_type' widget='radio' invisible="not context.get('raw')"/>
+                      <field name='required_date' 
+                      attrs="{'invisible':[('request_type','!=','full')],'required':[('request_type','=','full')]}"/>
+                      <field name='rm_date_line_ids' string="Schedule Details" readonly='1'
+                             context="{'mo_qty':product_qty, 'mo_rqty':remain_qty, 'uom':uom_id}"
+                             attrs="{'invisible':[('request_type','!=','partial')]}" >
+                          <tree editable="bottom"  >
+                              <field name='required_date'/>
+                              <field name='schedule_qty'/>
+                              <field name='uom_id' readonly='1'/>
+                              <field name='order_id' readonly='1'/>
+                          </tree>
+                 
+                      </field>
+                     
+                 </group>
+                 <separator string="Raw Material For Wastage Qty" colspan="4"/>
+                  <group colspan="4">
+                     <field name="rm_schedule_line_ids" nolabel="1" readonly='1'
+                      context="{'sch_line':True, 'schedule_id':production_id}">
+                        <form string='Raw Material Schedule' >
+                           <group>
+                                 <field name='production_id' invisible='1'/>
+		                  <field name="product_id"  required='1' readonly='1'
+		                     context="{'rm_schedule':True, 'production':parent.production_id}"/>
+		                  <field name='qty' readonly='1'/>
+		                  <field name='uom_id' readonly='1'/>
+		                  
+                          </group>
+                           <group>
+                              <field name='date_line_ids' nolabel='1' context="{'sh_qty': qty}">
+                                 <tree editable='bottom'>
+		                     <field name='required_date'/>
+                                     <field name='qty'/>
+                                 </tree>
+                              </field>
+                           </group>
+                        </form>
+                        <tree>
+                           <field name='production_id' invisible='1'/>
+                          <field name="product_id"  required='1' 
+                             context="{'rm_schedule':True, 'production':parent.production_id}"/>
+                          <field name='qty'/>
+                          <field name='uom_id'/>
+                          
+                        </tree>
+                     </field>
+                  </group>
+               <footer>
+                    <button type="object" string="Send Request" class="oe_highlight" 
+                     name="send_request_raw" invisible="not context.get('raw')"/>
+                    <button type="object" string="Send MO Request" class="oe_highlight" 
+                     name="send_request_mo" invisible="not context.get('mo')"/>
+                    <button type="object" string="Send PRQ Request" class="oe_highlight" 
+                     name="send_request_po" invisible="not context.get('po')"/>
+                    <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel' />
+               </footer>
+            </form>
+        </field>
+    </record-->
+  
+	<record id="mrp_sale_form_view_inherite" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="sale_mrp.mrp_production_form_view_inherit_sale_mrp"></field>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='sale_ref']" position="attributes">
+              <attribute name="invisible">1</attribute>
+          </xpath>
+          <xpath expr="//field[@name='move_prod_id']" position="attributes">
+              <attribute name="invisible">1</attribute>
+          </xpath>
+           
+          <field name="sale_name" position="replace">
+		<field name="sale_id" readonly="1" groups="gt_order_mgnt.group_sale_support,base.group_sale_manager"/>
+                <field name="requisition_id" readonly="1" string="Purchase Requisition"/>
+                <field name="calendar_state"/>
+	  </field>
+          <notebook position="inside">
+              <page string="Purchase Order" attrs="{'invisible':[('requisition_id','=',False)]}">
+		  <group>
+			<field name="n_purchase_date" string="Purchase Date" readonly="1"/>
+			<field name="n_purchase_bool" invisible="1"/>
+			<field name="n_po" invisible="1"/>
+			<h2><label string="New date is comes from Purchase order" style="color:red;" attrs="{'invisible': [('n_purchase_bool', '=',False)]}"/></h2>
+			<button name="approve_prpurchase_date" type="object"  string="Approve"  icon="gtk-apply" attrs="{'invisible':[('n_purchase_bool', '=',False)]}"/>
+   		  </group>
+		  <group>
+                  <field name="purchase_order_ids" readonly="1" nolabel="1"  widget="one2many_list">
+                    <tree edit='0' create='0' editable="top"> 
+                    <field name="date_order"/>
+                    <field name="name" string="Purchase Order Number"/>
+                    <field name='n_request_date' string="Product Receive Date"/>
+                    <field name="partner_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" invisible="1"/>
+                    <field name="date_planned" invisible="context.get('quotation_only', False)"/>
+                    <field name="origin" string="Tender Number"/>
+                    <field name="state"/>
+                    <button type="object" name="action_view_picking" icon="fa-truck" string="Shipment">
+                      
+                    </button>
+                    </tree>
+                   </field>
+		  </group>
+               </page>
+          </notebook>
+	</field>
+	</record>
+    
+	<record id="mrp_production_tree_view_inherite" model="ir.ui.view">
+        <field name="name">mrp.production.tree</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"></field>
+        <field name="arch" type="xml">
+           <field name="product_qty" position="after">
+		    <field name="n_request_qty" invisible="not context.get('show_qty')"/>
+		    <field name="n_produce_qty" invisible="not context.get('show_qty')"/>
+            </field>
+          
+           <field name="date_planned" position="replace">
+                <field name="date_planned" string='Scheduled Start Date'/>
+                 <field name='n_request_date'/>
+                 <field name="n_client_date" />
+                 <field name='partner_id'/>
+           </field>
+            <field name="routing_id" position="before">
+                   <field name="bom_id"/>
+            </field>
+            <field name="product_uom" position='attributes'>
+                  <attribute name='string'>Unit</attribute>
+            </field>
+            <!--field name="product_uom" position="after">
+              <field name="wastage_allow" string='Wastage(Kg)'/> COMENTED due to move in new module
+            </field-->
+            <field name="product_qty" position="after">
+               <field name="n_produce_qty" string='Produced Qty'/>
+            </field>
+            <field name="name" position='attributes'>
+                  <attribute name='string'>MO Name</attribute>
+            </field>
+           <field name="name" position='before'>
+                <field name="planned_status" />
+            </field>
+            <field name="origin" position='attributes'>
+                  <attribute name='string'>Sale Order No.</attribute>
+            </field>
+            <field name="product_qty" position='attributes'>
+                  <attribute name='string'>Quantity</attribute>
+            </field>
+           <field name="hour_total" position='replace'>
+               <field name="total_shfit_required" sum='Total'/>
+                <field name="total_shfit_completed" sum='Total'/>
+           </field>
+           <field name="cycle_total" position='replace'/>
+	</field>
+	</record> 
+    <record id="mrp_operations.mrp_production_form_inherit_view2" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit2</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+           <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='hour']" position="after">
+                <field name="state" invisible='1'/>
+                <button name="button_draft" string="Set Draft" states="cancel" icon="gtk-convert" invisible='1'/>
+                <button name="button_start_working" string="Start" states="draft" icon="gtk-media-play" invisible='1'/>
+                <button name="button_resume" string="Resume" states="pause" icon="gtk-media-pause" invisible='1'/>
+                <button name="button_pause" string="Pending" states="startworking" icon="gtk-media-pause" invisible='1'/>
+                <button name="button_done" string="Finished" states="startworking" icon="terp-check" invisible='1'/>
+           </xpath>
+        </field>
+    </record>
+  
+     <record id="mrp_operations.mrp_production_form_inherit_view" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+             <xpath expr="//field[@name='workcenter_lines']" position="attributes">
+                <attribute name='attrs'>{'readonly':[('state','in',('done','cancel'))]}</attribute>
+             </xpath>
+             <xpath expr="//field[@name='workcenter_lines']/tree" position="attributes">
+                <attribute name='create'>0</attribute>
+                <attribute name='delete'>0</attribute>
+             </xpath>
+             <xpath expr="//field[@name='workcenter_lines']" position="before">
+               <button name="open_scheduleworkorder" type="object" class="oe_highlight" icon="fa-calendar"
+                            string='Re-Schedule Orders' attrs="{'invisible':['|',('planned_status','=','unplanned'),('workorder_count','=',0)]}" />
+             </xpath>
+                   
+            <!--xpath expr="//field[@name='workcenter_lines']/form//field[@name='name']" position="before">
+                <header colspan="8" invisible='1'>
+                    <button name="button_start_working" string="Start" states="draft" icon="gtk-media-play" help="Start Working"/>
+                    <button name="button_cancel" string="Cancel Order" states="draft,startworking" icon="gtk-stop" help="Cancel Order"/>
+                    <button name="button_draft" string="Set Draft" states="cancel" icon="gtk-convert" help="Set to Draft"/>
+                    <button name="button_resume" string="Resume" states="pause" icon="gtk-media-pause" help="Resume Work Order"/>
+                    <button name="button_pause" string="Pending" states="startworking" icon="gtk-media-pause" help="Pause Work Order"/>
+                    <button name="button_done" string="Finished" states="startworking" icon="terp-check" help="Finish Order"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+            </xpath-->
+        </field>
+    </record>
+
+   
+     
+
+   
+     <record id="mrp_production_form_view_aalmir_ext" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
+        <field name="arch" type="xml">
+	<!--CH_N048 -->
+              <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+		
+               </xpath>
+              <div class="oe_title"  position="before">
+                   <div class="oe_button_box" name="button_box">
+                        <button name="open_workorders" type="object" class="oe_stat_button" 
+                        attrs="{'invisible':[('workorder_count','=',0)]}" icon="fa-pencil-square-o" >
+                            <field name="workorder_count" widget="statinfo" string="Work Orders"/>
+                        </button>
+                  </div>
+               </div>
+               <field name='user_id' position='attributes'>
+                  <attribute name='string'>Issue By</attribute>
+              </field>
+              <field name='allow_reorder' position='attributes'>
+                  <attribute name='invisible'>1</attribute>
+              </field>
+              <xpath expr="//page[5]/group" position='after'> 
+               <notebook>
+                  <page string='Lot Details' attrs="{'invisible':[('lot_ids','=',[])]}" name='lot'>
+                      <field name='lot_ids' attrs="{'invisible':[('lot_ids','=',[])]}" readonly='1'>
+		          <tree>
+		               <field name='name' string="Lot No."/>
+		                    <field name="product_id"/> 
+		                    <field name='total_qty'/>
+		                    <field name='product_uom_id' string="Unit"/>
+		                 
+		          </tree>
+		       </field> 
+                  </page>
+                 <page  string='Produced Qty In Operations' attrs="{'invisible':[('order_produce_ids','=',[])]}"
+                      name='operations'>
+                      <field name='order_produce_ids' nolabel='1' readonly='1' attrs="{'invisible':[('order_produce_ids','=',[])]}">
+                        <tree>
+                           <field name='order_id' string="Operation No."/>
+			   <field name='machine' string="Machine"/>
+			   <field name='product_qty' string="Produce Qty"/>
+			   <field name='uom_id' string='Unit'/>
+			   <field name='previous_batch_id'/>
+                           <field name='batch_id'/>
+                            <field name="create_uid" string='User Name'/>
+                            <field name='remark'/>
+                            <field name='produce_date'/>
+                            <field name='document'/>
+                        </tree>
+                         <form string='Produced Qty In Operations'>
+				    <group>
+                                        <group>
+                                          <field name='order_id' string="Operation No."/>
+				           <field name='machine' string="Machine"/>
+				           <field name='product_qty' string="Produce Qty"/>
+				           <field name='uom_id' string='Unit'/>
+				           <field name='previous_batch_id'/>
+                                        </group>
+                                      <group>
+		                           <field name='batch_id'/>
+				            <field name="create_uid" string='User Name'/>
+				            <field name='remark'/>
+				            <field name='produce_date'/>
+				            <field name='document'/>
+                                    </group>
+                                 </group>
+			</form>
+                     </field>
+                  </page>
+                 <page string='Pause Operations' attrs="{'invisible':[('order_pause_ids','=',[])]}" name='pause_operation'>
+                        <field name='order_pause_ids' nolabel='1' readonly='1' attrs="{'invisible':[('order_pause_ids','=',[])]}">
+                        <tree string='Pause Details'>
+                           <field name='order_id' string="Operation No."/>
+                            <field name='machine' string="Machine"/>
+                            <field name="user_id"/>
+                            <field name='reason'/>
+                            <field name="date_start"/>
+                            <field name='date_end'/>
+                            <field name="duration" widget='float_time'/>
+                            <field name='state'/>
+                        </tree>
+                        <form string='Pause Details'>
+                          <group col="4">
+                           <field name='order_id' string="Operation No."/>
+                            <field name='machine' string="Machine"/>
+                            <field name="user_id"/>
+                            <field name='reason'/>
+                            <field name="date_start"/>
+                            <field name='date_end'/>
+                            <field name="duration" widget='float_time'/>
+                            <field name='state'/>
+                         </group>
+                        </form>
+                     </field>
+                  </page>
+                 <!--page string='Wastage Information' attrs="{'invisible':[('wastage_ids','=',[])]}">
+                   <field name='wastage_ids' nolabel='1' readonly='1' attrs="{'invisible':[('wastage_ids','=',[])]}">
+                        <tree>
+                           <field name='name' />
+                            
+                            <field name='total_product_qty' string="Total Produced Qty"/>
+                            <field name="total_uom_id"  string="Unit"/>
+                            <field name="total_wastage_qty"/>
+                            <field name="wastage_uom_id"  string="Unit"/>
+                        </tree>
+                     </field>
+
+                </page-->
+               </notebook>
+               
+              </xpath>
+              
+               <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='workcenter_id']" position="after">
+                    <field name='date_planned' readonly='1'/>
+                   <field name='date_planned_end' readonly='1'/>
+                    <field name="date_start" string='Actual Start Date' readonly='1'/>
+                  
+                </xpath>
+                <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='cycle']" position="attributes">
+                     <attribute name='readonly'>1</attribute>
+                 </xpath>
+                <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='hour']" position="attributes">
+                      <field name="hour" readonly='1'/>
+                 </xpath>
+                 <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='name']" position="attributes">
+                     <attribute name='readonly'>1</attribute>
+                 </xpath>
+                 <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='sequence']" position="attributes">
+                     <attribute name='readonly'>1</attribute>
+                 </xpath>
+                <xpath expr="//page/field[@name='workcenter_lines']/form/group/field[@name='workcenter_id']" position="attributes">
+                     <attribute name='readonly'>1</attribute>
+                 </xpath>
+   
+               <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='workcenter_id']" position="before">
+                 <button name="open_workorder" type="object"  string="Order" icon="fa-folder-open-o"/>
+              </xpath>
+              <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='sequence']" position="replace">
+                     <field name="sequence" widget="handle" string='Seq.'/>
+                     <field name='index_seq' string='Seq.'/>
+              </xpath>
+              <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='cycle']" position="attributes">
+                     <attribute name='string'>Cycles</attribute>
+              </xpath>
+             <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='hour']" position="attributes">
+                     <attribute name='string'>Hours</attribute>
+              </xpath>
+              <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='hour']" position="after">
+                  <!--field name='process_type' invisible='1'/>
+		  <field name="mrp_sec_qty" string='Required Qty' attrs="{'invisible':[('process_type','not in',('raw','film'))]}"/>
+		  <field name="mrp_sec_uom"  attrs="{'invisible':[('process_type','not in',('raw','film'))]}"/>
+		  <field string='Required Qty' name="mrp_third_qty" attrs="{'invisible':[('process_type','!=','ptube')]}"/>
+		  <field name="mrp_third_uom" attrs="{'invisible':[('process_type','!=','ptube')]}"/>
+		  <field name="mrp_third_qty_sheet" string='Required Qty' attrs="{'invisible':[('process_type','!=','ptube')]}"/>
+		  <field name="mrp_third_uom_sheet" attrs="{'invisible':[('process_type','!=','ptube')]}"/-->
+                    <field name="shift_required" string='Total Shift'/>
+                   <field name='shift_produced' string='Shift Completed'/>
+                    <field name='total_product_qty' string="Produced Qty"/>
+                     <field name="total_uom_id"  string="Unit"/>
+                      <!--field name="total_wastage_qty"/>
+                      <field name="wastage_uom_id"  string="Unit"/-->
+              </xpath>
+              <!--xpath expr="//field[@name='workcenter_lines']/tree" position='attributes'>
+                   <attribute name='editable'>bottom</attribute>
+              </xpath-->
+             
+              <xpath expr="//field[@name='workcenter_lines']/tree/field[@name='workcenter_id']" position="after">
+                  <field name='machine_type_ids' widget="many2many_tags" invisible='1'/>
+                  <field name='machine' context="{'order_machine': True,'machine_type_ids':machine_type_ids}"/>
+                  <!--button type='object' name='action_schedule' string='Schedule' icon='fa-history'/-->
+                  <field name='time_efficiency'/>
+                  <field name='date_planned'/>
+                   <field name='date_planned_end' />
+                  <field name="date_start" string='Actual Start Date' />
+                 
+              </xpath>
+               <xpath expr="//field[@name='date_planned']" position="before">
+                    <field name='product_cat_type' invisible='1'/>
+                    <label for="mrp_sec_qty" string="Product Secondary Quantity"/>
+                    <div >
+                        <field name="mrp_sec_qty" class="oe_inline" style="width:94px;"/>
+                        <field name="mrp_sec_uom" style="width:100px;" />
+                    </div >
+                     <label for="mrp_third_qty" string="Product Qty In Tube((Pcs*(L+T+B))/100)" 
+                      attrs="{'invisible':[('product_cat_type','!=','film')]}" />
+                    <div attrs="{'invisible':[('product_cat_type','!=','film')]}">
+                        <field name="mrp_third_qty" class="oe_inline" style="width:94px;" help="Pcs * (Lenght + Top + Bottom)/100"/>
+                        
+                        <field name="mrp_third_uom" style="width:100px;" />
+                    </div>
+                    <label for="mrp_third_qty_sheet" string="Product Qty In Sheet((Pcs*(W+L+R))/100)" 
+                     attrs="{'invisible':[('product_cat_type','!=','film')]}"/>
+                    <div attrs="{'invisible':[('product_cat_type','!=','film')]}">
+                        <field name="mrp_third_qty_sheet" class="oe_inline" style="width:94px;" help="Pcs * (Width + Left + Right)/100"/>
+                        <field name="mrp_third_uom_sheet" style="width:100px;" />
+                    </div>
+                </xpath>
+               <xpath expr="//page[@groups='mrp.group_mrp_routings']/button[@name='action_compute']"
+                        position='attributes'>
+                  <attribute  name='invisible'>1</attribute>
+               </xpath>
+               <xpath expr="//page[4]" position='attributes'>
+                  <attribute  name='string'>Required Raw Materials</attribute>
+               </xpath>
+               <xpath expr="//page[4]/button[@name='action_compute']" position='attributes'>
+                  <attribute  name='invisible'>1</attribute>
+               </xpath>
+              
+              <button name="force_production" states="confirmed" position="attributes">
+                <attribute name="class">oe_highlight</attribute>
+              </button>
+              <!--button name="button_confirm"  position="replace">
+                <button name="button_confirm" states="draft" string="Confirm Production"
+               context="{'mo_con':True}" class="oe_highlight"/>
+              </button-->
+              <button name="button_produce" states="ready"  position="attributes">
+                <attribute name="invisible">1</attribute>
+              </button>
+               <button name="%(mrp.act_mrp_product_produce)d" position="attributes">
+                <attribute name="string">Transfer</attribute>
+               </button>
+               <button name="action_assign"   position="attributes">
+                <attribute name="invisible">1</attribute>
+                 <!--button name="action_assign"  string="Reserve" type="object" class="oe_highlight" attrs="{'invisible':[('state','not in',('confirmed','picking_except'))]}"/-->
+              </button>
+               <!--button name="force_production"   position="attributes">
+                <attribute name="invisible">1</attribute>
+               
+              </button-->
+              <button name="button_cancel" states="draft,ready,in_production" position="attributes">
+                <attribute name="class">oe_highlight</attribute>
+              </button>
+              <button name="action_cancel"  states="confirmed" position="attributes">
+                 <attribute name="class">oe_highlight</attribute>
+              </button>
+	   <field name="product_id" position="attributes">
+		 <attribute name="options">{'no_create': True}</attribute>
+		 <attribute name="attrs">{'readonly':[('request_line', '!=',False)]}</attribute>
+	  </field>
+	  <field name="location_src_id" position="attributes">
+	  	 <attribute name="attrs">{'invisible': [('state','=','draft')]}</attribute>
+		 <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+	  </field>
+	  <field name="location_dest_id" position="attributes">
+		 <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+	  </field>
+	  <field name="company_id" position="attributes">
+		 <attribute name="readonly">1</attribute>
+	  </field>
+	  <field name="user_id" position="attributes">
+		 <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+		 <attribute name="attrs">{'readonly':[('state', '!=','draft')]}</attribute>
+	  </field>
+          <field name="bom_id" position="replace">
+               <field name="bom_id"  
+		domain="['|',('product_id','=',product_id),'&amp;', ('product_tmpl_id.product_variant_ids','=',product_id), ('product_id','=',False)]"
+             	context="{'default_product_id': product_id, 'default_product_tmpl_id': product_tmpl_id}" on_change="bom_id_change(bom_id)" />
+          </field>
+          <xpath expr="//field[@name='move_created_ids2']/tree/button[@icon='terp-gtk-jump-to-ltr']" position="attributes">
+		 <attribute name="invisible">1</attribute>
+	  </xpath>
+          <xpath expr="//field[@name='move_lines']/tree/button[@icon='terp-gtk-jump-to-ltr']" position="attributes">
+		 <attribute name="invisible">1</attribute>
+	  </xpath>
+           <div class="oe_title" position="before">
+             <h2 style="margin-left:40px;color:red" attrs="{'invisible':[('hold_order','=','active')]}" >Manufacturing  Hold By Production Manager.</h2>
+           </div>
+           <xpath expr='//notebook/page[1]' position='attributes'>
+               <attribute name='invisible'>1</attribute>
+           </xpath>
+           <xpath expr='//notebook/page[1]/group/group[1]' position='attributes'>
+               <attribute name='invisible'>1</attribute>
+           </xpath>
+            <xpath expr='//notebook/page[1]/group/group[2]' position='attributes'>
+               <attribute name='invisible'>1</attribute>
+           </xpath>
+           <button name="button_cancel" states="draft,ready,in_production" position="replace">
+              <button name="cancel_mrp" type="object" states="draft"
+                          string="Cancel Production" class="oe_highlight" context="{'mrp_cancel':True}"/>
+           </button>
+	   <button name="action_cancel" position="replace">
+                  <button name="cancel_mrp" type="object" states="confirmed"  context="{'mrp_cancel':True}"
+                           string="Cancel Production" class="oe_highlight"/>
+                 <!--button type='object' name='action_schedule_route' string="Date"/-->
+                 <button name="print_order" string="Download" type="object"  class="oe_highlight" />
+                 <button type='object' name='mrp_hold' string='Hold MO' class="oe_highlight" 
+                    attrs="{'invisible': ['|',('hold_order','=','hold'),('state','in',('cancel','done'))]}"/>
+                 <button type='object' name='mrp_hold' string='Unhold MO' 
+                    class="oe_highlight" context="{'active':True}"
+                    attrs="{'invisible': ['|',('hold_order','=','active'),('state','in',('cancel','done'))]}"/>
+                 <button name="schedule_date" string="Update Completion Date" type="object"  attrs="{'invisible': ['|',('n_request_bool','=',True),('state','in',('cancel','done'))]}" help="click to send manufacture completion date to Sales Support"  class="btn-primary" />
+             </button> 
+	    <field name="date_planned" position="after">
+                 <!--field name='dup_date_planned'/-->
+                 <field name='hold_order' invisible='1'/>
+                 <field name='planned_status' invisible='1'/>
+                 <label for='n_request_date' attrs="{'invisible': [('n_request_date','=',False)]}"/>
+                 <div>
+                 	<field name="n_request_date"  attrs="{'invisible': [('n_request_date','=',False)]}" readonly="1" class="oe_inline" nolabel="1"/>
+                 	<button name="schedule_date" string="Update" type="object"  attrs="{'invisible': ['|',('n_request_bool','=',False),('state','in',('cancel','done'))]}" help="click to Updated manufacture completion date to Sales Support" class="btn-primary,oe_inline" nolabel="1"/>
+                 </div>
+                 <field name="raw_available" invisible="1"/>
+		 <field name="n_request_bool" invisible="1"/>
+		 <field name="n_request_date_bool" invisible="1"/>
+		 <field name="n_request_date_bool1" invisible="1" />
+		<label style="color:red" attrs="{'invisible': [('n_request_date_bool1','=',False)]}" string="New Date has been sent for approval"/>
+		<label style="color:green" attrs="{'invisible': [('n_request_date_bool','=',False)]}" string="Date is Approved"/>
+		
+               <field name="contract_id" attrs="{'invisible': [('contract_id', '=',False)]}" readonly="1"/>
+           </field>
+           <!--notebook position="before">
+               <h4 style="color:green" attrs="{'invisible': ['|',('state','!=','confirmed'),('raw_available', '=',False)]}">Raw Material Transfer in Manufaturing Raw Material Location.</h4>
+
+           </notebook-->
+
+           <field name="location_src_id" position="before">
+                <field name="request_line" string="Production Request" readonly="1" attrs="{'invisible': [('request_line', '=',False)]}"/>
+           </field>
+            <field name="product_id" position="before">
+               <field name='partner_id' attrs="{'readonly': [('request_line', '!=',False)]}" />
+            </field>
+	   <field name="date_planned" position="before">
+	         <label for='n_produce_qty' string="Quantity Produced" 
+                  attrs="{'invisible':[('state','not in',('cancel','done','in_production'))]}"/>
+		     <div attrs="{'invisible':[('state','not in',('cancel','done','in_production'))]}">
+		        <field name="n_produce_qty" class="oe_inline" nolabel="1" />
+			 <field name="produce_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+		<field name="n_client_date"  readonly="1" attrs="{'readonly': [('request_line','!=',False)]}"/>
+	   </field>
+	   <field name="origin" position="replace">
+
+		<field name="n_packaging"  attrs="{'readonly':['|',('state','!=','draft'),('request_line','=',True)]}"  string='Packaging' options="{'no_create': True, 'no_open': True}"  domain="[('product_tmpl_id.product_variant_ids','=',product_id),('pkgtype','=','primary')]"/>
+                
+                <label for='batch_id' string="Batch Number" attrs="{'invisible':[('batch_id','=',False)]}"/>
+		<div attrs="{'invisible':[('batch_id','=',False)]}">
+	            <field name="batch_id" class="oe_inline" nolabel="1" readonly="1"/>
+	            
+		</div>
+		<field name="n_note" attrs="{'invisible':[('n_note','=',False)]}" readonly="1"/>
+		<field name="n_approved_qty" readonly="1" attrs="{'invisible': [('n_approved_qty','=',0)]}"/>
+              	<field name="uploaded_documents" widget="many2many_binary" readonly="1" attrs="{'invisible':[('uploaded_documents','=',[])]}"/>
+             <div name="button_box" attrs="{'invisible':[('quality_scrap','=',0),('mo_scrap','=',0)]}" position="inside"> 
+			<button type="object" name="open_scrapped_history"  icon="terp-gtk-jump-to-ltr" class="oe_highlight">
+				<label string="Scrapped History"/>
+				<field string="MO Scrap" name="mo_scrap" attrs="{'invisible':[('mo_scrap','=',0)]}" widget="statinfo"/>		
+				<field string="Quality Scrap" name="quality_scrap" attrs="{'invisible':[('quality_scrap','=',0)]}" widget="statinfo"/>
+			</button>
+		</div> 
+           </field>
+	<!--CH_N048 -->  
+	   <button type="action" name="%(mrp.action_change_production_qty)d" position="replace">
+		<button type="action" name="%(mrp.action_change_production_qty)d" string="Update Qty" states="draft" class="oe_edit_only, btn-primary oe_link"/>
+	   </button>
+
+	   <field name="product_id" position="after">
+	      <field name="n_request_qty" attrs="{'invisible':[('request_line','=',False)]}" readonly="1"/>
+           </field>
+  	    <field name="product_uom" position="replace">
+              <field name="product_uom" options="{'no_create': True, 'no_open': True}" domain="[('unit_type.string','=','product')]" readonly='1'/> <!--attrs="{'readonly': ['|',('state','!=','draft'),('request_line', '!=',False)]}" /-->
+           </field>
+
+          <xpath expr="//notebook" position="inside">
+              <page string="Production Request" attrs="{'invisible':[('half_purchase','=', False)]}">
+                 <group>
+                    <group>
+                       <field name="production_reqst_id"  string="Production Request" 
+                          readonly="1" attrs="{'invisible': [('production_reqst_id', '=',False)]}"/>
+                       <field name="half_purchase" invisible="1"/>
+                      
+                    </group>
+                    <group>
+                     <field name="production_rqst_date" readonly="1"/>
+                     <field name="sale_line"  invisible="1"/>
+                    </group> 
+                 </group>
+              </page>
+          </xpath>         
+         </field>
+    </record>
+
+
+<!-- CH_N117 add view for sales support.. -->  
+   <record id="n_production_request_tree_sales_support" model="ir.ui.view">
+        <field name="name">Production Request Support Tree View</field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+           <tree string="Reserve" create="false" >
+                <field name="name" readonly="1"/>
+		<field name="n_sale_line" readonly="1" groups="gt_order_mgnt.group_sale_support" string="Sale Order"/>
+		<field name="create_uid" strign="Create By" readonly="1"/>
+		<field name="create_date" strign="Create On" widget="date" readonly="1"/>
+                <field name="n_delivery_date" readonly="1"/>
+                <field name="n_product_id" readonly="1"/>
+                <field name="n_order_qty" readonly="1"/>
+		 <field name="n_unit" readonly="1"/>
+		<field name="n_Note" readonly="1"/>
+                <field name="cancel_reason" readonly="1"/>
+		<field name="n_state" groups="gt_order_mgnt.group_sale_support" readonly="1"/>
+		<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to Cancel Production Request?" context="{'cancel_from_ss':True}" groups="mrp.group_mrp_user,gt_order_mgnt.group_sale_support" class="btn-primary"/>
+            </tree>
+        </field>
+    </record>
+ 
+    <record id="n_production_request_form" model="ir.ui.view">
+        <field name="name">Production Request Support Form view</field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="production_request">
+		<field name="n_sale_line" invisible="1"/>
+                 <field name="contract_id" invisible="1"/>
+		<field name="n_exist_pr" invisible="1"/>
+		<h2><label string="Production Request is sent for this product if you want it again it will send mail to manager" style="color:red;" attrs="{'invisible': [('n_exist_pr', '=',False)]}"/></h2>
+		<group name="n_data" col="4">
+		        <field name="n_product_id" readonly="1"/>
+			<field name="n_default_code" readonly="1"/>
+			<field name="n_category" options="{'no_create': True,'no_open': True}" />
+                    	<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
+			<field name="n_delivery_date" required="1" string='Requested Completion Date'/>
+                        <field name="n_packaging" readonly="1"/>
+			<field name="n_order_qty" />
+			<field name="n_unit" readonly="1"/>
+			<field name="remain_bool" invisible="1"/>
+                       <label string="Your Order Qty is greater than Remaining qty" for="remain_bool" style="color:red"
+                          attrs="{'invisible':[('remain_bool','=',False)]}"/>
+		</group>
+		<group>
+		<label for="n_Note"/>
+		<div>
+		<field name="n_Note" />
+		</div>
+		</group>
+		<footer>
+                   <button type="object" name="contract_save" string="Confirm request" 
+                      class="oe_highlight" attrs="{'invisible': ['|',('contract_id', '=',False),('remain_bool', '=',True)]}"/>
+                    <button name="n_save" type="object" string="Confirm Request" 
+                     class="oe_highlight" attrs="{'invisible': [('n_sale_line', '=',False)]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+<!-- #CH_N117 end<<< -->
+
+    <record id="n_production_request_tree" model="ir.ui.view">
+        <field name="name">New Production Request view</field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Reserve" create="false">
+               <field name="name"/>
+		<field name="n_sale_line" readonly="1" groups="gt_order_mgnt.group_sale_support" string="Sale Order"/>
+                <field name="n_sale_order_line"  invisible="1"/> 
+                <field name="contract_id" attrs="{'invisible':[('contract_id', '=',False)]}" groups="gt_order_mgnt.group_sale_support"/>
+                <field name="custmor_id" invisible="1"/>
+                <field name="n_delivery_date" readonly="1"/>
+                <field name="n_product_id" readonly="1"/>
+		<button name="show_product" options="{'no_create': True}" type="object" icon="gtk-jump-to" groups="mrp.group_mrp_user" invisible="1"/>
+		<field name="n_product_desc" readonly="1" groups="mrp.group_mrp_user"/>
+		<field name="n_default_code" readonly="1" groups="mrp.group_mrp_user"/>
+                <field name="n_order_qty" readonly="1"/>
+		 <field name="n_unit" readonly="1"/>
+                <field name="n_mo_number" invisible="1" readonly="1" />
+		<field name="n_po_number" invisible="1" readonly="1" string="Purchase Requisition" />
+		<field name="n_Note" readonly="1"/>
+		<field name="n_state" groups="gt_order_mgnt.group_sale_support"/>
+		<!--button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft')]}" groups="mrp.group_mrp_user"/>
+		<button name="%(production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" groups="mrp.group_mrp_user" />
+		<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to Cancel Production Request?" groups="mrp.group_mrp_user,gt_order_mgnt.group_sale_support"/-->
+            </tree>
+        </field>
+    </record>
+
+    <record id="n_production_request_tree_history" model="ir.ui.view">
+        <field name="name">History Production Request view</field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Reserve" create="false">
+		<field name="name"/>
+		<field name="n_sale_line" groups="gt_order_mgnt.group_sale_support" readonly="1" string="Sale Order"/>
+                <field name="contract_id" readonly="1" groups="gt_order_mgnt.group_sale_support"/>
+		<field name="create_uid" strign="Create By" groups="gt_order_mgnt.group_sale_support"/>
+		<field name="create_date" strign="Create On" widget="date" groups="gt_order_mgnt.group_sale_support"/>
+                <field name="n_delivery_date" readonly="1"/>
+                <field name="n_product_id" readonly="1"/>
+		<button name="show_product" options="{'no_create': True}" type="object" icon="gtk-jump-to" groups="mrp.group_mrp_user"/>
+		<field name="n_product_desc" readonly="1" groups="mrp.group_mrp_user"/> 
+		<field name="n_default_code" readonly="1" groups="mrp.group_mrp_user"/>
+                <field name="n_order_qty" readonly="1"/>
+		<field name="n_unit" readonly="1"/>
+		<field name="n_Note" readonly="1"/>
+		<field name="cancel_reason" readonly="1"/>
+		<field name="n_mo_number" readonly="1" groups="mrp.group_mrp_user"/>
+		<field name="n_po_number" readonly="1" string="Purchase Requisition" groups="mrp.group_mrp_user"/>
+		<field name="n_state" readonly="1" groups="mrp.group_mrp_user"/>
+		<button name="check_cancel" string="Check Request" type="object" icon="gtk-apply" attrs="{'invisible':[('n_state','!=','cancel')]}" groups="gt_order_mgnt.group_sale_support" />
+            </tree>
+        </field>
+    </record>
+	
+    <record id="mrp_production_request_form" model="ir.ui.view">
+        <field name="name">Production Request MRP view </field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="production_request">
+		<header>
+			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary" />
+			<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>
+			<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to Cancel Production Request?" class="btn-primary"/>
+			<button name="create_production_transfer" type="object"  string="Transfer Production"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary"/>
+			<field name="n_state" widget="statusbar" statusbar_visible="new,purchase,manufacture,done"/>
+		</header>
+		<sheet>
+			<field name="n_sale_line" invisible="1"/>
+		        <field name="contract_id" invisible="1"/>
+			<group name="n_data" col="4">
+			   <group col="2">
+                                <field name="name" string="Production Request No." readonly="1"/>
+				<field name="n_product_id" readonly="1"/>
+				<label for="n_order_qty"/>
+				<div>
+					<field name="n_order_qty" class="oe_inline" readonly="1"/>
+					<field name="n_unit" readonly="1"/>
+				</div>
+				<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="1" />
+                                <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>
+				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>
+		            	<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
+		           </group>
+		           <group col="2">
+		           	<field name="n_category" options="{'no_open':True}" readonly="1"/>
+		                <field name="n_packaging" readonly="1" options="{'no_open':True}"/>
+		                <field name="n_delivery_date" readonly="1"/>
+                                <field name='request_type' readonly="1"/>
+				<field name="remain_bool" invisible="1"/>
+				<field name="n_default_code" invisible="1"/>
+			   </group >
+			</group>
+			<notebook>
+			     <page name="extra_info" string="Extra Info" >
+				<group>
+					<label for="n_Note"/>
+					<div>
+					<field name="n_Note" readonly="1"/>
+					</div>
+					<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="1"/>
+				</group>
+			     </page>
+			     <page name="transfer_info" string="Transfer Details" attrs="{'invisible':[('transfer_ids','=',[])]}" >
+				<field name='transfer_ids'  readonly="1">
+					<tree>
+						<field name="picking_id" readonly="1"/>
+						<field name="product_id" readonly="1"/>
+						<field name="product_qty" readonly="1" />
+						<field name="product_uom" readonly="1" options="{'no_open':True}"/>
+						<field name="date" readonly="1"/>
+						<field name="state" readonly="1"/>
+					</tree>
+				</field>
+			     </page>
+			     <page name="batches_info" string="Batches Info" attrs="{'invisible':[('batches_ids','=',[])]}" >
+				<field name='batches_ids'  readonly="1">
+					<tree limit="10" string="New Batches" readonly="1">
+						<field name="product_id" readonly="1"/>
+						<field name="name" string="Number" readonly="1"/>
+						<field name="lot_id" readonly="1"/>
+						<field name="product_qty" string="Quantity" />
+						<field name="uom_id" readonly="1" options="{'no_open':True,}"/>
+						<field name="state" readonly="1"/>
+					</tree>
+					<form readonly="1">
+	 				 	<group col="4">
+							<field name="product_id" readonly="1"/>
+							<field name="name" string="Number" readonly="1"/>
+							<field name="lot_id" readonly="1"/>
+							<field name="convert_product_qty" string="Quantity"/>
+							<field name="uom_id" readonly="1" options="{'no_open':True}"/>
+							<field name="produce_qty_date" string="date" readonly="1"/>
+							<field name="user_id" readonly="1" options="{'no_open':True}"/>
+							<field name="employee_name" readonly="1"/>
+							<field name="state" readonly="1"/>
+						</group>
+					</form>
+				</field>
+			     </page>
+			</notebook>
+		</sheet>
+            </form>
+        </field>
+    </record>
+
+
+ <!--CH_N122 add code for cancel production request. -->
+    <record id="n_production_request_cancel_form" model="ir.ui.view">
+        <field name="name">Production Cancel Form view</field>
+        <field name="model">production.cancel</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Cancel Production">
+		<group>
+		<label for="cancel_reason"/>
+		<div>
+		<field name="cancel_reason" />
+		</div>
+		</group>
+		<footer>
+                   <button type="object" name="save" string="Cancel request" 
+                      class="oe_highlight" invisible="context.get('mrp_cancel')"/>
+                   <button type="object" name="mo_cancel" string="Cancel MO" 
+                      class="oe_highlight" invisible="not context.get('mrp_cancel')"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+   <record model="ir.actions.act_window" id="n_production_request_action">
+        <field name="name">Open Production Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">n.manufacturing.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('n_state', '=', 'draft')]</field>
+    </record>
+   <record id="action_partner_tree_view2" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="n_production_request_tree"/>
+            <field name="act_window_id" ref="n_production_request_action"/>
+        </record>
+        <record id="action_partner_form_view1" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="mrp_production_request_form"/>
+            <field name="act_window_id" ref="n_production_request_action"/>
+        </record>
+
+    <record model="ir.actions.act_window" id="n_production_request_action_history1">
+        <field name="name">Production Request History</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">n.manufacturing.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('n_state', 'not in', ('draft','new'))]</field>
+    </record>
+   <record id="action_partner_tree_view22" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="n_production_request_tree_history"/>
+            <field name="act_window_id" ref="n_production_request_action_history1"/>
+        </record>
+        <record id="action_partner_form_view12" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="mrp_production_request_form"/>
+            <field name="act_window_id" ref="n_production_request_action_history1"/>
+        </record>
+    <menuitem action="n_production_request_action" id="menu_production_request" name="Production Request" parent="base.menu_mrp_root" sequence="1" groups="mrp.group_mrp_user,base.group_sale_manager" />
+	<menuitem action="n_production_request_action" id="menu_production_request_new" name="New Request" parent="menu_production_request" sequence="1" />
+	<menuitem action="n_production_request_action_history1" id="menu_production_request_history" name="Request History" parent="menu_production_request" sequence="2" />
+	<menuitem action="gt_order_mgnt.production_detail_action_menu" id="outsourcing_request_from_menu" name="Outsource Request Form" parent="menu_production_request" sequence="3" />
+	
+  <!--BOM -->
+       <record model="ir.ui.view" id="view_mrp_bom_form_view_aalmir">
+            <field name="name">mrp.bom.form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+             <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="replace">
+                 <field name="product_id" on_change="onchange_product_id(product_id, product_qty)" domain="[('product_material_type.string', 'in',('raw','component' ,'grinding'))]" options="{'no_create':True}"/>
+             </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom']" position="after">
+               <field name="uom_name" invisible="1"/>
+               <field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
+               <field name='workcenter_id' options="{'no_open':True,'no_create':True}" context="{'bom_true':True,'routing':parent.routing_id}"/>
+              </xpath>
+              <field name='routing_id' position='attributes'>
+                  <attribute name='required'>1</attribute>
+                  <attribute name='options'>{'no_create': True, 'no_open': True}</attribute>
+              </field>
+               <notebook position='before'>
+                   <separator string="Wastage in Each Process" colspan="4"/>
+		           <field name='bom_wastage_ids' nolable='1'>
+		               <tree editable='bottom'>
+		                    <field name='name' required='1'/>
+		                    <field name='value' required='1' sum='total'/>
+		                    <field name='workcenter_id' options="{'no_open':True,'no_create':True}"
+                                        context="{'bom_true':True,'routing':parent.routing_id}"/>
+		               </tree>
+		           </field>
+               </notebook>
+               <field name="product_tmpl_id" position='attributes'>
+               	  <attribute name='invisible'>1</attribute>
+                  <attribute name='options'>{'no_create': True}</attribute>
+               </field>
+               <field name="product_id" position='replace'>
+               	  <field name='product_id' required='1' options="{'no_create': True, 'no_open': True}"/>
+               </field>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="attributes">
+                  <attribute name="attrs">{'readonly':[('uom_name','=','Kg')]}</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='date_start']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='date_stop']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='property_ids']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_rounding']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_efficiency']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='attribute_value_ids']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+               <xpath expr="//field[@name='type']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='company_id']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+             <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='product_rounding']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='product_efficiency']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+                <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='position']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+               <xpath expr="//separator[@groups='product.group_mrp_properties']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='property_ids']" position="attributes">
+                  <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
+                        <!--button name="action_mail_sent" string="Send Mail" type="object" 
+                            class='oe_highlight' style="float:left;margin-left:550px;margin-top:15px;position:absolute;" /-->
+              </xpath>
+              
+              <xpath expr="//label[@for='routing_id']" position="before">
+              	  <label for="product_weight"/>
+                   <div>
+                        <field name="product_weight" class="oe_inline" required="1"/> <label string="Kg/Unit" class="oe_inline"/>
+                   </div>
+                  <label for="weight"/>
+                   <div>
+                        <field name="weight" class="oe_inline" required="1"/> <label string="Kg/Unit" class="oe_inline"/>
+                   </div>
+              </xpath>
+                <page  groups="base.group_no_one" position='replace'>
+
+                </page>
+              <field name="code" position="replace">
+                        <field name='code' string='Bom Name' />
+              		<field name="master_id" string="BOM Code" options="{'no_open':True,'no_create':True}"/>
+                        <field name="active"/>
+                        <field name="date_start"/>
+                       <field name="date_stop"/>
+              </field>
+              <field name="bom_line_ids" position="before">
+              		<button name="recompute_qty" type="object" string="Recompute"/>
+              </field>
+              <field name="product_qty" position="attributes">
+              		<attribute name="readonly">1</attribute>
+              </field>
+              <field name="company_id" position="attributes">
+              		<attribute name="readonly">1</attribute>
+              </field>
+              <xpath expr="//notebook/page[1]" position="inside">
+              	    <separator string="Packaging Materials"/> 
+		    <field name="bom_packging_line" position="attributes">
+		    	<tree editable="top">
+              			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
+                            	<field name="product_uom" options="{'no_open':True,'no_create':True}" />
+                            	<field name="product_qty" string="Qty Required"/>
+                                <field name='workcenter_id' options="{'no_open':True,'no_create':True}" context="{'bom_true':True,'routing':parent.routing_id}"/>
+                    	</tree>
+			<form create='false' edit='false' delete='false'>
+              			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
+                            	<field name="product_uom" options="{'no_open':True,'no_create':True}"/>
+                            	<field name="product_qty"/>
+                    	</form>
+	            </field>
+	      </xpath>
+              <!--field name="bom_packging_line" position="attributes">
+              		<attribute name="readonly">1</attribute>
+              </field-->
+            </field>
+       </record>
+ <!--MASTER BOM -->
+       <record model="ir.ui.view" id="view_mrp_bom_tree_view_aalmir">
+            <field name="name">MRP BOM Tree View</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+            <field name="arch" type="xml">
+            	<field name="code" position="replace">
+              		<field name="master_id"/>
+                 </field>
+                   <field name="product_tmpl_id" position="before">
+              		<field name="code" string='Bom Name'/>
+                 </field>
+	    </field>
+       </record>
+
+    <record id="master_bom_form_view" model="ir.ui.view">
+        <field name="name">Master BOM Form view</field>
+        <field name="model">mrp.bom.master</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Master BOM">
+              <sheet>
+                <group>
+		    <field name="name" required="1"/>
+		</group>
+		<notebook>
+			<page string="Components">
+				<field name="master_line">
+					<tree editable="bottom">
+						<field name="product_id" domain="[('product_material_type.string', 'in',('raw','component'))]" options="{'no_open':True,'no_create':True}"/>
+						<field name="uom_name" readonly="1"/>
+						<field name="quantity" attrs="{'readonly':[('uom_name','=','Kg')],'required':[('uom_name','!=','Kg')]}"/>
+						<field name="percentage" attrs="{'readonly':[('uom_name','!=','Kg')],'required':[('uom_name','=','Kg')]}"/>
+						<field name="master_id" invisible="1"/>
+					</tree>
+					<form create='false' edit='false' delete='false'>
+						<field name="product_id" readonly="1"/>
+						<field name="uom_name" readonly="1"/>
+						<field name="quantity" attrs="{'required':[('uom_name','!=','Kg')],'readonly':[('uom_name','=','Kg')]}"/>
+						<field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
+						<field name="master_id" invisible="1"/>
+					</form>
+				</field>
+			</page>
+		</notebook>
+	       </sheet>
+            </form>
+        </field>
+    </record>
+       
+    <record model="ir.actions.act_window" id="n_action_bom_master">
+        <field name="name">Master BOM</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.bom.master</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+     <menuitem action="n_action_bom_master" id="menu_bom_master_id" name="Master BOM" parent="mrp.menu_mrp_bom" sequence="98" />
+
+    <record model="ir.ui.view" id="view_calendar_states_tree_view_aalmir">
+            <field name="name">Calendar States</field>
+            <field name="model">api.mrp.calendar</field>
+            <field name="type">tree</field>
+	    <field name="arch" type="xml">
+    		<form string="Calendar States">
+            		<field name="name"/>
+              		<field name="event_type"/>
+                 </form>
+	    </field>
+       </record>
+       
+    <record model="ir.actions.act_window" id="n_action_mrp_calendar_event">
+        <field name="name">Calendar States</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">api.mrp.calendar</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+     
+     <menuitem action="n_action_mrp_calendar_event" id="menu_calendar_id" name="Calendar States" parent="mrp.menu_mrp_configuration" sequence="50" groups="mrp.group_mrp_manager" />
+</odoo>
+

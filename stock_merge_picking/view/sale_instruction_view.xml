@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!--#CH_N078 START Template for complete MRP-->
+	<record id="email_template_sale_instruction" model="mail.template">
+            <field name="name">Instruction Send</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">New Instruction Received</field>
+            <field name="model_id" ref="stock_merge_picking.model_process_instruction"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+        
+        <!--  Produce -->
+	<record id="sale_instruction_form_view" model="ir.ui.view">
+        <field name="name">Process Instruction</field>
+        <field name="model">process.instruction</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Process Instruction">
+		<group >
+			<group>
+				<field name="product_id" string="Product Name." options="{'no_create_edit': True,'no_open': True}" attrs="{'invisible':[('sale_state','in',('draft','sent','awaiting','cancel'))]}" context="{'instruction_sale_id':sale_id}" />
+				<!--field name="sale_line" string="Product Name" options="{'no_create_edit': True}" attrs="{'invisible':[('sale_state','in',('sale','done','cancel'))]}" domain="[('order_id','=',sale_id)]"/--> <!-- comment for add new form (avoid js conflict)-->
+			</group>
+			<group >
+			<field name="sale_id" invisible="1"/>
+			<!--field name="n_model" invisible="1"/-->
+			<field name="sale_state" invisible="1"/>
+			</group >
+		</group>
+		<group>
+                <field name="message" />
+		<field name="send_user_id" widget="many2many_tags" options="{'no_create_edit': True}"/>
+		</group>
+		<group>
+		<button type="object" name="send" string="Send" class="oe_highlight" />
+		</group>
+		<group string="Message History">
+		<notebook>	
+		   <page string="All Messages">
+			<field name="all_messages_line" nolabel="1" readonly="1" >
+			   <tree string="Process Instruction" editable="top" create="0" colors="blue:message_type =='incomming'">
+				<field name="create_uid" invisible="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Messages">
+			<field name="messages_line" nolabel="1" readonly="1" >
+			   <tree string="Process Instruction" editable="top" create="0" colors="blue:message_type =='incomming'">
+				<field name="create_uid" invisible="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Receive Messages">
+			<field name="messages_receive" nolabel="1">
+			   <tree string="Process Instruction" editable="top" create="0">
+				<field name="create_uid" invisible="1"/>
+				<field name="create_date" string="receive Date"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="create_uid" string="From" readonly="1"/>
+				<field name="message_type" />
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Send Messages" >
+			<field name="messages_send" nolabel="1">
+			   <tree string="Process Instruction" editable="top" create="0">
+				<field name="create_uid" invisible="1"/>
+				<field name="create_date" string="Send Date" readonly="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="send_user_id" readonly="1"/>
+				<field name="read_user_id" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+        	 </notebook>
+		</group>
+            </form>
+        </field>
+	</record>
+
+  <!--#CH_N088 create new from for when sale order in quotatoin state then the product is not created so take sale order line as product desc for msg send (avoid js conflict)>>>> -->
+	<record id="sale_instruction_form_view_draft" model="ir.ui.view">
+        <field name="name">Process Instruction</field>
+        <field name="model">process.instruction</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Process Instruction">
+		<group >
+			<group>
+				<!--field name="product_id" string="Product Name." options="{'no_create_edit': True}" attrs="{'invisible':[('sale_state','in',('draft','sent','awaiting','cancel'))]}" context="{'process_sale_id':sale_id}"/-->
+				<field name="sale_line" string="Product Name" options="{'no_create_edit': True,'no_open': True}" attrs="{'invisible':[('sale_state','in',('sale','done','cancel'))]}" domain="[('order_id','=',sale_id)]"/>
+			</group>
+			<group >
+			<field name="sale_id" invisible="1"/>
+			<field name="sale_state" invisible="1"/>
+			</group >
+		</group>
+		<group>
+                <field name="message" />
+		<field name="send_user_id" widget="many2many_tags" options="{'no_create_edit': True}"/>
+		</group>
+		<group>
+		<button type="object" name="send" string="Send" class="oe_highlight" />
+		</group>
+		<group string="Message History">
+		<notebook>	
+		   <page string="All Messages">
+			<field name="all_messages_line" nolabel="1" readonly="1" >
+			   <tree string="Process Instruction" editable="top" create="0" colors="blue:message_type =='incomming'">
+				<field name="create_uid" invisible="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Messages">
+			<field name="messages_line" nolabel="1" readonly="1" >
+			   <tree string="Process Instruction" editable="top" create="0" colors="blue:message_type =='incomming'">
+				<field name="create_uid" invisible="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Receive Messages">
+			<field name="messages_receive" nolabel="1">
+			   <tree string="Process Instruction" editable="top" create="0">
+				<field name="create_uid" invisible="1"/>
+				<field name="create_date" string="receive Date"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="create_uid" string="From" readonly="1"/>
+				<field name="message_type" />
+			   </tree>
+			</field>
+		    </page>
+		    <page string="Send Messages" >
+			<field name="messages_send" nolabel="1">
+			   <tree string="Process Instruction" editable="top" create="0">
+				<field name="create_uid" invisible="1"/>
+				<field name="create_date" string="Send Date" readonly="1"/>
+				<field name="product_id" readonly="1"/>
+				<field name="message" readonly="1"/>
+				<field name="send_user_id" readonly="1"/>
+				<field name="read_user_id" readonly="1"/>
+				<field name="message_type" readonly="1"/>
+			   </tree>
+			</field>
+		    </page>
+        	 </notebook>
+		</group>
+            </form>
+        </field>
+	</record>
+<!--#CH_N088 end<<<< -->
+
+	<record id="order_confirm_sale_form_view" model="ir.ui.view">
+        <field name="name">order.confir.sale.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gt_order_mgnt.order_confirm_sale_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+		<group>
+			<group>
+			<label string="new str" invisible="1"/>
+			</group>
+			<group>
+				<group>
+				<label string="new str" invisible="1"/>
+				</group>
+				<group>
+					<div name="button_box" position="inside"> 
+       						<button class="oe_stat_button oe_highlight" name="send_instruction" type="object" icon="gtk-index">
+							<label string="Instruction"/>
+                        				<field string="New Messages" name="new_msg_count" attrs="{'invisible':[('new_msg_count','=',0)]}" widget="statinfo"/>
+                    				</button>
+          				</div>	
+				</group>
+			</group>
+		</group>
+            </xpath>
+	</field>
+	</record>
+
+<!--#CH_N086 for Production Request -->
+	<record id="mrp_production_request_form_inherite" model="ir.ui.view">
+        <field name="name">n.manufacturing.request</field>
+        <field name="model">n.manufacturing.request</field>
+        <field name="inherit_id" ref="gt_order_mgnt.mrp_production_request_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='n_Note']" position="after">
+		<group>
+		<group>
+		<label string="new str" invisible="1"/>
+		</group>
+		<group>
+			<group>
+			<label string="new str" invisible="1"/>
+			</group>
+				<group>
+					<div name="button_box" position="inside"> 
+       						<button class="oe_stat_button oe_highlight" name="send_instruction" type="object" icon="gtk-index" context="{'new_id':id}">
+							<label string="Instruction"/>
+                        				<field string="New Messages" name="new_msg_count" attrs="{'invisible':[('new_msg_count','=',0)]}" widget="statinfo" />
+                    				</button>
+          				</div>	
+				</group>
+			</group>
+		</group>
+            </xpath>
+	</field>
+	</record>
+
+<!--#CH_N086 for manufacture Order -->
+	<record id="mrp_production_form_view_aalmir_ext_inherite" model="ir.ui.view">
+        <field name="name">Manufacture Instructon</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="gt_order_mgnt.mrp_production_form_view_aalmir_ext" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+		<group>
+		<group>
+		<label string="new str" invisible="1"/>
+		</group>
+		<group>
+			<group>
+			<label string="new str" invisible="1"/>
+			</group>
+				<group>
+					<div name="button_box" position="inside"> 
+       						<button class="oe_stat_button oe_highlight" name="send_instruction" type="object" icon="gtk-index">
+							<label string="Instruction"/>
+                        				<field string="New Messages" name="new_msg_count" attrs="{'invisible':[('new_msg_count','=',0)]}" widget="statinfo"/>
+                    				</button>
+          				</div>	
+				</group>
+			</group>
+		</group>
+            </xpath>
+	</field>
+	</record>
+
+
+<!--#CH_N086 for Purchase Order -->
+	<!--record id="purchase_order_request_form_ext_inherite" model="ir.ui.view">
+        <field name="name">Purchase Order Instruction</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="gt_order_mgnt.purchase_order_request_form_ext" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+		<group>
+		<group>
+		<label string="new str" invisible="1"/>
+		</group>
+		<group>
+			<group>
+			<label string="new str" invisible="1"/>
+			</group>
+				<group>
+					<div name="button_box" position="inside"> 
+       						<button class="oe_stat_button oe_highlight" name="send_instruction" type="object" icon="gtk-index">
+							<label string="Instruction"/>
+                        				<field string="New Messages" name="new_msg_count" attrs="{'invisible':[('new_msg_count','=',0)]}" widget="statinfo"/>
+                    				</button>
+          				</div>	
+				</group>
+			</group>
+		</group>
+            </xpath>
+	</field>
+	</record-->
+ 
+<!--#CH_N086 for Delivery Order -->
+	<record id="view_picking_form_inherit_aalmir_inherite" model="ir.ui.view">
+        <field name="name">Stock Picking Instruction</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="gt_order_mgnt.view_picking_form_inherit_aalmir" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+		<group>
+		<group>
+		<label string="new str" invisible="1"/>
+		</group>
+		<group>
+			<group>
+			<label string="new str" invisible="1"/>
+			</group>
+			<group>
+				<div name="button_box" position="inside"> 
+				<button class="oe_stat_button oe_highlight" name="send_instruction" type="object" icon="gtk-index">
+					<label string="Instruction"/>
+					<field string="New Messages" name="new_msg_count" attrs="{'invisible':[('new_msg_count','=',0)]}" widget="statinfo"/>
+				</button>
+				</div>	
+			</group>
+			</group>
+		</group>
+            </xpath>
+	</field>
+	</record>
+ 
+    </data>
+</openerp>
+

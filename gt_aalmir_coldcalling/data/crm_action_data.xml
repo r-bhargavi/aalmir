@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="crm_activity_data_meeting" model="crm.activity">
+            <field name="name">Meeting</field>
+            <field name="days">1</field>
+        </record>
+
+        <record model="calendar.alarm" id="alarm_mail_15">
+            <field name="name">15 Minute(s) mail</field>
+            <field name="duration" eval="15" />
+            <field name="interval">minutes</field>
+            <field name="type">email</field>
+        </record>
+
+        <record model="calendar.alarm" id="alarm_mail_90">
+            <field name="name">2 Minute(s) mail</field>
+            <field name="duration" eval="2" />
+            <field name="interval">minutes</field>
+            <field name="type">notification</field>
+        </record>
+        
+        <record id="crm_activity_data_note" model="crm.activity">
+               <field name="name">Note</field>
+               <field name="days">1</field>
+        </record>
+        
+    </data>
+</odoo>

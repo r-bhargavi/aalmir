@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="seq_ean13_sequence_sale" model="ir.sequence">
+            <field name="name">Ean13 sale Code</field>
+            <field name="code">sale.ean13.code</field>
+            <field name="prefix">33</field>
+            <field name="padding">4</field>
+        </record>
+        
+        <record id="seq_ean13_bin_location" model="ir.sequence">
+            <field name="name">Ean13 Bin Code</field>
+            <field name="code">bin.ean13.code</field>
+            <field name="prefix">44</field>
+            <field name="padding">4</field>
+        </record>
+        
+        <record id="seq_ean13_master_batch" model="ir.sequence">
+            <field name="name">Ean13 Master Code</field>
+            <field name="code">mst.ean13.code</field>
+            <field name="prefix">55</field>
+            <field name="padding">4</field>
+        </record>
+        
+        <record id="seq_ean13_child_batch" model="ir.sequence">
+            <field name="name">Ean13 Child Code</field>
+            <field name="code">chld.ean13.code</field>
+            <field name="prefix">66</field>
+            <field name="padding">4</field>
+        </record>
+        
+    </data>
+</openerp>

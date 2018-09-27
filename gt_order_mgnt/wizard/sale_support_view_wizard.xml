@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--Not in Use (add alternative code) -->
+<openerp>
+    <data>
+        <record id="sale_support_warehouse_wizard_form_view" model="ir.ui.view">
+            <field name="name">Warehouse Selection Wizard</field>
+            <field name="model">sale.support.wizard</field>
+            <field name="arch" type="xml">
+            	<form string="Warehouse">
+	       		<group name="res_data" col="4">
+		            <field name="warehouse_id" context="{'wiz':True}" options="{'no_create': True, 'no_open': True}"/>
+		        </group>
+		        <footer>
+		            <button name="search_sale" type="object" string="Search" class="oe_highlight" />
+		        </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_warehouse_sale_support">
+		<field name="name">Sale Support Warehouse </field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">sale.support.wizard</field>
+		<field name="view_type">form</field>
+            	<field name="view_mode">form</field>
+            	<field name="target">new</field>
+		<field name="view_id" ref="gt_order_mgnt.sale_support_warehouse_wizard_form_view"/>
+	    </record>
+    
+        <menuitem action="action_warehouse_sale_support" id="menu_action_warehouse_sale_support" name="Warehouse Sale-Support" parent="menu_sale_support" sequence="2" />
+        
+    </data>
+</openerp>

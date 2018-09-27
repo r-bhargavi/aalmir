@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Reserve view-->
+    <record id="reschedule_shift_form_view" model="ir.ui.view">
+        <field name="name">Re-Schedule Shift Time</field>
+        <field name="model">mrp.workorder.rm.shifts.date.history</field>
+        <field name="arch" type="xml">
+            <form string="Re-Schedule Date">
+                <group name="schedule" col="4">
+                	 <field name='start_time' string="Previous Time" readonly="1"/>
+                	 <field name='new_start_time' />
+                	 <field name='end_time' invisible="1"/>
+                	 <field name='shift_id' invisible="1"/>
+                </group>
+                <footer>
+                    <button name="Process" type="object" string="Save" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!--record id="reschedule_rm_request_form_view" model="ir.ui.view">
+        <field name="name">Re-Schedule Shift Time</field>
+        <field name="model">mrp.workorder.rm.shifts.date.history</field>
+        <field name="arch" type="xml">
+            <form string="Re-Schedule Date">
+                <group name="schedule" col="4">
+                	 <field name='new_start_time' />
+                	 <field name='date' />
+                	 <field name='rm_request_id' invisible="1"/>
+                </group>
+                <footer>
+                    <button name="Process" type="object" string="Save" class="oe_highlight" />
+                </footer>
+            </form>
+        </field>
+    </record-->
+</odoo>
+<!--CH_N045 -->
+

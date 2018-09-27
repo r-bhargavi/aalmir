@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="mail assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/js/barcode_widget.js"></script>
+                 <link rel="stylesheet" href="/gt_order_mgnt/static/src/css/digital.css"/>
+                <link rel="stylesheet" href="/gt_order_mgnt/static/src/css/jquery.signature.css"/>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/lib/excanvas.js"></script>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/lib/jquery.signature.js"></script>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/js/digital_sign.js"></script>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/js/form_view.js"></script>
+                <script type="text/javascript" src="/gt_order_mgnt/static/src/js/window_draggable_dialog.js"></script> 
+            </xpath>
+        </template>
+    </data>
+</openerp>

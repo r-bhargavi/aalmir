@@ -1,0 +1,585 @@
+<odoo>
+    <record model="ir.ui.view" id="view_sale_order_trial_tree_ext">
+            <field name="name">sale.order.trial.form.form</field>
+            <field name="model">sale.order.trial.form</field>
+            <field name="arch" type="xml">
+                   <tree string="Sale Order Trial Form">
+                     <field name="name" />
+                     <field name="sale_id"  string="Trial Number"/>
+                    <field name="product_id" readonly="1"/>
+                    <field name="product_description"/>
+                   </tree>
+            </field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_sale_order_trial_form">
+            <field name="name">sale.order.trial.form.form</field>
+            <field name="model">sale.order.trial.form</field>
+            <field name="arch" type="xml">
+                   <form string="Sale Order Trial Form">
+                    <sheet>
+                   <group>
+                       <group>
+                        <field name="name" required="1" attrs="{'readonly':[('button_hide','=',True)]}"/>
+                        <field name="sale_id" readonly="1" string="Trial Number"/>
+                        <field name="product_description"  attrs="{'readonly':[('button_hide','=',True)]}"/>
+                      </group>
+                       <group>
+                        <field name='trial_sale_id' readonly="1" string="Sale Order No." attrs="{'readonly':['|',('trial_sale_id','=',False), ('button_hide','=',True)]}"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="note"  attrs="{'readonly':[('button_hide','=',True)]}"/>
+                        <field name="button_hide"  invisible="1"/>
+                      </group>
+                       <group>
+                         
+                      </group>
+                   </group>
+                   
+                   <footer>
+                     <button type="object" name="save" string="save" class="btn-primary" attrs="{'invisible':[('button_hide','=',True)]}" />
+                      <button string="Discard" class="btn-default btn-primary" special="cancel" 
+                  attrs="{'invisible':[('button_hide','=',True)]}" />
+                  </footer>
+                 </sheet>
+               </form>
+           </field>
+       </record>
+       
+  <!--Create Invocie From sale order -->
+    <record model="ir.ui.view" id="view_sale_order_invoice_form">
+            <field name="name">custom.saleorder.invoice.form</field>
+            <field name="model">custom.saleorder.invoice</field>
+            <field name="arch" type="xml">
+                   <form string="Sale Order Invoice">
+                  <sheet>
+                   <group>
+                       <group>
+                        <field name="sale_id" readonly="1" string="Current Sale Order Number"/>
+                        <field name='invoice_policy'/>
+                      </group>
+                       <group>
+                          <field name="invoice_due_date" required="1"/>
+                          <field name="qty_exceed" invisible="1"/>
+                          <field name="qty_exceed1" invisible="1"/>
+                      </group>
+                  
+                   </group>
+                     <h4><b attrs="{'invisible':[('qty_exceed1', '=',False)]}" style="color:red;">
+                       Make Invoice qty is greater than order qty</b></h4>
+                    <h4><b attrs="{'invisible':[('qty_exceed', '=',False)]}" style="color:red;">Invoice qty is greater than order qty</b></h4>
+                    <notebook>    
+                        <page string='Delivery Orders' attrs="{'invisible':[('invoice_policy', 'not in',('delivery','quantity'))]}"  >
+                         <field name='delivery_ids'  domain="[('state','not in',('cancel','confirmed')),('origin','=',context.get('sale_name')),('invoice_done','=',False)]"/>
+ 
+                        </page>         
+                        <page string="Product for invoice Line" attrs="{'invisible':[('invoice_policy', '!=','manual')]}">
+                           <field name="line_id" options="{'no_open': True, 'no_create': True}" >
+                           <tree editable='bottom' create='0' delete='0'>
+                              <field name="product_id" readonly="1"/>
+                              <field name="product_uom_qty" readonly="1"/>
+                              <field name="qty_invoiced" string="Invoiced Qty"/>
+                              <field name="name" invisible="1"/>
+                              <field name="product_uom" options="{'no_open': True, 'no_create': True}" readonly="1"/>                 
+			      <field name="mk_invoice_qty" />
+                              <field name="price_unit"/>
+                              <!--field name="check_bool"/-->
+                              <field name="state" readonly="1" invisible="1"/>
+                             
+                           </tree> 
+                           	</field>
+                        </page>
+                       
+                    </notebook>
+                   <footer>
+                     <button type="object" name="create_invoice_wizard" string="Create Invoice" class="btn-primary" />
+                      <button string="Cancel" class="btn-default" special="cancel"/>
+                  </footer>
+                </sheet>
+               </form>
+
+           </field>
+
+       </record>
+
+     <record id="view_order_tree_paidamount" model="ir.ui.view">
+        <field name="name">sale.tree.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree" />
+        <field name="arch" type="xml">
+             <field name="state" position="before">
+               <field name="invoice_val"/>
+             </field>
+        </field>
+     </record>
+
+     <record id="view_order_add_lient_date" model="ir.ui.view">
+        <field name="name">sale.tree.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gt_sale_quotation.view_order_form_custom_aalmir" />
+        <field name="arch" type="xml">
+             <field name="show_delivery_info" position="after">
+               <field name="client_date" readonly="1" attrs="{'invisible': ['|',('state','in',('draft','sent')),('client_date', '=',False)]}"/>
+             </field>
+        </field>
+     </record>
+
+     <record id="inherite_sale_quotation_view" model="ir.ui.view">
+        <field name="name">sale.order.inherite</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gt_sale_quotation.view_quotation_form_2" />
+        <field name="arch" type="xml">
+             <field name="is_trail" position="after">
+		<field name="trail_sale_id" colspan="2" domain="[('partner_id','=',partner_id)]" attrs="{'invisible': [('trail_sale_id', '=',False)]}" options="{'no_open': True, 'no_create': True}" string="Link to Existing Trial Order"/>
+		<field name="sale_trail_id" colspan="2" domain="[('partner_id','=',partner_id),('state','in',('draft','sent','awaiting'))]" attrs="{'invisible': [('is_trail', '=',False)]}" options="{'no_open': True, 'no_create': True}" readonly="1"/>
+              
+                 	<div name="sale_trail_id" colspan="4">
+                      
+                 </div> 
+                 
+               <field name="is_contract"/>
+	       <label for='contract_id' string='Contract No.' attrs="{'invisible':[('is_contract', '=',False)]}"/>
+              <div attrs="{'invisible':[('is_contract', '=',False)]}">
+                  <field name="contract_id" options="{'no_create': True, 'no_open': True}" domain="[('customer_id','=', partner_id)]"  class='oe_inline' nolabel='1'/>
+                  <button name="make_sale_contract" type="object" attrs="{'invisible':[('contract_id','!=',False)]}" icon="fa-cogs" help="Make Contract"  class="oe_highlight oe_inline" nolabel='1'/>
+              </div>
+             </field>
+        </field>
+     </record>
+
+    <record id="order_confirm_sale_form_view" model="ir.ui.view">
+        <field name="name">order.confir.sale.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gt_sale_pricelist.sale_line_pricelist" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_policy']" position="after" >
+                <!--field name="lead_time_info" nolabel="1" colspan="2" color="red"/-->
+                 <field name="customer_lead"/>Days
+          	 <field name="manufacturing_lead"/>Days
+           	 <field name="transit_time"/>Days
+            </xpath>
+
+            <button name="action_view_invoice" position="replace">
+                <button name="action_view_invoice" style='width:1600px;overflow:auto;display:compact'
+                        type="object"
+                        class="oe_stat_button"
+                         attrs="{'invisible':[('invoice_count','=',0)]}"> 
+                          <field name="invoice_count" widget="statinfo" string="Invoices" invisible="1"/>
+                        <field name="invoice_val" widget="statinfo" string="Invoices"/>
+                </button>
+               <button name="totalpr"   
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cogs"
+                        groups="gt_order_mgnt.group_sale_support"
+                        attrs="{'invisible':[('total_pr_qty','=',0)]}"> 
+                     <field name="total_pr_qty" widget="statinfo" string="Production Request"/>
+                </button>
+               <button name="totalmrp"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        groups="gt_order_mgnt.group_sale_support"
+                       attrs="{'invisible':[('total_mo_qty','=',0)]}"> 
+                      
+                   <field name="total_mo_qty" widget="statinfo"  string="Manufacturing"/>
+                </button>
+                
+                <button name="totaltender"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        groups="gt_order_mgnt.group_sale_support"
+                        attrs="{'invisible':[('total_TE','=',0)]}"> 
+                   <field name="total_TE" widget="statinfo" string="Total Tender"/>
+                </button>   
+                <button name="totalpurchase"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        groups="gt_order_mgnt.group_sale_support"
+                        attrs="{'invisible':[('total_po_qty','=',0)]}"> 
+                  <field name="total_po_qty" widget="statinfo" string="Purchase Order"/>
+                </button>
+                <!--button name="totalreservedqty"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                         groups="gt_order_mgnt.group_sale_support"
+                         attrs="{'invisible':[('total_reserved_qty','=',0)]}"> 
+                  <field name="total_reserved_qty" widget="statinfo" string="Reserved Qty" />
+                </button-->
+            </button>
+             
+            <field name="client_order_ref" position="after">
+                <field name="auto_invoice" readonly="1" groups='base.group_sale_manager'/>
+                	<field name="full_invoice" invisible="1"/>
+            	</field>
+            <field name="state" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,awaiting,sale,done"/>
+            </field>
+            <field name="warehouse_id" position="attributes">
+                    <attribute name="groups">gt_order_mgnt.group_sale_support</attribute>
+            </field>
+            <notebook position="inside">
+               <page string="Trial Form Detail" attrs="{'invisible': [('is_trail', '=',False)]}">
+                
+                 <group>
+                    <group>
+                       <button string="Fill Trial Form" name="saleOrder_Trailform" type="object" attrs="{'invisible':['|',('trial_form_id','!=',False),('is_trail', '=',False)]}" class="oe_highlight" />
+                     
+                   </group>
+                    <group>
+                     <field name="trial_form_id" attrs="{'invisible': [('trial_form_id', '=',False)]}" options="{'no_create': True}" />
+                   </group>
+                 </group>
+               </page>
+            </notebook>
+	<!--CH_N071 >>>>-->
+	     <button name="action_quotation_send" position="replace">
+			<button name="action_quotation_send" type="object" class="btn-primary" attrs="{'invisible' : ['|', ('lock','=', False), ('state','not in', ['draft','sent',])]}" string="Send Mail"/>
+	     <!--/button>
+	     <button name="print_quotation" position="replace"-->
+			 <button name="print_quotation" string="Download"  type="object" 
+                          attrs="{'invisible':[('payment_id','!=',False),('state','=','awaiting')]}"
+                          class="btn-primary" />
+                         <button  name="sale_order_invoice_create" type="object" 
+                           string="Create Invoice" class="btn-primary" 
+                         	attrs="{'invisible':['|',('full_invoice','=',True),('auto_invoice','=',True)]}"
+                         groups="gt_order_mgnt.group_sale_support" />
+	     </button>
+	<!--CH_N071 <<<<<-->
+            <button name="action_confirm" position="after">
+                <button name="confirm_sale_order" type="object" attrs="{'invisible' : ['|','|',('n_add_sales_product','not in',('done','edit')),('lock','=', False), ('state','not in', ['sent'])]}" string="Confirm Quotation" class="btn-primary" />
+     <!--CH_N029 add condition to invisible when products are not added -->
+		<field name="due_payment" invisible="1"/> <!-- add field to set invisibility of button action confirm-->
+                <button name="confirm_sale_order" type="object" states="awaiting,sale" string="Add Documents" class="btn-primary" context="{'from_awaiting' : True}" />
+                <button name="%(action_order_confirm_by_sales_person)d"  string="Confirm Sale Order" class="btn-primary" type="action" context="{'show_sale': True}" attrs="{'invisible' : [('state','!=','awaiting')]}"   groups="gt_order_mgnt.group_sale_support,base.group_sale_manager"/> <!--CH_N030 add condition to invisible when advance payment in not received by accountant --> 
+                <button name="print_advance_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': ['|','|',('due_payment','=','pending'),('state', '!=', 'awaiting'),('payment_id', '=',False)]}"/>
+                <button name="print_advance_payment_receipt" type="object" icon='fa-download' string="Proforma Invoice" class="btn-primary"  attrs = "{'invisible': ['|','|',('due_payment','!=','pending'),('state', '!=', 'awaiting'),('payment_id', '=',False)]}" context="{'proforma_invoice':True}"/>
+                 <button name='return_order' icon='fa-arrow-left' string='Return Order' type='object' 
+                              class="btn-primary" states='awaiting'/>
+		<button name="action_done" type="object" states="sale" string="Close Sale Order" confirm="Are you sure want to Complete Sale Order" groups="gt_order_mgnt.group_sale_support" class="btn-primary"  />
+            </button>
+	<!--#CH_N077 add conform on cancel button-->
+	    <button name="action_cancel" position="replace">
+		<button name="action_cancel" states="draft,sent" type="object" string="Cancel" class="btn-primary" groups="base.group_sale_salesman" confirm="Are you sure you want to Cancel This Quotation.?"/>
+		<button name="action_cancel" states="awaiting,sale" type="object" string="Cancel" class="btn-primary" groups="gt_order_mgnt.group_sale_support" confirm="Are you sure you want to Cancel This Sale order?"/>
+	    </button>
+            <xpath expr="//field[@name='payment_term_id']" position="replace">
+                <field name="payment_term_id" options="{'no_create': True, 'no_open': True}" attrs="{'readonly' : ['|', '|', ('state','in', ['cancel','done', 'sale']), ('lock', '=', True)]}" context="{'sale':True,'n_partner_id': partner_id}"/>
+                <!--CH_N043 add code for payment request start-->
+		
+                <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': ['|',('state','not in',('draft','sent')),('visible_request_button','=',False)]}" class="oe_edit_only,btn-primary"/>	
+		<field name="visible_request_button" invisible="1" />
+		<!--#CH_N043 end -->
+            </xpath>
+              <field name='partner_shipping_id' position='after'>
+                  <field name='sale_lpo_number'/>
+                  <field name='payment_id' readonly='1' attrs="{'invisible':[('payment_id','=',False)]}"/>
+              </field>
+              <notebook position="before">
+                <field name="total_invoice_amt" invisible="1"/>
+                <field name="cr_state" invisible="1"/>
+                <h4 attrs="{'invisible':[('cr_state','!=','request')]}" style="color:red">Sent Request to Accountant for Customer Credit Unblock</h4>
+                <h4 attrs="{'invisible':[('cr_state','!=','reject')]}" style="color:red">Request for customer credit is Rejected by Accountant </h4>
+                <field name="cr_note" attrs="{'invisible':[('cr_state','!=','reject')]}" readonly="1"/>
+             </notebook>
+              <field name="validity_date" position="before">
+		<field name="payment_date"  attrs="{'invisible':[('payment_date','=',False)]}"/>
+              </field>
+              
+            <xpath expr="//notebook" position="before">
+		<h2><label string="Requested Payment Term is not Approved by accounts" style="color:red;" attrs="{'invisible': [('payment_term_requested', '=',False)]}"/></h2>
+			   <field name="payment_term_requested" invisible="1" />
+		<h2><label string="Advance Payment is not received in accounts" style="color:red;" attrs="{'invisible': [('due_payment', 'not in',('pending'))]}" invisible='1'/>
+                  </h2>
+                 
+		<h2><label string="Advance Payment is Partially Received in accounts" style="color:red;" attrs="{'invisible': [('due_payment', 'not in',('half_payment'))]}" invisible='1'/></h2>
+		<field name="force_confirm" invisible="1"/>
+		<h2><label string="Force Confirmed By Sales Support" attrs="{'invisible': [('force_confirm', '=', False)]}"/></h2>
+		<h4><field name='advance_paid_amount' attrs="{'invisible': ['|',('state','!=','awaiting'),('payment_id','=',False)]}" style='color:green' readonly='1'/> 
+                  <button name='reminder_adv_amount' type='object' icon='fa-envelope'
+                     string='Inform Client' class="oe_highlight"
+                 attrs="{'invisible': ['|',('state','!=','awaiting'),('due_payment', 'not in',('pending'))]}"/>
+		</h4>
+		<group name="order_mgnt_1">
+                   <group name="signed_quote" string="Signed Quotation" attrs="{'invisible': [('signed_quote', '=', False)]}">
+                        <field name="signed_quote" invisible="1"/>
+                        <field name="signed_quote_name" invisible="1"/>
+                        <field name="signed_quote_receipt_doc" nolabel="1" colspan="2" filename="signed_quote_name" readonly="1"/>
+                        <field name="signed_quote_number" readonly="1"/>
+                        <field name="signed_quote_receipt_date" readonly="1"/>
+                    </group>
+                    <group name="lpo" string="LPO" attrs="{'invisible': [('lpo', '=', False)]}" invisible="1">
+                        <field name="lpo" invisible="1"/>
+                        <field name="lpo_name" invisible="1"/>
+                        <field name="lpo_document" nolabel="1" colspan="2" filename="lpo_name" readonly="1"/>
+                        <field name="lpo_number" readonly="1"/>
+                        <field name="lpo_receipt_date" readonly="1"/>
+                        <field name="lpo_issue_date" readonly="1"/>
+                    </group>
+		</group>
+		<group name="order_mgnt_2">
+                    <group name="pop" string="POP" attrs="{'invisible': [('pop', '=', False)]}">
+                        <field name="pop" invisible="1"/>
+                        <field name="pop_receipt_name" invisible="1"/>
+                        <field name="pop_uploaded_document" nolabel="1" colspan="2" filename="pop_receipt_name" readonly="1"/>
+                        <field name="pop_receipt_date" readonly="1"/>
+                    </group>
+                    <group name="email" string="Email" attrs="{'invisible': [('email', '=', False)]}">
+                        <field name="email" invisible="1"/>
+                        <field name="email_uploaded_name" invisible="1"/>
+                        <field name="email_uploaded_document" nolabel="1" colspan="2" filename="email_uploaded_name" readonly="1"/>
+                        <field name="email_confirmation_date" readonly="1"/>
+                    </group>
+		</group>
+            </xpath>
+            
+            <xpath expr="//field[@name='user_id']" position="before">
+	        <field name="match_payment_term" readonly="1" attrs="{'invisible':[('state','in',('draft','sent','awaiting'))]}"/>
+	        <field name="document_match" readonly="1" attrs="{'invisible':[('state','in',('draft','sent','awaiting'))]}"/>
+            </xpath>
+            <field  name='order_line' position='before'>
+                 <button name='add_lpo_number' type='object' string='LPO Product Wise' context="{'sale_id':id}"
+                          class='oe_highlight' states='sale,done'/>
+            </field>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='name']" position="after">
+                     <field name='lpo_documents' widget='many2many_tags'/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+                   <field name="contract_bool" invisible="1"/>
+                   <field name="contract_qty" attrs="{'invisible':[('contract_bool','=',False)]}" readonly="1"/>
+                   <field name="contract_remain_qty" readonly="1"
+                    attrs="{'invisible':['|',('contract_bool','=',False),('contract_remain_qty','=',0)]}" />
+                   <field name="open_qty" invisible="1"/>
+                   
+            </xpath>
+            
+            <field name="pricelist_item_ids" position="attributes">
+            	<attribute name="attrs">{'invisible':[('contract_bool','=',True)]}</attribute>
+     	    </field>
+            <!-- add fields in oder line vml -->
+             <field name="note" position="after">
+                <group>
+		<!--field name="origin_id" options="{'no_create': True, 'no_open': True}"/-->
+                 <group>
+                   <!--field name="total_net_weight"/-->
+                   <field name="total_gross_weight" string="Total order weight"/>                
+                 </group>
+                </group>
+                 
+             </field>
+           <notebook position="inside">
+		<page string="Customer Documents" attrs="{'invisible':[('n_customer_documents_upload','=',[])]}" >
+			<field name="n_customer_documents_upload" readonly="1" domain="[('lpo','=',False),('product_id','=',False)]">
+				<tree string="Customer Documents">
+					<field name="lpo" invisible="1"/>
+					<field name="product_id" invisible="1"/>
+					<field name="name" invisible="1"/>
+					<field name="customer_id" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="create_uid" string="Upload User"/>
+					<field name="create_date" string="Upload Date"/>
+				</tree>
+				<form string="Customer Documents">
+				   <group col="4">
+					<field name="lpo" invisible="1"/>
+					<field name="product_id" invisible="1"/>
+					<field name="name" invisible="1"/>
+					<field name="customer_id" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="create_uid" string="Upload User"/>
+					<field name="create_date" string="Upload Date"/>
+				   </group>
+				</form>
+			</field>
+		</page>
+         
+		<page string="Product Documents" attrs="{'invisible':[('n_product_documents_upload','=',[])]}" >
+			<field name="n_product_documents_upload" domain="[('lpo','=',False),('product_id','=',True)]" readonly="1"  >
+				<tree string="Product Documents">
+					<field name="lpo" invisible="1"/>
+					<field name="name" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="product_id" />
+					<field name="create_uid" string="Upload User"/>
+					<field name="create_date" string="Upload Date"/>
+				</tree>
+				<form string="Product Documents">
+				    <group col="4">
+					<field name="lpo" invisible="1"/>
+					<field name="name" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="product_id" />
+					<field name="create_uid" string="Upload User"/>
+					<field name="create_date" string="Upload Date"/>
+				    </group>
+				</form>
+			</field>
+		</page> 
+		
+                <page string="PO Documents" attrs="{'invisible': [('sale_lop_documents', '=', [])]}">
+                   <field name="sale_lop_documents" readonly="1" domain="[('lpo','!=',False)]">
+                	<tree string="PO Documents">
+                            <field name="lpo" invisible="1"/>
+	                    <field name="name" invisible="1"/>
+	                    <field name="n_upload_doc" string="PO Document" colspan="2" filename="name"/>
+	                    <field name="lpo_number" string="PO Number" />
+	                    <field name="lpo_receipt_date"  string="PO Receipt Date"/>
+	                    <field name="lpo_issue_date" string="PO issue Date"/>
+                            <button name='delete_lpo' type='object' icon='fa-trash-o'
+                             context="{'sale_lpo':True}" confirm='Are You Sure Want To Delete LPO Document.'/>
+                	</tree>
+                	
+                	<form string="PO Documents">
+                	  <group col="4">
+                            <field name="lpo" invisible="1"/>
+	                    <field name="name" invisible="1"/>
+	                    <field name="n_upload_doc" string="PO Document" colspan="2" filename="name"/>
+	                    <field name="lpo_number" string="PO Number" />
+	                    <field name="lpo_receipt_date"  string="PO Receipt Date"/>
+	                    <field name="lpo_issue_date" string="PO issue Date"/>
+	                  </group>
+                	</form>
+                   </field>
+                </page>
+	   </notebook>
+        </field>
+    </record>
+  <!-- start view for return sale order -->
+     <record id="sale_order_return_form" model="ir.ui.view">
+        <field name="name">sale.order.return</field>
+        <field name="model">sale.order.return</field>
+        <field name="arch" type="xml">
+            <form string="Sale order Return " >
+               <group col="4">
+               		<field name="reason" required='1'/>
+                 	<field name='name' invisible='1'/>
+                   	<field name='document' filename="name" />
+               </group>
+           	<footer>
+                     <button type="object" name="return_reason" string="Return" class="btn-primary" />
+                      <button string="Cancel" class="btn-default btn-primary" special="cancel" />
+    	</footer>
+	    </form>
+        </field>
+    </record>
+
+  <!-- End view for return sale order-->
+<!--Action for show awaiting records -->
+    <record id="view_sales_order_filter_awaiting" model="ir.ui.view">
+        <field name="name">sale.order.list.select.awaiting</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter" />
+        <field name="arch" type="xml">
+            <filter name="sales" position="before">
+                <filter string="Awaiting Orders" name="awaiting_orders" domain="[('state','=','awaiting')]"/>
+            </filter>
+        </field>
+    </record>
+
+<!--CH_N054 add action for sale status -->
+    <record id="sale_order_line_status_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.status</field>
+        <field name="model">sale.order.line.status</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="States" >
+                <field name="id" />
+                <field name="name"/>
+		<field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_sale_order_line_status">
+        <field name="name">Sale Order line Status</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.line.status</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	 <field name="view_id" ref="sale_order_line_status_tree"/>
+    </record>
+
+    <menuitem id='menu_sale_order_line_status' name='Sale Line Status' sequence="10" 		
+    			action="action_sale_order_line_status" parent="gt_order_mgnt.menu_sale_support" />
+    
+    <record model="ir.actions.act_window" id="sale_order_trial_form_action">
+        <field name="name">Trial Order Form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.trial.form</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	<field name="view_id" ref="view_sale_order_trial_tree_ext"/>
+    </record>
+     <record id="action_trial_tree_view22" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_sale_order_trial_tree_ext"/>
+            <field name="act_window_id" ref="sale_order_trial_form_action"/>
+        </record>
+        <record id="action_trial_form_view12" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_sale_order_trial_form"/>
+            <field name="act_window_id" ref="sale_order_trial_form_action"/>
+        </record>
+
+     <menuitem action="sale_order_trial_form_action" id="menu_sale_order_trail_form" parent="base.menu_base_partner" sequence="8"  groups='base.group_sale_manager'/>
+     
+<!--CH_N054 end <<< -->
+    <record id="view_price_calculator_inherite" model="ir.ui.view">
+        <field name="name">Price Calculator</field>
+        <field name="model">pricelist.calculater</field>
+        <field name="inherit_id" ref="gt_sale_pricelist.calculater_form_view" />
+        <field name="arch" type="xml">
+            <form position="inside">
+            	<group col="4">
+                	<button class="oe_highlight" name="save_mrp_calculator" type="object" invisible="not context.get('from_mrp')" string="Save Information"/>
+                </group>
+            </form>
+            <field name="qty" position="attributes">
+            	<attribute name="readonly">context.get('from_mrp')</attribute>
+            </field>
+            <field name="unit" position="attributes">
+            	<attribute name="readonly">context.get('from_mrp')</attribute>
+            </field>
+        </field>
+    </record>
+    <!-- Add Tree view for awaiting -->
+    <record id="awaiting_order_tree" model="ir.ui.view">
+            <field name="name">sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Orders" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" string="Order Number"/>
+                    <field name="date_order" string='Confirm Date'/>
+                    <field name="create_date" string='Quotation Date'/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="amount_total" sum="Total Tax Included" widget="monetary"/>
+                    <field name="invoice_status"/>
+                    <field name="state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+   
+    <!--CH_N053 add action for sale wizard -->
+    <record model="ir.actions.act_window" id="action_awating_sale_order">
+        <field name="name">Sale Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'awaiting')]</field> 
+	 <field name="view_id" ref="awaiting_order_tree"/>
+    </record>
+    
+    <menuitem id="menu_action_awating_sale_order" name="Awaiting order" parent="base.menu_sales" sequence="11" action="action_awating_sale_order" />
+    <menuitem id="menu_action_sale_support_awating_order" name="Awaiting Orders" parent="menu_sale_support_sales" sequence="5" action="gt_order_mgnt.action_awating_sale_order" />
+<!--CH_N053 end <<< -->
+
+</odoo>
+
+

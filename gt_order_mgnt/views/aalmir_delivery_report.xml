@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    <template id="report_delivery_aalmir">
+          <t t-call="report.html_container">
+               <t t-foreach="docs" t-as="doc">
+                <t t-call="gt_sale_quotation.aalmir_custom_external_layout_picking">
+                    <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+                    <div class="page" style="font-family: Calibri;margin-left:-15;margin-right:-15" >
+                        <div class="oe_structure"/>
+                         <t t-set="count" t-value="0" />
+                          <t t-foreach="doc.print_copy" t-as='copy'>
+                            <t t-call="gt_order_mgnt.delivery_report" />
+                             <div class="row">
+				      <div class="col-xs-12" style="font-size:small;margin-top:-15px">
+					  <span>Please check the goods at the time of delivery,no claim for any shortage or damage will be accepted once goods are delivered.</span><br></br>
+                                           <t t-set="count" t-value="count+1" />
+                                            <b><span t-esc='doc.company_id.report_note'/></b>
+					   <span>(copy <t t-esc="count" />)</span>
+					</div>
+				    </div>   
+                              <div style="margin-top: 30px;page-break-before:always;"/>   
+                          </t>
+                          
+                    </div>
+                   
+                   
+            </t>
+         </t>
+    </t>
+    </template>
+
+<template id='delivery_report' name='Delivery report'>
+    <style>
+.report_class {height:40px;
+              border:1px solid #9999;
+}
+
+</style>
+      <h2 align="center" style="font-family: Calibri;">
+	  <span><t t-esc='doc.report_name'/></span>
+       </h2>
+   <div class="row" style="margin-left:2px;margin-right:2px">
+                        <div class="col-xs-2 table-bordered report_class" t-if="doc.check_donumber">
+                            <t t-if="doc.purchase_id">
+                              <p style="font-weight: bold;">GRN No.</p>
+                           </t>
+                           <t t-if="doc.sale_id">
+				<t t-if="doc.reverse_reason">
+                              		<p style="font-weight: bold;">Retrun No.</p>
+				</t>
+				<t t-if="not doc.reverse_reason">
+                              		<p style="font-weight: bold;">D.O No.</p>
+				</t>
+                           </t>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_donumber">
+                            <p t-esc="doc.name"/>
+                        </div>
+                       <!-- DO Date with Multiple condition-->
+                            <div class="col-xs-2 table-bordered report_class" t-if="doc.check_date_withcol">
+                            <p style="font-weight: bold;">Date</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if=" doc.check_date_withcol">
+                           <t t-if="not doc.dispatch_date">
+                              <p t-esc="time.strftime('%d/%m/%Y',time.strptime(doc.min_date,'%Y-%m-%d %H:%M:%S'))"/> 
+                            </t>
+                          <t t-if="doc.dispatch_date">
+                              <p t-esc="time.strftime('%d/%m/%Y',time.strptime(doc.dispatch_date,'%Y-%m-%d %H:%M:%S'))"/> 
+                            </t>
+                        </div>
+                       <div class="col-xs-2 table-bordered report_class" t-if="doc.check_date_withnotcol">
+                            <p style="font-weight: bold;">Date</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_date_withnotcol">
+                           <p style="height:20px"/>
+                        </div>
+                       <!-- End DO Date with Multiple condition-->
+
+                        
+                       
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_invoice">
+                            <t t-if="doc.purchase_id">
+                             <p style="font-weight: bold;">Bill No.</p>
+                           </t>
+                             <t t-if="not doc.purchase_id">
+                               <p style="font-weight: bold;">Invoice No.</p>
+                           </t>
+                          
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_invoice">
+                             <t t-foreach="doc.invoice_ids" t-as="invoice">
+                                <span t-esc="invoice.number"/>
+                            </t>
+                        </div>
+                        
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_lpo">
+                            <p style="font-weight: bold;">LPO No.</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_lpo">
+                           <t t-if='doc.lpo_document_id'>
+                               <t t-foreach='doc.lpo_document_id' t-as='lpo'>
+                                  <t t-esc='lpo.lpo_number'/>,
+                              </t>
+                            </t>
+                        </div>
+                        
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_vehicle">
+                             <p style="font-weight: bold;">Vehicle No.</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_vehicle">
+                           <p t-esc="doc.vehicle_number.name"/>
+                        </div>
+                        
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_employee">
+                           <p style="font-weight: bold;">Driver Name</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_employee">
+                          <p t-esc="doc.employee_id.name"/>
+                        </div>
+                        <div class="col-xs-2 table-bordered report_class" t-if="doc.check_origin">
+                           <p style="font-weight: bold;">Origin of Goods</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_origin">
+                          <p t-esc="doc.origin_id.name"/>
+                        </div>
+                        <div class="col-xs-2 table-bordered report_class" t-if="doc.check_term">
+                           <p style="font-weight: bold;">Terms</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_term">
+                          <p t-esc="doc.term_of_delivery.name"/>
+                        </div>
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_ship">
+                           <p style="font-weight: bold;">Shipment Mode</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_ship">
+                          <p t-esc="dict(doc.fields_get(allfields=['shipment_mode'])['shipment_mode']['selection'])[doc.shipment_mode]"/>
+                        </div>
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_sale">
+                           <t t-if="doc.sale_id">
+                              <p style="font-weight: bold;">Sale Order No.</p>
+                           </t>
+                           <t t-if="doc.purchase_id">
+                              <p style="font-weight: bold;">PO No.</p>
+                           </t>
+                         </div>
+                         <div class="col-xs-4 table-bordered report_class" t-if="doc.check_sale">
+                          <t t-if="doc.sale_id">
+                              <p t-esc="doc.sale_id.name"/>
+                           </t>
+                           <t t-if="doc.purchase_id">
+                              <p t-esc="doc.origin"/>
+                           </t>
+                        </div>  
+
+			<div class="col-xs-2 table-bordered report_class" t-if="doc.reverse_reason">
+                              <p style="font-weight: bold;">Origin</p>
+                         </div>
+                         <div class="col-xs-4 table-bordered report_class" t-if="doc.reverse_reason">
+                              <p t-esc="doc.origin"/>
+                        </div>  
+                 
+                       <t t-if="not doc.purchase_id">
+                         <div class="col-xs-2 table-bordered report_class" t-if="doc.check_saleperson">
+                            <p style="font-weight: bold;">Sales Person</p>
+                        </div>
+                        <div class="col-xs-4 table-bordered report_class" t-if="doc.check_saleperson">
+                          <p t-esc="doc.sale_id.user_id.name"/>
+                        </div>
+                      </t>
+   </div>
+ 
+  <div class="row" style="margin-left:2px;margin-right:2px">
+    <div class="col-xs-2 table-bordered report_class" t-if="doc.check_partner">
+              <p style="font-weight: bold;"><span t-esc="doc.customer_name_report"/></p>
+     </div>
+    <div class="col-xs-10 table-bordered report_class" t-if="doc.check_partner">
+          <t t-esc="doc.partner_id.name"/>
+                            
+    </div>
+    <div class="col-xs-2 table-bordered report_class" t-if="doc.check_manuf">
+          <p style="font-weight: bold;">Manufactured By</p>
+    </div>
+    <div class="col-xs-10 table-bordered report_class" t-if="doc.check_manuf">
+          <p t-esc="doc.manufactured_by"/>
+    </div>
+   <div class="col-xs-2 table-bordered report_class" t-if="doc.check_destination">
+         <p style="font-weight: bold;"><span t-esc="doc.destination_report"/></p>
+   </div>
+   <div class="col-xs-10 table-bordered report_class" t-if="doc.check_destination">
+	    <t t-if="doc.term_of_delivery.code">	
+               <t t-if="doc.term_of_delivery.code != 'EXF'">
+		    <t t-if="doc.partner_shipping_id.street">
+		    <t t-esc="doc.partner_shipping_id.street"/>,</t>
+		    <t t-if="doc.partner_shipping_id.street2"> 
+		    <t t-esc="doc.partner_shipping_id.street2"/>,</t>
+		    <t t-if="doc.partner_shipping_id.city_id"> 
+		    <t t-esc="doc.partner_shipping_id.city_id.name"/>,</t>
+		    <t t-if="doc.partner_shipping_id.state_id">
+		    <t t-esc="doc.partner_shipping_id.state_id.name"/>,</t>
+		    <t t-if="doc.partner_shipping_id.country_id"> 
+		    <t t-esc="doc.partner_shipping_id.country_id.name"/>.</t>
+		    <t t-if="doc.partner_shipping_id.zip"><span>P.O. Box </span> 
+		    <t t-esc="doc.partner_shipping_id.zip"/></t>
+               </t>
+	       <t t-if="doc.term_of_delivery.code == 'EXF'">
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.street"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.street"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.street2"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.street2"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.city"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.city"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.state_id"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.state_id.name"/></t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.country_id"><span>UAE</span></t>
+		  <t t-if="doc.term_of_delivery.code">(<t t-esc="doc.term_of_delivery.name"/>)</t>
+               </t>
+	    </t>
+	    <t t-if="doc.picking_type_code == 'incoming'">
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.street"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.street"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.street2"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.street2"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.city"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.city"/>,</t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.state_id"><t t-esc="doc.picking_type_id.warehouse_id.partner_id.state_id.name"/></t>
+		  <t t-if="doc.picking_type_id.warehouse_id.partner_id.country_id"><span>UAE</span></t>
+		  <t t-if="doc.term_of_delivery.code">(<t t-esc="doc.term_of_delivery.name"/>)</t>
+            </t>
+    </div>
+
+  </div>
+	
+	
+   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px" t-if="doc.pack_operation_product_ids">
+                     
+                        <tr>
+                            <td rowspan="1"><b>SL#</b></td>
+                            <td><b>Item Description</b></td>
+                            <t t-if='doc.check_hs'>
+                            <td><b>HS Code</b></td>
+                            </t>
+                             <t t-if='doc.check_lpo_line'>
+                               <td><b>LPO No.</b></td>
+                              </t>
+                            <td><b> Quantity</b></td>
+                            <td><b>Units</b></td>
+                           <t t-if='doc.check_packaging'>
+                            <td><b>No. of Units / Packing</b></td>
+                             <td><b>Total Packing</b></td> 
+                           </t>
+                             <t t-if='doc.check_pallet'>
+                                 <td><b>Packing / Pallet</b></td>
+                                <td><b>Total no. of Pallets</b></td>
+                             </t>
+                           
+                        </tr>
+                        <t t-set="count" t-value="0" />
+                        <t t-foreach="doc.pack_operation_product_ids" t-as="l">
+                            <tr>
+                                <td>
+                                    <t t-set="count" t-value="count+1" />
+                                    <t t-esc="count" />
+                                </td>
+                                <td>
+                                 <t t-if='l.product_id.default_code'>
+                                    [<span t-esc='l.product_id.default_code'/>]
+                                  </t>
+                                  <t t-if='l.external_no'>
+                                    [<span t-esc='l.external_no'/>]
+                                  </t>
+                                  
+                                     <span t-esc="l.product_id.name" />
+                               
+                                   <br></br>
+                                  
+                                </td>
+                                 <t t-if='doc.check_hs'>
+                                 <td><t t-esc="l.product_hs_code" /></td>
+                                </t>
+                                 <t t-if='doc.check_lpo_line'>
+                                   <td>
+                                        <t t-foreach='l.lpo_documents' t-as='lpo'>
+                                         <t t-esc='lpo.lpo_number'/>
+  
+                                       </t>
+                                 </td>
+                                 </t>
+                                <td>
+                                   <t t-if='not l.qty_done'>
+                                      <t t-esc="'%.0f'% l.product_qty"  />
+                                    </t>
+                                     <t t-if='l.qty_done'>
+                                      <t t-esc="'%.0f'% l.qty_done"  />
+                                    </t>
+                                 </td>
+                                <td><t t-esc="l.product_uom_id and l.product_uom_id.name" /></td>
+                                <t t-if='doc.check_packaging'>
+                                <td>
+                                 <span t-esc="l.packaging_id.qty"/>
+                                    <span t-esc="l.packaging_id.unit_id.name"/>/
+                                 <t t-if='l.packaging_id.uom_id.product_type'>
+                                    <span t-esc="l.packaging_id.uom_id.product_type.name"/>
+                                 </t>
+                                 <t t-if='not l.packaging_id.uom_id.product_type'>
+                                    <span t-esc="l.packaging_id.uom_id.name"/>
+                                 </t>
+                                  <!--span t-esc='l.packaging_id.name'/-->
+                                 <!--t t-if='l.product_id.packaging_ids'>
+                                 <t t-foreach='l.product_id.packaging_ids[0]' t-as='pack'>
+                                   <span t-esc="'%.0f'% pack.qty"/> <br></br><span t-esc='l.product_id.uom_id.name'/> /
+                                       <span t-esc='pack.uom_id.name'/>
+                                 </t> 
+                                </t-->
+                                </td>
+                               <td>
+				  <sapn t-esc="'%.0f'% l.pack_qty"/> 
+                                  <t t-if="l.secondary_pack.unit_id.product_type">
+                                     <span t-esc="l.secondary_pack.unit_id.product_type.name"/>
+                                  </t>
+                                   <t t-if="not l.secondary_pack.unit_id.product_type">
+                                     <span t-esc="l.secondary_pack.unit_id.name"/>
+                                  </t>
+                                 <t t-if="not l.secondary_pack">
+                                        <t t-if="l.packaging_id.uom_id.product_type">
+                                        <span t-esc="l.packaging_id.uom_id.product_type.name"/>
+                                       </t>
+                                        <t t-if="not l.packaging_id.uom_id.product_type">
+                                          <span t-esc="l.packaging_id.uom_id.name"/>
+                                      </t>
+                                  </t>
+                                  <!--sapn t-esc="'%.0f'% l.pack_qty"/--> 
+                                <!--t t-if='l.product_id.packaging_ids'>
+                                   <span t-esc='l.product_id.packaging_ids[0].uom_id.name'/>
+                               </t-->
+                            </td>
+                               <!--td>
+				  <sapn t-esc="'%.0f'% l.pack_qty"/> 
+                                  <t t-if='l.secondary_pack.unit_id.product_type'>
+                                     <span t-esc= "l.secondary_pack.unit_id.product_type.name"/>
+                                  </t>
+                                   <t t-if='not l.secondary_pack.unit_id.product_type'>
+                                     <span t-esc= "l.secondary_pack.unit_id.name"/>
+                                  </t>
+                                
+                            </td-->
+                          </t>
+                             <t t-if='doc.check_pallet'>
+                                 <td><sapn t-esc="'%.0f'% l.pallet_no"/></td>
+                                 <td><sapn t-esc="'%.0f'% l.total_pallet_qty"/></td>
+                             </t>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td> </td>
+                            <td><b>Total</b></td>
+                             <t t-if='doc.check_hs'>
+                            <td ></td>
+                             </t>
+                              <t t-if='doc.check_lpo_line'>
+                               <td></td>
+                              </t>
+                              <td ><b><span t-esc="'%.0f'% doc.total_qty"/></b></td>
+                              <td ></td>
+                             <t t-if='doc.check_packaging'>
+                                <td></td>
+                                <td><b><span t-esc="'%.0f'% doc.total_pack"/></b></td>
+                            </t>
+                            <t t-if='doc.check_pallet'>
+                              <td></td>
+                              <td><b><span t-esc="'%.0f'% doc.total_pallet"/></b></td>
+                            </t>
+                        </tr>
+                    </table>
+                   <div class="row" style='margin-left:2px;margin-right:0px'>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_gross'>
+                           <p style="font-weight: bold;margin-top:8px;" >Total Net Wt(kg)</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_gross'>
+                          <p t-esc="'%.4f'% doc.total_gross_weight" style='margin-top:8px;'><span>kgs</span></p>
+                        </div>
+                         <div class="col-xs-3 table-bordered report_class" t-if='doc.check_net'>
+                           <p style="font-weight: bold;margin-top:8px;" >Total Gross Wt(kg)</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_net'>
+                          <p t-esc="'%.4f'% doc.total_net_weight" style='margin-top:8px;'><span>kgs</span></p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_primary_cbm'>
+                           <p style="font-weight: bold;margin-top:8px;" >Primary CBM(M3)</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_primary_cbm'>
+                          <p t-esc="doc.total_primary_cbm" style='margin-top:8px;'></p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_secondary_cbm'>
+                           <p style="font-weight: bold;margin-top:8px;" >Total Order CBM(M3)</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_secondary_cbm'>
+                          <p t-esc="doc.total_secondary_cbm" style='margin-top:8px;'></p>
+                        </div>
+			<!--div class="col-xs-3 table-bordered report_class" t-if='doc.check_secondary_wt'>
+                           <p style="font-weight: bold;margin-top:8px;" >Total Order Weight(Kg)</p>
+                        </div>
+                        <div class="col-xs-3 table-bordered report_class" t-if='doc.check_secondary_wt'>
+                          <p t-esc="doc.secondary_weight" style='margin-top:8px;'/>
+                        </div-->
+                   </div>
+                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px" name='Authorised'>
+                          <tr>
+                            <td>
+                               <t t-if="doc.purchase_id">
+                                  <span>Knowledged By</span>
+                               </t>
+                               <t t-if="not doc.purchase_id">
+                                 <span>Generated By</span>
+                                </t>
+                             </td>
+                            <td colspan="2">
+				<t t-if="doc.reverse_reason">
+                              		<p style="font-weight: bold;">Reason of return</p>
+				</t>
+				<t t-if="not doc.reverse_reason">
+                              		<p style="font-weight: bold;">Remarks</p>
+				</t>
+			    </td>
+                            <td colspan="2">
+                              <t t-if="doc.purchase_id">
+                                  <span>Vendor Name &amp; signature</span>
+                               </t>
+                               <t t-if="not doc.purchase_id">
+                                 <span>Receivers Name &amp; signature</span>
+                                </t>
+                            
+                            </td>
+                        </tr>
+                         <tr>
+                             <td style="height:100px;width:25%">
+                                 <span t-esc='user.name'/><br></br>
+                                <t t-if='doc.show_stamp'>
+                                 <span t-field="doc.report_company_name and doc.report_company_name.stamp_image" t-field-options='{"widget": "image"}'/>
+                                </t>
+                               </td>
+                            <td colspan="2" style="height:100px;width:45%"><span t-field="doc.note"/></td>
+                            <td colspan="2" style="height:100px:width:30%" > </td>
+                         </tr>
+                   </table>
+                  
+
+</template>
+</data>
+</openerp>

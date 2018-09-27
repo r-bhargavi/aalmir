@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+	    <record id="quantity_increase_form_view" model="ir.ui.view">
+            <field name="name">sale Quantity Increase Form View</field>
+            <field name="model">sale.order.quantity.increase</field>
+            <field name="arch" type="xml">
+                <form string="Sale Quantity Increase Form">
+			<group col='4'>
+                            <field name="sale_id" readonly="1" string="Current Sale Order Number"/>
+                            <field name='print_option' invisible="not context.get('report')"
+                             required="context.get('report')" />
+                         </group>
+                        <field name='report_one2many' nolabel='1' invisible="not context.get('report')">
+                          <tree string="Sale Products" create="false" editable="bottom" delete='0'>
+					<field name="sale_id" invisible="1"/>
+    					<field name="product_id" readonly="1"/>
+					<field name="sale_qty" readonly="1"/>
+                                        <field name='uom_id' readonly='1'/>
+					<field name="qty" string='Report Qty'/>
+                                        <field name="price_unit" readonly="1"/>
+            			</tree>
+                        </field>
+			<field name="line_one2many" nolabel="1" invisible="not context.get('qty')">
+				<tree string="Sale Products" create="false" editable="bottom" >
+					<field name="sale_id" invisible="1"/>
+    					<field name="product_id" readonly="1"/>
+					<field name="sale_qty" readonly="1"/>
+					<field name="qty" />
+                                        <field name="price_unit" invisible="1" />
+    					<field name="status" required="1"/>	
+					<field name="total_qty" readonly="1"/>
+            			</tree>
+			</field>
+                       <group>
+                        <field name="doc_name" invisible="1"/>
+			<field name="uploaded_document" filename="doc_name" string="Supporting Document"
+                             invisible="not context.get('qty')"/>
+			<field name="note" required="context.get('qty')" string="Reason"
+                         invisible="not context.get('qty')"/>
+                      </group>
+			<footer>
+			  <button name="save" class="btn-primary" string="Save" type="object"
+                             invisible="not context.get('qty')"/>
+                          <button name="create_report" class="btn-primary" string="Print" type="object"
+                             invisible="not context.get('report')"/>
+                          <button string="Cancel" class="btn-default btn-primary" special="cancel"/>
+                       </footer>
+		</form>
+	     </field>
+	     </record>
+
+            <record id="qtyincrease_form_view" model="ir.ui.view">
+		<field name="name">order.confir.sale.form.view</field>
+		<field name="model">sale.order</field>
+		<field name="inherit_id" ref="gt_order_mgnt.order_confirm_sale_form_view" />
+		<field name="arch" type="xml">
+			<button name="action_cancel" position="after">
+				<button name="open_wizard_qtyincrease" states="sale" type="object" string="Update Qty" groups="gt_order_mgnt.group_sale_support" class="btn-primary"  
+                                context="{'qty':True}"/>
+                                <button name="open_report_wizard" states="sale, awaiting,sent,done" type="object" string="Approval Report" groups="gt_order_mgnt.group_sale_support" class="btn-primary"  
+                                context="{'report':True}"/>
+			</button>
+		</field>
+	     </record>
+
+   <!--CH_N116 add view to hide new quotation in pipeline -->
+	    <!--record model="ir.ui.view" id="piprline_hide_button">
+		<field name="name">Pipeline in Order mgnt</field>
+		<field name="model">crm.team</field>
+		<field name="inherit_id" ref="gt_aalmir_coldcalling.crm_case_form_view_oppor_cust1"/>
+		<field name="arch" type="xml">
+			<button  name="%(sale_crm.sale_action_quotations_new)d" position="replace">
+			     <button string="New Quotation" name="349" type="action" class="oe_highlight" 
+				context="{'search_default_partner_id': partner_id,'default_partner_id': partner_id,                         
+					'default_team_id': team_id,'default_user_id': uid,'from_lead' : id}"
+				 attrs="{'invisible' : [('stage_name', 'in', ['Won','Lost','Awaiting'])]}"/>
+			</button>
+		</field>
+    	    </record-->
+	</data>
+</openerp>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+       <template id="report_purchaserequisitions_ext" inherit_id="purchase_requisition.report_purchaserequisitions">
+        <xpath expr="//t[@t-call='report.html_container']" position="replace">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="gt_sale_quotation.aalmir_custom_external_layout">
+                         <div class="page">
+                             <div class="oe_structure"/>
+                              <h1 align="center" style="font-family: Calibri;">Production Requisition</h1>
+                             <table class="table table-bordered" style="border: 1px solid #9999; margin-top: 30px">
+		                <tr >
+		                    <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Requisition Information</th>
+		                </tr>
+		                <tr>
+		                    <td width="25%" style="font-weight: bold;">Production Requisition No.</td>
+		                    <td width="25%"><t t-esc="o.name" /></td>
+		                    <td width="25%" style="font-weight: bold;">schedule Ordering  Date</td>
+		                    <td width="25%"><t t-esc="o.ordering_date" /></td>
+		                </tr>
+		                
+		                 <tr>
+		                    <td width="25%" style="font-weight: bold;" t-if="o.request_id">Production Request No.</td>
+		                    <td width="25%" t-if="o.request_id"><t t-esc="o.request_id.name" /></td>
+		                    <td width="25%" style="font-weight: bold;" t-if="o.sale_id">Sale order No.</td>
+		                    <td width="25%" t-if="o.sale_id"><t t-esc="o.sale_id.name" /></td>
+		                </tr>
+		                
+                           </table>
+                               <t t-if="o.line_ids">
+		                <h3>Products</h3>
+		                <table class="table table-condensed">
+		                    <thead>
+		                        <tr>
+		                            <th><strong>Description</strong></th>
+		                            <th class="text-right"><strong>Qty</strong></th>
+		                            <th class="text-center" groups="product.group_uom">
+		                                <strong>Product UoM</strong>
+		                            </th>
+		                            <th class="text-right"><strong>Scheduled Date</strong></th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        <tr t-foreach="o.line_ids" t-as="line_ids">
+		                            <td>
+		                                [ <span t-field="line_ids.product_id.code"/> ]
+		                                <span t-field="line_ids.product_id.name"/>
+		                            </td>
+		                            <td class="text-right">
+		                                <span t-field="line_ids.product_qty"/>
+		                            </td>
+		                            <t>
+		                                <td class="text-center" groups="product.group_uom">
+		                                    <span t-field="line_ids.product_uom_id.category_id.name"/>
+		                                </td>
+		                            </t>
+		                            <td class="text-right">
+		                                <span t-field="line_ids.schedule_date"/>
+		                            </td>
+		                        </tr>
+		                    </tbody>
+		                </table>
+		            </t>
+		            
+		            <t t-if="o.purchase_ids">
+		                <h3>Requests for Quotation Details</h3>
+		                <table class="table table-condensed">
+		                    <thead>
+		                        <tr>
+		                            <th><strong>Vendor </strong></th>
+		                            <th><strong>Date</strong></th>
+		                            <th class="text-right"><strong>Reference </strong></th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        <tr t-foreach="o.purchase_ids" t-as="purchase_ids">
+		                            <td>
+		                                <span t-field="purchase_ids.partner_id.name"/>
+		                            </td>
+		                            <td class="text-center">
+		                                <span t-field="purchase_ids.date_order"/>
+		                            </td>
+		                            <td class="text-right">
+		                                <span t-field="purchase_ids.name"/>
+		                            </td>
+		                        </tr>
+		                    </tbody>
+		                </table>
+                            </t>
+                            <div class="row" t-if='o.description'>
+                                <strong>Instruction To Vendor:</strong>   <span t-field="o.description"/>
+                              </div>
+                              <div class="row" t-if='o.note_from_PR'>
+                                <strong>Instruction From Production:</strong>   <span t-field="o.note_from_PR"/>
+                              </div>
+                         </div>
+                    </t>
+                </t>
+             </t>
+        </xpath>
+       </template>
+   </data>
+</openerp>

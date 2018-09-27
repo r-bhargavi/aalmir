@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+    <record model="ir.ui.view" id="crm_team_salesteams_view_kanban_for_payment_accepted_rejected">
+        <field name="name">crm.team.kanban.accepted.rejected</field>
+        <field name="model">crm.team</field>
+        <field name="inherit_id" ref="sale.crm_team_salesteams_view_kanban"/>
+        <field name="arch" type="xml">
+         
+            <xpath expr="//div[contains(@class, 'o_kanban_manage_view')]" position="inside">
+                <div groups="base.group_sale_salesman">
+                    <a  name="accepted_payment_term" type="object" groups="base.group_sale_salesman"><field name="accepted_request"/> - Accepted Payment Term</a>
+                    <a  name="rejected_payment_term" type="object" groups="base.group_sale_salesman"><field name="rejected_request"/> - Rejected Payment Term</a>
+                    <a  name="pending_payment_term" type="object" groups="base.group_sale_salesman"><field name="pending_request"/> - Pending Payment Term</a>
+                  </div>
+            </xpath>
+            <xpath expr="//div[contains(@class, 'o_kanban_manage_new')]" position="inside">
+                
+                <div groups="base.group_sale_salesman">
+                    <a  name="action_order_pending_request" type="object" groups="base.group_sale_salesman"><field name="order_pending_request"/> - Awaiting Sales Order Request</a>
+                <a  name="action_order_pending_salesperson" type="object" groups="base.group_sale_salesman"><field name="line_pending_request"/> - Sale Order Status</a>
+                </div>
+           </xpath>
+        </field>
+    </record>
+    </data>
+</openerp>

@@ -1,0 +1,44 @@
+<odoo>
+     <record model="ir.ui.view" id="email_compose_message_wizard_form_aalmir_po">
+            <field name="name">mail.compose.message.form</field>
+            <field name="model">mail.compose.message</field>
+            <field name="inherit_id" ref="mail.email_compose_message_wizard_form" />
+            <field name="arch" type="xml">
+             
+                <field name="subject" position="before">
+                    <!--field name="email_ids" invisible="not context.get('from_purchase_order')"
+                   placeholder='Comma-seperated email of Receivers' help='Comma-seperated email of Receivers'/>
+                </field-->
+                <field name="email_ids" attrs="{'invisible':[('email_ids','=',False)]}"
+                   placeholder='Comma-seperated email of Receivers' help='Comma-seperated email of Receivers'/>
+                </field>
+                <xpath expr="//footer/button[@name='send_mail_action']" position="attributes">
+                  <attribute name='attrs'>{'invisible':[('email_ids','!=',False)]}</attribute>
+                </xpath>
+                 <div groups="base.group_user" position="attributes">
+                  <attribute name='attrs'>{'invisible':[('email_ids','!=',False)]}</attribute>
+                </div> 
+                 <label for="partner_ids" groups="base.group_user" position="attributes">
+                  <attribute name='attrs'>{'invisible':[('email_ids','!=',False)]}</attribute>
+                </label> 
+                <xpath expr="//footer/button[@name='send_mail_action']" position="after">
+                  <!--button type='object'  name='send_mail_action_po' class='oe_highlight' 
+string='Send' invisible="not context.get('from_purchase_order')"/-->
+                   <button type='object'  name='send_mail_action_po' class='oe_highlight' 
+string='Send' attrs="{'invisible':['|',('partner_ids','=',True),('email_ids','=',False)]}"/>
+                </xpath>
+            </field>
+        </record>
+      <record model="ir.ui.view" id="email_compose_message_wizard_form_aalmir_ext">
+            <field name="name">mail.compose.message.form</field>
+            <field name="model">mail.compose.message</field>
+            <field name="inherit_id" ref="gt_aalmir_coldcalling.email_compose_message_wizard_form_aalmir" />
+            <field name="arch" type="xml">
+             
+               <field name="cc_ids"  position="attributes">
+                  <attribute name='invisible'>context.get('from_purchase_order')</attribute>
+                </field> 
+                
+            </field>
+        </record>
+</odoo>
