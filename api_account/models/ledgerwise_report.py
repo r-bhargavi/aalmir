@@ -351,6 +351,11 @@ class LedgerwiseReport(models.Model):
 				flag=True
 				journal_currency = records.journal_id.currency_id or records.account_id.currency_id
 				for chq in records.payment_id.cheque_details:
+                                        cd_acc=False
+#                                        if not cd_acc:
+#                                            cd_acc=False
+#                                        else:
+#                                            cd_acc=cd_acc[0].account_id.id
 					flag=False # to avoid get entry amount
 					if chq.id in cheque_ids:
 						continue
@@ -386,6 +391,7 @@ class LedgerwiseReport(models.Model):
 
 				# Payment is not cheque
 				if flag :
+                                        cd_acc=False
 					new_li = reconcile_lines.get(records.date,[])
 					new_li.append({	'account':records.account_id.id,
 							'journal':records.journal_id.id,
