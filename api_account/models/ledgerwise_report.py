@@ -143,6 +143,7 @@ class LedgerwiseReport(models.Model):
 							'move':records.move_id.id,
 							'line_id':res.id})
 				if records.debit:
+                                        print "dkjfhdskjfhjfbh"
                                         cd_acc=self.env['account.move.line'].search([('move_id','=',records.move_id.id),('credit','>',0.0)])
                                         if not cd_acc:
                                             cd_acc=False
