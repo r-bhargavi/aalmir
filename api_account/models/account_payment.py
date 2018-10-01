@@ -105,6 +105,7 @@ class BankChequeDetails(models.Model):
     journal_id = fields.Many2one('account.journal',related="payment_id.journal_id",string='Journal')
     partner_id = fields.Many2one('res.partner',related="payment_id.partner_id",string='Supplier/Customer')
     bank_name = fields.Many2one('cheque.bank.name','Bank Name')
+    communication = fields.Char(related="payment_id.communication",string='Internal Note')
     #bank_id = fields.Many2one('res.partner.bank', 'Bank Name')
     cheque_no = fields.Char('Cheque No.')
     cheque_date = fields.Date('Cheque Date')
