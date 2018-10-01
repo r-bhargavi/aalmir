@@ -71,7 +71,7 @@
 						<field name='cd_account'/>
 						<field name='partner_id'/>
 						<field name='narration' fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
-						<field name='po_number'/>
+						<field name='move'/>
 						<field name="debit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
 						<field name="credit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');" />
 						<field name="amount"/>
