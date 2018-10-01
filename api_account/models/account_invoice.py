@@ -12,6 +12,14 @@ class AccountInvoice(models.Model):
     
     refund_amount=fields.Float('Refund Amount', compute='amount_refund')
     refund_bool=fields.Boolean('Hide Refund Button', compute='amount_refund')
+    invoice_id_rel = fields.Many2one('account.invoice',string='Invoice ID')
+    
+    @api.model
+    def create(self, vals):
+        invoice = super(AccountInvoice, self).create(vals)
+        invoice.write({'invoice_id_rel':invoice.id})
+        #voucher.assert_balanced()
+        return invoice
    
     def read_group(self,cr,uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False,lazy=True):
         return super(AccountInvoice, self).read_group(cr,uid,domain,fields, groupby, offset, limit=limit, context=context, orderby=orderby,lazy=lazy)

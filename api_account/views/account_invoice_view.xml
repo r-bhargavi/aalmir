@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+        <record model="ir.ui.view" id="invoice_tree_vw_inherit_aalmir_b">
+            <field name="name">account.invoice.tree.inherit.ab</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+		<field name="number" position="after">
+                    <field name="invoice_id_rel"/>
+            	</field>
+            </field>
+       </record>
         <record id="api_account_invoice_form" model="ir.ui.view">
             <field name="name">account.invoice.form (account_invoice_send_proforma)</field>
             <field name="model">account.invoice</field>
@@ -101,6 +111,7 @@
 		 </field>
                  
 		 <field name='date_invoice' position='after'>
+                    <field name="invoice_id_rel" readonly="1"/>
                     <field name='refund_bool' invisible='1'/>
 		 </field>
                 

@@ -59,6 +59,52 @@ class account_journal(models.Model):
 			print ",,,,,",records.date,records.credit , records.debit ,opening_bal , records.amount_currency 
 		print ",,,,,",opening_bal,pro_balance,last_transaction
 		return opening_bal,pro_balance,last_transaction
+    #            to retrive on account click to move lines on bank and cash type
+    @api.multi
+    def open_action(self):
+        """return action based on type for related journals"""
+        action_name = self._context.get('action_name', False)
+        if not action_name:
+            if self.type == 'bank':
+#                action_name = 'action_bank_statement_tree'
+                action_name = 'action_move_journal_line'
+            elif self.type == 'cash':
+                action_name = 'action_move_journal_line'
+#                action_name = 'action_view_bank_statement_tree'
+            elif self.type == 'sale':
+                action_name = 'action_invoice_tree1'
+            elif self.type == 'purchase':
+                action_name = 'action_invoice_tree2'
+            else:
+                action_name = 'action_move_journal_line'
+
+        _journal_invoice_type_map = {
+            ('sale', None): 'out_invoice',
+            ('purchase', None): 'in_invoice',
+            ('sale', 'refund'): 'out_refund',
+            ('purchase', 'refund'): 'in_refund',
+            ('bank', None): 'bank',
+            ('cash', None): 'cash',
+            ('general', None): 'general',
+        }
+        invoice_type = _journal_invoice_type_map[(self.type, self._context.get('invoice_type'))]
+
+        ctx = self._context.copy()
+        ctx.pop('group_by', None)
+        ctx.update({
+            'journal_type': self.type,
+            'default_journal_id': self.id,
+            'search_default_journal_id': self.id,
+            'default_type': invoice_type,
+            'type': invoice_type
+        })
+        ir_model_obj = self.pool['ir.model.data']
+        model, action_id = ir_model_obj.get_object_reference(self._cr, self._uid, 'account', action_name)
+        action = self.pool[model].read(self._cr, self._uid, [action_id], context=self._context)[0]
+        action['context'] = ctx
+        action['domain'] = self._context.get('use_domain', [])
+        return action
+
 	
     @api.multi
     def get_journal_dashboard_datas(self):
