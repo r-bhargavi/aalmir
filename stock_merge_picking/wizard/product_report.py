@@ -196,10 +196,12 @@ class ProductReport(models.TransientModel):
                                   'price_unit':operation.n_sale_order_line.price_unit,
                                   'product_id':operation.product_id.id,
                                   'lpo_number':operation.picking_id.sale_id.sale_lpo_number,
-                                  'qty_ordered':operation.product_qty,
-                                  'delivery_ids':[(4, operation.picking_id.id)]
+                                  'qty_ordered':operation.n_sale_order_line.product_uom_qty,
+                                  'delivery_ids':[(4, operation.picking_id.id)],
+                                  'invoice_ids':[(6, 0, [x.id for x in  operation.picking_id.invoice_ids])],
                                   }))
                     if record.report_type == 'summary':
+                       cr = self.env.cr
                        val1=[]
                        import itertools as it
                        keyfunc = lambda x: x['product_id']
@@ -210,15 +212,24 @@ class ProductReport(models.TransientModel):
                        for ln in product:
                            for operation in operation_ids:
                                if ln['product_id'] == operation.product_id.id: 
+                                   cr.execute('SELECT sum(product_uom_qty) FROM sale_order_line where product_id=%s and order_id=%s', (operation.product_id.id,operation.picking_id.sale_id.id))
+                                   qty_check=cr.fetchone()[0]
+                                   cr.execute('SELECT sum(qty_delivered) FROM sale_order_line where product_id=%s and order_id=%s', (operation.product_id.id,operation.picking_id.sale_id.id))
+                                   qty_done=cr.fetchone()[0]
+                                   cr.execute('SELECT sum(qty_invoiced) FROM sale_order_line where product_id=%s and order_id=%s', (operation.product_id.id,operation.picking_id.sale_id.id))
+                                   qty_invoiced=cr.fetchone()[0]
                                    val1.append(({'sale_id':operation.picking_id.sale_id.id,
-                                      'qty_delivered':ln['qty'],
+                                      'qty_delivered':qty_done,
+                                      'delivery_ids':[(6, 0, [x.id for x in  operation.picking_id.sale_id.picking_ids])],
+                                       'invoice_ids':[(6, 0, [x.id for x in  operation.picking_id.sale_id.invoice_ids])],
                                       'product_uom':operation.product_uom_id.id,
                                       'order_date':operation.picking_id.delivery_date,
                                       'price_unit':operation.n_sale_order_line.price_unit,
                                       'product_id':operation.product_id.id,
                                       'lpo_number':operation.picking_id.sale_id.sale_lpo_number,
-                                      'qty_ordered':operation.product_qty
-                                  }))
+                                      'qty_ordered':qty_check,
+                                      'qty_invoiced':qty_invoiced
+                                  }))                   
                        final_val1=list({v['product_id']:v for v in val1}.values())
                        print"VVVVVVVVVVVVVV",val1 , final_val1        
                        record.product_line=final_val1
