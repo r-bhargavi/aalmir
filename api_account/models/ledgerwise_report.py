@@ -318,10 +318,6 @@ class LedgerwiseReport(models.Model):
 							'partner_id':line.partner_id.id})
 							reconcile_lines.update({str(reconcile_date):new_li})
 					elif chq.reconcile_date and chq.reconcile_date < from_date:
-#                                                invoice_ids=self.env['account.invoice'].search([])
-#                                                for each in invoice_ids:
-#                                                    each.write({'invoice_id_rel':each.id})
-#                                                return True
 						opening_bal += -chq.amount if line.credit else chq.amount
 				# if payment type is not cheque				
 				if flag:
