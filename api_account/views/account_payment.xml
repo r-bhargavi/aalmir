@@ -151,6 +151,7 @@
 		    		<field name="bank_name" />
 		        	<field name="journal_id" />
 		       		<field name="payment_id"/>
+		       		<field name="communication"/>
 		        	<field name='amount' total="sum"/>
 		        	<field name='reconcile_date' />
 		        	<field name='cheque_status' />
