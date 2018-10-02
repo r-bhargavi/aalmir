@@ -125,9 +125,15 @@ class LedgerwiseReport(models.Model):
 				invoice=self.env['account.invoice'].search([('move_id','=',records.move_id.id)])
 				po_number=','.join([i.lpo_number for i in invoice.document_id])
 				if records.credit and records.account_id.user_type_id.type in ('receivable','payable'):
+                                        cd_acc=self.env['account.move.line'].search([('move_id','=',records.move_id.id),('debit','>',0.0)])
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
 					opening_bal -= records.credit
 					report_line.create({'date':records.date,
 							'account':records.account_id.id,
+							'cd_account': cd_acc,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -137,9 +143,15 @@ class LedgerwiseReport(models.Model):
 							'move':records.move_id.id,
 							'line_id':res.id})
 				if records.debit:
+                                        cd_acc=self.env['account.move.line'].search([('move_id','=',records.move_id.id),('credit','>',0.0)])
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
 					opening_bal += records.debit
 					report_line.create({'date':records.date,
 							'account':records.account_id.id,
+                                                        'cd_account':cd_acc,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -195,15 +207,20 @@ class LedgerwiseReport(models.Model):
 			domain.extend([partner,account_dom,('date','>=',from_date)])
 
 			# code to find transaction records >>>
-			print "kkkkkkkkk,,",domain
 			line_ids=self.env['account.move.line'].search(domain,order='date asc')
 			for records in line_ids:
 				invoice=self.env['account.invoice'].search([('move_id','=',records.move_id.id)])
 				po_number=','.join([i.lpo_number for i in invoice.document_id])
 				if records.credit :
+                                        cd_acc=self.env['account.move.line'].search([('move_id','=',records.move_id.id),('debit','>',0.0)])
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
 					opening_bal -= records.credit
 					report_line.create({'date':records.date,
 							'account':records.account_id.id,
+							'cd_account':cd_acc,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -213,9 +230,15 @@ class LedgerwiseReport(models.Model):
 							'move':records.move_id.id,
 							'line_id':res.id})
 				if records.debit:
+                                        cd_acc=self.env['account.move.line'].search([('move_id','=',records.move_id.id),('credit','>',0.0)])
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
 					opening_bal += records.debit
 					report_line.create({'date':records.date,
 							'account':records.account_id.id,
+							'cd_account':cd_acc,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -247,7 +270,19 @@ class LedgerwiseReport(models.Model):
 				flag=True
 				journal_currency = line.journal_id.currency_id or line.account_id.currency_id
 				for chq in line.payment_id.cheque_details:
-					flag=False # to avoid get entry amount
+                                        if line.debit:
+                                            cd_acc=self.env['account.move.line'].search([('credit','>',0.0),('move_id','=',line.move_id.id)])                                        
+                                            if not cd_acc:
+                                                cd_acc=False
+                                            else:
+                                                cd_acc=cd_acc[0].account_id.id
+                                        if line.credit:
+                                            cd_acc=self.env['account.move.line'].search([('debit','>',0.0),('move_id','=',line.move_id.id)])                                        
+                                            if not cd_acc:
+                                                cd_acc=False
+                                            else:
+                                                cd_acc=cd_acc[0].account_id.id
+                                        flag=False # to avoid get entry amount
 					if chq.id in cheque_ids:
 						continue
 					cheque_ids.append(chq.id)
@@ -255,6 +290,7 @@ class LedgerwiseReport(models.Model):
 					if not chq.reconcile_date :
 							un_reconcile.append({'date':chq.cheque_date,
 							'account':line.account_id.id,
+							'cd_account':cd_acc,
 							'journal':line.journal_id.id,
 							'narration':line.name if len(line.name)>2 else \
 										 line.move_id.name,
@@ -269,6 +305,7 @@ class LedgerwiseReport(models.Model):
 							new_li = reconcile_lines.get(reconcile_date,[])
 							new_li.append({	'account':line.account_id.id,
 							'journal':line.journal_id.id,
+                                                        'cd_account':cd_acc,
 							'narration':line.name if len(line.name)>2 \
 										else line.move_id.name,
 							'credit_amount':chq.amount if line.credit else 0.0,
@@ -283,7 +320,6 @@ class LedgerwiseReport(models.Model):
 				# if payment type is not cheque				
 				if flag:
 					opening_bal += -line.credit or line.debit
-								
 			report_line.create({'narration':'OPENING BALANCE',
 							'credit_amount':abs(opening_bal) if opening_bal<0.0 else 0.0,
 							'debit_amount':opening_bal if opening_bal>0.0 else 0.0,
@@ -295,6 +331,19 @@ class LedgerwiseReport(models.Model):
 			line_ids=self.env['account.move.line'].search(domain,order='date asc')
 			cheque_ids = []
 			for records in line_ids:
+                                new_li = reconcile_lines.get(records.date,[])
+                                if records.debit:
+                                    cd_acc=self.env['account.move.line'].search([('credit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                    if not cd_acc:
+                                        cd_acc=False
+                                    else:
+                                        cd_acc=cd_acc[0].account_id.id
+                                if records.credit:
+                                    cd_acc=self.env['account.move.line'].search([('debit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                    if not cd_acc:
+                                        cd_acc=False
+                                    else:
+                                        cd_acc=cd_acc[0].account_id.id
 				flag=True
 				journal_currency = records.journal_id.currency_id or records.account_id.currency_id
 				for chq in records.payment_id.cheque_details:
@@ -306,6 +355,7 @@ class LedgerwiseReport(models.Model):
 					if not chq.reconcile_date :
 						un_reconcile.append({'date':chq.cheque_date,
 						'account':records.account_id.id,
+						'cd_account':cd_acc,
 						'journal':records.journal_id.id,
 						'narration':records.name if len(records.name)>2 \
 									else records.move_id.name,
@@ -320,6 +370,7 @@ class LedgerwiseReport(models.Model):
 						new_li = reconcile_lines.get(chq.reconcile_date,[])
 						new_li.append({	'account':records.account_id.id,
 						'journal':records.journal_id.id,
+                                                'cd_account':cd_acc,
 						'narration':records.name if len(records.name)>2 \
 									else records.move_id.name,
 						'credit_amount':chq.amount if records.credit else 0.0,
@@ -331,17 +382,31 @@ class LedgerwiseReport(models.Model):
 
 				# Payment is not cheque
 				if flag :
-					new_li = reconcile_lines.get(records.date,[])
-					new_li.append({	'account':records.account_id.id,
-							'journal':records.journal_id.id,
-							'narration':records.name if len(records.name)>2 \
-										else records.move_id.name,
-							'credit_amount':records.credit if records.credit else 0.0,
-							'debit_amount':records.debit if records.debit else 0.0,
-							'move':records.move_id.id,
-							'payment_date':records.date,
-							'partner_id':records.partner_id.id})
-					reconcile_lines.update({str(records.date):new_li})
+                                    cd_acc=False
+                                    if records.debit:
+                                        cd_acc=self.env['account.move.line'].search([('credit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
+                                    if records.credit:
+                                        cd_acc=self.env['account.move.line'].search([('debit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                        if not cd_acc:
+                                            cd_acc=False
+                                        else:
+                                            cd_acc=cd_acc[0].account_id.id
+                                    new_li = reconcile_lines.get(records.date,[])
+                                    new_li.append({	'account':records.account_id.id,
+                                                    'journal':records.journal_id.id,
+                                                    'cd_account':cd_acc,
+                                                    'narration':records.name if len(records.name)>2 \
+                                                                            else records.move_id.name,
+                                                    'credit_amount':records.credit if records.credit else 0.0,
+                                                    'debit_amount':records.debit if records.debit else 0.0,
+                                                    'move':records.move_id.id,
+                                                    'payment_date':records.date,
+                                                    'partner_id':records.partner_id.id})
+                                    reconcile_lines.update({str(records.date):new_li})
 			# <<<
 			
 			##>>> Code to Create Records in LedgerWise
@@ -501,9 +566,15 @@ class LedgerwiseReport(models.Model):
 					invoice=self.env['account.invoice'].search([('move_id','=',records.move_id.id)])
 					po_number=','.join([i.lpo_number for i in invoice.document_id])
 					if records.credit :
+                                                cd_acc=self.env['account.move.line'].search([('debit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                                if not cd_acc:
+                                                    cd_acc=False
+                                                else:
+                                                    cd_acc=cd_acc[0].account_id.id
 						opening_bal -= records.credit
 						report_detail_line.create({'date':records.date,
 								'account':records.account_id.id,
+								'cd_account':cd_acc,
 								'journal':records.journal_id.id,
 								'po_number':po_number,
 								'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -513,9 +584,16 @@ class LedgerwiseReport(models.Model):
 								'move':records.move_id.id,
 								'line_id':rp_line.id})
 					if records.debit:
+                                                cd_acc=self.env['account.move.line'].search([('credit','>',0.0),('move_id','=',records.move_id.id)])                                        
+                                                if not cd_acc:
+                                                    cd_acc=False
+                                                else:
+                                                    cd_acc=cd_acc[0].account_id.id
+
 						opening_bal += records.debit
 						report_detail_line.create({'date':records.date,
 								'account':records.account_id.id,
+                                                                'cd_account':cd_acc,
 								'journal':records.journal_id.id,
 								'po_number':po_number,
 								'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -613,6 +691,7 @@ class ledgerwiseLine(models.Model):
     partner_id = fields.Many2one('res.partner','Ledger')
     account = fields.Many2one('account.account','Account')
     journal = fields.Many2one('account.journal','Journal')
+    cd_account = fields.Many2one('account.account','Cr/Dr Account')
     move = fields.Many2one('account.move','Journal Entry')
     po_number = fields.Char('PO Number')
     narration = fields.Char('Naration')
@@ -661,4 +740,3 @@ class res_partner(models.Model):
 					employee = self.env['hr.employee'].search([('address_home_id','!=',False)])
 					args=[('id','in',[e.address_home_id.id for e in employee])]
 		return super(res_partner,self).name_search(name, args, operator=operator,limit=limit)
-

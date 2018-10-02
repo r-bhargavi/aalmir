@@ -10,8 +10,28 @@ from openerp.exceptions import UserError, ValidationError
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
     
+    @api.multi
+    def action_cancel(self):
+        cancel_result = super(AccountInvoice, self).action_cancel()
+        print "cancel_resultcancel_resultcancel_resultcancel_result",cancel_result
+        self.write({'send_bill_bool':False,'check_vat':False})
+        return cancel_result
+
+    
+    @api.multi
+    def amount_refund(self):
+        for record in self:
+            count=self.env['account.invoice'].search([('origin','=',record.number), ('type','in',('out_refund',)),('state','in',('draft','open','paid'))])
+
+            if count:
+               record.refund_amount=sum(line.amount_total_signed for line in count)
+               if record.refund_amount == (-record.amount_total_signed) or record.refund_amount < (-record.amount_total_signed):
+                  record.refund_bool=True
+               else:
+                  record.refund_bool=False
+    
     refund_amount=fields.Float('Refund Amount', compute='amount_refund')
-    refund_bool=fields.Boolean('Hide Refund Button', compute='amount_refund')
+    refund_bool=fields.Boolean('Hide Refund Button', compute='amount_refund',store=True)
     invoice_id_rel = fields.Many2one('account.invoice',string='Invoice ID')
     
     @api.model
@@ -27,6 +47,19 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_validate(self):
         res=super(AccountInvoice, self).invoice_validate()
+        result=False
+#        auto vat check box true when taxes in any one line of invoice
+        if any(line.invoice_line_tax_ids for line in self.invoice_line_ids):
+            result=True
+        else:
+            self.write({'check_vat':False})
+
+        if result==True:
+            if not self.partner_vat:
+                raise UserError("Please Input Partner VAT before Validating!!")
+            self.write({'check_vat':True})
+        if self.send_bill_bool==False and self.type=='in_invoice':
+            raise UserError("Bill cannot be validated untill payment approved by is selected in other info")
         if self.origin:
 		 count=self.env['account.invoice'].search([('number','=',self.origin),('type','in',('in_invoice',)),('state','in',('open','paid'))])
 		 if count:
@@ -38,18 +71,6 @@ class AccountInvoice(models.Model):
               add=self.register_payment(move_line)
         return res
    
-    @api.multi
-    def amount_refund(self):
-        for record in self:
-            count=self.env['account.invoice'].search([('origin','=',record.number), ('type','in',('out_refund',)),('state','in',('draft','open','paid'))])
-
-            if count:
-               record.refund_amount=sum(line.amount_total_signed for line in count)
-               if record.refund_amount == (-record.amount_total_signed) or record.refund_amount < (-record.amount_total_signed):
-                  record.refund_bool=True
-               else:
-                  record.refund_bool=False
-            
     @api.model
     def _get_invoice_key_cols(self):
         return [

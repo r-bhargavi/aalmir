@@ -60,6 +60,7 @@
                   <button name="aalmir_invoice_print" string="Download" type="object" states="paid,open" class="oe_highlight" context="{'out_invoice':True}" />
                   <button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
                  </button>
+
                   <xpath expr="//sheet/group[1]" position="before">
 			<div  class="oe_button_box"  name='button_box'>
                             <button name="open_delivery_history" string="Delivery" type="object" class="oe_stat_button"
@@ -129,6 +130,15 @@
 		        <attribute name="invisible">1</attribute>
 	    	 </field-->  
                 <field name="fiscal_position_id" position='after'>
+                <label for='check_vat'/>
+                  <div>
+                  	<field name='check_vat'/>
+                  	<field name='partner_vat' attrs="{'required':[('check_vat','=',True)],'invisible':[('check_vat','=',False)]}"/>
+                  	<h4  style="color:red" attrs="{'invisible': [('check_vat', '=', True)]}">
+			VAT can be removed from print only in case of export items, before removing make it sure, as further export documents will be required to upload
+		  	</h4>
+                  </div>
+		  <field name='tax_documents' attrs="{'invisible': [('check_vat', '=',True)]}" widget="many2many_binary"/>
                       
                        <label for='picking_ids' string='Receiving No.'/>
 			 <div>
@@ -320,7 +330,7 @@
                   	<field name='check_vat'/>
                   	<field name='partner_vat' attrs="{'required':[('check_vat','=',True)],'invisible':[('check_vat','=',False)]}"/>
                   	<h4  style="color:red" attrs="{'invisible': [('check_vat', '=', True)]}">
-			Customer VAT can be removed from print only in case of export items, before removing make it sure, as further export documents will be required to upload
+			VAT can be removed from print only in case of export items, before removing make it sure, as further export documents will be required to upload
 		  	</h4>
                   </div>
 		  <field name='tax_documents' attrs="{'invisible': [('check_vat', '=',True)]}" widget="many2many_binary"/>
