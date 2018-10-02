@@ -11,6 +11,19 @@
             	</field>
             </field>
        </record>
+        <record model="ir.ui.view" id="invoice_form_supplier_inherit_aalmir_b">
+            <field name="name">account.invoice.supplier.form.inherit.ab</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+		<field name="date_invoice" position="after">
+                    <field name="purchase_id" string="Purchase Order"/>
+            	</field>
+                <field name="origin" position="attributes">
+                    <attribute name="attrs">{'invisible':[('type', 'in', ['in_invoice'])]}</attribute>
+            	</field>
+            </field>
+       </record>
         <record id="api_account_invoice_form" model="ir.ui.view">
             <field name="name">account.invoice.form (account_invoice_send_proforma)</field>
             <field name="model">account.invoice</field>
@@ -56,7 +69,7 @@
                         <attribute name="class">oe_highlight</attribute>
 	    	 </button>
 	    	 <button name="%(account.action_account_invoice_refund)d" position='attributes'>
-                     <attribute name='attrs'>{'invisible':[('refund_bool','!=',False)]}</attribute>
+                     <!--<attribute name='attrs'>{'invisible':[('refund_bool','!=',False)]}</attribute>-->
                      <attribute name="groups">account.group_account_user,gt_order_mgnt.group_sale_support</attribute>
          	</button>
             
@@ -112,7 +125,6 @@
                  
 		 <field name='date_invoice' position='after'>
                     <field name="invoice_id_rel" readonly="1"/>
-                    <field name='refund_bool' invisible='1'/>
 		 </field>
                 
 		 <xpath expr="//sheet/label[1]" position="before">

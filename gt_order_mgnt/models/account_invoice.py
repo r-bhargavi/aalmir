@@ -43,6 +43,7 @@ class AccountInvoiceLine(models.Model):
     gross_weight=fields.Float('Net Weight(Kg)', compute='grossweight')
     net_weight=fields.Float('Gross Weight(Kg)', compute='netweight')
     packaging_id=fields.Many2one('product.packaging' ,string='Packaging', compute='product_packaging')
+    purchase_id=fields.Many2one('purchase.order' ,string='PO',store=True)
     lpo_documents=fields.Many2many('customer.upload.doc', string='LPO Documents')
     pack_qty=fields.Integer('Packaging Qty', compute='product_packaging')
     external_no=fields.Char('External No.', compute='product_ext_no')
@@ -174,8 +175,8 @@ class AccountInvoice(models.Model):
                                  'tax_id',
                                 'Global Taxes',)
                                 
-    check_vat=fields.Boolean('Print Customer VAT')
-    partner_vat=fields.Char('Customer VAT',related='partner_id.vat')
+    check_vat=fields.Boolean('Print VAT')
+    partner_vat=fields.Char('VAT',related='partner_id.vat')
     tax_documents=fields.Many2many('ir.attachment','customer_tax_documents_rel','invoice_id','doc_id','Upload Documents')
     
     @api.multi
@@ -317,7 +318,7 @@ class AccountInvoice(models.Model):
     vendor_invoice_date=fields.Date('Vendor Invoice Date')
     vendor_uploaded_document = fields.Binary(string='Vendor Document', default=False , attachment=True)
     vendor_doc_name=fields.Char()
-    approved_by=fields.Many2one('res.users','Approved By')   
+    approved_by=fields.Many2one('res.users','Payment Approved By')   
     send_bill_bool=fields.Boolean('Hide Send mail button', default=False)
     show_stamp=fields.Boolean('Show Stamp on Report',default=True)
     customer_name_report=fields.Char('Customer Name on Report',default='Customer Name')
