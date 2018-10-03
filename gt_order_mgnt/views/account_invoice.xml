@@ -60,13 +60,37 @@
                   <button name="aalmir_invoice_print" string="Download" type="object" states="paid,open" class="oe_highlight" context="{'out_invoice':True}" />
                   <button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
                  </button>
-
+                <button name="%(account.action_account_invoice_payment)d"  states="open" position='replace'>
+                   <button name="%(account.action_account_invoice_payment)d" type="action" 
+                        string="Register Payment" groups="account.group_account_user"
+                        class="oe_highlight" attrs="{'invisible':['|',('state','!=','open'),('send_bill_bool','=',False)]}"/>
+                 </button>
                   <xpath expr="//sheet/group[1]" position="before">
 			<div  class="oe_button_box"  name='button_box'>
                             <button name="open_delivery_history" string="Delivery" type="object" class="oe_stat_button"
                                 icon="fa-truck">
                             </button>
 			</div>
+		 </xpath>
+                    <field name='payment_term_id' position='replace'>
+                          <field name='show_stamp'/>
+                          <field name='customer_name_report'/>
+                          <field name='destination_report'/>
+                           <field name='report_company_name'/>
+                           <field name='company_currency_id' invisible='1'/>
+                   </field>
+                  <xpath expr="//field[@name='currency_id']" position="after">
+                         <label for='payment_term_id'/>
+			 <div>
+		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
+                                     options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
+			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
+			</div>
+		 </xpath>
+                  <xpath expr="//field[@name='vendor_uploaded_document']" position="after">
+                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
+			Select Payment Approved By for Payment
+		  	</h4>
 		 </xpath>
                  <field name='partner_id' position='replace'>
 		        <label for='partner_id' string='Vendor'/>
@@ -149,19 +173,6 @@
 			     <field name="check_do_number"  class="oe_inline" nolabel="1" />
 			</div>
                 </field>
-                <field name='payment_term_id' position='replace'>
-		          <label for='payment_term_id'/>
-			 <div>
-		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
-                                     options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
-			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
-			</div>
-                      <field name='show_stamp'/>
-                      <field name='customer_name_report'/>
-                      <field name='destination_report'/>
-                       <field name='report_company_name'/>
-                       <field name='company_currency_id' invisible='1'/>
-               </field>
                 <field name="currency_id"  groups="base.group_multi_currency" position='replace'>
                  <label for='currency_id' groups="base.group_multi_currency"/>
                   <div groups="base.group_multi_currency">
