@@ -180,7 +180,7 @@ class ProductReport(models.TransientModel):
                  if record.date_from and record.date_to:
                     domain +=[('picking_id.dispatch_date','>=',record.date_from),('picking_id.dispatch_date','<=',record.date_to )]
                  domain +=['|',('picking_id.partner_id.parent_id','in',all_partner_ids),('picking_id.partner_id','in',all_partner_ids)]
-                 domain +=[('product_id','in',product_id),('picking_id.state','=','delivered')]
+                 domain +=[('product_id','in',product_id),('picking_id.state','in',('done','delivered'))]
                  print"DOOOOOOOOOOOo",domain
                  operation_ids=self.env['stock.pack.operation'].search(domain) 
                  vals=[]
