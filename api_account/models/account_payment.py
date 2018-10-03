@@ -58,7 +58,28 @@ class accountPayment(models.Model):
 				    ('general', 'Miscellaneous')],related='journal_id.type')
     user_id = fields.Many2one('res.users', 'Reconcile By')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
-   
+    
+#    adding company domain on change of payment type
+    @api.onchange('payment_type')
+    def _onchange_payment_type(self):
+        if not self.invoice_ids:
+            # Set default partner type for the payment type
+            if self.payment_type == 'inbound':
+                self.partner_type = 'customer'
+            elif self.payment_type == 'outbound':
+                self.partner_type = 'supplier'
+        # Set payment method domain
+        res = self._onchange_journal()
+        if not res.get('domain', {}):
+            res['domain'] = {}
+
+        res['domain']['journal_id'] = self.payment_type == 'inbound' and [('at_least_one_inbound', '=', True)] or [('at_least_one_outbound', '=', True)]
+        res['domain']['journal_id'].append(('type', 'in', ('bank', 'cash')))
+        if self._context.get('active_model')=='account.invoice':
+            obj = self.env['account.invoice'].browse(self._context.get('active_id'))
+            res['domain']['journal_id'].append(('company_id', '=', obj.company_id.id))
+        return res
+    
     @api.multi
     def post(self):
     	for res in self:
