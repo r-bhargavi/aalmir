@@ -68,7 +68,7 @@
                            	<td><t t-esc="line.date" /></td>
                            	<td><t t-esc="line.journal.name" /></td>
                            	<td><t t-esc="line.partner_id.name" /></td>
-                           	<td><t t-esc="line.cd_account.name" /></td>
+                                <td><t t-esc="line.cd_account.name" /></td>
                            	<td><t t-esc="line.move.name" /></td>
                            	<td><t t-esc="line.narration" /></td>
                            	<td t-if='doc.ledger_type=="customer"' ><t t-esc="line.po_number"/></td>
