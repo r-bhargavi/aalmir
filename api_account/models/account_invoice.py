@@ -58,8 +58,6 @@ class AccountInvoice(models.Model):
             if not self.partner_vat:
                 raise UserError("Please Input Partner VAT before Validating!!")
             self.write({'check_vat':True})
-        if self.send_bill_bool==False and self.type=='in_invoice':
-            raise UserError("Bill cannot be validated untill payment approved by is selected in other info")
         if self.origin:
 		 count=self.env['account.invoice'].search([('number','=',self.origin),('type','in',('in_invoice',)),('state','in',('open','paid'))])
 		 if count:
