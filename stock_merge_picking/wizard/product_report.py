@@ -192,7 +192,7 @@ class ProductReport(models.TransientModel):
                         val.append((0,0,{'sale_id':operation.picking_id.sale_id.id,
                                   'qty_delivered':operation.qty_done,
                                   'product_uom':operation.product_uom_id.id,
-                                  'order_date':operation.picking_id.delivery_date,
+                                  'order_date':operation.picking_id.dispatch_date,
                                   'price_unit':operation.n_sale_order_line.price_unit,
                                   'product_id':operation.product_id.id,
                                   'lpo_number':operation.picking_id.sale_id.sale_lpo_number,
