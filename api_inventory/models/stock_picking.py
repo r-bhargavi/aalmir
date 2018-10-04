@@ -52,7 +52,8 @@ def subset_sum_batches(batches, target):
 				
 class stockPicking(models.Model):
 	_inherit = "stock.picking"
-
+        
+        pick_ref=fields.Many2one('stock.picking', string='Pick Ref')
      	store_ids = fields.One2many('picking.lot.store.location','picking_id','Store Location')
      	ntransfer_type = fields.Selection(selection_add=[('pre_stock','Move To Stock'),
      							('manufacturing','Manufacturing Transfer'),
@@ -66,6 +67,11 @@ class stockPicking(models.Model):
      				raise UserError('You are trying to do Internal Transfer in Same-Location')
      				
      		res =super(stockPicking,self).create(vals)
+                if res.origin:
+                    pick_id=self.search([('name','=',res.origin)])
+                    if pick_id:
+                        res.pick_ref=pick_id.id
+                        pick_id.write({'pick_ref':res.id})
      		if res.location_id.pre_ck and res.location_dest_id.actual_location:
      			res.ntransfer_type='pre_stock'
 			res.term_of_delivery=False
