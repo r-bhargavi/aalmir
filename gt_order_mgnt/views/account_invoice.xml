@@ -85,7 +85,11 @@
 		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
                                      options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
 			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
+                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
+			Select Payment Approved By for Payment
+		  	</h4>
 			</div>
+                       
 		 </xpath>
                  <field name='partner_id' position='replace'>
 		        <label for='partner_id' string='Vendor'/>
@@ -110,9 +114,6 @@
                     <field name='vendor_invoice_date'/>
                     <field name="vendor_doc_name"  invisible="1" />
 		    <field name="vendor_uploaded_document" filename="vendor_doc_name" />
-                    <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
-			Select Payment Approved By for Payment
-		  	</h4>
                  </field> 
                 <xpath expr='//page[2]' position='inside'>
                      <group>
