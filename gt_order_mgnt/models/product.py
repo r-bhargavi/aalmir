@@ -31,38 +31,38 @@ from urllib import urlencode
 class productProduct(models.Model):
     _inherit = 'product.product'
     
-    qty_scrapped=fields.Float(compute='action_open_scrap',digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
+#    qty_scrapped=fields.Float(compute='action_open_scrap',digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
     
     
-    @api.multi     
-    def action_open_scrap(self):
-        print "sdfsdsdsdf"
-        for line in self:
-            quant_tree = self.env.ref('stock.view_stock_quant_tree', False)
-            quant_form = self.env.ref('stock.view_stock_quant_form', False)
-            scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
-            quants_count=self.env['stock.quant'].search([('product_id','=',line.id),('location_id','in',scrap_locations.ids)])
-            print "quants_countquants_countquants_count",quants_count
-            if quants_count:
-                quant_qty=sum(x.qty for x in quants_count)
-                print "quant_qtyquant_qty",quant_qty
-                line.qty_scrapped=quant_qty
-            else:
-                line.qty_scrapped=0.0
-            
-            if quant_tree:
-                return {
-                    'name':'Scrapped',
-                    'type': 'ir.actions.act_window',
-                    'view_type': 'form',
-                    'view_mode': 'tree,',
-                    'res_model': 'stock.quant',
-                    'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
-                    'view_id': quant_tree.id,
-                    'target': 'current',
-                    'domain':[('product_id','=',line.id),('location_id','in',scrap_locations.ids)],
-                }
-        return True
+#    @api.multi     
+#    def action_open_scrap(self):
+#        print "sdfsdsdsdf"
+#        for line in self:
+#            quant_tree = self.env.ref('stock.view_stock_quant_tree', False)
+#            quant_form = self.env.ref('stock.view_stock_quant_form', False)
+#            scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
+#            quants_count=self.env['stock.quant'].search([('product_id','=',line.id),('location_id','in',scrap_locations.ids)])
+#            print "quants_countquants_countquants_count",quants_count
+#            if quants_count:
+#                quant_qty=sum(x.qty for x in quants_count)
+#                print "quant_qtyquant_qty",quant_qty
+#                line.qty_scrapped=quant_qty
+#            else:
+#                line.qty_scrapped=0.0
+#            
+#            if quant_tree:
+#                return {
+#                    'name':'Scrapped',
+#                    'type': 'ir.actions.act_window',
+#                    'view_type': 'form',
+#                    'view_mode': 'tree,',
+#                    'res_model': 'stock.quant',
+#                    'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
+#                    'view_id': quant_tree.id,
+#                    'target': 'current',
+#                    'domain':[('product_id','=',line.id),('location_id','in',scrap_locations.ids)],
+#                }
+#        return True
 
 
     @api.v7
@@ -406,7 +406,7 @@ class productTemplate(models.Model):
     		rec.progress_rate = percentage
     		rec.progress_value = val
                 
-    qty_scrapped=fields.Float(compute='action_open_scrap',digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
+#    qty_scrapped=fields.Float(compute='action_open_scrap',digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
     produce_delay_qty = fields.Integer('Manufacturing Quantity', default=1)
     product_hs_code=fields.Char('Hs Code')
     net_weight=fields.Float('Net Weight')
@@ -432,37 +432,37 @@ class productTemplate(models.Model):
     packaging_uom_id=fields.Many2one('product.uom')
     #purchase_approved_price=fields.Float('Purchase Apporved Price') 
     
-    @api.multi     
-    def action_open_scrap(self):
-        print "sdfsdsdsdf"
-        for line in self:
-            quant_tree = self.env.ref('stock.view_stock_quant_tree', False)
-            quant_form = self.env.ref('stock.view_stock_quant_form', False)
-            product_id=self.env['product.product'].search([('product_tmpl_id','=',line.id)])
-            scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
-            print "scrap_locationsscrap_locations",scrap_locations,product_id
-            if product_id and scrap_locations:
-                quants_count=self.env['stock.quant'].search([('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)])
-                print "quants_countquants_countquants_count",quants_count
-                if quants_count:
-                    quant_qty=sum(x.qty for x in quants_count)
-                    print "quant_qtyquant_qty",quant_qty
-                    line.qty_scrapped=quant_qty
-                else:
-                    line.qty_scrapped=0.0
-                if quant_tree:
-                    return {
-                        'name':'Scrapped',
-                        'type': 'ir.actions.act_window',
-                        'view_type': 'form',
-                        'view_mode': 'tree,',
-                        'res_model': 'stock.quant',
-                        'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
-                        'view_id': quant_tree.id,
-                        'target': 'current',
-                        'domain':[('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)],
-                    }
-        return True
+#    @api.multi     
+#    def action_open_scrap(self):
+#        print "sdfsdsdsdf"
+#        for line in self:
+#            quant_tree = self.env.ref('stock.view_stock_quant_tree', False)
+#            quant_form = self.env.ref('stock.view_stock_quant_form', False)
+#            product_id=self.env['product.product'].search([('product_tmpl_id','=',line.id)])
+#            scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
+#            print "scrap_locationsscrap_locations",scrap_locations,product_id
+#            if product_id and scrap_locations:
+#                quants_count=self.env['stock.quant'].search([('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)])
+#                print "quants_countquants_countquants_count",quants_count
+#                if quants_count:
+#                    quant_qty=sum(x.qty for x in quants_count)
+#                    print "quant_qtyquant_qty",quant_qty
+#                    line.qty_scrapped=quant_qty
+#                else:
+#                    line.qty_scrapped=0.0
+#                if quant_tree:
+#                    return {
+#                        'name':'Scrapped',
+#                        'type': 'ir.actions.act_window',
+#                        'view_type': 'form',
+#                        'view_mode': 'tree,',
+#                        'res_model': 'stock.quant',
+#                        'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
+#                        'view_id': quant_tree.id,
+#                        'target': 'current',
+#                        'domain':[('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)],
+#                    }
+#        return True
 
     @api.multi
     def create_Product_uom(self):
