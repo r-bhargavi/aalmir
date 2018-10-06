@@ -440,27 +440,28 @@ class productTemplate(models.Model):
             quant_form = self.env.ref('stock.view_stock_quant_form', False)
             product_id=self.env['product.product'].search([('product_tmpl_id','=',line.id)])
             scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
-            quants_count=self.env['stock.quant'].search([('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)])
-            print "quants_countquants_countquants_count",quants_count
-            if quants_count:
-                quant_qty=sum(x.qty for x in quants_count)
-                print "quant_qtyquant_qty",quant_qty
-                line.qty_scrapped=quant_qty
-            else:
-                line.qty_scrapped=0.0
-            
-            if quant_tree:
-                return {
-                    'name':'Scrapped',
-                    'type': 'ir.actions.act_window',
-                    'view_type': 'form',
-                    'view_mode': 'tree,',
-                    'res_model': 'stock.quant',
-                    'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
-                    'view_id': quant_tree.id,
-                    'target': 'current',
-                    'domain':[('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)],
-                }
+            print "scrap_locationsscrap_locations",scrap_locations,product_id
+            if product_id and scrap_locations:
+                quants_count=self.env['stock.quant'].search([('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)])
+                print "quants_countquants_countquants_count",quants_count
+                if quants_count:
+                    quant_qty=sum(x.qty for x in quants_count)
+                    print "quant_qtyquant_qty",quant_qty
+                    line.qty_scrapped=quant_qty
+                else:
+                    line.qty_scrapped=0.0
+                if quant_tree:
+                    return {
+                        'name':'Scrapped',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'tree,',
+                        'res_model': 'stock.quant',
+                        'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
+                        'view_id': quant_tree.id,
+                        'target': 'current',
+                        'domain':[('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)],
+                    }
         return True
 
     @api.multi
