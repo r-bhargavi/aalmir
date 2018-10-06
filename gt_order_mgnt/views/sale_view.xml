@@ -418,7 +418,8 @@
 			</field>
 		</page> 
 		
-                <page string="PO Documents" attrs="{'invisible': [('sale_lop_documents', '=', [])]}">
+                <page string="PO Documents">
+                <!--<page string="PO Documents" attrs="{'invisible': [('sale_lop_documents', '=', [])]}">-->
                    <field name="sale_lop_documents" readonly="1" domain="[('lpo','!=',False)]">
                 	<tree string="PO Documents">
                             <field name="lpo" invisible="1"/>
