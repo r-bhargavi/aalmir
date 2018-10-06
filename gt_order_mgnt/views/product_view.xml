@@ -112,9 +112,9 @@
                             <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
                         </button>
                 </xpath>
-			<field name="packaging_ids"  position="replace"/>
-			<field name="default_code" position="replace" />
-                    	<field name="barcode" position="replace" />
+                <field name="packaging_ids"  position="replace"/>
+                <field name="default_code" position="replace" />
+                <field name="barcode" position="replace" />
 
 		</field>
 	</record>
@@ -573,6 +573,14 @@
 		<field name="model">product.product</field>
 		<field name="inherit_id" ref="product.product_normal_form_view"/>
 		<field name="arch" type="xml">
+                    <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object"
+                            name="action_open_scrap"
+                            attrs="{'invisible':[('type', '!=', 'product')]}"
+                            class="oe_stat_button" icon="fa-building-o">
+                            <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
+                        </button>
+                </xpath>
 			<field name="default_code" position="replace"/>
     			<field name="barcode" position="replace"/>
    		</field>
