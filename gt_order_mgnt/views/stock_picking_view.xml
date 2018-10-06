@@ -174,7 +174,7 @@
 						('done','cancel','transit','dispatch','delivered'))]}</attribute>
 		</field>
 		
-            	<field name="sale_id" position="replace" />
+            	<!--<field name="sale_id" position="replace" />-->
             	<field name='partner_id' position="replace">
 		   	<label for='partner_id' attrs="{'invisible':[('picking_type_code', '=', 'internal')]}"/>
 			<div attrs="{'invisible':[('picking_type_code', '=', 'internal')]}">

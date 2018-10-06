@@ -282,6 +282,7 @@ class productTemplateProcess(models.Model):
     
 class productTemplate(models.Model):
     _inherit = 'product.template'
+        
     
     @api.multi
     def _get_product_profile(self):
@@ -370,7 +371,8 @@ class productTemplate(models.Model):
 				
     		rec.progress_rate = percentage
     		rec.progress_value = val
-    	
+                
+    qty_scrapped=fields.Float(digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
     produce_delay_qty = fields.Integer('Manufacturing Quantity', default=1)
     product_hs_code=fields.Char('Hs Code')
     net_weight=fields.Float('Net Weight')
@@ -394,7 +396,39 @@ class productTemplate(models.Model):
     progress_value = fields.Html('Values Not Filled',compute="_get_product_profile",readonly=True)
     #pvinvisible = fields.Boolean('Invisible Progress Details',help="Check this filed to show required details to complete this product profile")
     packaging_uom_id=fields.Many2one('product.uom')
-    #purchase_approved_price=fields.Float('Purchase Apporved Price')    
+    #purchase_approved_price=fields.Float('Purchase Apporved Price') 
+    
+    @api.multi     
+    def action_open_scrap(self):
+        print "sdfsdsdsdf"
+        for line in self:
+            quant_tree = self.env.ref('stock.view_stock_quant_tree', False)
+            print "machine_treemachine_treemachine_tree",machine_tree
+            quant_form = self.env.ref('stock.view_stock_quant_form', False)
+            product_id=self.env['product.product'].search([('product_tmpl_id','=',self.id)])
+            print "product_idproduct_idproduct_id",product_id
+            scrap_locations=self.env['stock.location'].search([('scrap_location','=',True)])
+            quants_count=self.env['stock.quant'].search([('product_id','=',product_id[0].id)])
+            if quants_count:
+                quant_qty=sum(x.qty for x in quants_count)
+                print "quant_qtyquant_qty",quant_qty
+                self.write({'qty_scrapped':quant_qty})
+            else:
+                self.write({'qty_scrapped':0.0})
+            
+            if machine_tree:
+                return {
+                    'name':'Scrapped',
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'tree,',
+                    'res_model': 'stock.quant',
+                    'views': [(quant_tree.id, 'tree'),(quant_form.id, 'form')],
+                    'view_id': quant_tree.id,
+                    'target': 'current',
+                    'domain':[('product_id','=',product_id[0].id),('location_id','in',scrap_locations.ids)],
+                }
+        return True
 
     @api.multi
     def create_Product_uom(self):

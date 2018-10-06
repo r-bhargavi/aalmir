@@ -7,8 +7,8 @@
 		<field name="inherit_id" ref="product.product_template_tree_view"/>
 		<field name="arch" type="xml">
                       <field name="type" position='replace' />
-                      <field name="volume" position='replace' />
-                      <field name="create_date" position='replace'>
+                      <!--<field name="volume" position='replace' />-->
+                      <field name="volume" position='replace'>
 		     		<field name="qty_reserved"/>
 		     		<field name="uom_id" invisible="not context.get('msq')"/>
 		     		<field name="reordering_min_qty" string="Minimum Stock Qty" invisible="not context.get('msq')"/>
@@ -104,7 +104,14 @@
 		<field name="model">product.template</field>
 		<field name="inherit_id" ref="product.product_template_only_form_view"/>
 		<field name="arch" type="xml">
-
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object"
+                            name="action_open_scrap"
+                            attrs="{'invisible':[('type', '!=', 'product')]}"
+                            class="oe_stat_button" icon="fa-building-o">
+                            <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
+                        </button>
+                </xpath>
 			<field name="packaging_ids"  position="replace"/>
 			<field name="default_code" position="replace" />
                     	<field name="barcode" position="replace" />

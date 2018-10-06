@@ -72,6 +72,7 @@
 						<field name='partner_id'/>
 						<field name='narration' fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
 						<field name='move'/>
+                                                <field name='jv_narration'/>
 						<field name="debit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
 						<field name="credit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');" />
 						<field name="amount"/>

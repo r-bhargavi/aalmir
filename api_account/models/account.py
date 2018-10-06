@@ -10,6 +10,10 @@ from openerp.exceptions import UserError, ValidationError
 class accountMove(models.Model):
     _inherit = "account.move"
     
+    name = fields.Char(string='Number', required=True, copy=False, track_visibility='onchange',default='/')
+    ref = fields.Char(string='Reference', copy=False,track_visibility='onchange')
+    date = fields.Date(track_visibility='onchange',required=True, states={'posted': [('readonly', True)]}, index=True, default=fields.Date.context_today)
+    
     @api.multi
     def button_cancel(self):
     	if not self._context.get('voucher'):
