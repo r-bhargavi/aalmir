@@ -15,7 +15,7 @@
 			<field name="n_standard_term" groups="base.group_system,base.group_sale_manager,
 				account.group_account_manager" 
                          attrs="{'invisible': [('n_new_request', '=',True)]}"/>
-			<field name="company_ids" widget="many2many_tags" groups="account.group_account_manager"/>
+			<field name="company_ids" required="1" widget="many2many_tags" groups="account.group_account_manager"/>
 			<field name="n_partner_id"  widget="many2many_tags" 
                            options="{'no_create': True}" 
                            attrs="{'invisible': ['|',('n_standard_term','=',True),('n_new_request', '=',True)]}"
