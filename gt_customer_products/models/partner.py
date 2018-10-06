@@ -47,148 +47,148 @@ class CustomerProduct(models.Model):
             else:
 		self.product_packaging=False
 
-    @api.model
-    def create(self, vals):
-	product_type='new'
-	low_price=0.0
-	n_ids=False
-	if vals.get('n_product_type'):	# api product type
-		product_type=vals.get('n_product_type')
-	if vals.get('n_calculator_id'):
-		n_ids=vals.get('n_calculator_id')
-	if vals.get('avg_price'):
-		if vals.get('currency_id'):
-			currency_id=self.env['res.currency'].search([('id','=',vals.get('currency_id'))])
-			low_price=currency_id.compute(vals.get('avg_price'),self.env.user.company_id.currency_id)
-			vals.pop('currency_id')
-	#CH_N019 change in code end
-        
-        prod_obj = self.env['product.product']
-        categ_obj = self.env['product.category']
-        tmpl_obj = self.env['product.template']
-        bom_obj = self.env['mrp.bom']
-        uom_obj = self.env['product.uom']
-          
-        if not vals.get('valid_from'):
-            vals.update({'valid_from' : fields.Date.context_today})
-        if not vals.get('to_date'):
-            vals.update({'to_date': (datetime.strptime(vals.get('valid_from'), '%Y-%m-%d') + relativedelta(months=6)).strftime('%Y-%m-%d')})
-        default_code = False
-        categ_id = vals.get('product_type')	# get product category
-        if vals.get('int_product_number'):
-            default_code = vals.get('int_product_number')
-            cate_obj = self.env['product.category']
-            if default_code[0] == '2':
-                c_ids = cate_obj.search([('cat_type', '=', 'injection')])
-                if c_ids:
-                    categ_id = c_ids[0].id
-            elif default_code[0] == '1':
-                c_ids = cate_obj.search([('cat_type', '=', 'film')])
-                if c_ids:
-                    categ_id = c_ids[0].id
-	weight=0.0
-	if vals.get('weight'):
-		weight=vals.get('weight')
-		vals.pop('weight')
-        pv_id = False
-        
-        data_obj = self.env['ir.model.data']
-        material_id = vals.pop('material_id',False)
-        raw_material_type = vals.pop('sub_type_id',False)
-        if vals.get('type')=='service':
-		mat_str = data_obj.get_object_reference('gt_customer_products','material_type_data8')
-		material_id = self.env['product.material.type'].search([('id','=',mat_str[1])])
-	elif not material_id and vals.get('type')=='product':
-		mat_str = data_obj.get_object_reference('gt_customer_products','material_type_data0')
-		material_id = self.env['product.material.type'].search([('id','=',mat_str[1])])
-        if default_code or vals.get('product_id'):
-            if vals.get('product_id'):
-                pv_id = prod_obj.browse(vals.get('product_id'))
-                vals.update({'existing_product' : True})
-            else:
-                p_ids = prod_obj.search([('default_code', '=', default_code)])
-                if p_ids:
-                    pv_id = p_ids[0]
-                    vals.update({'existing_product' : True})
-                else:
-                    pv_id = prod_obj.create({
-				        'name' : vals.get('product_name'),
-				        'description_sale' : vals.get('product_description'),
-				        'description_sale' : vals.get('product_description'),
-				        'categ_id' : categ_id,
-				        'external_product_number' : vals.get('ext_product_number'),
-				        'type' : vals.get('type'),
-				        'default_code' : default_code,
-				        'uom_id' : vals.get('uom_id'),
-				        'uom_po_id' : vals.get('uom_id'),
-					'lowest_price':low_price,		#CH_N010 #CH_N019 change in fields
-					'n_product_type': product_type,		#CH_N011 #CH_N019 change in fields
-					'n_calculator_id':n_ids,
-					'weight':weight,
-					'product_material_type':material_id.id,'matstrg':material_id.string,
-					'raw_material_type':raw_material_type.id if raw_material_type else False,
-                    })
-        else:
-            pv_id = prod_obj.create({
-                'name' : vals.get('product_name'),
-                'description_sale' : vals.get('product_description'),
-                'categ_id' : categ_id,
-                'external_product_number' : vals.get('ext_product_number'),
-                'type' : vals.get('type'),
-                'default_code' : default_code,
-                'uom_id' : vals.get('uom_id'),
-                'uom_po_id' : vals.get('uom_id'),
-		'lowest_price':low_price,		#CH_N010 #CH_N019 change in fields
-		'n_product_type':product_type,		#CH_N011 #CH_N019 change in fields
-		'n_calculator_id':n_ids,
-		'weight':weight,
-		'product_material_type':material_id.id,'matstrg':material_id.string,
-		'raw_material_type':raw_material_type.id if raw_material_type else False,
-           })
-        if vals.get('type_of_packaging') and vals.get('qty_per_package'):
-            unit_o = uom_obj.sudo().browse(vals.get('uom_id'))
-            p_obj = uom_obj.sudo().browse(vals.get('type_of_packaging'))
-            name = str(vals.get('qty_per_package')) + unit_o.name + '/' + p_obj.name
-	
-            pkg_ids=self.env['product.packaging'].create({'pkgtype':'primary','name':name,'uom_id':vals.get('type_of_packaging'),'qty':str(vals.get('qty_per_package')),'product_tmpl_id':pv_id.product_tmpl_id.id,'unit_id':unit_o.id})
-            
-            u_ids = uom_obj.sudo().search([('name', '=', name)])
-            puom=None
-            if u_ids:
-                puom = u_ids[0]
-            vals.update({'product_id' : pv_id.id,
-            		'product_packaging':pkg_ids.id if pkg_ids else False,
-			'pkg_editable':True,})
-        #CH_N020 update product_id in pricelist_items
-        #CH_N024 change code to remove write methods from create
-        if vals.get('item_ids'):
-        	n_item_ids=vals.get('item_ids')
-        	if n_item_ids[0] and isinstance(n_item_ids[0][2], dict):
-        		n_item_ids[0][2].update({'product_id': pv_id.id,'product_tmpl_id':pv_id.product_tmpl_id.id})
-        		vals.update({'item_ids':n_item_ids})
-        
-        vals.update({'product_id' : pv_id.id, 'int_product_number' : pv_id.default_code})
-        if vals.get('bom_id'):
-            bobj = bom_obj.browse(vals.get('bom_id'))
-            bobj.write({'product_id': pv_id.id})
-        if vals.get('initial_weight'):
-        	vals.pop('initial_weight')
-        res = super(CustomerProduct, self).create(vals)
-        body='<b>Customer Product Create in Pricelist:  </b>'
-	body +='<li> Product Name : '+str(res.product_id.name) +'</li>'
-        body +='<li>External Number:'+str(res.ext_product_number)+'</li>'
-        body +='<li> Packaging : '+str(res.product_packaging.name) +'</li>'
-        body +='<li> Qty Per Packaging : '+str(res.qty_per_package) +'</li>'
-	body +='<li> Customer Selling Price : '+str(res.avg_price) +'</li>'
-	body +='<li> Lowest Selling Price : '+str(res.lowest_price) +'</li>'
-	body +='<li> Floor Price: '+str(res.floor_price) +'</li>'
-        body +='<li> Validity Period:- '+str(res.valid_from)+" --TO--"+str(res.valid_from) +'</li>'
-	body +='<li> Created By  : '+str(res.env.user.name) +'</li>'
-	body +='<li> Created Date  : '+str(date.today()) +'</li>'
-	#res.pricelist_id.message_post(body=body)
-        res.message_post(body=body)
-        return res
-    
+#    @api.model
+#    def create(self, vals):
+#	product_type='new'
+#	low_price=0.0
+#	n_ids=False
+#	if vals.get('n_product_type'):	# api product type
+#		product_type=vals.get('n_product_type')
+#	if vals.get('n_calculator_id'):
+#		n_ids=vals.get('n_calculator_id')
+#	if vals.get('avg_price'):
+#		if vals.get('currency_id'):
+#			currency_id=self.env['res.currency'].search([('id','=',vals.get('currency_id'))])
+#			low_price=currency_id.compute(vals.get('avg_price'),self.env.user.company_id.currency_id)
+#			vals.pop('currency_id')
+#	#CH_N019 change in code end
+#        
+#        prod_obj = self.env['product.product']
+#        categ_obj = self.env['product.category']
+#        tmpl_obj = self.env['product.template']
+#        bom_obj = self.env['mrp.bom']
+#        uom_obj = self.env['product.uom']
+#          
+#        if not vals.get('valid_from'):
+#            vals.update({'valid_from' : fields.Date.context_today})
+#        if not vals.get('to_date'):
+#            vals.update({'to_date': (datetime.strptime(vals.get('valid_from'), '%Y-%m-%d') + relativedelta(months=6)).strftime('%Y-%m-%d')})
+#        default_code = False
+#        categ_id = vals.get('product_type')	# get product category
+#        if vals.get('int_product_number'):
+#            default_code = vals.get('int_product_number')
+#            cate_obj = self.env['product.category']
+#            if default_code[0] == '2':
+#                c_ids = cate_obj.search([('cat_type', '=', 'injection')])
+#                if c_ids:
+#                    categ_id = c_ids[0].id
+#            elif default_code[0] == '1':
+#                c_ids = cate_obj.search([('cat_type', '=', 'film')])
+#                if c_ids:
+#                    categ_id = c_ids[0].id
+#	weight=0.0
+#	if vals.get('weight'):
+#		weight=vals.get('weight')
+#		vals.pop('weight')
+#        pv_id = False
+#        
+#        data_obj = self.env['ir.model.data']
+#        material_id = vals.pop('material_id',False)
+#        raw_material_type = vals.pop('sub_type_id',False)
+#        if vals.get('type')=='service':
+#		mat_str = data_obj.get_object_reference('gt_customer_products','material_type_data8')
+#		material_id = self.env['product.material.type'].search([('id','=',mat_str[1])])
+#	elif not material_id and vals.get('type')=='product':
+#		mat_str = data_obj.get_object_reference('gt_customer_products','material_type_data0')
+#		material_id = self.env['product.material.type'].search([('id','=',mat_str[1])])
+#        if default_code or vals.get('product_id'):
+#            if vals.get('product_id'):
+#                pv_id = prod_obj.browse(vals.get('product_id'))
+#                vals.update({'existing_product' : True})
+#            else:
+#                p_ids = prod_obj.search([('default_code', '=', default_code)])
+#                if p_ids:
+#                    pv_id = p_ids[0]
+#                    vals.update({'existing_product' : True})
+#                else:
+#                    pv_id = prod_obj.create({
+#				        'name' : vals.get('product_name'),
+#				        'description_sale' : vals.get('product_description'),
+#				        'description_sale' : vals.get('product_description'),
+#				        'categ_id' : categ_id,
+#				        'external_product_number' : vals.get('ext_product_number'),
+#				        'type' : vals.get('type'),
+#				        'default_code' : default_code,
+#				        'uom_id' : vals.get('uom_id'),
+#				        'uom_po_id' : vals.get('uom_id'),
+#					'lowest_price':low_price,		#CH_N010 #CH_N019 change in fields
+#					'n_product_type': product_type,		#CH_N011 #CH_N019 change in fields
+#					'n_calculator_id':n_ids,
+#					'weight':weight,
+#					'product_material_type':material_id.id,'matstrg':material_id.string,
+#					'raw_material_type':raw_material_type.id if raw_material_type else False,
+#                    })
+#        else:
+#            pv_id = prod_obj.create({
+#                'name' : vals.get('product_name'),
+#                'description_sale' : vals.get('product_description'),
+#                'categ_id' : categ_id,
+#                'external_product_number' : vals.get('ext_product_number'),
+#                'type' : vals.get('type'),
+#                'default_code' : default_code,
+#                'uom_id' : vals.get('uom_id'),
+#                'uom_po_id' : vals.get('uom_id'),
+#		'lowest_price':low_price,		#CH_N010 #CH_N019 change in fields
+#		'n_product_type':product_type,		#CH_N011 #CH_N019 change in fields
+#		'n_calculator_id':n_ids,
+#		'weight':weight,
+#		'product_material_type':material_id.id,'matstrg':material_id.string,
+#		'raw_material_type':raw_material_type.id if raw_material_type else False,
+#           })
+#        if vals.get('type_of_packaging') and vals.get('qty_per_package'):
+#            unit_o = uom_obj.sudo().browse(vals.get('uom_id'))
+#            p_obj = uom_obj.sudo().browse(vals.get('type_of_packaging'))
+#            name = str(vals.get('qty_per_package')) + unit_o.name + '/' + p_obj.name
+#	
+#            pkg_ids=self.env['product.packaging'].create({'pkgtype':'primary','name':name,'uom_id':vals.get('type_of_packaging'),'qty':str(vals.get('qty_per_package')),'product_tmpl_id':pv_id.product_tmpl_id.id,'unit_id':unit_o.id})
+#            
+#            u_ids = uom_obj.sudo().search([('name', '=', name)])
+#            puom=None
+#            if u_ids:
+#                puom = u_ids[0]
+#            vals.update({'product_id' : pv_id.id,
+#            		'product_packaging':pkg_ids.id if pkg_ids else False,
+#			'pkg_editable':True,})
+#        #CH_N020 update product_id in pricelist_items
+#        #CH_N024 change code to remove write methods from create
+#        if vals.get('item_ids'):
+#        	n_item_ids=vals.get('item_ids')
+#        	if n_item_ids[0] and isinstance(n_item_ids[0][2], dict):
+#        		n_item_ids[0][2].update({'product_id': pv_id.id,'product_tmpl_id':pv_id.product_tmpl_id.id})
+#        		vals.update({'item_ids':n_item_ids})
+#        
+#        vals.update({'product_id' : pv_id.id, 'int_product_number' : pv_id.default_code})
+#        if vals.get('bom_id'):
+#            bobj = bom_obj.browse(vals.get('bom_id'))
+#            bobj.write({'product_id': pv_id.id})
+#        if vals.get('initial_weight'):
+#        	vals.pop('initial_weight')
+#        res = super(CustomerProduct, self).create(vals)
+#        body='<b>Customer Product Create in Pricelist:  </b>'
+#	body +='<li> Product Name : '+str(res.product_id.name) +'</li>'
+#        body +='<li>External Number:'+str(res.ext_product_number)+'</li>'
+#        body +='<li> Packaging : '+str(res.product_packaging.name) +'</li>'
+#        body +='<li> Qty Per Packaging : '+str(res.qty_per_package) +'</li>'
+#	body +='<li> Customer Selling Price : '+str(res.avg_price) +'</li>'
+#	body +='<li> Lowest Selling Price : '+str(res.lowest_price) +'</li>'
+#	body +='<li> Floor Price: '+str(res.floor_price) +'</li>'
+#        body +='<li> Validity Period:- '+str(res.valid_from)+" --TO--"+str(res.valid_from) +'</li>'
+#	body +='<li> Created By  : '+str(res.env.user.name) +'</li>'
+#	body +='<li> Created Date  : '+str(date.today()) +'</li>'
+#	#res.pricelist_id.message_post(body=body)
+#        res.message_post(body=body)
+#        return res
+#    
     @api.depends('item_ids', 'item_ids.qty', 'item_ids.min_quantity')
     @api.multi
     def get_line_qty(self):
@@ -247,7 +247,7 @@ class CustomerProduct(models.Model):
                 line.lowest_price = line.avg_price
     
     pricelist_id = fields.Many2one('product.pricelist', 'Pricelist',ondelete="cascade")
-    item_ids = fields.One2many('product.pricelist.item', 'cus_product_id','Priceline')
+    item_ids = fields.One2many('product.pricelist.item', 'cus_product_id','Priceline',copy=True)
     customer_id = fields.Many2one('res.partner', string="Customer")
     product_id = fields.Many2one('product.product', string='Product')
     product_tmpl_id = fields.Many2one('product.template',string="Product")
@@ -420,7 +420,7 @@ class ProductPricelistItem(models.Model):
 class ProductPricelist(models.Model):
     _inherit = "product.pricelist"
     
-    cus_products = fields.One2many('customer.product', 'pricelist_id' , 'Customer Products',)
+    cus_products = fields.One2many('customer.product', 'pricelist_id' , 'Customer Products',copy=True)
     
 class CrmTeam(models.Model):
     _inherit = 'crm.team'
