@@ -33,8 +33,12 @@ class stock_immediate_transfer(models.TransientModel):
 				raise UserError("Packaging of product '{}' not found".format(operation.product_id.name))
 				
 			elif not operation.secondary_pack:
-				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
-					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
+                                secondary_pack=self.env['product.packaging'].search([('product_tmpl_id','=',operation.product_id.product_tmpl_id.id),('pkgtype','=','secondary')])
+                                print "secondary_packsecondary_pack",secondary_pack
+                                if secondary_pack:
+                                    operation.write({'secondary_pack':secondary_pack.id})
+#				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
+#					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
 					
 			if operation.qty_done > operation.product_qty:
 				if self.pick_id.purchase_id and not self.pick_id.purchase_id.allow_extra:
@@ -152,8 +156,12 @@ class stock_backorder_confirmation(models.TransientModel):
 			if not operation.packaging_id:
 				raise UserError("Packaging of product '{}' not found".format(operation.product_id.name))
 			elif not operation.secondary_pack:
-				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
-					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
+                                secondary_pack=self.env['product.packaging'].search([('product_tmpl_id','=',operation.product_id.product_tmpl_id.id),('pkgtype','=','secondary')])
+                                print "secondary_packsecondary_pack",secondary_pack
+                                if secondary_pack:
+                                    operation.write({'secondary_pack':secondary_pack.id})
+#				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
+#					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
 			if operation.qty_done > operation.product_qty:
 				if self.pick_id.purchase_id and not self.pick_id.purchase_id.allow_extra:
 					raise UserError("Done Quantity Should be less than or equal to Product Quantity. \n If You want to receive Extra Please contact Purchase Manager to Set Allow Extra in Purchase Order")
@@ -255,8 +263,12 @@ class stock_backorder_confirmation(models.TransientModel):
 			if not operation.packaging_id:
 				raise UserError("Packaging of product '{}' not found".format(operation.product_id.name))
 			elif not operation.secondary_pack:
-				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
-					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
+                                secondary_pack=self.env['product.packaging'].search([('product_tmpl_id','=',operation.product_id.product_tmpl_id.id),('pkgtype','=','secondary')])
+                                print "secondary_packsecondary_pack",secondary_pack
+                                if secondary_pack:
+                                    operation.write({'secondary_pack':secondary_pack.id})
+#				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
+#					raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
 			if operation.qty_done > operation.product_qty:
 				if self.pick_id.purchase_id and not self.pick_id.purchase_id.allow_extra:
 					raise UserError("Done Quantity Should be less than or \
