@@ -67,11 +67,6 @@ class stockPicking(models.Model):
      				raise UserError('You are trying to do Internal Transfer in Same-Location')
      				
      		res =super(stockPicking,self).create(vals)
-                if res.origin:
-                    pick_id=self.search([('name','=',res.origin)])
-                    if pick_id:
-                        res.pick_ref=pick_id.id
-                        pick_id.write({'pick_ref':res.id})
      		if res.location_id.pre_ck and res.location_dest_id.actual_location:
      			res.ntransfer_type='pre_stock'
 			res.term_of_delivery=False
@@ -570,6 +565,11 @@ class stockPicking(models.Model):
     				_logger.error("API-EXCEPTION. in Transfer Quantity {} {}".format(repr(err),exc_tb.tb_lineno))
     				raise UserError(err)
 			result = super(stockPicking,self).action_confirm()
+                        pick_id=self.search([('origin','=',res.name)])
+                        print "pick_idpick_id",pick_id,res.id
+                        if pick_id:
+                            pick_id.write({'pick_ref':res.id})
+                            res.write({'pick_ref':pick_id.id})
 			if res.location_id.usage in ('inventory','production') and res.location_dest_id.pre_ck and res.ntransfer_type=='manufacturing' and not res.backorder_id:
 				batch_obj = self.env['mrp.order.batch.number']
 				batch_history_obj = self.env['mrp.order.batch.number.history']
