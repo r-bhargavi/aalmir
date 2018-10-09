@@ -257,7 +257,7 @@
 				('state','not in',('draft','partially_available','assigned')),('credit_bool','=',True),
 				('picking_status','!=','draft'),('picking_type_code','!=','outgoing')]}" confirm="This Order is not validated by Sale Support, Are you Sure want to Continue.?"/>
 			
-			<button name="reverse_from_dispatch"  string="Revert" groups="base.group_sale_manager" 
+			<button name="reverse_from_dispatch"  string="Revert" groups="base.group_sale_manager,gt_order_mgnt.group_sale_support" 
                  		type="object" class="oe_highlight" attrs="{'invisible' : [ '|','|','|','|',
 				('state','not in',('draft','partially_available','assigned')),('credit_bool','=',True),
 				('picking_status','!=','pick_list'),('picking_type_code','!=','outgoing')]}"/>
