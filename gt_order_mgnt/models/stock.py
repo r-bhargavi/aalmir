@@ -766,6 +766,10 @@ class StockPicking(models.Model):
      def reverse_from_dispatch(self):			
         ''' Click by Manager To reverse from the Picking List(ready to Dispatch) state to previous state '''
         for rec in self:
+                if rec.picking_status=='pick_list':
+                    if any(line.pick_qty>=1 for line in rec.pack_operation_product_ids):
+                        raise UserError("Still some qty are in pick location.Cant revert please contact logistic unit!!")
+
 	     	if rec.picking_status != 'pick_list':
 	     		raise UserError("Operation is not in proper state. You Can't Revert Back Please Contact Administrtor")
 	     	rec.picking_status='draft'	
