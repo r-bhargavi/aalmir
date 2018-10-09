@@ -1,0 +1,193 @@
+<odoo>
+   <record id="stock_series_tree" model="ir.ui.view">
+        <field name="name">Series View</field>
+        <field name="model">location.series.name</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Case" create="false" edit='false'>
+                <field name="id" />
+                <field name="name" />
+                <field name="str_id" />
+                <field name="value" />
+            </tree>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="stock_series_tree_action">
+        <field name="name">Series action</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">location.series.name</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+	<field name="view_id" ref="stock_series_tree"/>
+    </record>
+    
+    <menuitem action="stock_series_tree_action" name="Series" id="menu_stock_series" parent="stock.menu_warehouse_config" sequence="3" />
+    
+    <record id="stock_location_form_view_inherit" model="ir.ui.view">
+		<field name="name">Stock Location View</field>
+		<field name="model">stock.location</field>
+		<field name="inherit_id" ref="stock.view_location_form"></field>
+		<field name="arch" type="xml">
+			<field name="active" position="before">
+				<field name="actual_location" attrs="{'invisible':[('actual_location','!=',True)]}" readonly="1" groups="stock.group_stock_manager"/>
+			</field>
+                        <field name="return_location" position="attributes">
+			  	<attribute name="invisible">[('actual_location','=',True)]</attribute>
+		  	</field>
+		  	<field name="scrap_location" position="attributes">
+				  <attribute name="invisible">[('actual_location','=',True)]</attribute>
+		  	</field>
+		  	<field name="putaway_strategy_id" position="after">
+				<button name="importProduct" type="object" string="Import Product Qty" class="btn-primary" attrs="{'invisible':['|',('location_view','=',[]),('actual_location','!=',True)]}"/>
+			</field>
+		   	<field name="comment"  position="before">
+		   		<label for="location_image" attrs="{'invisible':[('actual_location','!=',True)]}"/>
+	   			<field col="4" nolabel="1" name="location_image" class="oe_form_field_image_api" widget="image" attrs="{'invisible':[('actual_location','!=',True)]}"/>
+		   		<label string="" />
+		   		<field name="location_view" attrs="{'invisible':[('actual_location','!=',True)]}" >
+	      				<tree >
+		      				<field name="name" />
+		      				<field name="row" />
+		      				<field name="column"/>
+		      				<field name="depth"/>
+		      				<field name="product_type"/>
+		      				<button name="show_view" type="object" string="Show" class="btn-primary"/>
+		      			</tree>
+		      			<form name="storage_location">
+		      				<group col="4">
+			      				<field name="name" attrs="{'readonly': [('location_type','in',('transit_in','transit_out'))]}" placeholder="Enter Name of Region"/>
+			      				<field name="location_type" invisible="1"/>
+		      				</group>
+						<group col="6" >
+				      			<field name="row" attrs="{'readonly': [('location_type','in',('transit_in','transit_out'))]}"/>
+					   		<field name="row_name" attrs="{'required': [('row','>',0)],'readonly':[('readonly_bool','in',('row','rc','rcd'))]}"  options="{'no_open':True,'no_create':True}"
+					   		domain="[('id','not in',(column_name,depth_name))]"/>
+						   	<field name="r_series" attrs="{'readonly': ['|',('r_str_id','not in',('ASL','ACL','NUM')),('readonly_bool','in',('row','rc','rcd'))]}"/>
+						   	
+				      			<field name="column" attrs="{'readonly': [('location_type','in',('transit_in','transit_out'))]}"/>
+				      			<field name="column_name" attrs="{'required': [('column','>',0)],'readonly':[('readonly_bool','in',('rc','rcd'))]}" options="{'no_open':True,'no_create':True}" 
+				      			domain="[('id','not in',(row_name,depth_name))]"/>
+						   	<field name="c_series" attrs="{'readonly': ['|',('c_str_id','not in',('ASL','ACL','NUM')),('readonly_bool','in',('row','rc','rcd'))]}"/>
+						   	
+				      			<field name="depth" attrs="{'readonly': [('location_type','in',('transit_in','transit_out'))]}"/>
+				      			<field name="depth_name" attrs="{'required': [('depth','>',0)],'readonly':[('readonly_bool','in',('rcd'))]}" options="{'no_open':True,'no_create':True}" 
+				      			domain="[('id','not in',(column_name,row_name))]"/>
+				      			<field name="d_series" attrs="{'readonly': ['|',('d_str_id','not in',('ASL','ACL','NUM')),('readonly_bool','in',('row','rc','rcd'))]}"/>
+				      			
+				      			<label for="storage_capacity"/>
+				      			<div>
+				      				<field name="storage_capacity" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}" class="oe_inline"/>
+				      				<field name="uom_id" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}" class="oe_inline" context="{'store_unit':True}" options="{'no_open':True,'no_create':True}"/>
+				      			</div>
+				      			<field name="product_type" required="1" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}"/>
+				      		</group>
+				      		<field name="readonly_bool" invisible="1"/>
+				      		<field name="r_str_id" invisible="1"/>
+				      		<field name="c_str_id" invisible="1"/>
+				      		<field name="d_str_id" invisible="1"/>
+			      			<!--button type="object" string="Calculate Structure" name="calculate_structure" class="btn-primary"/-->
+					   	<!--field name="storage_locations" readonly="1" nolabel="1"/-->
+		      			</form>
+		      		</field>
+                                <field name="storage_locations" readonly="1" nolabel="1" attrs="{'invisible':[('actual_location','!=',True)]}" />
+                       </field>
+                       
+		</field>
+    </record>
+
+    <record id="stock_location_view_form" model="ir.ui.view">
+        <field name="name">Store Location View</field>
+        <field name="model">stock.location.view</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Location View" create="0" edit='0' delete="0">
+            	<h1><field name="location_id"/></h1>
+		<h2><field name="name" /></h2>
+		<group col="6">
+			<field name="row" />
+	   		<field name="row_name" attrs="{'required': [('row','>',0)],'readonly':[('readonly_bool','in',('row','rc','rcd'))]}"  options="{'no_open':True,'no_create':True}"/>
+	   		<field name="r_series" attrs="{'invisible': [('r_series','=',False)]}"/>
+		   	
+      			<field name="column"/>
+      			<field name="column_name" attrs="{'required': [('column','>',0)],'readonly':[('readonly_bool','in',('rc','rcd'))]}" options="{'no_open':True,'no_create':True}" />
+      			<field name="c_series" attrs="{'invisible': [('c_series','=',False)]}"/>
+		   	
+      			<field name="depth"/>
+      			<field name="depth_name" attrs="{'required': [('depth','>',0)],'readonly':[('readonly_bool','in',('rcd'))]}" options="{'no_open':True,'no_create':True}" />
+      			<field name="d_series" attrs="{'invisible': [('d_series','=',False)]}"/>
+      			
+      			<label for="storage_capacity"/>
+      			<div>
+      				<field name="storage_capacity" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}" class="oe_inline"/>
+      				<field name="uom_id" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}" class="oe_inline" context="{'store_unit':True}" options="{'no_open':True,'no_create':True}"/>
+      			</div>
+      			<field name="product_type" required="1" attrs="{'readonly':[('readonly_bool','in',('row','rc','rcd'))]}"/>
+      		</group>
+      		<field name="dimentional_view" readonly="1" widget="url" invisible="1"/>
+      		<field name="readonly_bool" invisible="1"/>
+	   	<field name="storage_locations" readonly="1" nolabel="1"/>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_location_view_tree" model="ir.ui.view">
+        <field name="name">Store Location View</field>
+        <field name="model">stock.location.view</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Location View" create="0" edit='0' delete="0">
+            	<field name="location_id"/>
+		<field name="name" />
+		<field name="row" />
+		<field name="column"/>
+		<field name="depth"/>
+		<field name="storage_capacity" />
+		<field name="product_type" />
+            </tree>
+        </field>
+    </record>
+    
+    <record id="change_series_form" model="ir.ui.view">
+        <field name="name">Change Series</field>
+        <field name="model">change.series</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <form string="Change Series">
+               <group col="4">
+               	<field name="location_id" readonly="1"/>
+               	<field name="ntype" readonly="1"/>
+                <field name="previous_series" readonly="1"/>
+                <field name="new_series" options="{'no_open':True,'no_create':True}" domain="[('id','!=',previous_series)]"/>
+                <button name="update_series" string="Update" type="object" class="btn-primary"/>
+              </group>
+            </form>
+        </field>
+    </record>
+  
+  <!--Bin-Location view action --> 
+    <record model="ir.actions.act_window" id="bin_locaiton_store_view_action">
+        <field name="name">Bin-Locaiton Action</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.location.view</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	<field name="view_id" ref="stock_location_view_tree"/>
+    </record>
+    
+    <menuitem id="menu_bin_locaiton_view" name="Bin-Location View" action="bin_locaiton_store_view_action"
+            	parent="menu_stock_location_detail" sequence="0"/>
+    
+    <record id="action_location_form_api" model="ir.actions.act_window">
+            <field name="name">Locations</field>
+            <field name="res_model">stock.location</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="stock.view_location_tree2"/>
+            <field name="domain">[('actual_location','=',True)]</field>
+    </record>  
+          	
+    <menuitem id="menu_stock_locaiton_view" name="Stock Locations view" action="action_location_form_api"
+            	parent="menu_stock_detail_api" sequence="0" groups="stock.group_stock_manager"/>
+            
+</odoo>

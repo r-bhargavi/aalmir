@@ -1,0 +1,385 @@
+<odoo>
+    <record id="product_stock_location_from" model="ir.ui.view">
+		<field name="name">Bin Location From View</field>
+		<field name="model">n.warehouse.placed.product</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+		    <form string="Product Stock Location" edit='false' create="false" delete='false'>
+		    	<header>
+		    		<!--button type="object" name="stock_operation" attrs="{'invisible':['|','|',('location_type','!=','store'),('state','!=','empty'),('product_type','=','multi')]}" string="Add Quantity" class="btn-primary" context="{'add_stock':True}"/>
+		    		<button type="object" name="stock_operation" attrs="{'invisible':['|','|',('location_type','!=','store'),('state','!=','partial'),('product_type','!=','multi')]}" string="Add Quantity" class="btn-primary" context="{'add_stock':True}" help="Add new product in Multi product Location"/>
+		    		<button type="object" name="stock_operation" attrs="{'invisible':['|',('location_type','!=','store'),('state','!=','partial')]}" string="Update Quantity" class="btn-primary" context="{'update_stock':True}" help="Update quantity of existing Product"/-->
+		    		<button type="object" name="stock_operation"  attrs="{'invisible':[('state','=','empty')]}" invisible="context.get('transfer_wizard')" string="Release Quantity" class="btn-primary" context="{'release_stock':True}"/>
+		    		<button type="object" name="stock_operation"  attrs="{'invisible':['|',('state','not in',('partial','full')),('location_type','=','transit_out')]}" string="Transfer Quantity" class="btn-primary" invisible="context.get('transfer_wizard')" context="{'transfer_stock':True}"/>
+		    		
+		    		<button type="object" name="operation_on_store" string="Maintenance" class="btn-primary"
+		    			attrs="{'invisible':['|',('location_type','!=','store'),('state','!=','empty')]}"  context="{'maintenance':True}"/>
+		    		<button type="object" name="operation_on_store" string="Out of use" class="btn-primary"
+		    			attrs="{'invisible':['|',('location_type','!=','store'),('state','!=','empty')]}"  context="{'not_in_use':True}"/>
+		    		<button type="object" name="operation_on_store" string="In use" class="btn-primary" 
+		    			attrs="{'invisible':['|',('location_type','!=','store'),('state','not in',('maintenance','no_use'))]}"  context="{'in_use':True}"/>
+	    			<button type="object" name="split_opeartion" string="Split Batch" class="btn-primary" attrs="{'invisible':[('state','not in',('partial','full'))]}"/>
+	    			<field name="location_type" invisible="1"/>
+		    		<field name="state" widget="statusbar" visibility=""/>
+		    	</header>
+		    	<sheet>
+		    		
+		    		<field name="image" widget="image" class="oe_avatar"/>
+		    		<div class="oe_button_box" name="button_box" >
+				    <button class="oe_stat_button" type="object" name="open_stock_history" icon="fa-bookmark-o" string="History"/>
+				</div>
+				
+		    		<group col="4" attrs="{'readonly':[('state','!=','empty')]}">
+					<field name="n_warehouse"  readonly="1" options="{'no_create': True, 'no_open': True}"/>
+					<field name="n_row" readonly="1"/>
+					<field name="n_location" readonly="1" domain="[('usage','=','internal'),('scrap_location','=',False),('n_quality_ck','=',False)]" options="{'no_create': True, 'no_open': True}"/>
+					<field name="n_column" readonly="1"/>
+					<field name="n_location_view" readonly="1"/>
+					<field name="n_depth" readonly="1"/>
+					<label for="max_qty"/>
+					<div>
+						<field name="max_qty" nolabel="1" readonly="1" class="oe_inline"/>
+						<field name="qty_unit" class="oe_inline" readonly="1" options="{'no_create': True, 'no_open': True}"/> 
+				       		<!--button type="object" help="Change Storage Capicity" name="change_storage_capicity" class="oe_inline"  nolabel="1"  icon="gtk-go-forward"/-->
+					</div>
+					<field name="product_type" invisible="1"/>
+				</group>
+		    		<group name="single_product" col="4" readonly="1" attrs="{'invisible':[('product_type','!=','single')]}">
+					<field name="product_id"   readonly="1"/>
+					<label for="total_quantity" string='Store Quantity'/>
+					<div>
+						<field name="total_quantity" class="oe_inline" readonly="1"/>
+						<field name="total_qty_unit" class="oe_inline" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+					</div>
+					<field name="Packaging_type" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+					<label for="packages"/>
+					<div>
+						<field name="packages" class="oe_inline" readonly="1"/>
+						<field name="pkg_unit" class="oe_inline" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+					</div>
+					
+					<label for="pkg_capicity"/>
+					<div>
+						<field name="pkg_capicity" nolabel="1" readonly="1" class="oe_inline"/>
+				       		<field name="pkg_capicity_unit" nolabel="1" readonly="1" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+					</div>
+					
+				</group>
+				<group name="multi_product" attrs="{'invisible':[('product_type','!=','multi')]}" readonly="1">
+					<field name="multi_product_ids" readonly="1" nolable="1">
+						<tree limit="10">
+							<field name="product_id" />
+							<field name="total_quantity" />
+							<field name="total_qty_unit" options="{'no_create': True, 'no_open': True}"/>
+							<field name="Packaging_type" options="{'no_create': True, 'no_open': True}"/>
+							<field name="packages" class="oe_inline"/>
+							<field name="pkg_unit" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+						</tree>
+						<form>
+						   <group col="4">
+							<field name="product_id"/>
+							<field name="Packaging_type" options="{'no_create': True, 'no_open': True}"/>
+							<label for="total_quantity"/>
+							<div>
+								<field name="total_quantity" class="oe_inline"/>
+								<field name="total_qty_unit" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+							</div>
+							<label for="pkg_capicity"/>
+							<div>
+								<field name="pkg_capicity"  class="oe_inline"/>
+								<field name="pkg_capicity_unit" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+							</div>
+							<label for="packages"/>
+							<div>	
+								<field name="packages" class="oe_inline"/>
+								<field name="pkg_unit" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+							</div>
+						   </group>
+						   <group col="1">
+							   <field name="multi_product_ids" readonly="1" nolable="1">
+								<tree editable="top" create="1" delete="1">
+									<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+									<field name="name" />
+									<field name="approve_qty" string="Quantity" sum="approve_qty" readonly="1"/>
+									<field name="uom_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+									<field name="product_id" readonly="1"/>
+									<field name="sale_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							     	</tree>
+							     	<form edit="1" delete="1" add="1">
+									<field name="lot_id" options="{'no_create': True, 'no_open': True}"/>
+									<field name="name" />
+									<field name="approve_qty" sum="approve_qty"/>
+									<field name="uom_id" options="{'no_create': True, 'no_open': True}"/>
+									<field name="product_id" />
+									<field name="sale_id" />
+							     	</form>
+							   </field>
+						   </group>
+						</form>
+					</field>
+				</group>
+				
+				<notebook>
+					<page string="Master Batches Numbers" >
+						<field name="master_batches" readonly="1">
+						     <tree edit="1" create="1" delete="1">
+							<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" />
+							<field name="product_id" readonly="1"/>
+							<field name="picking_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+						     </tree>
+						     <form>
+						      <group col="4">
+							<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" readonly="1"/>
+							<field name="product_id" readonly="1"/>
+							<field name="picking_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+						     </group>
+							<field name="batch_id" readonly="1">
+							     <tree readonly="1" delete='false'>
+								<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+								<field name="name" />
+								<field name="approve_qty" string="Quantity" sum="approve_qty" readonly="1"/>
+								<field name="uom_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+								<field name="product_id" readonly="1"/>
+								<field name="sale_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							     </tree>
+							     <form >
+								<field name="lot_id" options="{'no_create': True, 'no_open': True}"/>
+								<field name="name" />
+								<field name="approve_qty" sum="approve_qty"/>
+								<field name="uom_id" options="{'no_create': True, 'no_open': True}"/>
+								<field name="product_id" />
+								<field name="sale_id" options="{'no_create': True, 'no_open': True}"/>
+							     </form>
+							</field>
+						     </form>
+						</field>
+					</page>
+					
+					<page string="Batch Numbers">
+						<field name="store_batches_ids">
+						   <tree editable="top" create="0" delete="false">
+							<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" />
+							<field name="approve_qty" string="Quantity" sum="approve_qty" readonly="1"/>
+							<field name="uom_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="product_id" readonly="1"/>
+							<field name="sale_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="store_id" invisible="1"/>
+							<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False)]}" groups="base.group_system"/>
+						     </tree>
+						     <form edit="0" delete="0" add="0">
+							<field name="lot_id" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" />
+							<field name="approve_qty" sum="approve_qty"/>
+							<field name="uom_id" options="{'no_create': True, 'no_open': True}"/>
+							<field name="product_id" />
+							<field name="sale_id" options="{'no_create': True, 'no_open': True}"/>
+						     </form>
+						</field>
+					</page>
+					<!--API code end -->
+					
+					<page name="extra_info" string="Extra Information">
+					   <group col="4" >
+						<field name="n_mo_number" readonly="1"/>
+						<field name="n_po_number" readonly="1"/>
+					   </group>
+					</page>
+					
+					<page string="Reserved Batchs" attrs="{'invisible':[('reserved_batches_ids','=',[])]}">
+						<field name="reserved_batches_ids" readonly="1">
+						     <tree editable="top" create="1" delete="1">
+							<field name="lot_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" />
+							<field name="approve_qty" string="Quantity" sum="approve_qty" readonly="1"/>
+							<field name="uom_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="product_id" readonly="1"/>
+							<field name="sale_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+							<field name="store_id" invisible="1"/>
+							<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False)]}" groups="base.group_system"/>
+							
+						     </tree>
+						     <form edit="1" delete="1" add="1">
+							<field name="lot_id" options="{'no_create': True, 'no_open': True}"/>
+							<field name="name" />
+							<field name="approve_qty" sum="approve_qty"/>
+							<field name="uom_id" options="{'no_create': True, 'no_open': True}"/>
+							<field name="product_id" />
+							<field name="sale_id" options="{'no_create': True, 'no_open': True}"/>
+						     </form>
+						</field>
+					</page>
+				</notebook>
+			</sheet>
+			
+			<div class="oe_chatter">
+		            <field name="message_ids" widget="mail_thread"/>
+		        </div>
+		        
+		    </form>
+		</field>
+    	</record>
+    	
+	<record id="product_stock_location_tree" model="ir.ui.view">
+		<field name="name">Bin-Location Tree View</field>
+		<field name="model">n.warehouse.placed.product</field>
+		<field name="type">tree</field>
+		<field name="arch" type="xml">
+		    <tree string="Product Stock Location" colors="green:store_status in ('reserve','part_rev')" create="false" delete='false'>
+		    	<field name="product_id" />
+			<field name="n_warehouse" />
+			<field name="n_location" />
+			<field name="product_type" />
+			<field name="n_location_view" />
+			<field name="n_row" />
+			<field name="n_column" />
+			<field name="n_depth" />
+			<field name="packages" />
+			<field name="store_status" invisible="1"/>
+		    </tree>
+		</field>
+	</record>
+    	
+	<record id="filter_view_bin_location" model="ir.ui.view">
+            <field name="name">Bin-Location seach View</field>
+            <field name="model">n.warehouse.placed.product</field>
+            <field name="arch" type="xml">
+                <search string="Search Bin-Location">
+                    <field name="name" />
+                    <field name="product_id" />
+                    <field name="n_location" />
+                    <group expand="0" string="Group By">
+			<filter name="n_warehouse" string="Warehouse" domain="[]" context="{'group_by':'n_warehouse'}"/>
+			<filter name="n_location_view" string="Bin-Location" domain="[]" context="{'group_by':'n_location_view'}" />
+			<filter name="product_id" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
+			<filter name="n_row" string="Row" domain="[]" context="{'group_by':'n_row'}"/>
+                        <filter name="n_column" string="Column" domain="[]" context="{'group_by':'n_column'}"/>
+                    </group>
+                </search>
+            </field>
+	</record>
+	
+	<record model="ir.actions.act_window" id="product_stock_location_action">
+		<field name="name">Bin-Location</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">n.warehouse.placed.product</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form,kanban</field>
+		<field name="domain">[ ("state", "in",('full','partial')) ]</field>
+		<field name="search_view_id" ref="filter_view_bin_location"/>
+		<field name="context">{'search_default_n_location_view':1}</field>
+		<field name="view_id" ref="product_stock_location_tree"/>
+	</record>
+    
+    	<menuitem id="menu_stock_detail_api" name="Store Details" 
+            parent="stock.menu_stock_root" sequence="5"/>
+            
+   	<menuitem id="menu_stock_location_detail" name="Bin-Location Details" 
+            parent="menu_stock_detail_api" sequence="1"/>
+        
+        <menuitem id="menu_product_location_detail" name="Product Stored" action="product_stock_location_action"
+            parent="menu_stock_location_detail" sequence="1"/>
+            
+        <record id="product_stock_free_location_tree" model="ir.ui.view">
+		<field name="name">Free Bin-Location Tree View</field>
+		<field name="model">n.warehouse.placed.product</field>
+		<field name="type">tree</field>
+		<field name="arch" type="xml">
+		    <tree string="Available Stock Location" create="false" delete='false'>
+			<field name="n_warehouse" />
+			<field name="n_location" />
+			<field name="product_type" />
+			<field name="n_location_view" />
+			<field name="n_row" />
+			<field name="n_column" />
+			<field name="n_depth" />
+			<field name="n_free_qty" />
+			<field name="state" />
+		    </tree>
+		</field>
+    	</record>
+        
+    	<record id="product_stock_free_location_kanban" model="ir.ui.view">
+		<field name="name">Bin-Location Kanban View</field>
+		<field name="model">n.warehouse.placed.product</field>
+		<field name="type">kanban</field>
+		<field name="arch" type="xml">
+		    <kanban>
+			    <templates>
+				<t t-name="kanban-box">
+				    <div class="oe_kanban_global_click">
+				    <div class="oe_resource_vignette">
+				        <div class="oe_resource_image">
+				            <a type="edit"><img t-att-src="kanban_image('n.warehouse.placed.product', 'image_medium', record.id.value)" class="oe_resource_picture"/></a>
+				        </div>
+				        <div class="oe_resource_details">
+				            <ul>
+		<!--Here u have to write the ur objects field name which u wnt to display in kanban view -->
+				               <strong><li><field name="name"/></li></strong>
+				               <li>Capacity: <field name="max_qty"/><field name="qty_unit"/></li>
+				               <li><field name="state"/></li>
+				             </ul>
+				        </div>
+				    </div> 
+				    </div>                    
+				</t>
+			    </templates>
+		    </kanban>
+		</field>
+    	</record>
+    	
+    	<record model="ir.actions.act_window" id="product_stock_free_location_action">
+		<field name="name">Free Bin-Location Action</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">n.warehouse.placed.product</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form,kanban</field>
+		<field name="domain">[("state","!=",'full'),("location_type","=",'store')]</field>
+		<field name="search_view_id" ref="filter_view_bin_location"/>
+		<field name="context">{'search_default_n_location_view':1}</field>
+		<field name="view_id" ref="product_stock_free_location_tree"/>
+    	</record>
+	
+    	<record model="ir.actions.act_window" id="product_transit_location_action">
+		<field name="name">Transit Bin-Location Action</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">n.warehouse.placed.product</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form,kanban</field>
+		<field name="domain">[ ("location_type", "in",('transit_in','transit_out')) ]</field>
+		<field name="search_view_id" ref="filter_view_bin_location"/>
+		<field name="context">{'search_default_n_warehouse':1}</field>
+		<field name="view_id" ref="product_stock_free_location_tree"/>
+    	</record>
+	
+    	<menuitem id="menu_free_stock_location_detail" name="Free Store Location" sequence="2"
+		 action="product_stock_free_location_action" parent="menu_stock_location_detail" />
+    
+    	<menuitem id="menu_transit_location_detail" name="Transit Location" sequence="3" 
+            	parent="menu_stock_location_detail" action="product_transit_location_action"/>
+            	
+    	<!--menuitem id="menu_transfer_stock_location_detail" name="Transfer on Location"
+            	parent="menu_stock_location_detail" sequence="4"/-->
+            
+    <!--History of Bin-stock location-->
+    <record id="stock_location_history_action_tree" model="ir.ui.view">
+        <field name="name">Location history Tree View</field>
+        <field name="model">location.history</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Row" edit='false' create='false' delete='false' editable="top">
+                <field name="product_id" />
+                <field name="create_date" string="Created On"/>
+                <field name="qty" />
+		<field name="operation" />
+		<field name="n_type" />
+		<field name="operation_name" />
+		<field name="create_uid" string="Created By"/>
+            </tree>
+        </field>
+    </record>
+    
+</odoo>
+
