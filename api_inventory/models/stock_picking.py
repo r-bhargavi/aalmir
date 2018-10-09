@@ -572,8 +572,9 @@ class stockPicking(models.Model):
                         pick_id=self.search([('origin','=',res.name)])
                         print "pick_idpick_id",pick_id,res.id
                         if pick_id:
-                            pick_id.write({'pick_ref':res.id})
-                            res.write({'pick_ref':pick_id.id})
+                            for each in pick_id:
+                                each.write({'pick_ref':res.id})
+                                res.write({'pick_ref':each.id})
 			if res.location_id.usage in ('inventory','production') and res.location_dest_id.pre_ck and res.ntransfer_type=='manufacturing' and not res.backorder_id:
 				batch_obj = self.env['mrp.order.batch.number']
 				batch_history_obj = self.env['mrp.order.batch.number.history']
