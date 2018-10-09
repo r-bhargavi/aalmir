@@ -758,6 +758,7 @@ class n_custom_product(models.Model):
 				pricelist_id=pricelist_obj.create(vals)
 
 			for line in rec.n_custom_line_o2m:
+                             print "line-----------------",line
 			     if line.n_add_product_bool:
 				line_product_type = line.n_product_type
 				material_id = sub_type_id = False
@@ -776,11 +777,13 @@ class n_custom_product(models.Model):
 				      'min_qty':line.n_min_qty,'uom_id':line.n_unit.id,
 				      'type_of_packaging':line.n_type_of_package.id,'type':line.product_type,
 				      'qty_per_package':line.n_qty_per_package,
+				      'product_id':line.n_sale_line_id.product_id.id,
 				      'material_id':material_id,'sub_type_id':sub_type_id,
 				      'valid_from':line.n_from_date,'to_date':line.n_to_date,'n_product_type':'custom',
 				      'currency_id':rec.n_custom_currency_id.id if rec.n_custom_currency_id else False,
 				      'item_ids':[[0, False, {'do_term':rec.n_sale_order_id.incoterm.id,
 				           'min_quantity': 1, 'fixed_price': line.n_avg_price, 'qty': line.n_min_qty}]]}
+                                print "valsvalsvalsvals cust ids----",vals
 				cust_ids=customer_obj.create(vals)
 				
 				if line.n_film_ids:
