@@ -452,6 +452,8 @@ class stockPicking(models.Model):
 					elif not operation.secondary_pack and operation.qty_done :
                                             secondary_pack=self.env['product.packaging'].search([('product_tmpl_id','=',operation.product_id.product_tmpl_id.id),('pkgtype','=','secondary')])
                                             print "secondary_packsecondary_pack",secondary_pack
+                                            if operation.hide_packaging==True:
+                                                operation.write({'secondary_pack':False})
                                             if not secondary_pack or len(secondary_pack)>1:
                                                 raise ValueError("Secondary Packaging of product '[{}]{}' not  defined".format(operation.product_id.default_code,operation.product_id.name))
                                             if secondary_pack:
