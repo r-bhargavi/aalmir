@@ -756,7 +756,7 @@ class n_custom_product(models.Model):
 				vals={'name':n_cust_name,'customer':rec.n_sale_order_id.partner_id.id,
 					'active':True,'company_id':self.env.user.company_id.id,'currency_id':rec.n_custom_currency_id.id}
 				pricelist_id=pricelist_obj.create(vals)
-
+                                print "pricelist_idpricelist_idpricelist_idpricelist_id",pricelist_id
 			for line in rec.n_custom_line_o2m:
                              print "line-----------------",line
 			     if line.n_add_product_bool:
@@ -777,7 +777,7 @@ class n_custom_product(models.Model):
 				      'min_qty':line.n_min_qty,'uom_id':line.n_unit.id,
 				      'type_of_packaging':line.n_type_of_package.id,'type':line.product_type,
 				      'qty_per_package':line.n_qty_per_package,
-				      'product_id':line.n_sale_line_id.product_id.id,
+#				      'product_id':line.n_sale_line_id.product_id.id,
 				      'material_id':material_id,'sub_type_id':sub_type_id,
 				      'valid_from':line.n_from_date,'to_date':line.n_to_date,'n_product_type':'custom',
 				      'currency_id':rec.n_custom_currency_id.id if rec.n_custom_currency_id else False,
@@ -785,7 +785,7 @@ class n_custom_product(models.Model):
 				           'min_quantity': 1, 'fixed_price': line.n_avg_price, 'qty': line.n_min_qty}]]}
                                 print "valsvalsvalsvals cust ids----",vals
 				cust_ids=customer_obj.create(vals)
-				
+				print "cust_idscust_idscust_ids",cust_ids
 				if line.n_film_ids:
 					self.env['sale.order.line'].sudo().browse(line.n_sale_line_id.id).write({
 					'product_id': cust_ids.product_id.id,'n_film_product_id':cust_ids.product_id.id,
