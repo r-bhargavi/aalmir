@@ -50,7 +50,7 @@
             <field name="arch" type="xml">
             	<form string="Batches Details" create="false" edit="false" delete="false">
             	    <header>
-            	    	<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False),('logistic_state','=','transit_in')]}" groups="base.group_system,gt_order_mgnt.group_sale_support,stock.group_stock_manager"/>
+            	    	<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False),('logistic_state','!=','transit_in')]}" groups="base.group_system,gt_order_mgnt.group_sale_support,stock.group_stock_manager"/>
             	    </header>
             	    <sheet>
             	    	<group col="4">
