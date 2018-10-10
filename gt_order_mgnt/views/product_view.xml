@@ -474,18 +474,6 @@
 	   </field>
 	</record>
 	
-	<record id="purchase_product_template_form_view_api_inherite" model="ir.ui.view">
-		<field name="name">Product Template Form</field>
-		<field name="model">product.template</field>
-		<field name="inherit_id" ref="purchase.view_product_template_purchase_buttons_from"/>
-		<field name="arch" type="xml">
-                    	<button name="%(purchase.action_purchase_line_product_tree)d" position="attributes">
-                    		<attribute name="attrs">{'invisible':[('purchase_ok','=',False)]}</attribute>
-                    		<attribute name="type">object</attribute>
-                    		<attribute name="name">action_view_po</attribute>
-            		</button>
-		</field>
-	</record> 
 	
 	<record id="procurment_product_template_form_view_api_inherite" model="ir.ui.view">
 		<field name="name">Product Template Form</field>
@@ -531,7 +519,7 @@
 		</field>
 	</record> 
 	
-	<record id="mrp_product_form_view_api_inherite" model="ir.ui.view">
+<!--	<record id="mrp_product_form_view_api_inherite" model="ir.ui.view">
 		<field name="name">Product Form</field>
 		<field name="model">product.product</field>
 		<field name="inherit_id" ref="mrp.product_product_form_view_bom_button"/>
@@ -567,7 +555,7 @@
 		<field name="arch" type="xml">
                     	<button name="%(procurement.procurement_order_action_product_product_stat)d" position="replace"/>
 		</field>
-	</record>
+	</record>-->
 	<record id="product_product_form_inheriten" model="ir.ui.view">
 		<field name="name">Product product Form</field>
 		<field name="model">product.product</field>
