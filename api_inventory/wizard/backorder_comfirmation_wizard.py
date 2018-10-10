@@ -37,8 +37,8 @@ class stock_immediate_transfer(models.TransientModel):
                                 print "secondary_packsecondary_pack",secondary_pack
                                 if operation.hide_packaging==True:
                                     operation.write({'secondary_pack':False})
-                                if not secondary_pack or len(secondary_pack)>1:
-                                    raise ValueError("Secondary Packaging of product '[{}]{}' not  defined".format(operation.product_id.default_code,operation.product_id.name))
+                                if operation.hide_packaging==False and not secondary_pack or len(secondary_pack)>1:
+                                    raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
                                 if secondary_pack:
                                     operation.write({'secondary_pack':secondary_pack.id})
 #				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
@@ -164,8 +164,8 @@ class stock_backorder_confirmation(models.TransientModel):
                                 print "secondary_packsecondary_pack",secondary_pack
                                 if operation.hide_packaging==True:
                                     operation.write({'secondary_pack':False})
-                                if not secondary_pack or len(secondary_pack)>1:
-                                    raise ValueError("Secondary Packaging of product '[{}]{}' not  defined".format(operation.product_id.default_code,operation.product_id.name))                                
+                                if operation.hide_packaging==False and not secondary_pack or len(secondary_pack)>1:
+                                    raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
                                 if secondary_pack:
                                     operation.write({'secondary_pack':secondary_pack.id})
 #				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
@@ -275,8 +275,8 @@ class stock_backorder_confirmation(models.TransientModel):
                                 print "secondary_packsecondary_pack",secondary_pack
                                 if operation.hide_packaging==True:
                                     operation.write({'secondary_pack':False})
-                                if not secondary_pack or len(secondary_pack)>1:
-                                    raise ValueError("Secondary Packaging of product '[{}]{}' not  defined".format(operation.product_id.default_code,operation.product_id.name))
+                                if operation.hide_packaging==False and not secondary_pack or len(secondary_pack)>1:
+                                    raise UserError("Secondary Packaging of product '{}' not  defined".format(operation.product_id.name))
                                 if secondary_pack:
                                     operation.write({'secondary_pack':secondary_pack.id})
 #				if not 'store' in operation.packaging_id.uom_id.unit_type.mapped('string'):
