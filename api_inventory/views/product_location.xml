@@ -1,4 +1,17 @@
 <odoo>
+    
+    	<record id="purchase_product_template_form_view_api_inherite" model="ir.ui.view">
+		<field name="name">Product Template Form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="purchase.view_product_template_purchase_buttons_from"/>
+		<field name="arch" type="xml">
+                    	<button name="%(purchase.action_purchase_line_product_tree)d" position="attributes">
+                    		<attribute name="attrs">{'invisible':[('purchase_ok','=',False)]}</attribute>
+                    		<attribute name="type">object</attribute>
+                    		<attribute name="name">action_view_po</attribute>
+            		</button>
+		</field>
+	</record> 
     <record id="product_template_location_form_view_inherite" model="ir.ui.view">
             <field name="name">Product Template Inherite inventory</field>
             <field name="model">product.template</field>
