@@ -31,7 +31,7 @@
                       <li> This all are should be internal transfer routes</li>''',
     'author': 'Aalmir Plastic Industries',
     'website': 'http://aalmrplastic.com',
-    'depends': ['stock','product','quality_control'],
+    'depends': ['stock','product','quality_control','purchase'],
     'data': [
                 'security/stock_security.xml',
                 'security/stock_menu.xml',
