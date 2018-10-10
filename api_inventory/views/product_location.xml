@@ -2,7 +2,7 @@
     <record id="product_template_location_form_view_inherite" model="ir.ui.view">
             <field name="name">Product Template Inherite inventory</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="inherit_id" ref="product.product_template_form_view" />
             <field name="arch" type="xml">
                  <div name="button_box" position="inside">
                     <button class="oe_stat_button" type="object" name="open_inventory_location" icon="fa-object-group" groups="stock.group_stock_user">
