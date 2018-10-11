@@ -80,10 +80,9 @@ class stock_immediate_transfer(models.TransientModel):
 			'target': 'new',
 			'res_id':res_id.id,
 		    }
-		    
         #from  INventry loss/Purchase  >> INput_location (Purchase /Inventory Loss)
-        elif (self.pick_id.picking_type_code =='internal' and self.pick_id.location_id.usage == 'inventory' and self.pick_id.ntransfer_type !='manufacturing') or (self.pick_id.picking_type_code =='incoming') :
-    		product_data = []
+        elif (self.pick_id.picking_type_code =='internal' and self.pick_id.location_dest_id.scrap_location==False and self.pick_id.location_id.usage == 'inventory' and self.pick_id.ntransfer_type !='manufacturing') or (self.pick_id.picking_type_code =='incoming'):
+                product_data = []
 		for operation in self.pick_id.pack_operation_product_ids:
 			#if not operation.qty_done:
 			#	continue
@@ -126,7 +125,8 @@ class stock_immediate_transfer(models.TransientModel):
 			'res_id':res_id.id,
 		    }
 		    
-	else:	    
+	else:	
+                print "finally it wrn t to else part---------------------"
 		# If still in draft => confirm and assign
 		if self.pick_id.state == 'draft':
 		    self.pick_id.action_confirm()

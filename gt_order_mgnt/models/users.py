@@ -70,6 +70,6 @@ class ResCompany(models.Model):
 
     @api.multi
     def write(self,vals):
-        print "jjjjjjjjjjjjjjjjjjjjjjjjjjjj",vals
+#        print "jjjjjjjjjjjjjjjjjjjjjjjjjjjj",vals
         return super(ResCompany,self).write(vals)
 

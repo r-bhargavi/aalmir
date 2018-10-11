@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+sales_manager_customer_product_access,sales.manager.customer.product.access,model_customer_product,base.group_sale_manager,1,0,1,0
+sales_all_lead_customer_product_access,sales.all.leads.customer.product.access,model_customer_product,base.group_sale_salesman_all_leads,1,0,1,0
+sales_person_customer_product_access,sales.person.customer.product.access,model_customer_product,base.group_sale_salesman,1,1,1,1
+sales_person_product_product_access,sales.persona.product.access,product.model_product_product,base.group_sale_salesman,1,1,1,0
+sales_all_lead_product_product_access,sales.all.lead.persona.product.access,product.model_product_product,base.group_sale_salesman,1,1,1,0
+,,,,,,,
+sales_access_product_uom_type,access_product_uom_type,model_product_uom_type,base.group_sale_salesman,1,0,0,0
+,,,,,,,
+access_product_raw_material_type,product_raw_material_type_manager,model_product_raw_material_type,base.group_sale_salesman,1,0,0,0
+,,,,,,,
+access_product_material_type_sale,product_material_type_sale,model_product_material_type,base.group_sale_salesman,1,0,0,0

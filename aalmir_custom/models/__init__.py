@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #
-#    Copyright (C) 2013-Today(www.aalmirplastic.com).
+#    Copyright (C) 2013-Today(www.aalmir_plastic.com).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,5 +18,5 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import product
+import company
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

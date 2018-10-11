@@ -14,7 +14,7 @@
 			<field name="convert_product_qty" string="Quantity" readonly="1" sum="total"/>
 			<field name="store_id" readonly="1"/>
 			<field name="uom_id" readonly="1"/>
-			<field name="logistic_state" invisible="1"/>
+			<field name="logistic_state"/>
 	     	</tree>
             </field>
 	</record>
@@ -50,7 +50,7 @@
             <field name="arch" type="xml">
             	<form string="Batches Details" create="false" edit="false" delete="false">
             	    <header>
-            	    	<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('store_id','=',False),('logistic_state','!=','transit_in')]}" groups="base.group_system,gt_order_mgnt.group_sale_support,stock.group_stock_manager"/>
+            	    	<button type="object" name="split_mrp_batch" string="Split" class="btn-primary" attrs="{'invisible':[('logistic_state','not in',('transit_in'))]}" groups="base.group_system,gt_order_mgnt.group_sale_support,stock.group_stock_manager"/>
             	    </header>
             	    <sheet>
             	    	<group col="4">

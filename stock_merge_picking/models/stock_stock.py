@@ -25,6 +25,19 @@ from openerp.exceptions import UserError
 
 class stock_picking(osv.osv):
     _inherit='stock.picking'
+    
+    def action_assign(self, cr, uid, ids, context=None):
+        print "pciking moves action assign------------------------"
+        """ Check availability of picking moves.
+        This has the effect of changing the state and reserve quants on available moves, and may
+        also impact the state of the picking as it is computed based on move's states.
+        @return: True
+        """
+        result= super(stock_picking,self).action_assign(cr, uid, ids,context=context)
+        pick_brw=self.pool.get('stock.picking').browse(cr,uid,ids[0])
+        if any([ x.state in ('confirmed') for x in pick_brw.move_lines]):
+            raise UserError('Some Products are not available in mentioned source location')
+        return result
 
 
     def _prepare_pack_ops(self, cr, uid, picking, quants, forced_qties, context=None):

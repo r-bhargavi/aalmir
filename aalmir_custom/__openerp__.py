@@ -15,29 +15,29 @@
 #    GNU Affero General Public License for more details.
 #
 #    You should have received a copy of the GNU Affero General Public License
-#    along with this program.
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
 {
-    'name': 'Aalmir Custom', 
+    'name': 'Aalmir Custom',
     'version': '1.0',
-    'category': 'fixes',
-    'sequence': 1015,
-    'summary': 'Bugs and Issues Management',
-    'description': '''Resolving Bugs and Issues''',
+    'category': 'product',
+    'sequence': 1005,
+    'summary': 'Scrips and Other Fixes',
+    'description': '''
+  Customer Products Customization
+''',
     'author': 'Aalmir Plastic Industries',
-    'website': 'http://aalmrplastic.com',
-    'depends': ['stock','product'],
+    'website': 'http://aalmirplastic.com/',
+    'depends': ['product'],
     'data': [
-                'views/product_location.xml',
-                ],
-
+#        'security/ir.model.access.csv',
+        'views/company_view.xml',
+    ],
     'demo': [],
     'test': [],
-#    'qweb': ['static/src/xml/*.xml',],
     'installable': True,
     'auto_install': False,
     'application': False,
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-
