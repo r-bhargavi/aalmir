@@ -15,6 +15,7 @@ class HrExpense(models.Model):
 
 
     employee_id = fields.Many2one('hr.employee', string="Employee")
+#    check_bank = fields.Boolean(string="Bank Journal")
     product_uom_id = fields.Many2one('product.uom', string='Unit of Measure', required=True)
 
     refuse_reason = fields.Char(string='Refuse Reason',track_visibility='always' )
@@ -37,7 +38,6 @@ class HrExpense(models.Model):
     approved_by = fields.Many2one('res.users', 'Approved By')
     user_id = fields.Many2one('res.users', 'User')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
-    
     
     @api.model
     def create(self, vals):
@@ -189,10 +189,6 @@ class HrExpense(models.Model):
         self.write({'state': 'approve','approved_by':self._uid})
 
     
-    @api.onchange('pay_type')
-    def pay_type_onchange(self):
-    	if self.pay_type != 'bank':
-    		self.payment_method=False
                 
     @api.onchange('product_id')
     def _onchange_product_id(self):
