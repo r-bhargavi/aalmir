@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="view_approval_config_form" model="ir.ui.view">
+            <field name="name">view.approval.config.form</field>
+            <field name="model">approval.config</field>
+            <field name="arch" type="xml">
+                <form string="Approval Config"> 
+                    <group>
+                        <field name="name"/>
+                    </group>
+
+                    <sheet>
+                        <notebook>
+                            <page string="Approval Lines">
+                                <field name="approval_line">
+
+                                    <tree editable="top">
+                                        <field name="partner_id" required="1"/>
+                                        <field name="approve_amount" required="1" />
+                                        <field name="approval_by" required="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="approval_config_my_tree" model="ir.ui.view">
+            <field name="name">approve.config.tree</field>
+            <field name="model">approval.config</field>
+            <field name="arch" type="xml">
+                <tree string="Approval Config">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="approval_config_tree_action" model="ir.actions.act_window.view">
+            <field name="sequence" eval="0"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="approval_config_my_tree"/>
+        </record>
+        <record id="action_approval_config" model="ir.actions.act_window">
+            <field name="name">Approval Configuration</field>
+            <field name="res_model">approval.config</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new approval config
+                </p>
+            </field>
+        </record>
+        <!--Inherit Expenses  to add new menuitem  -->
+        <menuitem id="menu_approval_config" name="Approval Configuration" parent="hr_expense.menu_hr_expense_configuration" 
+                  action="action_approval_config"/>
+    </data>
+</openerp>
