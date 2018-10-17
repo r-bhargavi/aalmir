@@ -36,6 +36,9 @@
                  <field name="employee_id" position="attributes">
                     <attribute name='attrs'>{'required':[('expense_type','=','emp_expense')],'invisible':[('expense_type','!=','emp_expense')]}</attribute>
                 </field>
+                 <field name="product_uom_id" position="attributes">
+                    <attribute name='invisible'>1</attribute>
+                </field>
                 <field name="product_id" position="before">
                     <field name="expense_type" required="1"/>
                     <field name="uploaded_document_bill" colspan="2" filename="doc_name" 
@@ -59,9 +62,9 @@
                 </field>
 
                  <field name="tax_ids" position="after">
-                    <field name="bank_journal_id"/>
+                    <field name="bank_journal_id" string="Payment Method" required="1"/>
 
-                    <field name="payment_method" string="Payment Method"/>
+                    <field name="payment_method" string="Type" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
                     <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
                             <tree editable="top">
