@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_approval_config_sr_manager,approval.config.sr.manager,model_approval_config,restricted_hr_expense_grant,1,1,1,1
+access_approval_config_basic_employee,approval.config.basic.employee,model_approval_config,base.group_user,1,0,0,0
+access_approval_config_line_sr_manager,approval.config.line.sr.manager,model_approval_config_line,restricted_hr_expense_grant,1,1,1,1
+access_approval_config_line_group_base,approval.config.line.group.base,model_approval_config_line,base.group_user,1,0,0,0
+access_approval_config_line_account_user,approval.config.line.account.user,model_approval_config_line,account.group_account_user,1,1,1,1
+access_approval_config_account_user,approval.config.account.user,model_approval_config,account.group_account_user,1,1,1,1
+access_bank_cheque_details_account_user,bank.cheque.details.account.user,api_account.model_bank_cheque_details,account.group_account_user,1,1,1,0
+access_bank_cheque_details_group_user,bank.cheque.details.group.user,api_account.model_bank_cheque_details,base.group_user,1,1,1,0

@@ -1,0 +1,15 @@
+<odoo>
+    
+    <record id="product_template_inherit_partner_form_view_inherite" model="ir.ui.view">
+            <field name="name">Product Template Inherite inventory Partner</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                 <field name="list_price" position="after">
+                    <field name="partner_id_preferred" attrs="{'invisible':[('can_be_expensed','=',False)]}"/>
+              </field>
+            </field>
+    </record>
+    
+</odoo>
+

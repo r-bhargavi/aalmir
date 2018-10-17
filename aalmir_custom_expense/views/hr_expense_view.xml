@@ -1,0 +1,82 @@
+<odoo>
+    
+    <record model="ir.ui.menu" id="hr_expense.menu_expense_approved">
+     <field name="name">Expenses</field>
+    </record>
+    <record model="ir.ui.menu" id="hr_expense.menu_expense_all">
+     <field name="name">Expenses</field>
+    </record>
+    <record id="hr_expense_inherit_tree" model="ir.ui.view">
+		<field name="name">HR Expense Tree New</field>
+		<field name="model">hr.expense</field>
+		<field name="inherit_id" ref="hr_expense.view_expenses_tree"/>
+		<field name="arch" type="xml">
+                <field name="employee_id" position="after">
+                    <field name="approval_by"/>
+                </field>
+		</field>
+	</record> 
+    	<record id="hr_expense_inherit_form" model="ir.ui.view">
+		<field name="name">HR Expense Form New</field>
+		<field name="model">hr.expense</field>
+		<field name="inherit_id" ref="hr_expense.hr_expense_form_view"/>
+		<field name="arch" type="xml">
+                 <field name="payment_mode" position="replace">
+                 </field>
+                 <field name="bank_journal_id" position="attributes">
+                    <attribute name='attrs'>{}</attribute>
+                </field>
+                 <xpath expr="//button[@name='approve_expenses']" position="attributes">
+                    <attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant</attribute>
+                </xpath>
+                <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" position="attributes">
+                    <attribute name='groups'>aalmir_custom_expense.restricted_hr_expense_grant</attribute>
+
+                </button>
+                 <field name="employee_id" position="attributes">
+                    <attribute name='attrs'>{'required':[('expense_type','=','emp_expense')],'invisible':[('expense_type','!=','emp_expense')]}</attribute>
+                </field>
+                <field name="product_id" position="before">
+                    <field name="expense_type" required="1"/>
+                    <field name="uploaded_document_bill" colspan="2" filename="doc_name" 
+                             string="Upload Bills"/>
+                </field>
+                <field name="description" position="after">
+                    <field name="refuse_reason" placeholder="Rejection Reason if any....."/>
+                </field>
+                <field name="account_move_id" position="after">
+                    <field name="doc_name"  invisible="1"/>
+                    <field name="approval_status" readonly="1"/>
+                    <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
+                    <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>
+                    <field name="communication"/>
+                    <field name="internal_note"/>
+                    <field name="uploaded_document" colspan="2" filename="doc_name" 
+                             string="Upload Document"/>
+                </field>
+                <field name="employee_id" position="after">
+                    <field name="partner_id_preferred" attrs="{'invisible':[('expense_type','=','emp_expense')]}"/>
+                </field>
+
+                 <field name="tax_ids" position="after">
+                    <field name="bank_journal_id"/>
+
+                    <field name="payment_method" string="Payment Method"/>
+                    <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
+                    <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
+                            <tree editable="top">
+                                    <field name="bank_name" required="1"/>
+                                    <field name="cheque_no" required="1" />
+                                    <field name="cheque_date" required="1"/>
+                                    <field name="branch_name" />
+                                    <field name="amount" required="1" sum="total"/>
+                                    <field name="reconcile_date" attrs="{'required':[('cheque_status','=','cleared')],'readonly':[('cheque_status','!=','cleared')]}"/>
+                                    <field name="cheque_status" invisible="1"/>
+                            </tree>
+                    </field>
+              </field>
+		</field>
+	</record> 
+    
+</odoo>
+
