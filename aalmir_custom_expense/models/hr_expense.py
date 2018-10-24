@@ -46,7 +46,8 @@ class HrExpense(models.Model):
             self.bank_journal=True
         else:
             self.bank_journal=False
-    
+        return {'domain': {'bank_journal_id': [('company_id', '=', self.company_id.id)]}}
+
     @api.model
     def create(self, vals):
             vals['name'] = self.env['ir.sequence'].next_by_code('hr.expense')
