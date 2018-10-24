@@ -47,7 +47,7 @@ class unpickBatchesWizard(models.TransientModel):
 			transit_id=total_qty_unit=pkg_capicity_unit = pkg_unit=False	
 			for line in rec.line_ids:
 				if not q.check:
-					continue
+                                    continue
 				master_batch_id = line.master_id
 				Packaging_type = master_batch_id.packaging
 				pkg_capicity_unit = pkg_unit = master_batch_id.packaging.uom_id

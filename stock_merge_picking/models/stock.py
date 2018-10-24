@@ -425,6 +425,7 @@ class StockMove(models.Model):
 				quants=self.env['stock.quant'].search([('reservation_id','in',move._ids),
         							       ('product_id','=',res.product_id.id)])
 		 		reserve_qty=sum([x.qty for x in quants])
+                                print "reserve qty condidtion if picking idd-----",reserve_qty
 		 		if not reserve_qty :
 					if res.picking_id.quant_reserved_exist == True:
 						continue
@@ -459,6 +460,7 @@ class StockMove(models.Model):
 						('picking_id','=',res.picking_id.id),
 						('product_id','=',res.product_id.id)],order='id')
 				reserve_qty -= sum([ i.convert_product_qty for i in back_id])
+                                print "reserve_qtyin main if cons=dition of outgoing",reserve_qty,back_id
 				res_btch_qty = reserve_qty # get new reserved qty
 				packets = int(reserve_qty / res.product_packaging.qty)
 				result_batches = []
@@ -472,6 +474,7 @@ class StockMove(models.Model):
 						('store_id.n_location','=',res.location_id.id),
 						],order='id',limit=packets)
 					reserve_qty -= sum([ i.convert_product_qty for i in sale_line_batches])
+                                        print "reserve_qtyreserve_qty in sale line batcjes if packets>0",reserve_qty,sale_line_batches
 					if sale_line_batches:
 						numbers=[srch for srch in sale_line_batches]
 						result_batches.extend(numbers)
@@ -486,6 +489,7 @@ class StockMove(models.Model):
 						('store_id.n_location','=',res.location_id.id),
 						],order='id',limit=packets)
 					reserve_qty -= sum([ i.convert_product_qty for i in search_id])
+                                        print "reserve_qtyreserve_qty in search id condition",reserve_qty,search_id
 					packets -= len(search_id)
 					if search_id:
 						numbers=[srch for srch in search_id]
@@ -500,6 +504,7 @@ class StockMove(models.Model):
 						('store_id.n_location','=',res.location_id.id)
 						],order='id',limit=packets)
 						reserve_qty -= sum([ i.convert_product_qty for i in search_id])
+                                                print "reserve_qty if reserve_qty and packets condition",reserve_qty,
 						if search_id:
 							numbers=[srch for srch in search_id]
 							result_batches.extend(numbers)

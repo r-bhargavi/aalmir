@@ -60,11 +60,14 @@
                 <field name="employee_id" position="after">
                     <field name="partner_id_preferred" attrs="{'invisible':[('expense_type','=','emp_expense')]}"/>
                 </field>
+                <field name="bank_journal_id" position="replace">
+                </field>
 
                  <field name="tax_ids" position="after">
                     <field name="bank_journal_id" string="Payment Method" required="1"/>
+                    <field name="bank_journal" readonly="1" invisible="1"/>
 
-                    <field name="payment_method" string="Type" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="payment_method" string="Type" attrs="{'readonly':[('state','!=','draft')],'required':[('bank_journal','=',True)]}"/>
                     <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
                     <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
                             <tree editable="top">

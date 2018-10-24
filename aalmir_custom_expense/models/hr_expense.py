@@ -26,6 +26,7 @@ class HrExpense(models.Model):
 
     internal_note=fields.Text('Remarks on Receipt')
     communication = fields.Char(string='Internal Note')
+    bank_journal = fields.Boolean(string='Bank Type?')
 
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
     uploaded_document_bill = fields.Binary(string='Uploaded Bills', default=False , attachment=True)
@@ -38,6 +39,13 @@ class HrExpense(models.Model):
     approved_by = fields.Many2one('res.users', 'Approved By')
     user_id = fields.Many2one('res.users', 'User')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
+    @api.onchange('bank_journal_id')
+    def journal_onchange(self):
+        print "bank_journal_idbank_journal_id",self.bank_journal_id
+    	if self.bank_journal_id.type == 'bank':
+            self.bank_journal=True
+        else:
+            self.bank_journal=False
     
     @api.model
     def create(self, vals):
@@ -51,17 +59,21 @@ class HrExpense(models.Model):
     def submit_expenses(self):
         if any(expense.state != 'draft' for expense in self):
             raise UserError(_("You can only submit draft expenses!"))
-        if self.partner_id_preferred and self.expense_type=='other_expense':
+        if self.expense_type=='other_expense':
             self.write({'employee_id':False})
-            non_approval=self.env['approval.config.line'].search([('partner_id','=',self.partner_id_preferred.id)])
-            if non_approval:
-                limit_amt=non_approval.approve_amount
-                if self.total_amount>limit_amt:
-                    self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+            if self.partner_id_preferred:
+                non_approval=self.env['approval.config.line'].search([('partner_id','=',self.partner_id_preferred.id)])
+                if non_approval:
+                    limit_amt=non_approval.approve_amount
+                    if self.total_amount>limit_amt:
+                        self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+                    else:
+                        self.write({'state': 'approve'})
                 else:
-                    self.write({'state': 'approve'})
+                    self.write({'state': 'submit','approval_status':'app_not_required'})
             else:
                 self.write({'state': 'submit','approval_status':'app_not_required'})
+    
         else:
             self.write({'state': 'submit','approval_status':'app_not_required'})
         return True
@@ -158,7 +170,7 @@ class HrExpense(models.Model):
                             emp_account = expense.partner_id_preferred.property_account_payable_id.id
                             name=expense.partner_id_preferred.name
                         else:
-                            emp_account = expense.product_id.property_account_payable_id.id
+                            emp_account = expense.product_id.property_account_expense_id.id
                             name=expense.product_id.name
                    
                 print "namenamename----------------",name,emp_account
