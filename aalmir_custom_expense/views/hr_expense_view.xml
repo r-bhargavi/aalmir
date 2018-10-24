@@ -67,7 +67,7 @@
                     <field name="bank_journal_id" string="Payment Method" required="1"/>
                     <field name="bank_journal" readonly="1" invisible="1"/>
 
-                    <field name="payment_method" string="Type" attrs="{'readonly':[('state','!=','draft')],'required':[('bank_journal','=',True)]}"/>
+                    <field name="payment_method" string="Type" attrs="{'readonly':[('state','!=','draft')],'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>
                     <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
                     <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
                             <tree editable="top">
