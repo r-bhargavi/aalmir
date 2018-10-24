@@ -51,17 +51,21 @@ class HrExpense(models.Model):
     def submit_expenses(self):
         if any(expense.state != 'draft' for expense in self):
             raise UserError(_("You can only submit draft expenses!"))
-        if self.partner_id_preferred and self.expense_type=='other_expense':
+        if self.expense_type=='other_expense':
             self.write({'employee_id':False})
-            non_approval=self.env['approval.config.line'].search([('partner_id','=',self.partner_id_preferred.id)])
-            if non_approval:
-                limit_amt=non_approval.approve_amount
-                if self.total_amount>limit_amt:
-                    self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+            if self.partner_id_preferred:
+                non_approval=self.env['approval.config.line'].search([('partner_id','=',self.partner_id_preferred.id)])
+                if non_approval:
+                    limit_amt=non_approval.approve_amount
+                    if self.total_amount>limit_amt:
+                        self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+                    else:
+                        self.write({'state': 'approve'})
                 else:
-                    self.write({'state': 'approve'})
+                    self.write({'state': 'submit','approval_status':'app_not_required'})
             else:
                 self.write({'state': 'submit','approval_status':'app_not_required'})
+    
         else:
             self.write({'state': 'submit','approval_status':'app_not_required'})
         return True
