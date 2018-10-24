@@ -1,12 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-sales_manager_customer_product_access,sales.manager.customer.product.access,model_customer_product,base.group_sale_manager,1,0,1,0
-sales_all_lead_customer_product_access,sales.all.leads.customer.product.access,model_customer_product,base.group_sale_salesman_all_leads,1,0,1,0
-sales_person_customer_product_access,sales.person.customer.product.access,model_customer_product,base.group_sale_salesman,1,1,1,1
-sales_person_product_product_access,sales.persona.product.access,product.model_product_product,base.group_sale_salesman,1,1,1,0
-sales_all_lead_product_product_access,sales.all.lead.persona.product.access,product.model_product_product,base.group_sale_salesman,1,1,1,0
-,,,,,,,
-sales_access_product_uom_type,access_product_uom_type,model_product_uom_type,base.group_sale_salesman,1,0,0,0
-,,,,,,,
-access_product_raw_material_type,product_raw_material_type_manager,model_product_raw_material_type,base.group_sale_salesman,1,0,0,0
-,,,,,,,
-access_product_material_type_sale,product_material_type_sale,model_product_material_type,base.group_sale_salesman,1,0,0,0
+access_crm_lead_sr_manager,crm.lead.sr.manager,crm.model_crm_lead,restricted_sale_salesman,1,1,1,1
+access_crm_stage_sr_manager,crm.stage.sr.manager,crm.model_crm_stage,restricted_sale_salesman,1,1,1,1
+access_crm_opportunity_report_sr_manager,crm.opportunity.report.sr.manager,crm.model_crm_opportunity_report,restricted_sale_salesman,1,1,1,1
+access_res_partner_sr_manager,res.partner.sr.manager,base.model_res_partner,restricted_sale_salesman,1,0,0,0
+access_res_partner_category_sr_manager,res.partner.category.sr.manager,base.model_res_partner_category,restricted_sale_salesman,1,0,0,0
+access_base_action_rule_sr_manager,base.action.rule sr manager,base_action_rule.model_base_action_rule,restricted_sale_salesman,1,1,1,1
+access_crm_lead_tag_sr_manager,crm_lead_tag sr manager,crm.model_crm_lead_tag,restricted_sale_salesman,1,1,1,1
+access_crm_lost_reason_sr_manager,crm.lost.reason.sr.manager,crm.model_crm_lost_reason,restricted_sale_salesman,1,1,1,1
+access_crm_activity_sr_manager,crm.activity.sr.manager,crm.model_crm_activity,restricted_sale_salesman,1,1,1,1
+access_crm_activity_report_sr_manager,crm.activity.report.sr.manager,crm.model_crm_activity_report,restricted_sale_salesman,1,1,1,1
+access_product_pricelist_sr_manager,product.pricelist.sr.manager,product.model_product_pricelist,restricted_sale_salesman,1,1,1,1
+access_res_users_sr_manager,res.users.sr.manager,base.model_res_users,restricted_sale_salesman,1,0,0,0

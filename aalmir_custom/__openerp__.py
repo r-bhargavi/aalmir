@@ -32,6 +32,7 @@
     'depends': ['product'],
     'data': [
 #        'security/ir.model.access.csv',
+#        'security/restricted_sale_security.xml',
         'views/company_view.xml',
     ],
     'demo': [],

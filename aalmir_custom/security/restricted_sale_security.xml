@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+    
+
+    <record id="restricted_sale_salesman" model="res.groups">
+        <field name="name">User: Sale Access Limited</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to his own data in the sales application.</field>
+    </record>
+
+</data>
+
+<data noupdate="0">
+
+    <record id="sale_rule_restricted_group" model="ir.rule">
+        <field name="name">Personal Customers Restricted</field>
+        <field ref="base.model_res_partner" name="model_id"/>
+        <field name="domain_force">[('create_uid','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('restricted_sale_salesman'))]"/>
+    </record>
+    <record id="sale_rule_restricted_group_pricelist" model="ir.rule">
+        <field name="name">Generic Pricelist Restricted</field>
+        <field ref="product.model_product_pricelist" name="model_id"/>
+        <field name="domain_force">[('generic_use','=',True)]</field>
+        <field name="groups" eval="[(4, ref('restricted_sale_salesman'))]"/>
+    </record>
+    <record id="sale_rule_restricted_group_product" model="ir.rule">
+        <field name="name">Sales Product Restricted</field>
+        <field ref="product.model_product_product" name="model_id"/>
+        <field name="domain_force">[('create_uid','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('restricted_sale_salesman'))]"/>
+    </record>
+    <record id="sale_rule_restricted_group_product_tmp" model="ir.rule">
+        <field name="name">Sales Product Template Restricted</field>
+        <field ref="product.model_product_template" name="model_id"/>
+        <field name="domain_force">[('create_uid','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('restricted_sale_salesman'))]"/>
+    </record>
+<!--    <record id="sale_rule_restricted_group_lead" model="ir.rule">
+        <field name="name">User Leads Restricted</field>
+        <field ref="crm.model_crm_lead" name="model_id"/>
+        <field name="domain_force">[('create_uid','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('restricted_sale_salesman'))]"/>
+    </record>-->
+
+</data>
+</openerp>

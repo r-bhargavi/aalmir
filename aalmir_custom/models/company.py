@@ -22,7 +22,19 @@ class resCompany(models.Model):
                     pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
                     print "pol_idpol_idpol_idpol_id",pol_id
                     if not pol_id:
-                        each.write({'list_price':0.0,'standard_price':0.0})
+#                        if not sol and pol the chekc pricelist
+                        pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id)],order='id desc',limit=1)
+                        if not pricelist_id:
+                            each.write({'list_price':0.0,'standard_price':0.0})
+                        else:
+                            if pricelist_id.currency_id.id!=self.currency_id.id:
+                                from_currency = pricelist_id.currency_id
+                                to_currency = self.currency_id
+                                price_con = from_currency.compute(price_pol, to_currency, round=False)
+                                print "price price_con afre conversion=============",price_con
+                                each.write({'list_price':price_con,'standard_price':price_con})
+                            else:
+                                each.write({'list_price':pricelist_id.avg_price,'standard_price':pricelist_id.avg_price})
                     else:
 #                        convertng price first to kg if the uom is MT
                         if pol_id.product_uom.name=='MT':
