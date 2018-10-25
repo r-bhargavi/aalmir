@@ -24,13 +24,14 @@ class resCompany(models.Model):
                     if not pol_id:
 #                        if not sol and pol the chekc pricelist
                         pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id)],order='id desc',limit=1)
+                        print "no sol no pol so fould pricelist---------------------",pricelist_id
                         if not pricelist_id:
                             each.write({'list_price':0.0,'standard_price':0.0})
                         else:
                             if pricelist_id.currency_id.id!=self.currency_id.id:
                                 from_currency = pricelist_id.currency_id
                                 to_currency = self.currency_id
-                                price_con = from_currency.compute(price_pol, to_currency, round=False)
+                                price_con = from_currency.compute(pricelist_id.avg_price, to_currency, round=False)
                                 print "price price_con afre conversion=============",price_con
                                 each.write({'list_price':price_con,'standard_price':price_con})
                             else:
