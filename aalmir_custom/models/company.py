@@ -17,13 +17,13 @@ class resCompany(models.Model):
         for each in all_prods:
             product_id=self.env['product.product'].search([('product_tmpl_id','=',each.id)],limit=1)
             if product_id:
-                sol_id=self.env['sale.order.line'].search([('product_id','=',product_id.id),('order_id.state', 'in', ('sale','done'))],order='id desc',limit=1)
+                sol_id=self.env['sale.order.line'].search([('price_unit','>',0.0),('product_id','=',product_id.id),('order_id.state', 'in', ('sale','done'))],order='id desc',limit=1)
                 if not sol_id:
-                    pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
+                    pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('price_unit','>',0.0),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
                     print "pol_idpol_idpol_idpol_id",pol_id
                     if not pol_id:
 #                        if not sol and pol the chekc pricelist
-                        pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id)],order='id desc',limit=1)
+                        pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id),('avg_price','>',0.0)],order='id desc',limit=1)
                         print "no sol no pol so fould pricelist---------------------",pricelist_id
                         if not pricelist_id:
                             each.write({'list_price':0.0,'standard_price':0.0})
