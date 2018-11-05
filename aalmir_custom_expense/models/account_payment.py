@@ -1,8 +1,7 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
-#
-#    Copyright (C) 2013-Today(www.aalmir_plastic.com).
+#    Copyright (C) 2013-Today(www.aalmirplastic.com).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,10 +17,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import approval_config
-import account_invoice
-import approval_config_bill
-import account_payment
-import hr_expense
-import product
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+
+from openerp import fields, models ,api, _
+
+		
+class accountPayment(models.Model):
+    _inherit='account.payment'
+
+    expense_pay = fields.Boolean('Expense Pay')
+    expense_id = fields.Many2one('hr.expense', 'Expense')

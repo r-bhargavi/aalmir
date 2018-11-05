@@ -1,11 +1,64 @@
 <odoo>
-    
-    <record model="ir.ui.menu" id="hr_expense.menu_expense_approved">
-     <field name="name">Expenses</field>
-    </record>
-    <record model="ir.ui.menu" id="hr_expense.menu_expense_all">
-     <field name="name">Expenses</field>
-    </record>
+<menuitem id="hr_expense.menu_hr_expense_configuration" name="Approval Configuration" parent="hr_expense.menu_hr_expense_root"
+            sequence="100" groups="base.group_configuration"/>
+    <menuitem id="hr_expense.menu_expense_all" action="hr_expense.expense_all" name="New Expense" parent="hr_expense.menu_hr_expense_root"/>
+<menuitem id="hr_expense.menu_hr_product" name="Expense Products" parent="hr_expense.menu_hr_expense_root" 
+            action="hr_expense.hr_expense_product" groups="base.group_hr_manager"/>
+     <record id="action_draft_expense" model="ir.actions.act_window">
+            <field name="name">Expenses</field>
+            <field name="res_model">hr.expense</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="context">{'group_by':'state'}</field>
+            <field name="view_id" ref="hr_expense.view_expenses_tree"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create new expenses.
+              </p><p>
+                Once you have created your expense, submit it to your manager who will validate it.
+              </p>
+            </field>
+        </record>
+     <record id="action_draft_expense_account" model="ir.actions.act_window">
+            <field name="name">Expenses Draft</field>
+            <field name="res_model">hr.expense</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="context">{'group_by':'state'}</field>
+            <field name="view_id" ref="hr_expense.view_expenses_tree"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create new expenses.
+              </p><p>
+                Once you have created your expense, submit it to your manager who will validate it.
+              </p>
+            </field>
+        </record>
+     <record id="action_show_vendor_bills" model="ir.actions.act_window">
+            <field name="name">Vendor Bills</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="context">{'group_by':'state','default_type': 'in_invoice', 'type': 'in_invoice', 'journal_type': 'purchase'}</field>
+            <field name="domain">[('type','in',('in_invoice', 'in_refund'))]</field>
+
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="view_id" ref="account.invoice_supplier_tree"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click here to create new expenses.
+              </p><p>
+                Once you have created your expense, submit it to your manager who will validate it.
+              </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_expense_draft" name="All Expenses" parent="hr_expense.menu_hr_expense_root" groups="base.group_hr_user" 
+            action="action_draft_expense" sequence="11"/>
+        <menuitem id="menu_expense_draft_account" name="Expenses" parent="account.menu_finance_payables" groups="base.group_hr_user" 
+            action="action_draft_expense_account" sequence="11"/>
+        <menuitem id="menu_vendor_bills" name="Vendor Bills" parent="hr_expense.menu_hr_expense_root" groups="base.group_hr_user" 
+            action="action_show_vendor_bills" sequence="11"/>
+
     <record id="hr_expense_inherit_tree" model="ir.ui.view">
 		<field name="name">HR Expense Tree New</field>
 		<field name="model">hr.expense</field>
@@ -21,14 +74,110 @@
 		<field name="model">hr.expense</field>
 		<field name="inherit_id" ref="hr_expense.hr_expense_form_view"/>
 		<field name="arch" type="xml">
+                
+                <field name="name" position="attributes">
+                <attribute name="readonly">1</attribute>
+
+                </field>
+                <field name="analytic_account_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+
+                </field>
+                <field name="quantity" position="replace">
+
+                </field>
+                <field name="product_id" position="attributes">
+                <attribute name="string">Expense</attribute>
+                </field>
+                <field name="unit_amount" position="attributes">
+                <attribute name="string">Price</attribute>
+                </field>
+                <field name="journal_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+
+                </field>
+                <field name="company_id" position="attributes">
+                                <attribute name='options'>{'no_create_edit': True, 'no_quick_create': True}</attribute>
+
+                </field>
+                <field name="currency_id" position="attributes">
+                <attribute name='options'>{'no_create_edit': True, 'no_quick_create': True}</attribute>
+                </field>
+                <field name="tax_ids" position="attributes">
+                                <attribute name='options'>{'no_create_edit': True, 'no_quick_create': True}</attribute>
+
+                </field>
+                <field name="product_id" position="after">
+                    <field name="type_product" required="1" readonly="1"/>
+                    <!--<field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('product_expense_account','!=',False)]}"/>-->
+                    <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)]}"/>
+
+                </field>
+<!--                <field name="bank_journal_id" position="attributes">
+                                    <attribute name="attrs">{}</attribute>-->
+
+                                <!--</field>-->
+                <field name="bank_journal_id" position="replace">
+
+                                </field>
+                <field name="account_move_id" position="replace">
+                                </field>
+                
+                <xpath expr="//sheet" position="inside">
+                        <notebook>
+                            <page string="Payment Details" attrs="{'invisible':[('state','not in',['approve','post','done'])]}">
+                                <group>
+                                <!--<field name="bank_cash" attrs="{'required':[('state','not in',['draft','submit'])]}"/>-->
+                                <field name="bank_journal_id_expense" widget="selection" attrs="{'required':[('state','not in',['draft','submit','cancel'])]}"/>
+                                <field name="is_bank_journal" readonly="1" invisible="1"/>
+                                <!--<field name="payment_method" string="Type" attrs="{'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>-->
+                                <field name="payment_method" attrs="{'required':[('is_bank_journal','=',True)],'invisible':[('is_bank_journal','=',False)]}" string="Type"/>
+                                <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','approve')],'required':[('payment_method','=','cheque')]}"/>
+                                <field name="cheque_details" attrs="{'readonly':[('state','in',['draft','submit'])],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
+                                        <tree editable="top">
+                                                <field name="bank_name" required="1"/>
+                                                <field name="cheque_no" required="1" />
+                                                <field name="cheque_date" required="1"/>
+                                                <field name="branch_name" />
+                                                <field name="amount" required="1" sum="total"/>
+                                                <field name="reconcile_date" attrs="{'required':[('cheque_status','=','cleared')],'readonly':[('cheque_status','!=','cleared')]}"/>
+                                                <field name="cheque_status" invisible="1"/>
+                                        </tree>
+                                </field>
+                                <field name="account_pay_id" readonly="1" attrs="{'invisible':[('account_pay_id','=',False)]}"/>
+                                <field name="payment_id" readonly="1" attrs="{'invisible':[('account_pay_id','=',False)]}"/>
+                                <field name="pay_date" attrs="{'invisible':[('account_pay_id','=',False)]}" readonly="1"/>
+                                <field name="account_move_id" readonly="1"/>
+                                <field name="doc_name" invisible="1"/>
+                                <field name="communication"/>
+                                <field name="internal_note"/>
+                                <field name="uploaded_document" colspan="2" filename="doc_name" 
+                                         string="Upload Payment Docs"/>
+                                </group>
+                            </page>
+                        </notebook>
+                </xpath>
+                <xpath expr="//button[@name='action_get_attachment_view']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
                  <field name="payment_mode" position="replace">
                  </field>
-                 <field name="bank_journal_id" position="attributes">
-                    <attribute name='attrs'>{}</attribute>
+                 <field name="journal_id" position="after">
+                     <field name="requested_by"/>
+                    <field name="department"/>
+                    <field name="approval_status" readonly="1"/>
+                     <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
+                    <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>
+                 </field>
+                 <field name="state" position="before">
+                        <button name="print_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': [('account_pay_id', '=',False)]}"/>
                 </field>
                  <xpath expr="//button[@name='approve_expenses']" position="attributes">
-                    <attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant</attribute>
+                    <attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>
                 </xpath>
+<!--                 <xpath expr="//button[@name='approve_expenses']" position="attributes">
+                        <attribute name='invisible'>[('approval_by','!=',user_id.id)]</attribute>
+                </xpath>-->
                 <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" position="attributes">
                     <attribute name='groups'>aalmir_custom_expense.restricted_hr_expense_grant</attribute>
 
@@ -42,45 +191,16 @@
                 <field name="product_id" position="before">
                     <field name="expense_type" required="1"/>
                     <field name="uploaded_document_bill" colspan="2" filename="doc_name" 
-                             string="Upload Bills"/>
+                             string="Upload Bills" widget="many2many_binary"/>
                 </field>
                 <field name="description" position="after">
-                    <field name="refuse_reason" placeholder="Rejection Reason if any....."/>
-                </field>
-                <field name="account_move_id" position="after">
-                    <field name="doc_name"  invisible="1"/>
-                    <field name="approval_status" readonly="1"/>
-                    <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
-                    <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>
-                    <field name="communication"/>
-                    <field name="internal_note"/>
-                    <field name="uploaded_document" colspan="2" filename="doc_name" 
-                             string="Upload Document"/>
+                    <field name="refuse_reason" placeholder="Rejection Reason if any....." invisible="1"/>
                 </field>
                 <field name="employee_id" position="after">
-                    <field name="partner_id_preferred" attrs="{'invisible':[('expense_type','=','emp_expense')]}"/>
+                    <field name="partner_id_preferred" domain="[('parent_id','=',False)]" attrs="{'invisible':[('expense_type','=','emp_expense')]}"/>
                 </field>
-                <field name="bank_journal_id" position="replace">
-                </field>
+                
 
-                 <field name="tax_ids" position="after">
-                    <field name="bank_journal_id" string="Payment Method" required="1"/>
-                    <field name="bank_journal" readonly="1" invisible="1"/>
-
-                    <field name="payment_method" string="Type" attrs="{'readonly':[('state','!=','draft')],'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>
-                    <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
-                    <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
-                            <tree editable="top">
-                                    <field name="bank_name" required="1"/>
-                                    <field name="cheque_no" required="1" />
-                                    <field name="cheque_date" required="1"/>
-                                    <field name="branch_name" />
-                                    <field name="amount" required="1" sum="total"/>
-                                    <field name="reconcile_date" attrs="{'required':[('cheque_status','=','cleared')],'readonly':[('cheque_status','!=','cleared')]}"/>
-                                    <field name="cheque_status" invisible="1"/>
-                            </tree>
-                    </field>
-              </field>
 		</field>
 	</record> 
     

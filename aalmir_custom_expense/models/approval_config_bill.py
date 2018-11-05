@@ -8,31 +8,31 @@ from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 import openerp.addons.decimal_precision as dp
 from dateutil.relativedelta import relativedelta
 
-class ApprovalConfig(models.Model):
-    _name = 'approval.config'
+class ApprovalConfigBill(models.Model):
+    _name = 'approval.config.bill'
     
     
     name=fields.Char(string='Approval Name')
-    approval_line = fields.One2many('approval.config.line','approve_id','Approval Lines')
+    approval_line_bill = fields.One2many('approval.config.bill.line','approve_id','Approval Lines')
     
     @api.model
     def create(self, vals):
-        vals['name'] = self.env['ir.sequence'].next_by_code('approval.config')
+        vals['name'] = self.env['ir.sequence'].next_by_code('approval.config.bill')
         print "vls----------------",vals
-        approve_config = super(ApprovalConfig, self).create(vals)
+        approve_config = super(ApprovalConfigBill, self).create(vals)
         return approve_config
 	
 class ApprovalConfigLine(models.Model):
-    _name = 'approval.config.line'
+    _name = 'approval.config.bill.line'
     
-    approve_id = fields.Many2one('approval.config', 'Approve ID')
-    type_product = fields.Many2one('type.product', 'Product Type')
+    approve_id = fields.Many2one('approval.config.bill', 'Approve ID')
+    partner_id = fields.Many2one('res.partner', domain=[('supplier','=',True),('parent_id','=',False)])
     approval_by = fields.Many2one('res.users', 'Approval By')
     approve_amount = fields.Float('Approval Not Req Upto')
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
 
-    _sql_constraints = [('approve_product_type_uniq', 'unique (approve_id,type_product)',     
-                 'Duplicate product type in approval config line not allowed !')]
+    _sql_constraints = [('approve_product_type_uniq', 'unique (approve_id,partner_id)',     
+                 'Duplicate Partner in approval bill config line not allowed !')]
     
     @api.onchange('approval_by')
     def approval_by_onchange(self):

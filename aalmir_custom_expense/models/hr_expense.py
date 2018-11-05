@@ -11,8 +11,12 @@ from dateutil.relativedelta import relativedelta
 class HrExpense(models.Model):
     _inherit = "hr.expense"
     
-    name = fields.Char(string='Expense Description', readonly=True,states={'draft': [('readonly', False)]})
-
+    name = fields.Char(string='Expense Description', readonly=True)
+    account_pay_id = fields.Many2one('account.move', string='Payment Journal Entry', copy=False, track_visibility="onchange")
+    payment_id = fields.Many2one('account.payment', string='Payment', copy=False, track_visibility="onchange")
+    type_product = fields.Many2one('type.product', 'Product Type',related='product_id.type_product',store=True)
+    product_expense_account = fields.Many2one('account.account', 'Product Expense Account',related='product_id.property_account_expense_id',store=True)
+    journal_id = fields.Many2one('account.journal', string='Expense Journal', states={'done': [('readonly', True)], 'post': [('readonly', True)]}, default=lambda self: self.env['account.journal'].search([('type', '=', 'purchase'),('company_id','=',self.env.user.company_id.id)], limit=1), help="The journal used when the expense is done.")
 
     employee_id = fields.Many2one('hr.employee', string="Employee")
 #    check_bank = fields.Boolean(string="Bank Journal")
@@ -23,30 +27,82 @@ class HrExpense(models.Model):
     partner_id_preferred = fields.Many2one('res.partner', 'Partner')
     expense_type = fields.Selection([("emp_expense", "Employee Expense"), ("other_expense", "Other Expense")], string="Expense Type")
     approval_status = fields.Selection([("app_required", "Approval Required"), ("app_not_required", "No Approval")],default='app_not_required', string="Approval Status")
+#    bank_cash = fields.Selection([("bank", "Bank"), ("cash", "Cash")],default='cash', string="Journal Type?",copy=False)
+    bank_journal_id_expense = fields.Many2one('account.journal', string='Bank Journal', states={'done': [('readonly', True)]}, default=lambda self: self.env['account.journal'].search([('type', 'in', ['cash', 'bank']),('company_id','=',self.env.user.company_id.id)], limit=1), help="The payment method used when the expense is paid by the company.")
 
     internal_note=fields.Text('Remarks on Receipt')
     communication = fields.Char(string='Internal Note')
-    bank_journal = fields.Boolean(string='Bank Type?')
+    is_bank_journal = fields.Boolean(string='Bank Type?')
+    pay_date = fields.Date(readonly=True, string="Paid Date")
+
 
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
-    uploaded_document_bill = fields.Binary(string='Uploaded Bills', default=False , attachment=True)
+    uploaded_document_bill = fields.Many2many('ir.attachment','bill_attachment_expense_rel','bill','exp_id','Upload Bills')
+
+
     doc_name=fields.Char()
     payment_method = fields.Selection([('neft', 'Fund Transfer'),
-				    ('cheque', 'Cheque')],string='Type')
+				    ('cheque', 'Cheque')],string='Type',copy=False)
 				    
-    cheque_details = fields.One2many('bank.cheque.details','payment_id','Cheque Details')
-    approval_by = fields.Many2one('res.users', 'Approval By')
-    approved_by = fields.Many2one('res.users', 'Approved By')
+    cheque_details = fields.One2many('bank.cheque.details.expense','expense_id','Cheque Details')
+    approval_by = fields.Many2one('res.users', 'Approval Req. By',copy=False)
+    approved_by = fields.Many2one('res.users', 'Approved By',copy=False)
+    requested_by = fields.Many2one('hr.employee', 'Requested By',copy=False)
     user_id = fields.Many2one('res.users', 'User')
+    department = fields.Many2one('hr.department', 'Department',related='requested_by.department_id',store=True)
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
-    @api.onchange('bank_journal_id')
+    
+    @api.model
+    def default_get(self, fields):
+        res = super(HrExpense,self).default_get(fields)
+        print "fieldsfieldsfields",fields
+        res.update({'bank_journal_id_expense':False,'is_bank_journal':False})
+        return res
+    
+    
+    @api.multi
+    def print_payment_receipt(self):
+        return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account')
+        return False
+    
+    @api.onchange('bank_journal_id_expense')
     def journal_onchange(self):
-        print "bank_journal_idbank_journal_id",self.bank_journal_id
-    	if self.bank_journal_id.type == 'bank':
+        print "bank_journal_id_expensebank_journal_id_expense",self.bank_journal_id_expense
+    	if self.bank_journal_id_expense.type == 'bank' and self.state!='draft':
+            self.is_bank_journal=True
+
+        if self.bank_journal_id_expense.type =='cash' and self.state!='draft':
+            self.is_bank_journal=False
+            print "is it bank journal-----------------",self.is_bank_journal
+
+#    @api.onchange('bank_cash')
+#    def bank_cash_onchange(self):
+#        print "bank_cash=======",self.bank_cash
+#    	if self.bank_cash and self.bank_cash == 'bank':
+#            self.is_bank_journal=True
+#            self.bank_journal_id=False
+#            return {'domain': {'bank_journal_id_expense': [('type', '=', 'bank'),('company_id', '=', self.company_id.id)]}}
+#        elif self.bank_cash and self.bank_cash == 'cash':
+#            self.is_bank_journal=False
+#            return {'domain': {'bank_journal_id_expense': [('type', '=', 'cash'),('company_id', '=', self.company_id.id)]}}
+        
+    
+    @api.onchange('requested_by')
+    def requested_by_onchange(self):
+        print "requeste by---------------------d",self.requested_by
+    	if self.requested_by:
             self.bank_journal=True
-        else:
-            self.bank_journal=False
-        return {'domain': {'bank_journal_id': [('company_id', '=', self.company_id.id)]}}
+            
+    @api.onchange('company_id')
+    def company_onchange(self):
+        print "copmany id now",self.company_id
+    	if self.company_id:
+            journal_search=self.env['account.journal'].search([('type', '=', 'purchase'),('company_id','=',self.company_id.id)], limit=1)
+            print "journal_searchjournal_search",journal_search
+            if journal_search:
+                self.journal_id=journal_search.id
+            return {'domain': {'bank_journal_id_expense': [('company_id', '=', self.company_id.id),('type', 'in', ['bank','cash'])]}}
+
 
     @api.model
     def create(self, vals):
@@ -60,21 +116,27 @@ class HrExpense(models.Model):
     def submit_expenses(self):
         if any(expense.state != 'draft' for expense in self):
             raise UserError(_("You can only submit draft expenses!"))
+        if self.total_amount==0.0:
+            raise UserError(_("Expense Amount Cannot be zero!"))
+        self.write({'user_id':self._uid})
         if self.expense_type=='other_expense':
             self.write({'employee_id':False})
-            if self.partner_id_preferred:
-                non_approval=self.env['approval.config.line'].search([('partner_id','=',self.partner_id_preferred.id)])
-                if non_approval:
-                    limit_amt=non_approval.approve_amount
-                    if self.total_amount>limit_amt:
-                        self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
-                    else:
-                        self.write({'state': 'approve'})
-                else:
-                    self.write({'state': 'submit','approval_status':'app_not_required'})
+        if self.expense_type=='employee_expene':
+            self.write({'partner_id_preferred':False})
+        self.write({'bank_journal_id_expense':False})
+        non_approval=self.env['approval.config.line'].search([('type_product','=',self.type_product.id)])
+        print "non_approvalnon_approvalnon_approval",non_approval
+        if non_approval:
+            if non_approval.currency_id.id!=self.currency_id.id:
+                from_currency = non_approval.currency_id
+                to_currency = self.currency_id
+                limit_amt = from_currency.compute(non_approval.approve_amount, to_currency, round=False)
             else:
-                self.write({'state': 'submit','approval_status':'app_not_required'})
-    
+                limit_amt=non_approval.approve_amount
+            if self.total_amount>limit_amt:
+                self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+            else:
+                self.write({'state': 'approve'})
         else:
             self.write({'state': 'submit','approval_status':'app_not_required'})
         return True
@@ -83,7 +145,7 @@ class HrExpense(models.Model):
     def refuse_expenses(self, reason):
         result = super(HrExpense, self).refuse_expenses(reason)
 
-        self.write({'refuse_reason': reason})
+        self.write({'refuse_reason': reason,'approved_by':False,'approval_by':False})
         return result
     
     def _prepare_move_line(self, line):
@@ -120,6 +182,9 @@ class HrExpense(models.Model):
         '''
         main function that is called when trying to create the accounting entries related to an expense
         '''
+        if not self.bank_journal_id_expense:
+            raise UserError(_("Please select Bank Journal for Processiong Payment"))
+
         if any(expense.state != 'approve' for expense in self):
             raise UserError(_("You can only generate accounting entry for approved expense(s)."))
 
@@ -134,7 +199,7 @@ class HrExpense(models.Model):
         for expense in self:
             if expense.date > maxdate:
                 maxdate = expense.date
-            jrn = expense.bank_journal_id if expense.payment_mode == 'company_account' else expense.journal_id
+            jrn = expense.bank_journal_id_expense if expense.payment_mode == 'company_account' else expense.journal_id
             journal_dict.setdefault(jrn, [])
             journal_dict[jrn].append(expense)
 
@@ -155,12 +220,13 @@ class HrExpense(models.Model):
                 total, total_currency, move_lines = expense._compute_expense_totals(company_currency, move_lines, maxdate)
                     
                 if expense.payment_mode == 'company_account':
-                    if not expense.bank_journal_id.default_credit_account_id:
-                        raise UserError(_("No credit account found for the %s journal, please configure one.") % (expense.bank_journal_id.name))
-                    emp_account = expense.bank_journal_id.default_credit_account_id.id
+                    if not expense.bank_journal_id_expense.default_credit_account_id:
+                        raise UserError(_("No credit account found for the %s journal, please configure one.") % (expense.bank_journal_id_expense.name))
+                    emp_account = expense.bank_journal_id_expense.default_credit_account_id.id
+
                 else:
                     move_line_data={}
-                    if not expense.employee_id.address_home_id and expense.expense_type=='employee_expense':
+                    if expense.expense_type=='employee_expense' and not expense.employee_id.address_home_id:
                         raise UserError(_("No Home Address found for the employee %s, please configure one.") % (expense.employee_id.name))
                     if expense.employee_id:
                         print expense.employee_id.address_home_id
@@ -195,6 +261,63 @@ class HrExpense(models.Model):
                 if expense.payment_mode == 'company_account':
                     expense.paid_expenses()
             move.post()
+        print "expenkdskjdsnhkjfhdskjfjkednf",expense.uploaded_document
+        pay_dict={'payment_type': 'outbound',
+        'payment_method_id': self.env.ref('account.account_payment_method_manual_out').id,
+        'payment_method': self.payment_method,
+        'partner_type': 'supplier',
+        'amount': expense.total_amount,
+        'expense_pay':True,
+        'expense_id':expense.id,
+        'currency_id': expense.currency_id.id,
+        'payment_date': date.today(),
+        'journal_id': expense.bank_journal_id_expense.id,
+        'communication': expense.communication,
+        'internal_note': expense.internal_note,
+        }
+        
+        if self.expense_type=='other_expense':
+            if self.partner_id_preferred:
+                pay_dict.update({ 'partner_id': self.partner_id_preferred.id})
+            else:
+                pay_dict.update({ 'partner_id': self.env.user.partner_id.id})
+            
+        else:
+            pay_dict.update({ 'partner_id': self.employee_id.address_home_id.id})
+
+                   
+
+        payment = self.env['account.payment'].create(pay_dict)
+        print "paymentpaymentpayment",payment,emp_account
+        print "jhdgijedhjewd",payment.journal_id
+        payment.post()
+        if self.cheque_details:
+            vals=[]
+            for each in self.cheque_details:
+                vals.append((0,0,{
+					'partner_id':each.partner_id, 
+					'journal_id':each.journal_id,
+					'bank_name':each.bank_name.id,
+					'communication': each.communication,
+					'cheque_no': each.cheque_no,
+					'branch_name': each.branch_name,
+					'amount': each.amount,
+					'reconcile_date': each.reconcile_date,
+#					'register_payment_id': each.register_payment_id,
+#					'payment_id':payment.id,
+					'reconcile_date': each.reconcile_date,
+					'cheque_status':each.expense_id.cheque_status
+                                        }))
+            print "valspppppppppppppppppppppppppppppppp",vals
+            payment.write({'cheque_details':vals})
+        if self.uploaded_document:
+            payment.write({'uploaded_document': self.uploaded_document})
+
+        move_line_id=self.env['account.move.line'].search([('payment_id','=',payment.id)])
+        move_pay=move_line_id[0].move_id
+        expense.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
+        expense.paid_expenses()
+
         return True
     
     @api.multi
@@ -212,4 +335,26 @@ class HrExpense(models.Model):
                 self.partner_id_preferred = self.product_id.product_tmpl_id.partner_id_preferred.id
             print "uom-----------------",self.product_id.product_tmpl_id.uom_id.id
             self.product_uom_id= self.product_id.uom_id.id
+            self.type_product= self.product_id.type_product
         return result
+    
+    
+class BankChequeDetailsExpense(models.Model):
+    '''to store cheque details against bank'''
+    _name = "bank.cheque.details.expense"
+    
+    expense_id = fields.Many2one('hr.expense','Payment Name')
+    journal_id = fields.Many2one('account.journal',related="expense_id.bank_journal_id_expense",string='Journal')
+    partner_id = fields.Many2one('res.partner',related="expense_id.partner_id_preferred",string='Supplier/Customer')
+    bank_name = fields.Many2one('cheque.bank.name','Bank Name')
+    communication = fields.Char(related="expense_id.communication",string='Internal Note')
+    #bank_id = fields.Many2one('res.partner.bank', 'Bank Name')
+    cheque_no = fields.Char('Cheque No.')
+    cheque_date = fields.Date('Cheque Date')
+    branch_name = fields.Char('Bank Branch Name')
+    amount = fields.Float('Amount')
+    reconcile_date = fields.Date('Reconcile Date')
+    register_payment_id=fields.Many2one('account.register.payments')
+    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status')
+    
+    		   			   			

@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <form string="Approval Config"> 
                     <group>
-                        <field name="name"/>
+                        <field name="name" required="1"/>
                     </group>
 
                     <sheet>
@@ -17,8 +17,9 @@
                                 <field name="approval_line">
 
                                     <tree editable="top">
-                                        <field name="partner_id" required="1"/>
+                                        <field name="type_product" required="1"/>
                                         <field name="approve_amount" required="1" />
+                                        <field name="currency_id" required="1" />
                                         <field name="approval_by" required="1"/>
                                     </tree>
                                 </field>
@@ -54,8 +55,65 @@
                 </p>
             </field>
         </record>
+        <record id="view_approval_config_bill_form" model="ir.ui.view">
+            <field name="name">view.approval.config.bill.form</field>
+            <field name="model">approval.config.bill</field>
+            <field name="arch" type="xml">
+                <form string="Approval Bill Config"> 
+                    <group>
+                        <field name="name" required="1"/>
+                    </group>
+
+                    <sheet>
+                        <notebook>
+                            <page string="Bill Approval Lines">
+                                <field name="approval_line_bill">
+
+                                    <tree editable="top">
+                                        <field name="partner_id" required="1"/>
+                                        <field name="approve_amount" required="1" />
+                                        <field name="currency_id" required="1" />
+
+                                        <field name="approval_by" required="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="approval_config_bill_my_tree" model="ir.ui.view">
+            <field name="name">approve.config.bill.tree</field>
+            <field name="model">approval.config.bill</field>
+            <field name="arch" type="xml">
+                <tree string="Bill Config">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="approval_config_bill_tree_action" model="ir.actions.act_window.view">
+            <field name="sequence" eval="0"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="approval_config_bill_my_tree"/>
+        </record>
+        
+        <record id="action_approval_config_bill" model="ir.actions.act_window">
+            <field name="name">Bill Configuration</field>
+            <field name="res_model">approval.config.bill</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new approval config
+                </p>
+            </field>
+        </record>
         <!--Inherit Expenses  to add new menuitem  -->
-        <menuitem id="menu_approval_config" name="Approval Configuration" parent="hr_expense.menu_hr_expense_configuration" 
+        <menuitem id="menu_approval_config" name="Expense Configuration" parent="hr_expense.menu_hr_expense_configuration" 
                   action="action_approval_config"/>
+        <menuitem id="menu_approval_config_bill" name="Bill Configuration" parent="hr_expense.menu_hr_expense_configuration" 
+                  action="action_approval_config_bill"/>
     </data>
 </openerp>

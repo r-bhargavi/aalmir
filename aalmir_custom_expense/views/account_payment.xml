@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--  Produce -->
+       <record id="view_account_payment_form_inherit_expense" model="ir.ui.view">
+		<field name="name">account.payment.form.expense</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_form"></field>
+		<field name="arch" type="xml">
+			 <field name="communication" position="after">
+                              <field name="expense_pay"  readonly="1" invisible="1"/>
+                              <field name="expense_id"  readonly="1" attrs="{'invisible':[('expense_pay','=',False)]}"/>
+		         </field>
+                </field>
+	</record>
+
+    </data>
+</openerp>
+

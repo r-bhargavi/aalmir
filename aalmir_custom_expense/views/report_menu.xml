@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+         <report 
+            id="report_payment_account_new_expense"
+            string="Expense Receipt"
+            model="hr.expense" 
+            report_type="qweb-pdf"
+            file="aalmir_custom_expense.report_payment_account" 
+            name="aalmir_custom_expense.report_payment_account" 
+        />
+    </data>
+</openerp>
