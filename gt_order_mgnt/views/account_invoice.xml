@@ -55,16 +55,31 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_open']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="states">''</attribute>
+                    <attribute name="attrs">{'invisible':['|',('check_total','=',True),('state','!=','draft')]}</attribute>
+		 </xpath>
               
-                 <button name="invoice_cancel" states="draft,proforma2"  position="before">
-                  <button name="aalmir_invoice_print" string="Download" type="object" states="paid,open" class="oe_highlight" context="{'out_invoice':True}" />
+                 <button name="invoice_open"  position="after">
+                <button name="aalmir_invoice_print" string="Download" type="object" states="draft,open" class="oe_highlight" context="{'out_invoice':True}" />
+                
+                  <button name="send_mail_for_approval"  
+                  attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['draft','rejected'])]}"
+                          string="Send For Approval" type="object" class="oe_highlight" groups="base.group_user"/>
+                  <button name="send_approval_reminder" attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['waiting_approval'])]}" string="Approval Reminder" type="object" class="oe_highlight" groups="base.group_user"/>
+                  <button name="approve_bill" attrs="{'invisible':['|',('check_total','!=',True)]}" string="Approve" type="object" states="waiting_approval" class="oe_highlight" groups="gt_order_mgnt.restricted_bill_approve_grant"/>
+                    <button name="%(gt_order_mgnt.bill_refuse_wizard_action)d" attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['waiting_approval'])]}" string="Refuse" type="action" icon="fa-times" groups="gt_order_mgnt.restricted_bill_approve_grant"/>
+
                   <button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
                  </button>
-                <button name="%(account.action_account_invoice_payment)d"  states="open" position='replace'>
-                   <button name="%(account.action_account_invoice_payment)d" type="action" 
-                        string="Register Payment" groups="account.group_account_user"
-                        class="oe_highlight" attrs="{'invisible':['|',('state','!=','open'),('send_bill_bool','=',False)]}"/>
-                 </button>
+
+                 
+<!--                <button name="invoice_open"  states="draft" position='replace'>
+                   <button name="invoice_open" string="Validate" class="oe_highlight" groups="base.group_user"
+                       invisible="1"/>
+                 </button>-->
+                 
                   <xpath expr="//sheet/group[1]" position="before">
 			<div  class="oe_button_box"  name='button_box'>
                             <button name="open_delivery_history" string="Delivery" type="object" class="oe_stat_button"
@@ -85,9 +100,9 @@
 		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
                                      options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
 			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
-                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
+<!--                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
 			Select Payment Approved By for Payment
-		  	</h4>
+		  	</h4>-->
 			</div>
                        
 		 </xpath>
@@ -137,9 +152,9 @@
                      <label for='approved_by'/>
                      <div>
 		         <field name="approved_by"  options="{'no_create': True, 'no_open': True}" class='oe_inline'
-                            nolabel='1' attrs="{'readonly':[('send_bill_bool','=',True)]}"/>
-                         <button type='object' name='send_bill' class='oe_highlight' icon='fa-envelope'
-                            attrs="{'invisible':['|',('send_bill_bool','=',True),('approved_by','=',False)]}"/>
+                            nolabel='1' readonly="1"/>
+<!--                         <button type='object' name='send_bill' class='oe_highlight' icon='fa-envelope'
+                            attrs="{'invisible':['|',('send_bill_bool','=',True),('approved_by','=',False)]}"/>-->
                      </div>
 	    	 </field> 
  

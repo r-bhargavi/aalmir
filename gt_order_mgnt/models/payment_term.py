@@ -508,73 +508,74 @@ class accountPayment(models.Model):
                 template_ids.write({'body_html':body})
                 values = template_ids.generate_email(self.sale_id.id)
         else:
-		bill,internal=False,False
-		if self.partner_type=='supplier':
-			bill = True
-		elif self.partner_type == False:
-			internal =True
+            if not self.expense_id:
+                    bill,internal=False,False
+                    if self.partner_type=='supplier':
+                            bill = True
+                    elif self.partner_type == False:
+                            internal =True
 
-                subject='API-ERP Invoice Payment Alert:'
-		group = self.env['res.groups'].sudo().search([('name', '=', 'Register Payment Email')])
-		if bill:
-			subject='API-ERP Bill Payment Alert:'
-                	group = self.env['res.groups'].sudo().search([('name', '=', 'Bill Payment Email')])
-		if internal:
-			subject='API-ERP Internal Payment Alert:'
-		for recipient in group.users:
-		    if self.env.user.company_id.id in recipient.company_ids._ids:
-                    	if recipient.login not in recipient_partners:
-    				recipient_partners.append(str(recipient.login))
-    					
-		body = '<b><h3>{}</h3> '.format(self.env.user.company_id.name)
-		body +='Payment Received : </b>' if self.partner_type =='customer' else '<b>Payment Paid :</b>'
-		if self.partner_id:
-                	body +='<li> Customer  Name: ' +(self.partner_id.name) +'</li>'  if self.partner_type =='customer' else '<li> Vendor  Name: ' +(self.partner_id.name) +'</li>'
-		if bill or internal:
-                	body +='<li> Payment Voucher No.: '+str(self.name) +'</li>'
-		else:
-                	body +='<li> Payment Receipt No.: '+str(self.name) +'</li>'
-                body +='<li> Payment Method: '+str(self.journal_id.name) +'</li>'
-                if self.payment_method:
-                   body +='<li> Received Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'  if self.partner_type =='customer' else '<li> Paid Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'
-                if self.cheque_status:
-                   body +='<li> Cheque Status: '+str(dict(self.fields_get(allfields=['cheque_status'])['cheque_status']['selection'])[self.cheque_status])+'</li>'
+                    subject='API-ERP Invoice Payment Alert:'
+                    group = self.env['res.groups'].sudo().search([('name', '=', 'Register Payment Email')])
+                    if bill:
+                            subject='API-ERP Bill Payment Alert:'
+                            group = self.env['res.groups'].sudo().search([('name', '=', 'Bill Payment Email')])
+                    if internal:
+                            subject='API-ERP Internal Payment Alert:'
+                    for recipient in group.users:
+                        if self.env.user.company_id.id in recipient.company_ids._ids:
+                            if recipient.login not in recipient_partners:
+                                    recipient_partners.append(str(recipient.login))
 
-		body +='<li> Received Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>' if self.partner_type =='customer' else '<li> Paid Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>'
-                body +='<li> Payment Date: '+str(self.payment_date)+'</li>'
-		body +='<li> Registered On: '+str(date.today())+'</li>'
-                type_p=''
+                    body = '<b><h3>{}</h3> '.format(self.env.user.company_id.name)
+                    body +='Payment Received : </b>' if self.partner_type =='customer' else '<b>Payment Paid :</b>'
+                    if self.partner_id:
+                            body +='<li> Customer  Name: ' +(self.partner_id.name) +'</li>'  if self.partner_type =='customer' else '<li> Vendor  Name: ' +(self.partner_id.name) +'</li>'
+                    if bill or internal:
+                            body +='<li> Payment Voucher No.: '+str(self.name) +'</li>'
+                    else:
+                            body +='<li> Payment Receipt No.: '+str(self.name) +'</li>'
+                    body +='<li> Payment Method: '+str(self.journal_id.name) +'</li>'
+                    if self.payment_method:
+                       body +='<li> Received Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'  if self.partner_type =='customer' else '<li> Paid Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'
+                    if self.cheque_status:
+                       body +='<li> Cheque Status: '+str(dict(self.fields_get(allfields=['cheque_status'])['cheque_status']['selection'])[self.cheque_status])+'</li>'
 
-                if self.communication:
-                   body +='<li> Remarks: '+  str(self.communication)+'</li>'
-                   if self.partner_type =='customer':
-                      type_p='  Payment Received for Invoice of  '
-                      body +='<br></br>' 
-                      if self.invoice_ids:
-                   
-                         body +="<table class='table table-bordered' style='border: 1px solid #9999;width:80%; height: 50%;font-family:arial; text-align:center;'><tr><th>Invoice Number </th><th> Sale order</th><th>Total Amount</th><th>Due Amount </th><th>Status</th></tr>"
+                    body +='<li> Received Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>' if self.partner_type =='customer' else '<li> Paid Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>'
+                    body +='<li> Payment Date: '+str(self.payment_date)+'</li>'
+                    body +='<li> Registered On: '+str(date.today())+'</li>'
+                    type_p=''
 
-                   if self.partner_type =='supplier':  
-                      type_p='  Bill Paid for   ' 
-                      if self.invoice_ids: 
-                         body +="<table class='table table-bordered' style='border: 1px solid #9999;width:80%; height: 50%;font-family:arial; text-align:center;'><tr><th>Bill Number </th><th> Purchase order</th><th>Total Amount</th><th>Due Amount </th><th>Status </th></tr>"
+                    if self.communication:
+                       body +='<li> Remarks: '+  str(self.communication)+'</li>'
+                       if self.partner_type =='customer':
+                          type_p='  Payment Received for Invoice of  '
+                          body +='<br></br>' 
+                          if self.invoice_ids:
 
-                if self.invoice_ids:
-                   for invoice in self.invoice_ids: 
-                       if invoice.sale_id:
-				recipient_partners.append(str(invoice.sale_id.user_id.login))
-                       body +="<tr><td>%s</td><td>%s</td><td>%s %s</td><td>%s %s </td><td>%s</td></tr>"%(invoice.number, invoice.origin ,invoice.amount_total, invoice.currency_id.symbol, invoice.residual, invoice.currency_id.symbol, invoice.state) 
-                       invoice.message_post(body=body)
+                             body +="<table class='table table-bordered' style='border: 1px solid #9999;width:80%; height: 50%;font-family:arial; text-align:center;'><tr><th>Invoice Number </th><th> Sale order</th><th>Total Amount</th><th>Due Amount </th><th>Status</th></tr>"
 
-                   if self.payment_from != 'multi':
-                      self.payment_from='invoice' 
-                   subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+ str(self.partner_id.name)
-                if not self.invoice_ids:
-                   subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+' against for '  +  str(self.partner_id.name)
-                template_ids = self.env.ref('gt_order_mgnt.email_template_for_register_payment_received1')
-                template_ids.write({'body_html':body, 'lang':self.partner_id.lang,'subject':subject})
-                values = template_ids.generate_email(self.id)
-	print "llllllllllllllllllllllllllllll",recipient_partners
+                       if self.partner_type =='supplier':  
+                          type_p='  Bill Paid for   ' 
+                          if self.invoice_ids: 
+                             body +="<table class='table table-bordered' style='border: 1px solid #9999;width:80%; height: 50%;font-family:arial; text-align:center;'><tr><th>Bill Number </th><th> Purchase order</th><th>Total Amount</th><th>Due Amount </th><th>Status </th></tr>"
+
+                    if self.invoice_ids:
+                       for invoice in self.invoice_ids: 
+                           if invoice.sale_id:
+                                    recipient_partners.append(str(invoice.sale_id.user_id.login))
+                           body +="<tr><td>%s</td><td>%s</td><td>%s %s</td><td>%s %s </td><td>%s</td></tr>"%(invoice.number, invoice.origin ,invoice.amount_total, invoice.currency_id.symbol, invoice.residual, invoice.currency_id.symbol, invoice.state) 
+                           invoice.message_post(body=body)
+
+                       if self.payment_from != 'multi':
+                          self.payment_from='invoice' 
+                       subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+ str(self.partner_id.name)
+                    if not self.invoice_ids:
+                       subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+' against for '  +  str(self.partner_id.name)
+                    template_ids = self.env.ref('gt_order_mgnt.email_template_for_register_payment_received1')
+                    template_ids.write({'body_html':body, 'lang':self.partner_id.lang,'subject':subject})
+                    values = template_ids.generate_email(self.id)
+            print "llllllllllllllllllllllllllllll",recipient_partners
         if template_ids and recipient_partners:
 	   if self.env.user.login in recipient_partners:
 		recipient_partners.remove(self.env.user.login)

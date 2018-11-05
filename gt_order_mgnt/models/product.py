@@ -104,9 +104,10 @@ class productProduct(models.Model):
               args.extend([('id','in',prod)])
         return super(productProduct,self).name_search(cr, uid, name, args, operator=operator, context=context, limit=limit)
 
-# Inherite to update state in calculation
+### Inherite to update state in calculation
     @api.multi
     def _purchase_count(self):
+        print "psdjfhsdfhbhj====================="
         domain = [
             ('state', 'in', ['purchase', 'done','sent po']),
             ('product_id', 'in', self.mapped('id')),
@@ -116,8 +117,9 @@ class productProduct(models.Model):
             r[group['product_id'][0]] = group['quantity']
         for product in self:
             product.purchase_count = r.get(product.id, 0)
+        print "product.purchase_count",product.purchase_count
         return True
-        
+#        
     @api.onchange('initial_weight')
     def onchange_weight(self):
     	if self.initial_weight:
@@ -152,8 +154,22 @@ class productProduct(models.Model):
     
     @api.multi
     def action_view_po(self):
-    	return self.product_tmpl_id.action_view_po()
-    	
+        print "all to actionskjfdkgnjidfungijerngiergn"
+    	self.ensure_one()
+        po_id_tree = self.env.ref('purchase.purchase_order_line_tree', False)
+        print "po_id_treepo_id_tree",po_id_tree
+        if po_id_tree:
+            return {
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'tree',
+                    'res_model': 'purchase.order.line',
+                    'views': [(po_id_tree.id, 'tree')],
+                    'view_id': po_id_tree.id,
+                    'target': 'current',
+                    'domain': [('product_id', '=', self.id)],
+            }
+#    	
     @api.multi
     def open_production_request(self):
         for line in self:
@@ -683,6 +699,7 @@ class productTemplate(models.Model):
     
     @api.multi
     def action_view_po(self):
+        print "all to actionskjfdkgnjidfungijerngiergn"
     	self.ensure_one()
         po_id_tree = self.env.ref('purchase.purchase_order_line_tree', False)
         if po_id_tree:

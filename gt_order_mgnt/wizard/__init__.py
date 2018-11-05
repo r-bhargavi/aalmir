@@ -11,3 +11,4 @@ import mail_compose
 import sale_order_lpo
 import sale_support_wizard
 import stock_return_picking
+import reject_bill_reason

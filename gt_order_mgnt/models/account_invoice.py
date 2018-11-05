@@ -157,6 +157,23 @@ class AccountInvoice(models.Model):
                body +='<li>Cancelled By:'+str(self.env.user.name)  +'</li>'
                body +="<li>Date:" +str(date.today()) +"</li>"
                record.message_post(body=body)'''
+               
+    state = fields.Selection([
+            ('draft','Draft'),
+            ('waiting_approval','Awaiting'),
+            ('rejected','Rejected'),
+            ('proforma', 'Pro-forma'),
+            ('proforma2', 'Pro-forma'),
+            ('open', 'Open'),
+            ('paid', 'Paid'),
+            ('cancel', 'Cancelled'),
+        ], string='Status', index=True, readonly=True, default='draft',
+        track_visibility='onchange', copy=False,
+        help=" * The 'Draft' status is used when a user is encoding a new and unconfirmed Invoice.\n"
+             " * The 'Pro-forma' status is used the invoice does not have an invoice number.\n"
+             " * The 'Open' status is used when user create invoice, an invoice number is generated. Its in open status till user does not pay invoice.\n"
+             " * The 'Paid' status is set automatically when the invoice is paid. Its related journal entries may or may not be reconciled.\n"
+             " * The 'Cancelled' status is used when user cancel invoice.")
 
     delivery_date=fields.Datetime( string='Delivery Date', compute='payment_invoice_date')
     payment_date_inv =fields.Date('Invoice Due Date', compute='payment_invoice_date')
@@ -178,6 +195,24 @@ class AccountInvoice(models.Model):
     check_vat=fields.Boolean('Print VAT')
     partner_vat=fields.Char('VAT',related='partner_id.vat')
     tax_documents=fields.Many2many('ir.attachment','customer_tax_documents_rel','invoice_id','doc_id','Upload Documents')
+    
+    @api.multi
+    def approve_bill(self):
+        self.signal_workflow('invoice_open')
+        self.write({'approved_by':self._uid})
+        return True
+
+    @api.multi
+    def send_mail_for_approval(self):
+      for record in self:
+          group = self.env['res.groups'].search([('name', '=', 'Approve Bills')])
+          record.send_bill(group,check='send_for_approval')
+          
+    @api.multi
+    def send_approval_reminder(self):
+      for record in self:
+          group = self.env['res.groups'].search([('name', '=', 'Approve Bills')])
+          record.send_bill(group,check='send_approval_reminder')
     
     @api.multi
     def user_name(self):
@@ -285,6 +320,7 @@ class AccountInvoice(models.Model):
     payable_amount=fields.Float('Payable Amount')
     payable_discount=fields.Char()
     ##add new fields For report 
+    refuse_reason = fields.Char(string='Refuse Reason',track_visibility='always' )
 
     manufactured_by=fields.Char('Manufactured By', default='Aal Mir Plastic Industries ,PO Box 4537, Sharjah, UAE.')
     origin_id=fields.Many2one('res.country', string='Origin of Goods',default=lambda self: self.env['res.country'].search([('code', '=','AE')]))
@@ -347,11 +383,22 @@ class AccountInvoice(models.Model):
                record.all_invoice_due_amount=total
 
     @api.multi 
-    def send_bill(self):
+    def send_bill(self,group,check):
+        if group:
+            user_ids = self.env['res.users'].sudo().search([('groups_id', 'in', [group.id])])
+            email_to = ''.join([user.partner_id.email + ',' for user in user_ids])
+            email_to = email_to[:-1]
+        else:
+            email_to=record.approved_by.login
         for record in self:
-            temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor123')
+            if check=='send_for_approval':
+                temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_send_approval')
+            elif check=='send_approval_reminder':
+                  temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_send_approval_reminder')
+            else:
+                temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor123')
             if temp_id:
-	       base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+               base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 	       query = {'db': self._cr.dbname}
 	       fragment = {
 			 'model': 'account.invoice',
@@ -360,7 +407,13 @@ class AccountInvoice(models.Model):
 			}
 	       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                text_link = _("""<a href="%s">%s</a> """) % (url,record.number)
-	       body ='This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. ' 
+               if check=='send_for_approval':
+                    body ='You have been requested for approval on the release of payment for the attached bill. ' 
+               elif check=='send_approval_reminder':
+                    body ='This is reminder for approval on release of payment for the attached bill. ' 
+               else:
+                    body ='This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. ' 
+
                body +='<b>The bill details are as below.</b>'
                body +='<li> <b>Vendor Name :</b> '+str(record.partner_id.name) +'</li>'
                body +='<li> <b>Vendor Invoice No. :</b>'+str(record.reference) +'</li>'
@@ -370,8 +423,8 @@ class AccountInvoice(models.Model):
                body +='<li> <b>Bill Due date :</b>'+str(record.date_due) +'</li>'
                body +='<li> <b>Payment Term :</b> '+str(record.payment_term_id.name) +'</li>'
                body +='<li> <b>Total Bill Amount :</b>'+str(record.amount_total) +str(record.currency_id.symbol)+'</li>'
-	       body += '</b>Note:</b> No action is required by your side unless you want to stop the release of bill payment, once payment is done, you will be informed.'
-	       temp_id.write({'body_html': body, 'email_to':record.approved_by.login,
+	       body += '</b>Note:</b>After your approval, once payment is done, you will be informed.'
+	       temp_id.write({'body_html': body, 'email_to':email_to,
                               'email_from':self.env.user.login})
                values = temp_id.generate_email(record.id)
                mail_mail_obj = self.env['mail.mail']
@@ -406,6 +459,7 @@ class AccountInvoice(models.Model):
 		      values['attachment_ids'] =[(4, attachment_ids)]
 		      msg_id.write({'attachment_ids':[(4, attachment_ids)]}) 
                record.send_bill_bool=True
+               record.state='waiting_approval'
                msg_id.send()	       
 
     @api.multi
