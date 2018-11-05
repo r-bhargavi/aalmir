@@ -12,6 +12,19 @@
             		</button>
 		</field>
 	</record> 
+        
+    <record id="product_form_view_inherite" model="ir.ui.view">
+            <field name="name">Product Product Inherite inventory</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view" />
+            <field name="arch" type="xml">
+                 <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_view_po" icon="fa-object-group" groups="stock.group_stock_user">
+                    	<field name="purchase_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </field>
+    </record>
     <record id="product_template_location_form_view_inherite" model="ir.ui.view">
             <field name="name">Product Template Inherite inventory</field>
             <field name="model">product.template</field>
@@ -26,6 +39,9 @@
                     </button>
                     <button class="oe_stat_button" type="object" name="open_child_batches" icon="fa-database" >
                     	<field name="batches_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" type="object" context="{'group_by':'state'}" name="open_expenses" icon="fa-database" >
+                    	<field name="expenses_count" widget="statinfo"/>
                     </button>
                 </div>
             </field>

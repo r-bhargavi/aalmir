@@ -488,6 +488,7 @@ class storePikcingList(models.Model):
     			view += '<td style="background-color:black;width:14%;font-size:100%;text-align:center"> <font color="white"><b>  Out of Use </font> </b></td>'
 			view += '</tr></table><p> <p>'
 		    else:
+                        print "self._contextself._contextself._context",self._context
 		    	if self._context.get('picking_view'):
 		    		raise ValidationError("Quantity of product '{}' is not found in any location of '{}'  warehouse ".format(res.product_id.name,res.picking_id.picking_type_id.warehouse_id.name))
 		

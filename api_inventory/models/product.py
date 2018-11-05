@@ -39,6 +39,7 @@ class productTemplate(models.Model):
 			
 	master_btch_count = fields.Char('Master Batches',compute='_get_batches_data')
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
+	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
 	bin_location_count = fields.Integer('#Bin Location',compute='_get_batches_data')
 	
 	@api.multi
@@ -66,6 +67,14 @@ class productTemplate(models.Model):
 			domain=['|',('multi_product_ids.product_id','in',product_id),('product_id','in',product_id)]
 			bin_count = self.env['n.warehouse.placed.product'].search(domain)
 			res.bin_location_count= len(bin_count)
+	@api.multi
+	def _get_expense_data(self):
+		for res in self:
+			product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+			product_id = [p.id for p in product_id]
+		
+			expense_ids = self.env['hr.expense'].search([('product_id','in',product_id)])
+			res.expenses_count = str(len(expense_ids))
 
 	@api.multi
 	def open_master_batches(self):
@@ -85,6 +94,26 @@ class productTemplate(models.Model):
 								'stored','reserved','r_t_dispatch','transit'))],
 		    'target': 'current',
 		 }
+                 
+
+	@api.multi
+	def open_expenses(self):
+		order_tree = self.env.ref('hr_expense.view_expenses_tree', False)
+		order_form = self.env.ref('hr_expense.hr_expense_form_view', False)
+		product_id = self.env['product.product'].search([('product_tmpl_id','=',self.id)])
+		product_id = [p.id for p in product_id]
+		return {
+		    'name':"'{}'Expenses".format(self.name),
+		    'type': 'ir.actions.act_window',
+		    'view_type': 'form',
+		    'view_mode': 'tree',
+		    'res_model': 'hr.expense',
+		    'views': [(order_tree.id, 'tree'),(order_form.id, 'form')],
+		    'view_id': order_form.id,
+		    'domain':[('product_id','in',product_id)],
+		    'target': 'current',
+		 }
+	
 
 	@api.multi
 	def open_child_batches(self):
@@ -122,6 +151,9 @@ class productProduct(models.Model):
 	@api.multi
 	def open_master_batches(self):
 		return self.product_tmpl_id.open_master_batches()
+	@api.multi
+	def open_expenses(self):
+		return self.product_tmpl_id.open_expenses()
 
 	@api.multi
 	def open_child_batches(self):
