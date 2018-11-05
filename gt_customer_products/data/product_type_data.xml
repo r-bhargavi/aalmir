@@ -15,6 +15,12 @@
             <field name="string">packaging</field>
             <field name="active">1</field>
         </record>
+        <record id="material_type_data_expense" model="product.material.type">
+            <field name="name">Expense</field>
+            <field name="sequence">9</field>
+            <field name="string">expense</field>
+            <field name="active">1</field>
+        </record>
         
         <record id="material_type_data2" model="product.material.type">
             <field name="name">Component</field>

@@ -235,9 +235,12 @@ class ProductProduct(models.Model):
 		    		if product_tmpl_id.raw_material_type.string=='mould':
 			    		vals.update({'default_code' :v})
 			    		vals.update({'asset_code' :'AMP/ML/'+v})
-			    else:
-	    			error_string='Issue in creation of Internal Number for Asset'
-				raise
+			#generate default code for Asset
+			elif product_tmpl_id.product_material_type.string=='expense':
+                            print "asdsscscscdsc===============",self._context
+			    v=False
+                            v= seq_obj.next_by_code('expense.internal.number')
+                            vals.update({'default_code' :v,'asset_code':''})
 			else:
 				error_string='Material Type of Product is not Found'
 				raise
