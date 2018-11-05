@@ -7,6 +7,25 @@ from openerp.tools import float_is_zero
 from openerp import models, fields, api,_
 from openerp.exceptions import UserError, ValidationError
 
+#class AccountInvoiceLine(models.Model):
+#    _inherit = "account.invoice.line"
+#    
+#    state_tracker = fields.Boolean(string='Inv State?',compute='_compute_inv_state_tracker',store=True)
+#    @api.model
+#    def default_get(self, fields):
+#        res = super(AccountInvoiceLine,self).default_get(fields)
+#        res.update({'state_tracker':False})
+#        return res
+#
+#    @api.depends('invoice_id.state')
+#    def _compute_inv_state_tracker(self):
+#        print "dsfdsfdsfdsfdsfds-------"
+#        if self.invoice_id.type in ('in_invoice','in_refund'):
+#            if self.invoice_id.state in ('draft','waiting_approval','rejected'):
+#                self.state_tracker=False
+#            else:
+#                self.state_tracker=True
+#        print "selfkjhjstet tracjet======================================",self.state_tracker
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
     
@@ -33,12 +52,16 @@ class AccountInvoice(models.Model):
     refund_amount=fields.Float('Refund Amount', compute='amount_refund')
     refund_bool=fields.Boolean('Hide Refund Button', compute='amount_refund',store=True)
     invoice_id_rel = fields.Many2one('account.invoice',string='Invoice ID')
+    invoice_id_cus = fields.Many2one('account.invoice',string='Invoice ID')
     
     @api.model
     def create(self, vals):
         invoice = super(AccountInvoice, self).create(vals)
-        invoice.write({'invoice_id_rel':invoice.id})
-        #voucher.assert_balanced()
+        if vals.get('type') in ('in_invoice','in_refund'):
+            invoice.write({'invoice_id_rel':invoice.id})
+        elif vals.get('type') in ('out_invoice','out_refund'):
+            invoice.write({'invoice_id_cus':invoice.id})
+
         return invoice
    
     def read_group(self,cr,uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False,lazy=True):
@@ -68,7 +91,8 @@ class AccountInvoice(models.Model):
            if move_line:
               add=self.register_payment(move_line)
         return res
-   
+    
+    
     @api.model
     def _get_invoice_key_cols(self):
         return [

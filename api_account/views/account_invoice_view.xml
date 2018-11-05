@@ -10,6 +10,16 @@
                     <field name="invoice_id_rel"/>
             	</field>
             </field>
+        </record>
+        <record model="ir.ui.view" id="invoice_tree_vw_inherit_aalmir_customer_b">
+            <field name="name">account.invoice.customer.tree.inherit.ab</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+		<field name="number" position="after">
+                    <field name="invoice_id_cus"/>
+            	</field>
+            </field>
        </record>
         <record model="ir.ui.view" id="invoice_form_supplier_inherit_aalmir_b">
             <field name="name">account.invoice.supplier.form.inherit.ab</field>
@@ -18,10 +28,22 @@
             <field name="arch" type="xml">
 		<field name="date_invoice" position="after">
                     <field name="purchase_id" string="Purchase Order"/>
-            	</field>
+                    <field name="invoice_id_rel" readonly="1"/>
+		 </field>            	
                 <field name="origin" position="attributes">
                     <attribute name="attrs">{'invisible':[('type', 'in', ['in_invoice'])]}</attribute>
             	</field>
+                <field name="partner_id" position="attributes">
+                <attribute name="domain">[('parent_id', '=', False)]</attribute>
+            	</field>
+<!--                <xpath expr="//form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
+                    <field name="state_tracker" invissible="1"/>
+
+                 </xpath>
+                <xpath expr="//form/sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="attributes">
+                    <attribute name="attrs">{}</attribute> 
+                   <attribute name="attrs">{'required':[('state_tracker','=',True)]}</attribute>
+                 </xpath>-->
             </field>
        </record>
         <record id="api_account_invoice_form" model="ir.ui.view">
@@ -124,7 +146,7 @@
 		 </field>
                  
 		 <field name='date_invoice' position='after'>
-                    <field name="invoice_id_rel" readonly="1"/>
+                    <field name="invoice_id_cus" readonly="1"/>
 		 </field>
                 
 		 <xpath expr="//sheet/label[1]" position="before">

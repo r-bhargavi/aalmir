@@ -59,6 +59,28 @@ class accountPayment(models.Model):
     user_id = fields.Many2one('res.users', 'Reconcile By')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
     
+#    @api.multi
+#    def button_invoices(self):
+#        if self.payment_type=='outbound':
+#            
+#            tree_view = self.env.ref('account.invoice_supplier_tree', False)
+#            form_view = self.env.ref('account.invoice_supplier_form', False)
+#        if self.payment_type=='inbound':
+#            tree_view = self.env.ref('account.invoice_tree', False)
+#            form_view = self.env.ref('account.invoice_form', False)
+#            print "form_viewform_viewform_view",form_view
+#
+#        return {
+#            'name': _('Paid Invoices'),
+#            'view_type': 'form',
+#            'view_mode': 'tree',
+#            'res_model': 'account.invoice',
+#            'views': [(tree_view.id,'tree'),(form_view.id, 'form')],
+#            'view_id': tree_view.id,
+#            'type': 'ir.actions.act_window',
+#            'domain': [('id', 'in', [x.id for x in self.invoice_ids])],
+#        }
+    
 #    adding company domain on change of payment type
     @api.onchange('payment_type')
     def _onchange_payment_type(self):
