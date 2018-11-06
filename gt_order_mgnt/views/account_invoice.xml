@@ -60,6 +60,9 @@
                     <attribute name="states">''</attribute>
                     <attribute name="attrs">{'invisible':['|',('check_total','=',True),('state','!=','draft')]}</attribute>
 		 </xpath>
+                <xpath expr="//button[@name='action_cancel_draft']" position="attributes">
+                    <attribute name="attrs">{'invisible':[('state','not in',['cancel','rejected'])]}</attribute>
+		 </xpath>
               
                  <button name="invoice_open"  position="after">
                 <button name="aalmir_invoice_print" string="Download" type="object" states="draft,open" class="oe_highlight" context="{'out_invoice':True}" />
