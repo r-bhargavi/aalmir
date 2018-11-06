@@ -14,24 +14,25 @@ class AccountInvoice(models.Model):
     @api.depends('amount_total')
     def _compute_check_total_tracker(self):
         print "dsfdsfdsfdsfdsfds-------------------------"
-        if self.type in ('in_invoice','in_refund'):
-            if self.state in ('draft') and not self.purchase_id:
-                non_approval=self.env['approval.config.bill.line'].search([('partner_id','=',self.partner_id.id)])
-                print "non_approvalnon_approvalnon_approval",non_approval
-                if non_approval:
-                    if non_approval.currency_id.id!=self.currency_id.id:
-                        from_currency = non_approval.currency_id
-                        to_currency = self.currency_id
-                        limit_amt = from_currency.compute(non_approval.approve_amount, to_currency, round=False)
-                    else:
-                        limit_amt=non_approval.approve_amount
-                    if self.amount_total>limit_amt:
-                        self.check_total=True
-                    else:
-                        self.check_total=False
+        for invoice in self:
+            if invoice.type in ('in_invoice','in_refund'):
+                if invoice.state in ('draft') and not invoice.purchase_id:
+                    non_approval=self.env['approval.config.bill.line'].search([('partner_id','=',invoice.partner_id.id)])
+                    print "non_approvalnon_approvalnon_approval",non_approval
+                    if non_approval:
+                        if non_approval.currency_id.id!=invoice.currency_id.id:
+                            from_currency = non_approval.currency_id
+                            to_currency = invoice.currency_id
+                            limit_amt = from_currency.compute(non_approval.approve_amount, to_currency, round=False)
+                        else:
+                            limit_amt=non_approval.approve_amount
+                        if invoice.amount_total>limit_amt:
+                            invoice.check_total=True
+                        else:
+                            invoice.check_total=False
 #            else:
 #                self.check_total=True
-        print "self.check_totalself.check_totalself.check_total",self.check_total
+        print "self.check_totalself.check_totalself.check_total",invoice.check_total
   
             
 
