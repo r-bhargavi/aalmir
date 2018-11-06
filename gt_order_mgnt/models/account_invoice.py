@@ -418,6 +418,7 @@ class AccountInvoice(models.Model):
                if check=='send_for_approval':
                     body ='You have been requested for approval on the release of payment for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+                    record.state='waiting_approval'
 
                elif check=='send_approval_reminder':
                     body ='This is reminder for approval on release of payment for the attached bill. ' 
@@ -472,7 +473,6 @@ class AccountInvoice(models.Model):
 		      values['attachment_ids'] =[(4, attachment_ids)]
 		      msg_id.write({'attachment_ids':[(4, attachment_ids)]}) 
                record.send_bill_bool=True
-               record.state='waiting_approval'
                msg_id.send()	       
 
     @api.multi
