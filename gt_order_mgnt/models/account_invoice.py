@@ -201,8 +201,8 @@ class AccountInvoice(models.Model):
         self.signal_workflow('invoice_open')
         self.write({'approved_by':self._uid})
         group = self.env['res.groups'].search([('name', '=', 'Inform Once Bill Approved')])
-
-        record.send_bill(group,check='bill_approved')
+        print "groupgroupgroupgroup",group
+        self.send_bill(group,check='bill_approved')
 
         return True
 
@@ -395,7 +395,7 @@ class AccountInvoice(models.Model):
             email_to = email_to[:-1]
             print "email_toemail_to",email_to
         else:
-            email_to=record.approved_by.login
+            email_to=self.approved_by.login
         for record in self:
             if check=='send_for_approval':
                 temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_send_approval')
@@ -428,6 +428,7 @@ class AccountInvoice(models.Model):
                     body ='This is reminder for approval on release of payment for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
                elif check=='bill_approved':
+                    email_to+=','+record.user_id.login
                     body ='Payment is Approved for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
                elif check=='bill_refused':
