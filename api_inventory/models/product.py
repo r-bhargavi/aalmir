@@ -78,17 +78,18 @@ class productTemplate(models.Model):
 			res.expenses_count = str(len(expense_ids))
 	@api.multi
 	def _get_bill_data(self):
-		for res in self:
-			product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
-			product_id = [p.id for p in product_id]
-		
-			inv_line_ids = self.env['account.invoice.line'].search([('product_id','in',product_id)])
-                        if inv_line_ids:
-                            inv_ids=[]
-                            for each in inv_line_ids:
-                                if each.invoice_id not in inv_ids:
-                                    inv_ids.append( each.invoice_id.id)
-                            res.expenses_count = str(len(inv_ids))
+            for res in self:
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+                product_id = [p.id for p in product_id]
+
+                inv_line_ids = self.env['account.invoice.line'].search([('product_id','in',product_id)])
+                inv_ids=[]
+                if inv_line_ids:
+                    for each in inv_line_ids:
+                        if each.invoice_id.id not in inv_ids:
+                            inv_ids.append(each.invoice_id.id)
+                            print "len(inv_ids)len(inv_ids)",len(inv_ids)
+                    res.bill_count = str(len(inv_ids))
 
 	@api.multi
 	def open_master_batches(self):
@@ -137,7 +138,7 @@ class productTemplate(models.Model):
 
                 if inv_line_ids:
                     for each in inv_line_ids:
-                        if each.invoice_id not in acc_inv_ids:
+                        if each.invoice_id.id not in acc_inv_ids:
                             acc_inv_ids.append(each.invoice_id.id)
                 return {
                     'name':"'{}'Bills".format(self.name),
