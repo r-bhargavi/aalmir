@@ -3,7 +3,7 @@
             sequence="100" groups="base.group_configuration"/>
     <menuitem id="hr_expense.menu_expense_all" action="hr_expense.expense_all" name="New Expense" parent="hr_expense.menu_hr_expense_root"/>
 <menuitem id="hr_expense.menu_hr_product" name="Expense Products" parent="hr_expense.menu_hr_expense_root" 
-            action="hr_expense.hr_expense_product" groups="base.group_hr_manager"/>
+            action="hr_expense.hr_expense_product" groups="base.group_hr_manager,account.group_account_user"/>
      <record id="action_draft_expense" model="ir.actions.act_window">
             <field name="name">Expenses</field>
             <field name="res_model">hr.expense</field>
