@@ -72,7 +72,7 @@
                           string="Send For Approval" type="object" class="oe_highlight" groups="base.group_user"/>
                   <button name="send_approval_reminder" attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['waiting_approval'])]}" string="Approval Reminder" type="object" class="oe_highlight" groups="base.group_user"/>
                   <button name="approve_bill" attrs="{'invisible':['|',('check_total','!=',True)]}" string="Approve" type="object" states="waiting_approval" class="oe_highlight" groups="gt_order_mgnt.restricted_bill_approve_grant"/>
-                    <button name="%(gt_order_mgnt.bill_refuse_wizard_action)d" attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['waiting_approval'])]}" string="Refuse" type="action" icon="fa-times" groups="gt_order_mgnt.restricted_bill_approve_grant"/>
+                    <button name="%(gt_order_mgnt.bill_refuse_wizard_action)d" attrs="{'invisible':['|',('check_total','!=',True),('state','not in',['waiting_approval'])]}" string="Reject" type="action" icon="fa-times" groups="gt_order_mgnt.restricted_bill_approve_grant"/>
 
                   <button name="print_advance_payment_receipt" string="Download Receipt" type="object" attrs="{'invisible':['|',('paid_amount','=',0.0),('state', '=', 'draft')]}" groups="base.group_user" class="btn-primary" />
                  </button>
@@ -100,7 +100,7 @@
                   <xpath expr="//field[@name='currency_id']" position="after">
                          <label for='payment_term_id'/>
 			 <div>
-		               <field name="payment_term_id" class="oe_inline" nolabel="1" 
+		               <field name="payment_term_id" required="1" class="oe_inline" nolabel="1" 
                                      options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
 			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
 <!--                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
@@ -114,7 +114,7 @@
 			 <div>
 		                <field name="partner_id" 
                                 context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" 
-                                domain="[('supplier', '=', True)]" class="oe_inline" nolabel="1"/>
+                                domain="[('supplier', '=', True),('parent_id','=',False)]" class="oe_inline" nolabel="1"/>
 			     <field name="check_partner"  class="oe_inline" nolabel="1" />
 			</div>
 		        <label for='partner_invoice_id' string='Bill Address'/>
