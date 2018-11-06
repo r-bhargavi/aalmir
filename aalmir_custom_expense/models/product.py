@@ -19,6 +19,8 @@ class productTemplate(models.Model):
     
     
     partner_id_preferred = fields.Many2one('res.partner', 'Preferred Partner')
+    type_product = fields.Many2one('type.product', 'Category Product')
+
     
 class ProductProduct(models.Model):
     _inherit = "product.product"
