@@ -44,6 +44,9 @@
                     <button class="oe_stat_button" type="object" context="{'group_by':'state'}" name="open_expenses" icon="fa-database" >
                     	<field name="expenses_count" widget="statinfo"/>
                     </button>
+                    <button class="oe_stat_button" type="object" context="{'group_by':'state'}" name="open_bills" icon="fa-database" >
+                    	<field name="bill_count" widget="statinfo"/>
+                    </button>
                 </div>
             </field>
     </record>

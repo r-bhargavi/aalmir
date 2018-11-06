@@ -40,6 +40,7 @@ class productTemplate(models.Model):
 	master_btch_count = fields.Char('Master Batches',compute='_get_batches_data')
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
+	bill_count = fields.Char('#Bills',compute='_get_bill_data')
 	bin_location_count = fields.Integer('#Bin Location',compute='_get_batches_data')
 	
 	@api.multi
@@ -75,6 +76,19 @@ class productTemplate(models.Model):
 		
 			expense_ids = self.env['hr.expense'].search([('product_id','in',product_id)])
 			res.expenses_count = str(len(expense_ids))
+	@api.multi
+	def _get_bill_data(self):
+		for res in self:
+			product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+			product_id = [p.id for p in product_id]
+		
+			inv_line_ids = self.env['account.invoice.line'].search([('product_id','in',product_id)])
+                        if inv_line_ids:
+                            inv_ids=[]
+                            for each in inv_line_ids:
+                                if each.invoice_id not in inv_ids:
+                                    inv_ids.append( each.invoice_id)
+                            res.expenses_count = str(len(inv_ids))
 
 	@api.multi
 	def open_master_batches(self):
@@ -114,6 +128,29 @@ class productTemplate(models.Model):
 		    'target': 'current',
 		 }
 	
+	@api.multi
+	def open_bills(self):
+		order_tree = self.env.ref('account.invoice_supplier_tree', False)
+		order_form = self.env.ref('account.invoice_supplier_form', False)
+		inv_line_ids = self.env['account.invoice.line'].search([('product_id.product_tmpl_id','=',self.id)])
+                acc_inv_ids=[]
+
+                if inv_line_ids:
+                    for each in inv_line_ids:
+                        if each.invoice_id not in acc_inv_ids:
+                            acc_inv_ids.append(each.invoice_id)
+                return {
+                    'name':"'{}'Bills".format(self.name),
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'tree',
+                    'res_model': 'account.invoice',
+                    'views': [(order_tree.id, 'tree'),(order_form.id, 'form')],
+                    'view_id': order_form.id,
+                    'domain':[('id','in',acc_inv_ids)],
+                    'target': 'current',
+                    }
+	
 
 	@api.multi
 	def open_child_batches(self):
@@ -151,6 +188,12 @@ class productProduct(models.Model):
 	@api.multi
 	def open_master_batches(self):
 		return self.product_tmpl_id.open_master_batches()
+	@api.multi
+	def open_expenses(self):
+		return self.product_tmpl_id.open_expenses()
+	@api.multi
+	def open_bills(self):
+		return self.product_tmpl_id.open_bills()
 	@api.multi
 	def open_expenses(self):
 		return self.product_tmpl_id.open_expenses()
