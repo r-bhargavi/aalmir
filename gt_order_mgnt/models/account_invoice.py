@@ -200,7 +200,7 @@ class AccountInvoice(models.Model):
     def approve_bill(self):
         self.signal_workflow('invoice_open')
         self.write({'approved_by':self._uid})
-        group = self.env['res.groups'].search([('name', '=', 'Approve Bills')])
+        group = self.env['res.groups'].search([('name', '=', 'Inform Once Bill Approved')])
 
         record.send_bill(group,check='bill_approved')
 
@@ -390,8 +390,10 @@ class AccountInvoice(models.Model):
     def send_bill(self,group,check):
         if group:
             user_ids = self.env['res.users'].sudo().search([('groups_id', 'in', [group.id])])
+            print "user_idsuser_ids",user_ids
             email_to = ''.join([user.partner_id.email + ',' for user in user_ids])
             email_to = email_to[:-1]
+            print "email_toemail_to",email_to
         else:
             email_to=record.approved_by.login
         for record in self:
@@ -414,7 +416,9 @@ class AccountInvoice(models.Model):
 			 'id': record.id,
 			}
 	       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-               text_link = _("""<a href="%s">%s</a> """) % (url,record.number)
+               print "urlurl",url
+               text_link = _("""<a href="%s">%s</a> """) % (url,"BILL")
+               print "text_linktext_linktext_link",text_link
                if check=='send_for_approval':
                     body ='You have been requested for approval on the release of payment for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
@@ -427,6 +431,8 @@ class AccountInvoice(models.Model):
                     body ='Payment is Approved for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
                elif check=='bill_refused':
+                    email_to=record.user_id.login
+
                     body ='Payment is Refused for the attached bill. ' 
                     body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
 
