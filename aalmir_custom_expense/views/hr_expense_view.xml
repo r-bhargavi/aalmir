@@ -128,7 +128,7 @@
                             <page string="Payment Details" attrs="{'invisible':[('state','not in',['approve','post','done'])]}">
                                 <group>
                                 <!--<field name="bank_cash" attrs="{'required':[('state','not in',['draft','submit'])]}"/>-->
-                                <field name="bank_journal_id_expense" widget="selection" attrs="{'required':[('state','not in',['draft','submit','cancel'])]}"/>
+                                <field name="bank_journal_id_expense" domain="[('company_id', '=', company_id),('type','in',['bank','cash'])]" widget="selection" attrs="{'required':[('state','not in',['draft','submit','cancel'])]}"/>
                                 <field name="is_bank_journal" readonly="1" invisible="1"/>
                                 <!--<field name="payment_method" string="Type" attrs="{'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>-->
                                 <field name="payment_method" attrs="{'required':[('is_bank_journal','=',True)],'invisible':[('is_bank_journal','=',False)]}" string="Type"/>
