@@ -294,11 +294,18 @@ class AccountPaymentTermRequest(models.Model):
 	self.state = 'update'
 	self.approve_date = datetime.now()
 	self.accountant_id = self.env.uid
-	self.quote_id.payment_term_requested=True
-	self.quote_id.visible_request_button=False
-	self.quote_id.payment_term_requested=False
-	if self.quote_id.state in ('draft','sent'):  #CH_N043 add condition to update when record is in quotation state
+        if self.quote_id:
+            self.quote_id.payment_term_requested=True
+            self.quote_id.visible_request_button=False
+            self.quote_id.payment_term_requested=False
+            if self.quote_id.state in ('draft','sent'):  #CH_N043 add condition to update when record is in quotation state
         	self.quote_id.payment_term_id=self.n_payment_term.id
+        elif self.purchase_id:
+            self.purchase_id.payment_term_bool_moved0=True
+            self.purchase_id.visible_request_button=False
+            self.purchase_id.payment_term_requested=False
+            if self.purchase_id.state in ('draft','sent'):  #CH_N043 add condition to update when record is in quotation state
+        	self.purchase_id.payment_term_id=self.n_payment_term.id
 	
         for rec in self:
 	    ids=[rec.customer_id.id] if rec.customer_id else []
@@ -310,24 +317,42 @@ class AccountPaymentTermRequest(models.Model):
             user_obj = self.env['res.users'].browse(self.env.uid)
             base_url = self.env['ir.config_parameter'].get_param('web.base.url')
             query = {'db': self._cr.dbname}
-            fragment = {
-                'model': 'sale.order',
-                'view_type': 'form',
-                'id': self.quote_id.id,
-            }
+            if self.quote_id:
+                fragment = {
+                    'model': 'sale.order',
+                    'view_type': 'form',
+                    'id': self.quote_id.id,
+                }
+            elif self.purchase_id:
+                 fragment = {
+                    'model': 'purchase.order',
+                    'view_type': 'form',
+                    'id': self.purchase_id.id,
+                }
+                
             url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-            text_link = _("""<a href="%s">%s</a> """) % (url,self.quote_id.name)
+            if self.quote_id:
+                text_link = _("""<a href="%s">%s</a> """) % (url,self.quote_id.name)
+                username=self.quote_id.user_id.name
+                email=self.quote_id.user_id.email
+                id=self.quote_id.id
 
+            elif self.purchase_id:
+                self.purchase_id.write({'payment_term_request':'approve'})
+                text_link = _("""<a href="%s">%s</a> """) % (url,self.purchase_id.name)
+                username=self.sales_person_id.name
+                email=self.sales_person_id.email
+                id=self.purchase_id.id
             body_html = """<div>
     <p> <strong>Payment Term Merge</strong></p><br/>
     <p>Dear %s,<br/>
         <b>%s </b>Payment Term :  <b> %s </b>for <b>%s </b> <br/>
     </p>
-    </div>"""%(self.quote_id.user_id.name or '', user_obj.name or '',  self.name, text_link)
+    </div>"""%(username or '', user_obj.name or '',  self.name, text_link)
 
             body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.quote_id.id, context=self._context)
-            temp_id.write({'body_html': body_html, 'email_to' : self.quote_id.user_id.email, 'email_from': user_obj.partner_id.email})
-            temp_id.send_mail(self.quote_id.id)
+            temp_id.write({'body_html': body_html, 'email_to' :email , 'email_from': user_obj.partner_id.email})
+            temp_id.send_mail(id)
 	return True
 	
 #CH_N043 <<<	
