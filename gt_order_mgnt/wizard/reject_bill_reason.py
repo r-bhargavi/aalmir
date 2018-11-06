@@ -19,4 +19,6 @@ class BillRefuseWizard(models.TransientModel):
         active_ids = context.get('active_ids', [])
         bill = self.env['account.invoice'].browse(active_ids)
         bill.write({'refuse_reason':self.description,'state':'rejected'})
+        group = self.env['res.groups'].search([('name', '=', 'Approve Bills')])
+        bill.send_bill(group,check='bill_refused')
         return {'type': 'ir.actions.act_window_close'}
