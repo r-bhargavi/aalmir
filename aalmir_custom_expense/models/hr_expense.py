@@ -28,7 +28,7 @@ class HrExpense(models.Model):
     expense_type = fields.Selection([("emp_expense", "Employee Expense"), ("other_expense", "Other Expense")], string="Expense Type")
     approval_status = fields.Selection([("app_required", "Approval Required"), ("app_not_required", "No Approval")],default='app_not_required', string="Approval Status")
 #    bank_cash = fields.Selection([("bank", "Bank"), ("cash", "Cash")],default='cash', string="Journal Type?",copy=False)
-    bank_journal_id_expense = fields.Many2one('account.journal', string='Bank Journal', states={'done': [('readonly', True)]}, default=lambda self: self.env['account.journal'].search([('type', 'in', ['cash', 'bank']),('company_id','=',self.env.user.company_id.id)], limit=1), help="The payment method used when the expense is paid by the company.")
+    bank_journal_id_expense = fields.Many2one('account.journal', string='Bank Journal', states={'done': [('readonly', True)]},default=lambda self: self.env['account.journal'].search([('type', 'in', ['cash', 'bank']),('company_id','=',self.env.user.company_id.id)], limit=1), help="The payment method used when the expense is paid by the company.")
 
     internal_note=fields.Text('Remarks on Receipt')
     communication = fields.Char(string='Internal Note')
@@ -51,6 +51,7 @@ class HrExpense(models.Model):
     user_id = fields.Many2one('res.users', 'User')
     department = fields.Many2one('hr.department', 'Department',related='requested_by.department_id',store=True)
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
+
     
     @api.model
     def default_get(self, fields):
@@ -58,6 +59,12 @@ class HrExpense(models.Model):
         print "fieldsfieldsfields",fields
         res.update({'bank_journal_id_expense':False,'is_bank_journal':False})
         return res
+    
+    @api.one
+    def copy(self, default=None):
+        default = dict(default or {})
+        default.update({'bank_journal_id_expense':False,'is_bank_journal':False})
+        return super(HrExpense, self).copy(default)
     
     
     @api.multi
@@ -306,6 +313,7 @@ class HrExpense(models.Model):
 #					'register_payment_id': each.register_payment_id,
 #					'payment_id':payment.id,
 					'reconcile_date': each.reconcile_date,
+					'cheque_date': each.cheque_date,
 					'cheque_status':each.expense_id.cheque_status
                                         }))
             print "valspppppppppppppppppppppppppppppppp",vals
