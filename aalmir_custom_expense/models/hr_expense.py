@@ -189,6 +189,11 @@ class HrExpense(models.Model):
         '''
         main function that is called when trying to create the accounting entries related to an expense
         '''
+        if self.payment_method and self.payment_method=='cheque':
+            cheque_amt=sum(line.amount for line in self.cheque_details)
+            if self.total_amount!=cheque_amt:
+                raise UserError(_("Cheque Amount does not match with Expense Amount.Please check!!"))
+
         if not self.bank_journal_id_expense:
             raise UserError(_("Please select Bank Journal for Processiong Payment"))
 
