@@ -30,6 +30,8 @@ class AccountInvoice(models.Model):
                             invoice.check_total=True
                         else:
                             invoice.check_total=False
+                    else:
+                         invoice.check_total=True
 #            else:
 #                self.check_total=True
         print "self.check_totalself.check_totalself.check_total",invoice.check_total
