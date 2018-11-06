@@ -87,7 +87,7 @@ class productTemplate(models.Model):
                             inv_ids=[]
                             for each in inv_line_ids:
                                 if each.invoice_id not in inv_ids:
-                                    inv_ids.append( each.invoice_id)
+                                    inv_ids.append( each.invoice_id.id)
                             res.expenses_count = str(len(inv_ids))
 
 	@api.multi
@@ -138,7 +138,7 @@ class productTemplate(models.Model):
                 if inv_line_ids:
                     for each in inv_line_ids:
                         if each.invoice_id not in acc_inv_ids:
-                            acc_inv_ids.append(each.invoice_id)
+                            acc_inv_ids.append(each.invoice_id.id)
                 return {
                     'name':"'{}'Bills".format(self.name),
                     'type': 'ir.actions.act_window',
