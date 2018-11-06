@@ -200,6 +200,10 @@ class AccountInvoice(models.Model):
     def approve_bill(self):
         self.signal_workflow('invoice_open')
         self.write({'approved_by':self._uid})
+        group = self.env['res.groups'].search([('name', '=', 'Approve Bills')])
+
+        record.send_bill(group,check='bill_approved')
+
         return True
 
     @api.multi
@@ -395,6 +399,10 @@ class AccountInvoice(models.Model):
                 temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_send_approval')
             elif check=='send_approval_reminder':
                   temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_send_approval_reminder')
+            elif check=='bill_approved':
+                  temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_bill_approved')
+            elif check=='bill_refused':
+                  temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor_bill_refused')
             else:
                 temp_id = self.env.ref('gt_order_mgnt.email_template_for_invoice_vendor123')
             if temp_id:
@@ -409,21 +417,26 @@ class AccountInvoice(models.Model):
                text_link = _("""<a href="%s">%s</a> """) % (url,record.number)
                if check=='send_for_approval':
                     body ='You have been requested for approval on the release of payment for the attached bill. ' 
+                    body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+
                elif check=='send_approval_reminder':
                     body ='This is reminder for approval on release of payment for the attached bill. ' 
+                    body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+               elif check=='bill_approved':
+                    body ='Payment is Approved for the attached bill. ' 
+                    body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+               elif check=='bill_refused':
+                    body ='Payment is Refused for the attached bill. ' 
+                    body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+
                else:
                     body ='This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. ' 
 
-               body +='<b>The bill details are as below.</b>'
-               body +='<li> <b>Vendor Name :</b> '+str(record.partner_id.name) +'</li>'
-               body +='<li> <b>Vendor Invoice No. :</b>'+str(record.reference) +'</li>'
-               body +='<li> <b>Vendor Invoice Date :</b> '+str(record.vendor_invoice_date) +'</li>'
-               body +='<li> <b>PO Number :</b>'+str(record.origin) +'</li>'
-               body +='<li> <b>Bill Number :</b> '+str(text_link) +'</li>'
-               body +='<li> <b>Bill Due date :</b>'+str(record.date_due) +'</li>'
-               body +='<li> <b>Payment Term :</b> '+str(record.payment_term_id.name) +'</li>'
-               body +='<li> <b>Total Bill Amount :</b>'+str(record.amount_total) +str(record.currency_id.symbol)+'</li>'
-	       body += '</b>Note:</b>After your approval, once payment is done, you will be informed.'
+                    body +='<li> <b>View Bill :</b> '+str(text_link) +'</li>'
+                    body +='<li> <b>Bill Due date :</b>'+str(record.date_due) +'</li>'
+                    body +='<li> <b>Payment Term :</b> '+str(record.payment_term_id.name) +'</li>'
+                    body +='<li> <b>Total Bill Amount :</b>'+str(record.amount_total) +str(record.currency_id.symbol)+'</li>'
+                    body += '</b>Note:</b>After your approval, once payment is done, you will be informed.'
 	       temp_id.write({'body_html': body, 'email_to':email_to,
                               'email_from':self.env.user.login})
                values = temp_id.generate_email(record.id)
