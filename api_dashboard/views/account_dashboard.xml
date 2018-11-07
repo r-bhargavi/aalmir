@@ -117,7 +117,7 @@
                                     </a>
                                 </div>
                                 <div class="col-xs-6 text-right">
-                                    <span t-if="journal_type == 'purchase'"><t t-esc="dashboard.no_waiting_approval"/></span>
+                                    <span t-if="journal_type == 'purchase'"><t t-esc="dashboard.sum_waiting_approval"/></span>
                                 </div>
                             </div>
                             
