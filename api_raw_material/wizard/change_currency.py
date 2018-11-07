@@ -43,6 +43,10 @@ class chnageCurrencyValue(models.TransientModel):
 					vals.update({'qty_range_6':res.rm_pricelist_id.currency_id.compute(res.rm_pricelist_id.qty_range_6,self.currency_id)})
 				if res.rm_pricelist_id.qty_range_7:	
 					vals.update({'qty_range_7':res.rm_pricelist_id.currency_id.compute(res.rm_pricelist_id.qty_range_7,self.currency_id)})
+				if res.rm_pricelist_id.qty_range_8:	
+					vals.update({'qty_range_8':res.rm_pricelist_id.currency_id.compute(res.rm_pricelist_id.qty_range_8,self.currency_id)})
+				if res.rm_pricelist_id.qty_range_9:	
+					vals.update({'qty_range_9':res.rm_pricelist_id.currency_id.compute(res.rm_pricelist_id.qty_range_9,self.currency_id)})
 
 		if vals:
 			print ".................",vals

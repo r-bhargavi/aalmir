@@ -43,6 +43,8 @@ class RawMaterailPricelist(models.Model):
     	stock_qty=fields.Float('On-Hand',compute="_get_onhande_qty")
 	base_price=fields.Float('Purchase Cost',default=0.0)
 	qty_range_1=fields.Float('<300',default=0.0)
+	qty_range_8=fields.Float('301-1000',default=0.0)
+	qty_range_9=fields.Float('1001-3000',default=0.0)
 	qty_range_2=fields.Float('301-3000',default=0.0)
 	qty_range_3=fields.Float('3001-10000',default=0.0)
 	qty_range_4=fields.Float('10001-15000',default=0.0)
@@ -124,6 +126,10 @@ class RawMaterailPricelist(models.Model):
 			body += '<li>Half Truck(15T) : {} </li>'.format(vals.get('qty_range_6'))	
 		if vals.get('qty_range_7',False):
 			body += '<li>Full Truck(25T) : {} </li>'.format(vals.get('qty_range_7'))	
+		if vals.get('qty_range_8',False):
+			body += '<li>Full Truck(25T) : {} </li>'.format(vals.get('qty_range_8'))	
+		if vals.get('qty_range_9',False):
+			body += '<li>Full Truck(25T) : {} </li>'.format(vals.get('qty_range_9'))	
 		if vals.get('discount',False):
 			body += '<li>Discount(%) : {} </li>'.format(vals.get('discount'))
 		if vals.get('msq',False):
@@ -176,6 +182,8 @@ class SaleOrderLine(models.Model):
 			'qty_range_5':prlist_id.currency_id.compute(prlist_id.base_price + prlist_id.qty_range_5,self.order_id.n_quotation_currency_id),
 			'qty_range_6':prlist_id.currency_id.compute(prlist_id.base_price + prlist_id.qty_range_6,self.order_id.n_quotation_currency_id),
 			'qty_range_7':prlist_id.currency_id.compute(prlist_id.base_price + prlist_id.qty_range_7,self.order_id.n_quotation_currency_id),
+			'qty_range_8':prlist_id.currency_id.compute(prlist_id.base_price + prlist_id.qty_range_8,self.order_id.n_quotation_currency_id),
+			'qty_range_9':prlist_id.currency_id.compute(prlist_id.base_price + prlist_id.qty_range_9,self.order_id.n_quotation_currency_id),
 			'stock_qty':prlist_id.stock_qty}
 			      
 		if self.buying_type == 'spot':
@@ -371,6 +379,10 @@ class SaleOrderLine(models.Model):
 				if line.product_uom_qty and line.buying_type =='book':
 					if line.product_uom_qty >= 15000 and line.product_uom_qty <25000:
 						new_price += pricelist_id.qty_range_6
+					if line.product_uom_qty > 300 and line.product_uom_qty <=1000:
+						new_price += pricelist_id.qty_range_8
+					if line.product_uom_qty > 1000 and line.product_uom_qty <=3000:
+						new_price += pricelist_id.qty_range_9
 					elif line.product_uom_qty >= 25000:
 						new_price += pricelist_id.qty_range_7
 				elif line.product_uom_qty and line.buying_type =='spot':
@@ -384,6 +396,10 @@ class SaleOrderLine(models.Model):
 						new_price += pricelist_id.qty_range_4
 					elif line.product_uom_qty > 15000:
 						new_price += pricelist_id.qty_range_5
+					elif line.product_uom_qty > 300 and line.product_uom_qty <=1000:
+						new_price += pricelist_id.qty_range_8
+					elif line.product_uom_qty > 1000 and line.product_uom_qty <=3000:
+						new_price += pricelist_id.qty_range_9
 				line.fixed_price = pricelist_id.currency_id.compute(new_price,line.order_id.n_quotation_currency_id)
                 else:
 			super(SaleOrderLine,self).get_default_price_cur()
@@ -432,12 +448,14 @@ class RawMaterailPricelistSale(models.Model):
     	stock_qty =fields.Float('On-Hand',compute="_get_onhande_qty")
 	base_price =fields.Float('Purchase Cost(1Kg)')
 	qty_range_1 =fields.Float('Qty Till 300')
-	qty_range_2 =fields.Float('Qty 301_3000')
+	qty_range_2 =fields.Float('Qty 301_1000')
 	qty_range_3 =fields.Float('Qty 3001_10000')
 	qty_range_4 =fields.Float('Qty 10001_15000')
 	qty_range_5 =fields.Float('Qty 15001')
 	qty_range_6 =fields.Float('Half Truck(15T)')
 	qty_range_7 =fields.Float('Full Truck(25T)')
+	qty_range_8 =fields.Float('Qty 1001_2000')
+	qty_range_9 =fields.Float('Qty 2001-3000')
 	currency_id =fields.Many2one('res.currency',related='pricelist_id.currency_id')
 	
     	@api.multi
@@ -456,7 +474,9 @@ class rawMaterilaPriceUpdate(models.Model):
     	product_id=fields.Many2many('product.product','product_raw_material_bulk_rel','materila_id','product_id',"Products")
 	base_price=fields.Float('Purchase Cost(1Kg)')
 	qty_range_1=fields.Float('Qty Till 300')
-	qty_range_2=fields.Float('Qty 301_3000')
+	qty_range_2=fields.Float('Qty 301_1000')
+	qty_range_8=fields.Float('Qty 1001_2000')
+	qty_range_9=fields.Float('Qty 2001-3000')
 	qty_range_3=fields.Float('Qty 3001_10000')
 	qty_range_4=fields.Float('Qty 10001_15000')
 	qty_range_5=fields.Float('Qty 15001')
