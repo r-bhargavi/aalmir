@@ -62,6 +62,7 @@ class account_journal(models.Model):
     #            to retrive on account click to move lines on bank and cash type
     @api.multi
     def open_action(self):
+        print "selfkjdshkjshkjdshnkjsj",self._context
         """return action based on type for related journals"""
         action_name = self._context.get('action_name', False)
         if not action_name:
@@ -88,7 +89,7 @@ class account_journal(models.Model):
             ('general', None): 'general',
         }
         invoice_type = _journal_invoice_type_map[(self.type, self._context.get('invoice_type'))]
-
+        print "invoice_type--------",invoice_type
         ctx = self._context.copy()
         ctx.pop('group_by', None)
         ctx.update({
@@ -98,11 +99,20 @@ class account_journal(models.Model):
             'default_type': invoice_type,
             'type': invoice_type
         })
+        print "ctx final=====================",ctx
         ir_model_obj = self.pool['ir.model.data']
         model, action_id = ir_model_obj.get_object_reference(self._cr, self._uid, 'account', action_name)
+        print "model and action idi-----------------",model,action_id
         action = self.pool[model].read(self._cr, self._uid, [action_id], context=self._context)[0]
         action['context'] = ctx
-        action['domain'] = self._context.get('use_domain', [])
+        if ctx.get('search_default_rejected'):
+            action['domain'] = [('state','=','rejected')]
+        elif ctx.get('search_default_waiting_approval'):
+            action['domain'] = [('state','=','waiting_approval')]
+
+        else:
+            action['domain'] = self._context.get('use_domain', [])
+        print "domain=======================",action
         return action
 
 	
@@ -113,7 +123,7 @@ class account_journal(models.Model):
         ac_bnk_stmt = []
         title = ''
         invoice_wait=0
-        number_draft = number_waiting = number_late = sum_draft = sum_waiting = sum_late = 0
+        number_draft = number_waiting =number_rejected=no_waiting_approval= number_late = sum_draft = sum_waiting=sum_rejected=sum_waiting_approval = sum_late = 0
         unclear_cheque = todays_cheque = tomorrows_cheque = future_cheque = pro_balance = 0
         p_cnt = t_cnt = tm_cnt = f_cnt = chq_cnt= 0
         pre_chq = t_chq = tm_chq = f_chq = 0
@@ -194,9 +204,12 @@ class account_journal(models.Model):
             self.env.cr.execute(query, (self.id, today))
             late_query_results = self.env.cr.dictfetchall()
             sum_draft = 0.0
+            sum_rejected = 0.0
+            sum_waiting_approval = 0.0
             number_draft = 0
             number_waiting = 0
-           
+            number_rejected = 0
+            no_waiting_approval=0
             for result in query_results:
                 cur = self.env['res.currency'].browse(result.get('currency'))
                 if result.get('state') in ['open','draft']:
@@ -209,6 +222,14 @@ class account_journal(models.Model):
                 elif result.get('state') == 'open':
                     number_waiting += 1
                     sum_waiting += result.get('residual_company_signed') #cur.compute(result.get('amount_total'), currency)
+                elif result.get('state') == 'rejected':
+                    number_rejected += 1
+                    sum_rejected += cur.compute(result.get('amount_total'), currency) #cur.compute(result.get('amount_total'), currency)
+                    print "number_rejectedv",number_rejected,sum_rejected
+                elif result.get('state') == 'waiting_approval':
+                    no_waiting_approval += 1
+                    sum_waiting_approval += cur.compute(result.get('amount_total'), currency) #cur.compute(result.get('amount_total'), currency)
+                    print "no_waiting_approval",no_waiting_approval,sum_waiting_approval
             sum_late = 0.0
             number_late = 0
             for result in late_query_results:
@@ -254,14 +275,19 @@ class account_journal(models.Model):
         not_match="select order_id  from sale_order_line where qty_delivered != qty_invoiced and state ='sale'"
         self._cr.execute(not_match)
         lines=[i[0] for i in self._cr.fetchall()]
+
         return {
             'number_to_reconcile': number_to_reconcile,
             'account_balance': formatLang(self.env, account_sum, currency_obj=self.currency_id or self.company_id.currency_id),
             'last_balance': formatLang(self.env, last_balance, currency_obj=self.currency_id or self.company_id.currency_id),
             'number_draft': number_draft,
             'number_waiting': number_waiting,
+            'number_rejected': number_rejected,
+            'no_waiting_approval': no_waiting_approval,
             'number_late': number_late,
             'sum_draft': formatLang(self.env, sum_draft or 0.0, currency_obj=self.currency_id or self.company_id.currency_id),
+            'sum_rejected': formatLang(self.env, sum_rejected or 0.0, currency_obj=self.currency_id or self.company_id.currency_id),
+            'sum_waiting_approval': formatLang(self.env, sum_waiting_approval or 0.0, currency_obj=self.currency_id or self.company_id.currency_id),
             'sum_waiting': formatLang(self.env, sum_waiting or 0.0, currency_obj=self.currency_id or self.company_id.currency_id),
             'sum_late': formatLang(self.env, sum_late or 0.0, currency_obj=self.currency_id or self.company_id.currency_id),
             'currency_id': self.currency_id and self.currency_id.id or self.company_id.currency_id.id,

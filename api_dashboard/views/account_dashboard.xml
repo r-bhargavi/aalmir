@@ -14,7 +14,7 @@
                     <div class="container o_kanban_card_content o_visible">
                         <div class="row">
                             <t t-if="(journal_type=='bank' || journal_type == 'cash')" t-call="JournalBodyBankCashApi"/>
-                            <t t-if="journal_type == 'sale' || journal_type == 'purchase'" t-call="JournalBodySalePurchase"/>
+                            <t t-if="journal_type == 'sale' || journal_type == 'purchase'" t-call="JournalBodySalePurchaseInherit"/>
 			    <t t-if="journal_type == 'request'" t-call="JournalRequest"/> <!--#CH_N105 -->
                             <div t-if="journal_type == 'general' || journal_type == 'situation'" class="row">
                         </div>
@@ -63,6 +63,124 @@
                             </div>
                         </div>
                 </t>
+                
+                <t t-name="JournalBodySalePurchaseInherit">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <button type="object" name="account.action_create_new" class="btn btn-primary btn-sm">
+                                <t t-if="journal_type == 'sale'"><span>New Invoice</span></t>
+                                <t t-if="journal_type == 'purchase'"><span>New Bill</span></t>
+                            </button>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_draft': '1', 'search_default_proforma': '1'}">
+                                        <span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>
+                                        <span t-if="journal_type == 'purchase'" title="Draft bills"><t t-esc="dashboard.number_draft"/> Draft bills</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_draft"/></span>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_unpaid': '1'}">
+                                        <span t-if="journal_type == 'sale'" title="Awaiting payments"><t t-esc="dashboard.number_waiting"/>  Awaiting payments</span>
+                                        <span t-if="journal_type == 'purchase'" title="Payments to do"><t t-esc="dashboard.number_waiting"/> Payments to do</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_waiting"/></span>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_rejected': '1'}">
+                                        <!--<span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>-->
+                                        <span t-if="journal_type == 'purchase'" title="Rejected bills"><t t-esc="dashboard.number_rejected"/> Rejected bills</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span t-if="journal_type == 'purchase'"><t t-esc="dashboard.sum_rejected"/></span>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_waiting_approval': '1'}">
+                                        <!--<span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>-->
+                                        <span t-if="journal_type == 'purchase'" title="Waiting Approval"><t t-esc="dashboard.no_waiting_approval"/> Waiting Approval</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span t-if="journal_type == 'purchase'"><t t-esc="dashboard.no_waiting_approval"/></span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </t>
+                    
+                    
+                
+<!--                <t t-name="JournalBodySalePurchaseInherit">
+                        <div class="col-xs-6 o_kanban_primary_left">
+                            <button type="object" name="action_create_new" class="btn btn-primary btn-sm">
+                                <t t-if="journal_type == 'sale'"><span>New Invoice</span></t>
+                                <t t-if="journal_type == 'purchase'"><span>New Bill</span></t>
+                            </button>
+                        </div>
+                        <div class="col-xs-6 o_kanban_primary_right">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action">
+                                        <span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>
+                                        <span t-if="journal_type == 'purchase'" title="Draft bills"><t t-esc="dashboard.number_draft"/> Draft bills</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_draft"/></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_rejected': '1'}">
+                                        <span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>
+                                        <span t-if="journal_type == 'purchase'" title="Rejected"><t t-esc="dashboard.number_rejected"/> Rejected</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_rejected"/></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_waiting_approval': '1'}">
+                                        <span t-if="journal_type == 'sale'" title="Invoices to validate"><t t-esc="dashboard.number_draft"/> Invoices to validate</span>
+                                        <span t-if="journal_type == 'purchase'" title="Waiting Approval"><t t-esc="dashboard.no_waiting_approval"/> Awaiting</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_waiting_approval"/></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <a type="object" name="open_action" context="{'search_default_unpaid': '1'}">
+                                        <span t-if="journal_type == 'sale'" title="Awaiting payments"><t t-esc="dashboard.number_waiting"/>  Awaiting payments</span>
+                                        <span t-if="journal_type == 'purchase'" title="Payments to do"><t t-esc="dashboard.number_waiting"/> Payments to do</span>
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span><t t-esc="dashboard.sum_waiting"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    -->
             
             <t t-name="JournalBodyBankCashApi">
 		<!-- On the left, display :
@@ -95,11 +213,11 @@
 	                           <t t-if="dashboard.t_chq == 0">
 				    	<span title="Todays cheques to be clear in bank">Todays Cheques</span>
 	                           </t>
-	                        </div>
-	                        <div class="col-xs-6 text-right">
-	                            <a name="open_cheque_payments" context="{'type': 'todays'}" type="object">
+	                        </   <a name="open_cheque_payments" context="{'type': 'todays'}" type="object">
 	                            <span><t t-esc="dashboard.todays_cheque"/></span>
-	                            </a>
+	                       div>
+	                        <div class="col-xs-6 text-right">
+	                              </a>
 	                        </div>
 	                    </div-->
 	                    <div class="row" >
