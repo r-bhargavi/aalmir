@@ -432,7 +432,7 @@ class SaleOrderLine(models.Model):
             	warning_mess = {
                         'title': _('Not enough inventory!'),
                         'message' : _("This [%s]%s couldn't be sold as it's current stock is %.2f %s.\n After selling %.2f %s the remaining stock will be %.2f %s that is lower than MSQ of %.2f %s. You can maximum sell upto %.2f %s ") % \
-                            (self.product_id.default_code,self.product_id.name,pricelist_id.stock_qty, self.product_uom.name,rec.product_uom_qty, self.product_id.uom_id.name, pricelist_id.stock_qty-product_qty, self.product_id.uom_id.name,pricelist_id.msq, self.product_uom.name,pricelist_id.stock_qty-pricelist_id.msq, self.product_uom.name)
+                            (self.product_id.default_code,self.product_id.name,pricelist_id.stock_qty, self.product_uom.name,self.product_uom_qty, self.product_id.uom_id.name, pricelist_id.stock_qty-product_qty, self.product_id.uom_id.name,pricelist_id.msq, self.product_uom.name,pricelist_id.stock_qty-pricelist_id.msq, self.product_uom.name)
                     }
            	return {'warning': warning_mess}
         
