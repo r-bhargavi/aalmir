@@ -55,6 +55,11 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
+                <notebook position='before'>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','request')]}" style='color:blue'>Payment Term Request Sent to Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','approve')]}" style='color:green'>Payment Term Request Approved By Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','reject')]}" style='color:red'>Payment Term Request  Rejected By Account Department.</h4>
+                </notebook>
                 <xpath expr="//button[@name='invoice_open']" position="attributes">
                     <attribute name="attrs">{}</attribute>
                     <attribute name="states">''</attribute>
@@ -107,6 +112,10 @@
 			Select Payment Approved By for Payment
 		  	</h4>-->
 			</div>
+                        <field name='payment_term_request' invisible='1'/>
+
+                        <field name="visible_request_button" invisible="1" />
+                       <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
                        
 		 </xpath>
                  <field name='partner_id' position='replace'>
@@ -250,7 +259,11 @@
 		        <field name='payment_term_id' position='replace'>
 		        <label for='payment_term_id'/>
 			<div>
-	               		<field name="payment_term_id" class="oe_inline" nolabel="1" context="{'n_partner_id':partner_id,'sale_id':sale_id}" options="{'no_create': True}"/>
+                                                    <field name='payment_term_request' invisible='1'/>
+
+	               		<field name="payment_term_id" required="1" class="oe_inline" nolabel="1" context="{'n_partner_id':partner_id,'n_standard_term':True}" options="{'no_create': True}"/>
+                                <field name="visible_request_button" invisible="1" />
+                                <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
 		      		<field name="check_payment_term"  class="oe_inline" nolabel="1" />
 			</div>
                           <field name="delivery_date"  attrs="{'invisible':[('delivery_date','=',False)]}"/>
@@ -475,7 +488,11 @@
 		   <field name="n_pop_uploaded_document"  nolabel="1" colspan="2" 
                     attrs="{'invisible':[('n_pop_receipt_date','=',False)]}" filename="lpo_name" readonly="1"/>
                  </field>
-
+                <notebook position='before'>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','request')]}" style='color:blue'>Payment Term Request Sent to Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','approve')]}" style='color:green'>Payment Term Request Approved By Account Department.</h4>
+                <h4 attrs="{'invisible':[('payment_term_request','!=','reject')]}" style='color:red'>Payment Term Request  Rejected By Account Department.</h4>
+                </notebook>
                   <xpath expr="//notebook/page[2]" position='attributes'>
                        <attribute name='string'>Other Info</attribute>
                   </xpath>

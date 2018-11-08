@@ -185,6 +185,9 @@ class AccountInvoice(models.Model):
     document_id=fields.Many2many('customer.upload.doc', 'customer_invoice_rel','cust_doc_rel',
      string='LPO Number')
     user_ids=fields.Many2one('res.users', compute='user_name')
+    visible_request_button= fields.Boolean(string='Visible Button', default=False)
+
+    payment_term_request =fields.Selection([('request','Requested'),('approve','Approved'),('reject','Rejected')])
 
     taxe = fields.Many2many('account.tax', 
                                 'product_taxes_rel_value_ext',
@@ -195,6 +198,29 @@ class AccountInvoice(models.Model):
     check_vat=fields.Boolean('Print VAT')
     partner_vat=fields.Char('VAT',related='partner_id.vat')
     tax_documents=fields.Many2many('ir.attachment','customer_tax_documents_rel','invoice_id','doc_id','Upload Documents')
+    
+    @api.multi
+    def show_payment_term(self):
+	if self.payment_term_id.n_new_request and self.visible_request_button:
+		form_id = self.env.ref('gt_order_mgnt.request_payment_term_wizard_form_view', False)
+		return {
+		    'type': 'ir.actions.act_window',
+		    'view_type': 'form',
+		    'view_mode': 'form',
+		    'res_model': 'request.payment.term.wizard',
+		    'views': [(form_id.id, 'form')],
+		    'view_id': form_id.id,
+		    'target':'new',
+		} 
+
+    @api.multi
+    @api.onchange('payment_term_id')
+    def n_payment_term(self):
+	if self.payment_term_id.n_new_request:
+		self.visible_request_button=True
+	else:
+		self.visible_request_button=False
+	return 
     
     @api.multi
     def approve_bill(self):
@@ -379,7 +405,9 @@ class AccountInvoice(models.Model):
     @api.multi
     def _due_invoice_amount(self):
         for record in self:
-            invoices=self.env['account.invoice'].search([('sale_id','=', record.sale_id.id),('id','!=',record.id),('state','in',('draft','open'))])
+            print "resdfd sale-------------",record.sale_id.id
+            invoices=self.env['account.invoice'].search([('partner_id','=',record.partner_id.id),('id','!=',record.id),('state','=','open')])
+            print "invoicesinvoicesinvoices",invoices
             if invoices:
                total=0.0
                for invoice in invoices:
