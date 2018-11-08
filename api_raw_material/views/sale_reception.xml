@@ -35,6 +35,8 @@
 				<tree string="Discount" limit="2" create="false" edit="false" delete="false" >
 			            <field name="qty_range_1" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 			            <field name="qty_range_2" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+				    <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 			            <field name="qty_range_3" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 			            <field name="qty_range_4" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 			            <field name="qty_range_5" widget='monetary' options="{'currency_field': 'currency_id'}"/>
@@ -56,11 +58,15 @@
 				    <field name="base_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_6" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_7" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                    <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+				    <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="currency_id" invisible="1"/>
 				</tree>
 				<form create="false" edit="false" delete="false">
 					<field name="qty_range_6" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 					<field name="qty_range_7" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                        <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                        <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 					<field name="currency_id" invisible="1"/>
 				</form>
 	        	</field>
@@ -118,9 +124,9 @@
                                 attrs="{'invisible': [('product_id', '=', False)]}"
                                 class="oe_edit_only"  icon="fa-history"/>
                     <field name="qty_range_1" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                    <field name="qty_range_2" string="301_1000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                    <field name="qty_range_8" string="1001_2000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                    <field name="qty_range_9" string="2001_3000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    <field name="qty_range_2" string="301-1000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    <field name="qty_range_8" string="1001-2000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    <field name="qty_range_9" string="2001-3000" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     <field name="qty_range_3" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 		    <field name="qty_range_4" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     <field name="qty_range_5" widget='monetary' options="{'currency_field': 'currency_id'}"/>
@@ -168,12 +174,15 @@
                             </div>
 		            <field name="stock_qty" readonly="1"/>
 		            <field name="qty_range_1"/>
-		            <field name="qty_range_2"/>
+		            <field name="qty_range_2" string="301-1000"/>
+                             <field name="qty_range_8" string="1001-2000"/>
+		            <field name="qty_range_9" string="2001-3000"/>
 		            <field name="qty_range_3"/>
 			    <field name="qty_range_4"/>
 		            <field name="qty_range_5"/>
 		            <field name="qty_range_6"/>
 		            <field name="qty_range_7"/>
+		           
 		            <field name="discount"/>
 		            <field name="msq"/>
 		            
