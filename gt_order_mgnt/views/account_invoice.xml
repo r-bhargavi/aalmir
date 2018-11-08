@@ -107,7 +107,7 @@
 			 <div>
 		               <field name="payment_term_id" required="1" class="oe_inline" nolabel="1" 
                                      options="{'no_create': True}" context="{'partner_id':partner_id,'vendor':True}"/>
-			      <field name="check_payment_term"  class="oe_inline" nolabel="1" />
+			      <field name="check_payment_term"  invisible="1" class="oe_inline" nolabel="1" />
 <!--                        <h4  style="color:red" attrs="{'invisible': ['|',('send_bill_bool', '=', True),('state','!=','open')]}">
 			Select Payment Approved By for Payment
 		  	</h4>-->
@@ -262,10 +262,12 @@
                                                     <field name='payment_term_request' invisible='1'/>
 
 	               		<field name="payment_term_id" required="1" class="oe_inline" nolabel="1" context="{'n_partner_id':partner_id,'n_standard_term':True}" options="{'no_create': True}"/>
-                                <field name="visible_request_button" invisible="1" />
-                                <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
-		      		<field name="check_payment_term"  class="oe_inline" nolabel="1" />
+                                
 			</div>
+                                <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
+		      		<field name="check_payment_term"  class="oe_inline" nolabel="1" invisible="1"/>
+                                                        <field name="visible_request_button" invisible="1" />
+
                           <field name="delivery_date"  attrs="{'invisible':[('delivery_date','=',False)]}"/>
 		           <field name='lpo_number' attrs="{'invisible':[('lpo_number','=',False)]}" readonly='1'/>
                            <field name="invoice_due_date" invisible="1"/>
