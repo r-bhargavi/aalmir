@@ -69,7 +69,7 @@ class HrExpense(models.Model):
     
     @api.multi
     def print_payment_receipt(self):
-        return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account')
+        return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account_new')
         return False
     
     @api.onchange('bank_journal_id_expense')
