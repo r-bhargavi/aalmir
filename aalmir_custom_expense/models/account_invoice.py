@@ -19,7 +19,7 @@ class AccountInvoice(models.Model):
             pass
         elif self.employee_bill and self.employee_bill ==True:
             return {'domain': {'partner_id': [('employee', '=', True)]}}
-    @api.depends('amount_total')
+    @api.depends('amount_total','state')
     def _compute_check_total_tracker(self):
         print "yrfbfnmfdknkjfngkdjngkjdfbg-------------------------"
         for invoice in self:
