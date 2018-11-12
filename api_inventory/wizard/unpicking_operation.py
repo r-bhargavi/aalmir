@@ -46,6 +46,7 @@ class unpickBatchesWizard(models.TransientModel):
 			master_batch_name = ''
 			transit_id=total_qty_unit=pkg_capicity_unit = pkg_unit=False	
 			for line in rec.line_ids:
+                                print "line------------------------",line
 				if not q.check:
                                     continue
 				master_batch_id = line.master_id
@@ -66,6 +67,7 @@ class unpickBatchesWizard(models.TransientModel):
 					total_quantity += btch.convert_product_qty
 					rem_batches.extend([(3,x.id) for x in master_batch_id.batch_id])
 				transit_id = line.store_id
+                                print "transit_idtransit_id",transit_id,line
 			# to update batches in pack Operation
 			rec.pick_id.batch_number = rem_batches
 			

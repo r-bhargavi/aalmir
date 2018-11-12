@@ -68,6 +68,8 @@
                 <xpath expr="//button[@name='action_cancel_draft']" position="attributes">
                     <attribute name="attrs">{'invisible':[('state','not in',['cancel','rejected'])]}</attribute>
 		 </xpath>
+                <xpath expr="//field[@name='purchase_id']" position="replace">
+		 </xpath>
               
                  <button name="invoice_open"  position="after">
                 <button name="aalmir_invoice_print" string="Download" type="object" states="draft,open" class="oe_highlight" context="{'out_invoice':True}" />
@@ -100,6 +102,7 @@
                           <field name='customer_name_report'/>
                           <field name='destination_report'/>
                            <field name='report_company_name'/>
+                           <field name='origin' readonly="1" attrs="{'invisible':[('origin','!=','')]}"/>
                            <field name='company_currency_id' invisible='1'/>
                    </field>
                   <xpath expr="//field[@name='currency_id']" position="after">

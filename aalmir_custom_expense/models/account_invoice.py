@@ -21,12 +21,13 @@ class AccountInvoice(models.Model):
             return {'domain': {'partner_id': [('employee', '=', True)]}}
     @api.depends('amount_total')
     def _compute_check_total_tracker(self):
-        print "dsfdsfdsfdsfdsfds-------------------------"
+        print "yrfbfnmfdknkjfngkdjngkjdfbg-------------------------"
         for invoice in self:
             if invoice.type in ('in_invoice','in_refund'):
-                if invoice.state in ('draft') and not invoice.purchase_id:
+                if not invoice.origin and invoice.state in ('draft'):
+                    print "if condition matched-----------------"
                     non_approval=self.env['approval.config.bill.line'].search([('partner_id','=',invoice.partner_id.id)])
-                    print "non_approvalnon_approvalnon_approval",non_approval
+                    print "non_approvalnon_ap123123provalnon_approval",non_approval
                     if non_approval:
                         if non_approval.currency_id.id!=invoice.currency_id.id:
                             from_currency = non_approval.currency_id
@@ -40,8 +41,9 @@ class AccountInvoice(models.Model):
                             invoice.check_total=False
                     else:
                          invoice.check_total=True
-#            else:
-#                self.check_total=True
+                else:
+                    print "ekse part-----345345----------------"
+                    self.check_total=False
         print "self.check_totalself.check_totalself.check_total",invoice.check_total
   
             
