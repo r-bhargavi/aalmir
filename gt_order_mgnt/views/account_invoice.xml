@@ -407,11 +407,11 @@
                     <field name="amount_total_company_signed" nolabel="1" class="oe_subtotal_footer_separator oe_inline" widget='monetary' options="{'currency_field': 'company_currency_id'}" />
                  </xpath> 
                  
-                 <field name="amount_untaxed" position="before"> 
-                     <label for='all_invoice_due_amount' style='color:red' attrs="{'invisible':['|',('all_invoice_due_amount','=',0),('state','in',('paid','cancel','open'))]}"/>
+                 <!--<field name="amount_untaxed" position="before">--> 
+<!--                     <label for='all_invoice_due_amount' style='color:red' attrs="{'invisible':['|',('all_invoice_due_amount','=',0),('state','in',('paid','cancel','open'))]}"/>
                      <div >
                         <field name='all_invoice_due_amount' attrs="{'invisible':['|',('all_invoice_due_amount','=',0),('state','in',('paid','cancel','open'))]}" widget='monetary' options="{'currency_field': 'currency_id'}" style='color:red' nolabel='1' class='inline'/>
-                     </div>
+                     </div>-->
                       <!--field name="total_sale_amount" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible':[
 
 '|',('order_line', '=',False),('sale_id','=',False)]}"/-->
@@ -421,7 +421,7 @@
                               options="{'currency_field': 'currency_id'}"
                          readonly="1" attrs="{'invisible':[('payable_amount','=',0)]}"/-->
                        
-                 </field>
+                 <!--</field>-->
                  
                  <field name="invoice_line_ids" position="before">
                      <field name="order_line" nolabel="1" widget="one2many_list" mode="tree,kanban" context="{'type': type, 'journal_id': journal_id, 'default_invoice_id': id}" attrs="{'readonly':[('state','!=','draft')],'invisible':[('advance_invoice','=',False)]}">
