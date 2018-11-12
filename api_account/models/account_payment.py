@@ -45,19 +45,27 @@ class PaymentDocuments(models.Model):
 class accountPayment(models.Model):
     _inherit='account.payment'
 
-    uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
+#    uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
+    uploaded_document = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload Document')
+    bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always')
+
+    send_ftr_req=fields.Boolean(string="FTR Sent",default=False)
     doc_name=fields.Char()
     payment_method = fields.Selection([('neft', 'Fund Transfer'),
-				    ('cheque', 'Cheque')],string='Type')
+				    ('cheque', 'Cheque')],string='Type',track_visibility='always')
+    pay_p_up = fields.Selection([('post', 'Posted'),
+				    ('not_posted', 'Not Posted')],string='Fund Posted/Unposted',track_visibility='always')
+    chq_s_us = fields.Selection([('signed', 'Signed'),
+				    ('not_signed', 'Not Signed')],string='Cheque Signed/Unsigned',track_visibility='always')
 				    
     cheque_details = fields.One2many('bank.cheque.details','payment_id','Cheque Details')
     pay_type = fields.Selection([('sale', 'Sale'),
 				    ('purchase', 'Purchase'),
 				    ('cash', 'Cash'),
 				    ('bank', 'Bank'),
-				    ('general', 'Miscellaneous')],related='journal_id.type')
+				    ('general', 'Miscellaneous')],related='journal_id.type',track_visibility='always')
     user_id = fields.Many2one('res.users', 'Reconcile By')
-    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
+    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status',track_visibility='always')
     
 #    @api.multi
 #    def button_invoices(self):
@@ -80,6 +88,14 @@ class accountPayment(models.Model):
 #            'type': 'ir.actions.act_window',
 #            'domain': [('id', 'in', [x.id for x in self.invoice_ids])],
 #        }
+
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.partner_id.id)])
+            if bank_id:
+                self.bank_id=bank_id.id
     
 #    adding company domain on change of payment type
     @api.onchange('payment_type')
@@ -101,6 +117,26 @@ class accountPayment(models.Model):
             obj = self.env['account.invoice'].browse(self._context.get('active_id'))
             res['domain']['journal_id'].append(('company_id', '=', obj.company_id.id))
         return res
+    @api.multi
+    def post_funds(self):
+        
+        self.write({'pay_p_up':'post'})
+    @api.multi
+    def send_fund_tfr_req(self):
+        cofirm_form = self.env.ref('api_account.fund_transfer_wiz_form', False)
+        if cofirm_form:
+            return {
+                        'name':'Fund Transfer Request Details',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'fund.transfer.wizard',
+                        'views': [(cofirm_form.id, 'form')],
+                        'view_id': cofirm_form.id,
+                        'target': 'new',
+                        'context':{'force_confirm':True}
+                    }
+        return True
     
     @api.multi
     def post(self):
@@ -148,13 +184,12 @@ class BankChequeDetails(models.Model):
     journal_id = fields.Many2one('account.journal',related="payment_id.journal_id",string='Journal')
     partner_id = fields.Many2one('res.partner',related="payment_id.partner_id",string='Supplier/Customer')
     bank_name = fields.Many2one('cheque.bank.name','Bank Name')
-    communication = fields.Char(related="payment_id.communication",string='Internal Note')
-    #bank_id = fields.Many2one('res.partner.bank', 'Bank Name')
-    cheque_no = fields.Char('Cheque No.')
-    cheque_date = fields.Date('Cheque Date')
-    branch_name = fields.Char('Bank Branch Name')
+    communication = fields.Char(related="payment_id.communication",string='Internal Note',track_visibility='always')
+    cheque_no = fields.Char('Cheque No.',track_visibility='always')
+    cheque_date = fields.Date('Cheque Date',track_visibility='always')
+    branch_name = fields.Char('Bank Branch Name',track_visibility='always')
     amount = fields.Float('Amount')
-    reconcile_date = fields.Date('Reconcile Date')
+    reconcile_date = fields.Date('Reconcile Date',track_visibility='always')
     register_payment_id=fields.Many2one('account.register.payments')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="payment_id.cheque_status", string='Cheque Status')
     

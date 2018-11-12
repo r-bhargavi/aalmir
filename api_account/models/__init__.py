@@ -23,5 +23,6 @@ import account_payment
 import bank_reconcilation
 import journal_voucher
 import ledgerwise_report
+import fund_transfer_wiz
 import account
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

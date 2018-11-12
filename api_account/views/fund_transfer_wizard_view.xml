@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+             <!-- End add draft Po menu in po-->
+    <!--- Start purchase order cancel -->
+     <record id="fund_transfer_wiz_form" model="ir.ui.view">
+        <field name="name">fund.transfer.wizard.form</field>
+        <field name="model">fund.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fund Transfer Wizard">
+                <group>
+                   <field name='mail_details' readonly="1"/>
+                </group>
+                  <footer>
+                     <button type="object" string="Send Request" class="oe_highlight" 
+                     name="send_mail"/>
+                   <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+                     special='cancel'/>
+  
+                </footer>
+               
+            </form>
+        </field>
+    </record>
+    </data>
+</openerp>
+
