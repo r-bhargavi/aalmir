@@ -25,3 +25,4 @@ access_product_price_history_group_user,product.price.history.group.user,product
 access_production_request_detail_group_user,production.request.detail.group.user,gt_order_mgnt.model_production_request_detail,account.group_account_user,1,1,1,1
 access_type_product_group_user,type.product.group.user,model_type_product,base.group_user,1,1,1,1
 access_bank_details_expense_group_user,bank.details.group.user,model_bank_cheque_details_expense,account.group_account_user,1,1,1,1
+access_res_partner_group_user,res.partner.group.user,base.model_res_partner,account.group_account_user,1,1,1,0

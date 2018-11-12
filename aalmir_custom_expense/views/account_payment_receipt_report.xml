@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
   <openerp>
     <data>
-	<template id="report_payment_account_new" >
+	<template id="report_payment_account_new1" >
 
            <t t-call="report.html_container">
                <t t-foreach="docs" t-as="doc">
@@ -38,12 +38,7 @@
                            <p t-field="doc.date" t-options ='{"format": "MM/dd/yyyy"}'/>
                         </div>
                        
-                         <div class="col-xs-3 table-bordered report_class" >
-                            <p style="font-weight: bold;" >Payment Ref.</p>
-                        </div>
-                        <div class="col-xs-3 table-bordered report_class" >
-                            <p t-esc="doc.payment_id.name"></p>
-                        </div>
+                        
                        
                         <div class="col-xs-3 table-bordered report_class" >
                            <p style="font-weight: bold;" >Payment Date</p>
@@ -51,50 +46,73 @@
                         <div class="col-xs-3 table-bordered report_class" >
                           <p t-esc="doc.payment_id.payment_date"></p>
                         </div>
-                        
-   </div>  
-  <div class="row" style='border:1px solid #9999;margin-left:2px;margin-right:2px'>
-    <div class="col-xs-3 table-bordered report_class">
+                        <div class="col-xs-3 table-bordered report_class">
                            <p style="font-weight: bold;" >Paid To</p>
        </div>
-                        <div class="col-xs-9 table-bordered report_class">
+                        <div class="col-xs-3 table-bordered report_class">
                             <t t-if="doc.employee_id">
                                 <t t-esc="doc.employee_id.name"/></t>
                             <t t-if="doc.partner_id_preferred">
                                 <t t-esc="doc.partner_id_preferred.name"/></t>
                         </div>
                         
-
-            </div>
-            
-            <div class="row" >
-                       </div>
+   </div>  
 
        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px">
                         <tr>
                             <td style="font-weight: bold;">Product#</td>
-                            <td  style="font-weight: bold;">Product Type</td> 
                              <td  style="font-weight: bold;">Unit Price</td>
-                            <td  style="font-weight: bold;">Expense Account</td>
+                            <td  style="font-weight: bold;">VAT</td>
                           <td style="font-weight: bold;">Total</td>
                         </tr>
                        
                         <t t-foreach="doc" t-as="line">
                            <tr>
                                 <td>
+                                    <span t-if='line.product_id.default_code'>
+                                    [<span t-esc='line.product_id.default_code'/>]</span>
                                     <t t-esc="line.product_id.name"/>
                                 </td>
-                                <td><t t-esc="line.type_product.name"/></td>
                                  <td>
                                     <t t-esc="line.unit_amount"/></td>   
                                  <td>
-                                    <t t-esc="line.product_expense_account.name"/></td>   
+                                     <span t-if='line.tax_ids'>
+                                     <span t-if='line.tax_ids.price_include==False'>
+                                    <t t-esc="line.unit_amount*0.05"/>
+                                     </span>
+                                     <span t-if='line.tax_ids.price_include==True'>
+                                    <t t-esc="line.unit_amount*0.0"/>
+                                     </span>
+                                     </span>
+                                 </td>  
                                  <td>
                                     <t t-esc="line.total_amount"/></td>   
                             </tr>
                         </t>
                              
                     </table>
+                    
+                    
+                    <table class="table table-bordered" style="border: 1px solid #9999;margin-top:5px" 
+                 >
+          <tr>
+	     <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Fund Transfer Payment Details</th> 
+          </tr>
+          <tr>
+              <th>Payment Date</th>
+              <th>Receipt No.</th>
+              <th>Transfer Method</th>
+              <th>Amount</th>
+           </tr>
+           <tr>
+              <td><span t-field='doc.payment_id.payment_date' t-options="{&quot;format&quot;: &quot;dd/MM/yyyy&quot;}"/></td>
+              <td><span t-esc='doc.payment_id.name'/></td>
+              <td><span t-esc='doc.payment_id.journal_id.type'/></td>
+              <td><span t-esc='doc.payment_id.amount'/>
+              <span t-esc="doc.payment_id.currency_id.symbol"/>
+              </td>
+           </tr>
+        </table>
                      
                             <table class="table table-bordered" style="border: 1px solid #9999;margin-top:5px">
 		                  <tr>

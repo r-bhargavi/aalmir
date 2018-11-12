@@ -69,7 +69,7 @@ class HrExpense(models.Model):
     
     @api.multi
     def print_payment_receipt(self):
-        return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account_new')
+        return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account_new1')
         return False
     
     @api.onchange('bank_journal_id_expense')
@@ -82,16 +82,7 @@ class HrExpense(models.Model):
             self.is_bank_journal=False
             print "is it bank journal-----------------",self.is_bank_journal
 
-#    @api.onchange('bank_cash')
-#    def bank_cash_onchange(self):
-#        print "bank_cash=======",self.bank_cash
-#    	if self.bank_cash and self.bank_cash == 'bank':
-#            self.is_bank_journal=True
-#            self.bank_journal_id=False
-#            return {'domain': {'bank_journal_id_expense': [('type', '=', 'bank'),('company_id', '=', self.company_id.id)]}}
-#        elif self.bank_cash and self.bank_cash == 'cash':
-#            self.is_bank_journal=False
-#            return {'domain': {'bank_journal_id_expense': [('type', '=', 'cash'),('company_id', '=', self.company_id.id)]}}
+
         
     
     @api.onchange('requested_by')
@@ -128,7 +119,7 @@ class HrExpense(models.Model):
         self.write({'user_id':self._uid})
         if self.expense_type=='other_expense':
             self.write({'employee_id':False})
-        if self.expense_type=='employee_expense':
+        if self.expense_type=='emp_expense':
             self.write({'partner_id_preferred':False})
         self.write({'bank_journal_id_expense':False})
         non_approval=self.env['approval.config.line'].search([('type_product','=',self.type_product.id)])
@@ -238,12 +229,12 @@ class HrExpense(models.Model):
 
                 else:
                     move_line_data={}
-                    if expense.expense_type=='employee_expense' and not expense.employee_id.address_home_id:
+                    if expense.expense_type=='emp_expense' and not expense.employee_id.address_home_id:
                         raise UserError(_("No Home Address found for the employee %s, please configure one.") % (expense.employee_id.name))
-                    if expense.employee_id:
-                        print expense.employee_id.address_home_id
-                        emp_account = expense.employee_id.address_home_id.property_account_payable_id.id
-                        name=expense.employee_id.name
+                    if expense.expense_type=='emp_expense':
+                            print expense.employee_id.address_home_id
+                            emp_account = expense.employee_id.address_home_id.property_account_payable_id.id
+                            name=expense.employee_id.name
                     else:
                         if expense.expense_type=='other_expense' and expense.partner_id_preferred:
                             emp_account = expense.partner_id_preferred.property_account_payable_id.id
@@ -251,6 +242,9 @@ class HrExpense(models.Model):
                         else:
                             emp_account = expense.product_id.property_account_expense_id.id
                             name=expense.product_id.name
+                if not emp_account:
+                    raise UserError(_("Please Define Partner for registering payment"))
+
                    
                 print "namenamename----------------",name,emp_account
                 move_line_data={
