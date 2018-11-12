@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="account.invoice_supplier_tree"/>
             <field name="arch" type="xml">
 		<field name="number" position="after">
-                    <field name="invoice_id_rel"/>
+                    <field name="invoice_id_rel" attrs="{'invisible':[('invoice_id_rel','=',False)]}"/>
             	</field>
             </field>
         </record>
@@ -17,7 +17,7 @@
             <field name="inherit_id" ref="account.invoice_tree"/>
             <field name="arch" type="xml">
 		<field name="number" position="after">
-                    <field name="invoice_id_cus"/>
+                    <field name="invoice_id_cus" attrs="{'invisible':[('invoice_id_cus','=',False)]}"/>
             	</field>
             </field>
        </record>
