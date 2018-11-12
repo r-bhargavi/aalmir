@@ -47,8 +47,6 @@
 				    <field name="base_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_6" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_7" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-				    <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-				    <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="stock_qty" readonly="1"/>
 				    <field name="currency_id" invisible="1"/>
 				</form>
@@ -58,15 +56,11 @@
 				    <field name="base_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_6" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="qty_range_7" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                                    <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-				    <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 				    <field name="currency_id" invisible="1"/>
 				</tree>
 				<form create="false" edit="false" delete="false">
 					<field name="qty_range_6" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 					<field name="qty_range_7" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                                        <field name="qty_range_8" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                                        <field name="qty_range_9" widget='monetary' options="{'currency_field': 'currency_id'}"/>
 					<field name="currency_id" invisible="1"/>
 				</form>
 	        	</field>

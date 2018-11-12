@@ -379,16 +379,12 @@ class SaleOrderLine(models.Model):
 				if line.product_uom_qty and line.buying_type =='book':
 					if line.product_uom_qty >= 15000 and line.product_uom_qty <25000:
 						new_price += pricelist_id.qty_range_6
-					if line.product_uom_qty > 300 and line.product_uom_qty <=1000:
-						new_price += pricelist_id.qty_range_8
-					if line.product_uom_qty > 1000 and line.product_uom_qty <=3000:
-						new_price += pricelist_id.qty_range_9
 					elif line.product_uom_qty >= 25000:
 						new_price += pricelist_id.qty_range_7
 				elif line.product_uom_qty and line.buying_type =='spot':
 					if line.product_uom_qty  <=300:
 						new_price += pricelist_id.qty_range_1
-					elif line.product_uom_qty > 300 and line.product_uom_qty <=3000:
+					elif line.product_uom_qty > 300 and line.product_uom_qty <=1000:
 						new_price += pricelist_id.qty_range_2
 					elif line.product_uom_qty > 3000 and line.product_uom_qty <=10000:
 						new_price += pricelist_id.qty_range_3
@@ -396,9 +392,9 @@ class SaleOrderLine(models.Model):
 						new_price += pricelist_id.qty_range_4
 					elif line.product_uom_qty > 15000:
 						new_price += pricelist_id.qty_range_5
-					elif line.product_uom_qty > 300 and line.product_uom_qty <=1000:
+					elif line.product_uom_qty > 1000 and line.product_uom_qty <=2000:
 						new_price += pricelist_id.qty_range_8
-					elif line.product_uom_qty > 1000 and line.product_uom_qty <=3000:
+					elif line.product_uom_qty > 2000 and line.product_uom_qty <=3000:
 						new_price += pricelist_id.qty_range_9
 				line.fixed_price = pricelist_id.currency_id.compute(new_price,line.order_id.n_quotation_currency_id)
                 else:
@@ -485,6 +481,56 @@ class rawMaterilaPriceUpdate(models.Model):
 
 	@api.multi
 	def update_price(self):
-		pass
+#            if self._contextcontext is None:
+#                context = {}
+            active_ids = self._context.get('active_ids')
+            print "active_idsactive_ids",active_ids
+            for record in self:
+                material_obj=self.env['raw.material.pricelist']
+                if record.qty_range_1>0.0:
+                    qty_1=material_obj.browse(active_ids)
+                    if qty_1:
+                        for each in qty_1:
+                            each.write({'qty_range_1':record.qty_range_1})
+                elif record.qty_range_2>0.0:
+                    qty_2=material_obj.browse(active_ids)
+                    if qty_2:
+                        for each in qty_2:
+                            each.write({'qty_range_2':record.qty_range_2})
+                elif record.qty_range_3>0.0:
+                    qty_3=material_obj.browse(active_ids)
+                    if qty_3:
+                        for each in qty_3:
+                            each.write({'qty_range_3':record.qty_range_3})
+                elif record.qty_range_4>0.0:
+                    qty_4=material_obj.browse(active_ids)
+                    if qty_4:
+                        for each in qty_4:
+                            each.write({'qty_range_4':record.qty_range_4})
+                elif record.qty_range_5>0.0:
+                    qty_5=material_obj.browse(active_ids)
+                    if qty_5:
+                        for each in qty_5:
+                            each.write({'qty_range_5':record.qty_range_5})
+                elif record.qty_range_6>0.0:
+                    qty_6=material_obj.browse(active_ids)
+                    if qty_6:
+                        for each in qty_6:
+                            each.write({'qty_range_6':record.qty_range_6})
+                elif record.qty_range_7>0.0:
+                    qty_7=material_obj.browse(active_ids)
+                    if qty_7:
+                        for each in qty_7:
+                            each.write({'qty_range_7':record.qty_range_7})
+                elif record.qty_range_8>0.0:
+                    qty_8=material_obj.browse(active_ids)
+                    if qty_8:
+                        for each in qty_8:
+                            each.write({'qty_range_8':record.qty_range_8})
+                elif record.qty_range_9>0.0:
+                    qty_9=material_obj.browse(active_ids)
+                    if qty_9:
+                        for each in qty_9:
+                            each.write({'qty_range_9':record.qty_range_9})
 		
 
