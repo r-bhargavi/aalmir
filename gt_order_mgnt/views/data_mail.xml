@@ -163,7 +163,7 @@
         <record id="email_template_payment_term_accepted" model="mail.template">
             <field name="name">Payment Term Accepted</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted for ${object.name}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted</field>
             <field name="email_to">${object.user_id.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>
             <field name="model_id" ref="sale.model_sale_order"/>
@@ -176,7 +176,7 @@
          <record id="email_template_payment_term_accepted_po" model="mail.template">
             <field name="name">Payment Term Accepted</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted for ${object.name}</field>
+            <field name="subject">API-ERP Payment Term Alert :Payment Term Accepted</field>
             <!--field name="email_to">${object.user_id.email|safe}</field-->
             <field name="lang">${object.partner_id.lang}</field>
             <field name="model_id" ref="purchase.model_purchase_order"/>
@@ -396,6 +396,27 @@
 		     <field name="model_id" ref="account.model_account_invoice"/>
                     <!--field name="report_template" ref="gt_order_mgnt.report_invoice_aalmir"/-->
                     <field name="report_name">API-Bill_${object.partner_id.name}_${(object.number or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html"><![CDATA[
+				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+				    <p>Dear Amir,</p>
+
+				    <p>This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. </p>
+                                    <p>Note: No action is required by your side unless you want to stop the release of bill payment, once payment is done, you will be informed. </p>
+
+				</div>
+                    ]]></field>
+        </record>
+        <record id="email_template_for_fund_transfer_request" model="mail.template">
+		    <field name="name">Funds Transfer Request</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">New Bank transfer request for Vendor name is created</field>
+		    <field name="email_to">${object.user_id.email|safe}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		     <field name="model_id" ref="account.model_account_payment"/>
+                    <!--field name="report_template" ref="gt_order_mgnt.report_invoice_aalmir"/-->
+                    <field name="report_name">Fund_Transfer_Details_${object.partner_id.name}_${(object.number or '').replace('/','_')}</field>
 		    <field name="auto_delete" eval="False"/>
 		    <field name="body_html"><![CDATA[
 				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">

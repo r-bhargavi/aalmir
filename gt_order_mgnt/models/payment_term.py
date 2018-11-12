@@ -466,7 +466,7 @@ class accountPayment(models.Model):
     sale_id = fields.Many2one('sale.order', 'Sale Order No.')
     sale_amount=fields.Float('Requested Amount', digits=(4,2))
     sale_currency_id=fields.Many2one('res.currency')
-    internal_note=fields.Text('Remarks on Receipt')
+    internal_note=fields.Text('Remarks on Receipt',track_visibility='always')
     payment_from=fields.Selection([('manual','Manual'),('advance','Advance Sale Order'),('invoice','Invoice Payment'),('multi','Multi Payment')], default='manual', string='Payment From')
 
     @api.multi
