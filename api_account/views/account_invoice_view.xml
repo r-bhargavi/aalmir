@@ -28,7 +28,7 @@
             <field name="arch" type="xml">
 		<field name="date_invoice" position="after">
                     <field name="purchase_id" string="Purchase Order"/>
-                    <field name="invoice_id_rel" readonly="1"/>
+                    <field name="invoice_id_rel" readonly="1" attrs="{'invisible':[('invoice_id_rel','=',False)]}"/>
 		 </field>            	
                 <field name="origin" position="attributes">
                     <attribute name="attrs">{'invisible':[('type', 'in', ['in_invoice'])]}</attribute>
@@ -146,7 +146,7 @@
 		 </field>
                  
 		 <field name='date_invoice' position='after'>
-                    <field name="invoice_id_cus" readonly="1"/>
+                    <field name="invoice_id_cus" readonly="1" attrs="{'invisible':[('invoice_id_cus','=',False)]}"/>
 		 </field>
                 
 		 <xpath expr="//sheet/label[1]" position="before">
