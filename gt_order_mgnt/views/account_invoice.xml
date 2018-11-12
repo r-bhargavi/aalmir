@@ -119,7 +119,7 @@
                        
 		 </xpath>
                  <field name='partner_id' position='replace'>
-		        <label for='partner_id' string='Vendor'/>
+		        <label for='partner_id' string='Partner'/>
 			 <div>
 		                <field name="partner_id" 
                                 context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" 
@@ -261,7 +261,7 @@
 			<div>
                                                     <field name='payment_term_request' invisible='1'/>
 
-	               		<field name="payment_term_id" required="1" class="oe_inline" nolabel="1" context="{'n_partner_id':partner_id,'n_standard_term':True}" options="{'no_create': True}"/>
+	               		<field name="payment_term_id" required="1" class="oe_inline" nolabel="1" context="{'sale':True,'n_partner_id': partner_id}" domain="[('n_standard_term','=',True)]" options="{'no_create': True}"/>
                                 
 			</div>
                                 <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
