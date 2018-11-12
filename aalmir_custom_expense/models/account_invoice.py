@@ -11,14 +11,15 @@ from dateutil.relativedelta import relativedelta
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
     check_total = fields.Boolean(string='Check Total',compute='_compute_check_total_tracker',default=False,store=True)
-    employee_bill = fields.Boolean(string='Employee Bill',default=False)
-    @api.onchange('employee_bill')
-    def employee_bill_onchange(self):
-        print "employee bil------------------",self.employee_bill
-    	if self.employee_bill and self.employee_bill == False:
-            pass
-        elif self.employee_bill and self.employee_bill ==True:
-            return {'domain': {'partner_id': [('employee', '=', True)]}}
+#    employee_bill = fields.Boolean(string='Employee Bill',default=False)
+#    @api.onchange('employee_bill')
+#    def employee_bill_onchange(self):
+#        print "employee bil------------------",self.employee_bill
+#    	if self.employee_bill and self.employee_bill == False:
+#            pass
+#        elif self.employee_bill and self.employee_bill ==True:
+#            print "self._context-------------------",self._context
+#            return {'domain': {'partner_id': [('employee', '=', True)]}}
     @api.depends('amount_total')
     def _compute_check_total_tracker(self):
         print "yrfbfnmfdknkjfngkdjngkjdfbg-------------------------"
