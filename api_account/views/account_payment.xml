@@ -31,7 +31,7 @@
 			 <field name="communication" position="after">
                               <field name="doc_name"  invisible="1" />
                               <field name="send_ftr_req"  invisible="1" />
-		              <field name="uploaded_document" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')]}"/>
+		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')]}"/>
 		         </field>
 		         <field name="journal_id" position="after">
 		              <field name="pay_type" invisible="1"/>
@@ -138,7 +138,7 @@
                    </field>
 		    <field name="communication" position="after">
 			  <field name="doc_name"  invisible="1" />
-			  <field name="uploaded_document" widget="many2many_binary" filename="doc_name" 
+			  <field name="uploaded_document" filename="doc_name" 
                              string="Upload Document" attrs="{'readonly':[('state','!=','draft')]}"/>
                           <field name='internal_note'/>
 		    </field>

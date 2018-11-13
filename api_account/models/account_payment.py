@@ -45,8 +45,8 @@ class PaymentDocuments(models.Model):
 class accountPayment(models.Model):
     _inherit='account.payment'
 
-#    uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
-    uploaded_document = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload Document')
+    uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
+#    uploaded_document = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload Document')
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always')
 
     send_ftr_req=fields.Boolean(string="FTR Sent",default=False)
