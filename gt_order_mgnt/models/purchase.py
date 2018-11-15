@@ -723,6 +723,7 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def create(self, vals): 
+        name=''
 	if vals.get('requisition_id'):
 		te_id=self.env['purchase.requisition'].search([('id','=',vals.get('requisition_id'))])
 		vals.update({'n_request_date':te_id.schedule_date,'notes':te_id.note_from_PR,'vendor_remark':te_id.description})
