@@ -106,7 +106,7 @@ class AccountInvoiceLine(models.Model):
     				if packg.pkgtype == 'primary':
 					rec.packaging_id =packg.id
 					break
-		rec.pack_qty =math.ceil(rec.quantity /rec.packaging_id.qty if rec.packaging_id else 1)
+		rec.pack_qty =math.ceil(rec.quantity /rec.packaging_id.qty if rec.packaging_id else 0)
 	
     @api.multi
     def write(self, vals):
