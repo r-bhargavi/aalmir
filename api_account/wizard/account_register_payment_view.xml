@@ -28,12 +28,17 @@
            <field name="journal_id" position='after'>
                 <field name="pay_type" invisible="1"/>
 		<field name="payment_method" attrs="{'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}" />
+                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')]}"/>
+                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
+                <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')]}"/>
                <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'required':[('payment_method','=','cheque')]}"/>
             </field>
              <field name="communication" position="replace">
                  <field name="communication" string='Internal Note'/>
                    <field name="doc_name"  invisible="1" />
-		   <field name="uploaded_document" filename="doc_name"  />
+		   <field name="uploaded_document" filename="doc_name" attrs="{'invisible':[('pay_p_up','=','not_posted')]}"/>
+                    <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'invisible':[('pay_p_up','=',False)]}"/>
+
 	    </field>
             <xpath expr="//group" position="after">
                 <group invisible="not context.get('batch', False)">

@@ -1,6 +1,5 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
-#
 #
 #    Copyright (C) 2013-Today(www.aalmirplastic.com).
 #
@@ -18,12 +17,29 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import account_invoice
-import account_payment
-import bank_reconcilation
-import journal_voucher
-import ledgerwise_report
-import fund_transfer_wiz
-import account
-import bank
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+
+from openerp import fields, models ,api, _
+from datetime import datetime,date,timedelta
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from openerp.tools.translate import _
+from openerp.exceptions import UserError, ValidationError
+import logging
+from urlparse import urljoin
+from urllib import urlencode
+import openerp.addons.decimal_precision as dp
+_logger = logging.getLogger(__name__)
+
+class ResPartnerBank(models.Model):
+    _inherit='res.partner.bank'
+    
+    account_name = fields.Char(string="Account Name", size=68)
+    swift_code = fields.Char('Swift Code',related='bank_id.bic',store=True)
+
+
+
+    @api.model
+    def create(self, vals):
+        bank = super(ResPartnerBank, self).create(vals)
+        print "bankbankbankbank",bank,self._context,vals
+
+        return bank

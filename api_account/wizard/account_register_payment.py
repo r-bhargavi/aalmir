@@ -83,6 +83,15 @@ class AccountRegisterPayments(models.Model):
     def _compute_pay_total(self):
         self.total_pay_amount = sum(line.paying_amt for line in
                                     self.invoice_payments)
+                                    
+    uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
+    bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always',copy=False)
+
+    pay_p_up = fields.Selection([('post', 'Done'),
+				    ('not_posted', 'Pending')],copy=False,string='Transfer Status',track_visibility='always')
+    chq_s_us = fields.Selection([('signed', 'Signed'),
+				    ('not_signed', 'Not Signed')],copy=False,string='Cheque Signed/Unsigned',track_visibility='always')
+				    
 
     is_auto_fill = fields.Char(string="Auto-Fill Pay Amount")
     invoice_payments = fields.One2many('invoice.payment.line', 'wizard_id',
@@ -98,7 +107,7 @@ class AccountRegisterPayments(models.Model):
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
     doc_name=fields.Char()
     payment_method = fields.Selection([('neft', 'Fund Transfer'),
-				    ('cheque', 'Cheque')],string='Type')
+				    ('cheque', 'Cheque')],string='Type',copy=False)
 
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')				    
     cheque_details = fields.One2many('bank.cheque.details','register_payment_id','Cheque Details')

@@ -9,6 +9,7 @@
             <field name="arch" type="xml">
                 <field name="currency_id" position="after">
                     <button string="Price Update Products" name="price_update_products" type="object" class="btn-primary"/>
+                    <button string="Payment Report" name="print_excel_report" type="object" class="btn-primary"/>
                 </field>
             </field>
          </record>

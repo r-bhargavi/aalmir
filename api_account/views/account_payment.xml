@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-            <record id="account.action_account_payments_payable" model="ir.actions.act_window">
-            <field name="name">Payments</field>
-            <field name="res_model">account.payment</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form,graph</field>
-            <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
-            <field name="domain">[('partner_type', '=', 'supplier')]</field>
-            <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                  Click to register a payment
-                </p><p>
-                  Payments are used to register liquidity movements (send, collect or transfer money).
-                  You can then process those payments by your own means or by using installed facilities.
-                </p>
-            </field>
-        </record>
         <!--  Produce -->
        <record id="view_account_payment_form_inherit" model="ir.ui.view">
 		<field name="name">account.payment.form</field>
@@ -25,20 +8,28 @@
 		<field name="inherit_id" ref="account.view_account_payment_form"></field>
 		<field name="arch" type="xml">
 			 <button name="post" position="after">
-		  	<button string='Send Fund Transfer Request' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|',('pay_p_up','!=','not_posted'),('payment_type','!=','outbound')]}" type="object" class="btn-primary"/>
-		  	<button string='Post Funds' name="post_funds" groups="account.group_account_manager" attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','!=','not_posted'),('payment_type','!=','outbound')]}" type="object" class="btn-primary"/>
+		  	<button string='Send Fund Transfer Reminder' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
+		  	<button string='Post Funds' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','!=','not_posted')]}" type="object" class="btn-primary"/>
+                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':[('payment_type','!=','outbound'),('chq_s_us','!=','unsigned'),('state','!=','posted')]}" type="object" class="btn-primary"/>
+
 		         </button>
 			 <field name="communication" position="after">
                               <field name="doc_name"  invisible="1" />
                               <field name="send_ftr_req"  invisible="1" />
-		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
+
+		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=','not_posted')]}"/>
+		              <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=',False)]}"/>
 		         </field>
+                         <field name="amount" position="after">
+                         </field>
+
 		         <field name="journal_id" position="after">
 		              <field name="pay_type" invisible="1"/>
 		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
-                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','!=','draft')],'invisible':[('payment_type','!=','outbound'),('payment_method','!=','neft')]}"/>
-                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear')],'readonly':[('state','!=','draft')],'invisible':[('cheque_status','!=','not_clear')]}"/>
-                                <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','!=','draft')],'invisible':[('payment_type','!=','outbound'),('payment_method','!=','neft')]}"/>
+                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')]}"/>
+                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
+                                <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
@@ -53,6 +44,21 @@
 		              		</tree>
 		              </field>
 			</field>
+                        <sheet>
+                        <notebook>
+                            <page string="Transfer Details" attrs="{'invisible':[('pay_p_up','=',False)]}">
+                                <group>
+                                <field name="mail_details" readonly="1"/>
+                                                            </group>
+                                <group>
+
+                                <field name="internal_note_tt" string="Remarks After Transfer" readonly="1"/>
+                               <field name="uploaded_proof" string="Payment Proof" widget="many2many_binary" readonly="1"/>
+                                                                                           </group>
+
+                            </page>
+                        </notebook>
+                    </sheet>
 		</field>
 	</record>
 
@@ -132,15 +138,23 @@
 		<field name="arch" type="xml">
 		    <button name="post" position="replace">
 		  	<button string='Register Payment' name="post" type="object" class="btn-primary"/>
+		  	<button string='Post Funds' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request" attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','!=','not_posted')]}" type="object" class="btn-primary"/>
 		    </button>
                     <field name="communication" position='attributes'>
                       <attribute name='string'>Internal Note</attribute>
+
                    </field>
 		    <field name="communication" position="after">
 			  <field name="doc_name"  invisible="1" />
+                        <field name="send_ftr_req"  invisible="1" />
+
+                        <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':['|',('payment_type','=','inbound'),('pay_p_up','!=','not_posted')]}"/>
+
 			  <field name="uploaded_document" filename="doc_name" 
-                             string="Upload Document" attrs="{'readonly':[('state','!=','draft')]}"/>
+                             string="Upload Document" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=','not_posted')]}"/>
                           <field name='internal_note'/>
+                            <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
+
 		    </field>
 		    <field name="currency_id" position="replace">
 			<field name="currency_id" invisible="1"/>
@@ -149,6 +163,10 @@
 		    <field name="journal_id" position="after">
 		              <field name="pay_type" invisible="1"/>
 		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
+                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','not in',['draft','posted'])],'invisible':['|',('payment_type','!=','outbound'),('payment_method','!=','neft')]}"/>
+                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
+                                <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','not in',['draft','posted'])]}"/>
+
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
 		              		<tree editable="top">

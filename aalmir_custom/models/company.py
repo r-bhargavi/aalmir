@@ -13,6 +13,16 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
+#        all_mat=self.env['raw.material.pricelist'].search([])
+#        for each in all_mat:
+#            each.write({'qty_range_8':each.qty_range_3,'qty_range_9':each.qty_range_3})
+#        return True
+        all_banks = self.env['res.partner.bank'].search([])
+        for each_bank in all_banks:
+            if each_bank.bank_id:
+                if each_bank.bank_id.bic:
+                    each_bank.write({'swift_code':each_bank.bank_id.bic})
+        return True
         all_prods = self.env['product.template'].search([])
         for each in all_prods:
             product_id=self.env['product.product'].search([('product_tmpl_id','=',each.id)],limit=1)
