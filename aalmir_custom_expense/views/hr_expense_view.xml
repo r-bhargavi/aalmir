@@ -5,7 +5,7 @@
             <field name="res_model">account.payment</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
-            <field name="context">{'default_payment_type': 'outbound','group_by':'chq_s_us'}</field>
+            <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
             <field name="domain">[('state','=','posted')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
@@ -22,7 +22,7 @@
             <field name="res_model">account.payment</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
-            <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
+            <field name="context">{'default_payment_type': 'outbound','group_by':'chq_s_us'}</field>
             <field name="domain">[('state','=','posted')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
