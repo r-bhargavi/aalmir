@@ -10,7 +10,7 @@
 			 <button name="post" position="after">
 		  	<button string='Send Fund Transfer Reminder' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
 		  	<button string='Post Funds' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|',('send_ftr_req','=',False),('pay_p_up','!=','not_posted')]}" type="object" class="btn-primary"/>
-                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':[('payment_type','!=','outbound'),('chq_s_us','!=','unsigned'),('state','!=','posted')]}" type="object" class="btn-primary"/>
+                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|',('payment_type','!=','outbound'),('chq_s_us','!=','unsigned'),('state','!=','posted')]}" type="object" class="btn-primary"/>
 
 		         </button>
 			 <field name="communication" position="after">
