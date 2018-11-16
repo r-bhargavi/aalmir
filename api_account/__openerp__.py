@@ -34,7 +34,7 @@
                 'views/account_invoice_view.xml',
                 'views/account_payment.xml',
                 'views/bank_reconcilation_view.xml',
-                'views/fund_transfer_wizard_view.xml',
+#                'views/fund_transfer_wizard_view.xml',
                 'views/ledgerwise_report.xml',
                 'views/journal_voucher_view.xml',
                 'views/squence_view.xml',

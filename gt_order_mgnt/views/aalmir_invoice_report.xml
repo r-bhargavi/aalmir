@@ -319,7 +319,10 @@
                                  <td><t t-esc="line.packaging_id.name"/></td>
                                 </t>
                                  <t t-if="doc.check_packaging_count">
-                                     <td><sapn t-esc="'%.0f'% line.pack_qty"/>
+                                     <td>
+                                         <t t-if='not line.product_id.tye=="service"'>
+                                         <span t-esc="'%.0f'% line.pack_qty"/>
+                                         </t>
                                         <t t-if='not line.packaging_id.uom_id.product_type'>
                                    	     <span t-esc="line.packaging_id.uom_id.name"/>
                                         </t>
