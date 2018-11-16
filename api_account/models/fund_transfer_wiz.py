@@ -34,7 +34,7 @@ import base64
 class FundTRansferApprove(models.Model):
     _name='fund.transfer.approve'
   
-    uploaded_proof = fields.Many2many('ir.attachment','bill_attachment_fund_rel','bill','fund_id','Payment Proof')
+    uploaded_proof = fields.Many2many('ir.attachment','bill_attachment_fund_rel','bill','fund_id','Payment Proof',track_visibility='always')
     internal_note_tt=fields.Text('Remarks on Fund Transfer',track_visibility='always')
     @api.multi 
     def transfer_funds(self):
