@@ -46,17 +46,17 @@ class accountPayment(models.Model):
     _inherit='account.payment'
 
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
-#    uploaded_document = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload Document')
-    bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always')
+    uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
+    bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always',copy=False)
 
-    send_ftr_req=fields.Boolean(string="FTR Sent",default=False)
+    send_ftr_req=fields.Boolean(string="FTR Sent",default=False,copy=False)
     doc_name=fields.Char()
     payment_method = fields.Selection([('neft', 'Fund Transfer'),
-				    ('cheque', 'Cheque')],string='Type',track_visibility='always')
-    pay_p_up = fields.Selection([('post', 'Posted'),
-				    ('not_posted', 'Not Posted')],string='Fund Posted/Unposted',track_visibility='always')
+				    ('cheque', 'Cheque')],string='Type',track_visibility='always',copy=False)
+    pay_p_up = fields.Selection([('post', 'Done'),
+				    ('not_posted', 'Pending')],copy=False,string='Transfer Status',track_visibility='always')
     chq_s_us = fields.Selection([('signed', 'Signed'),
-				    ('not_signed', 'Not Signed')],string='Cheque Signed/Unsigned',track_visibility='always')
+				    ('not_signed', 'Not Signed')],copy=False,string='Cheque Signed/Unsigned',track_visibility='always')
 				    
     cheque_details = fields.One2many('bank.cheque.details','payment_id','Cheque Details')
     pay_type = fields.Selection([('sale', 'Sale'),
@@ -66,6 +66,13 @@ class accountPayment(models.Model):
 				    ('general', 'Miscellaneous')],related='journal_id.type',track_visibility='always')
     user_id = fields.Many2one('res.users', 'Reconcile By')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status',track_visibility='always')
+#    mail_details=fields.Text('Fund Details',copy=False)
+    mail_details = fields.Html('Fund Details',copy=False)
+
+    uploaded_proof = fields.Many2many('ir.attachment','pay_attachment_fund_rel','fund_id','pay_id','Payment Proof',copy=False)
+    internal_note_tt=fields.Text('Any remarks after transfer',track_visibility='always',copy=False)
+    internal_request_tt=fields.Text('Note to write on transfer',track_visibility='always',copy=False)
+
     
 #    @api.multi
 #    def button_invoices(self):
@@ -89,12 +96,17 @@ class accountPayment(models.Model):
 #            'domain': [('id', 'in', [x.id for x in self.invoice_ids])],
 #        }
 
+    @api.onchange('payment_method')
+    def pay_method_onchange(self):
+        print "dsfhdsjf========================"
+    	if self.payment_method and self.payment_method=='neft':
+            self.pay_p_up='not_posted'
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id:
-            bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.partner_id.id)])
-            if bank_id:
+            bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.partner_id.id),('active_account','=',True)])
+            if len(bank_id)==1:
                 self.bank_id=bank_id.id
     
 #    adding company domain on change of payment type
@@ -102,6 +114,9 @@ class accountPayment(models.Model):
     def _onchange_payment_type(self):
         if not self.invoice_ids:
             # Set default partner type for the payment type
+            self.payment_method=False
+            self.journal_id=False
+            self.chq_s_us=''
             if self.payment_type == 'inbound':
                 self.partner_type = 'customer'
             elif self.payment_type == 'outbound':
@@ -117,10 +132,26 @@ class accountPayment(models.Model):
             obj = self.env['account.invoice'].browse(self._context.get('active_id'))
             res['domain']['journal_id'].append(('company_id', '=', obj.company_id.id))
         return res
+    
+    @api.multi
+    def sign_check(self):
+        self.write({'chq_s_us':'signed'})
+        
     @api.multi
     def post_funds(self):
+        confirm_form = self.env.ref('api_account.fund_transfer_approve_wiz_form', False)
+
+        return {
+                        'name':'Post Transfer Request',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'fund.transfer.approve',
+                        'views': [(confirm_form.id, 'form')],
+                        'view_id': confirm_form.id,
+                        'target': 'new'
+                    }
         
-        self.write({'pay_p_up':'post'})
     @api.multi
     def send_fund_tfr_req(self):
         cofirm_form = self.env.ref('api_account.fund_transfer_wiz_form', False)
@@ -133,14 +164,22 @@ class accountPayment(models.Model):
                         'res_model': 'fund.transfer.wizard',
                         'views': [(cofirm_form.id, 'form')],
                         'view_id': cofirm_form.id,
-                        'target': 'new',
-                        'context':{'force_confirm':True}
+                        'target': 'new'
                     }
         return True
     
     @api.multi
     def post(self):
+        check=super(accountPayment,self).post()
     	for res in self:
+                if res.pay_p_up and res.pay_p_up=='not_posted':
+                    print "res.bank_id.partner_id.id",res.bank_id.partner_id.id,res.partner_id.id
+                    if res.bank_id.partner_id.id!=res.partner_id.id:
+                        raise UserError(_("Bank selected in Payment should have same Partner defined!!"))
+
+                    wiz_id = self.env['fund.transfer.wizard'].create({'mail_details':''})
+                    print "wiz_idwiz_idwiz_id",wiz_id
+                    wiz_id.with_context({'active_ids':res.id}).send_mail()
     		amount=res.amount
     		if res.pay_type =='bank' and res.payment_method =='cheque':
     			n_amount=0
@@ -158,7 +197,7 @@ class accountPayment(models.Model):
 		res=self.env['payment.receipt.documents'].create({'invoice_id':obj.id,
 								'uploaded_document':self.uploaded_document,
 								'name':self.communication, 'amount':self.amount})
-	return super(accountPayment,self).post()
+	return check
     
     @api.onchange('cheque_details')
     def amount_change(self):
@@ -175,6 +214,10 @@ class accountPayment(models.Model):
     def pay_type_onchange(self):
     	if self.pay_type != 'bank':
     		self.payment_method=False
+    @api.onchange('cheque_status')
+    def cheque_statuss_onchange(self):
+    	if self.cheque_status and self.cheque_status=='cleared':
+            self.chq_s_us='signed'
 	
 class BankChequeDetails(models.Model):
     '''to store cheque details against bank'''

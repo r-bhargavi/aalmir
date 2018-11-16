@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_crm_lead_summary_tree" model="ir.ui.view">
+            <field name="name">CRM Sales Reports Tree</field>
+            <field name="model">crm.lead.summary</field>
+            <field name="arch" type="xml">
+                <tree string="Search SalesPerson Reports " style="text-align:right"  create="0" edit="0" toolbar="1">
+                 <field name="from_date" invisible="1"/>
+                <field name="to_date"/>
+                 <field name="user_id"/>
+                 <field name="today_create"/>
+                  <button name="views_crm_lead_create" type="object"  string="New Coldcalling" icon="fa-plus" attrs="{'invisible':[('today_create','=', False)]}"/>                  
+                  <field name="today_contact"/> 
+                  <button name="views_crm_lead_contact" type="object"  string=" Total Contact" icon="fa-phone" attrs="{'invisible':[('today_contact','=', False)]}"/>         
+                    <field name="day_target_allot"/>
+                   <field name="total_calls"/>
+                 <field name="total_mails"/>
+                 <field name="total_notifications"/>
+                 <field name="mass_mail"/>
+                 <field name="target_achieve" invisible="1"/> 
+                 <field name="today_interval_change" />
+                 <field name="today_date_exceed"/>
+                 <field name="today_opportunity"/>
+                 <button name="get_opportunity" type="object"  string="New Opportunity" icon="fa-plus" 
+                     attrs="{'invisible':[('today_opportunity','=', False)]}"/>
+                 <field name="today_Qualified"/>
+                 <button name="views_crm_lead_qualified" type="object"  string="Total Qualified" icon="STOCK_APPLY"
+                     attrs="{'invisible':[('today_Qualified','=', False)]}"/>
+                 <field name="today_disqualified"/>
+                 <button name="views_crm_lead_disqualified" type="object"  string="Total Disqualified" icon="fa-close" 
+                     attrs="{'invisible': [('today_disqualified','=', False)]}"/>
+                 <field name="total_lost_lead"/>
+                  <button name="get_lost_lead" type="object"  string="Total Lost Lead" icon="fa-history"
+                       attrs="{'invisible':[('total_lost_lead','=', False)]}"/>
+                 <field name="today_quatation"/>
+                 <button name="views_crm_lead_quotation" type="object"  string="Total New Quotation" icon="fa-history"
+                     attrs="{'invisible':[('today_quatation','=', False)]}"/>
+                 <field name="quotation_total" sum="sale_total"/>
+                 <field name="today_sale"/>   
+                 <button name="views_crm_lead_sale" type="object"  string="Total New Quotation" icon="fa-shopping-cart"
+                       attrs="{'invisible':[('today_sale','=', False)]}"/>              
+                 <field name="sale_total" sum="sale_total"/> 
+                 <field name="monthly_target_allot"/>
+                 <field name="is_summary" invisible="1"/>
+
+               </tree>
+           </field>
+        </record>
+        <record id="view_crm_report_wizard_form" model="ir.ui.view">
+            <field name="name">CRM Sales Reports</field>
+            <field name="model">wizard.crm.lead</field>
+            <field name="arch" type="xml">
+                <form string="Search SalesPerson Reports ">
+                   <group> 
+                       <field name="all_record"/>
+                       <field name="user_id" options="{'no_quick_create': True, 'no_create_edit' : True}" 
+                       attrs="{'invisible':[('all_record', '=', True)]}" string="SalesPerson"/>
+                       <field name="duration"/>
+                       <field name="today_date" attrs="{'invisible':[('duration', '!=', 'today')]}"/>
+                       <field name="yesterday_date" attrs="{'invisible':[('duration', '!=', 'yesterday')]}"/>
+                        <label for="date_from" string="Duration" attrs="{'invisible':[('duration', '!=','custom'),('duration', '!=', 'month')]}"/>
+                           <div attrs="{'invisible':[('duration', '!=','custom'),('duration', '!=', 'month')]}">                              
+                               <field name="date_from" nolabel="1" class="oe_inline" /> -
+                               <field name="date_to" nolabel="1" class="oe_inline" />
+                           </div>
+                        
+                   </group>
+                   <footer>                   
+                        <button name="open_sale_person_report" string="Done" colspan="1" type="object" class="oe_highlight"/>
+                        <button special="cancel" string="Cancel" class="oe_link"/>                        
+                   </footer>
+               </form>
+            </field>
+        </record>
+        <record id="action_crm_wizard" model="ir.actions.act_window">
+            <field name="name">Search CRM Sales Reports</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.crm.lead</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem name="Progress Report" id="menu_sale_inquiry" parent="gt_aalmir_coldcalling.menu_sales_lead" sequence="4" action="action_crm_wizard" groups="base.group_sale_manager"/>
+        
+    </data>
+</openerp>

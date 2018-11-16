@@ -32,6 +32,7 @@
     'data': [
                 'security/ir.model.access.csv',
                 'views/account_invoice_view.xml',
+                'views/bank_view.xml',
                 'views/account_payment.xml',
                 'views/bank_reconcilation_view.xml',
 #                'views/fund_transfer_wizard_view.xml',

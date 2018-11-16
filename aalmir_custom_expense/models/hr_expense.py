@@ -50,9 +50,36 @@ class HrExpense(models.Model):
     requested_by = fields.Many2one('hr.employee', 'Requested By',copy=False)
     user_id = fields.Many2one('res.users', 'User')
     department = fields.Many2one('hr.department', 'Department',related='requested_by.department_id',store=True)
-    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status')
-
+    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')], string='Cheque Status',copy=False)
     
+    pay_p_up = fields.Selection([('post', 'Done'),
+				    ('not_posted', 'Pending')],copy=False,string='Transfer Status',track_visibility='always')
+    chq_s_us = fields.Selection([('signed', 'Signed'),
+				    ('not_signed', 'Not Signed')],copy=False,string='Cheque Signed/Unsigned',track_visibility='always')
+    uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
+    bank_id = fields.Many2one('res.partner.bank', 'Bank Name',copy=False,track_visibility='always')
+    internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
+    
+    @api.onchange('payment_method')
+    def pay_method_onchange(self):
+    	if self.payment_method and self.payment_method=='neft':
+            self.pay_p_up='not_posted'
+
+    @api.onchange('partner_id_preferred','employee_id')
+    def _onchange_partner_emp(self):
+        if self.partner_id_preferred:
+            bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.partner_id_preferred.id),('active_account','=',True)])
+            if len(bank_id)==1:
+                self.bank_id=bank_id.id
+            return {'domain': {'bank_id': [('partner_id', '=', self.partner_id_preferred.id)]}}
+
+        elif self.employee_id:
+            bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.employee_id.address_home_id.id),('active_account','=',True)])
+            if len(bank_id)==1:
+                self.bank_id=bank_id.id
+            return {'domain': {'bank_id': [('partner_id', '=', self.employee_id.address_home_id.id)]}}
+
+
     @api.model
     def default_get(self, fields):
         res = super(HrExpense,self).default_get(fields)
@@ -74,6 +101,7 @@ class HrExpense(models.Model):
     
     @api.onchange('bank_journal_id_expense')
     def journal_onchange(self):
+        self.payment_method=False
         print "bank_journal_id_expensebank_journal_id_expense",self.bank_journal_id_expense
     	if self.bank_journal_id_expense.type == 'bank' and self.state!='draft':
             self.is_bank_journal=True
@@ -180,6 +208,12 @@ class HrExpense(models.Model):
         '''
         main function that is called when trying to create the accounting entries related to an expense
         '''
+        
+        if self.bank_journal_id_expense and self.bank_journal_id_expense.type=='bank' and self.bank_journal_id_expense.currency_id:
+            print self.bank_journal_id_expense.currency_id.id,self.currency_id.id
+            if self.bank_journal_id_expense.currency_id.id!=self.currency_id.id:
+                raise UserError(_("Currency of Expense did not match with Bank Currency.Please check!!"))
+            
         if self.payment_method and self.payment_method=='cheque':
             cheque_amt=sum(line.amount for line in self.cheque_details)
             if self.total_amount!=cheque_amt:
@@ -281,7 +315,13 @@ class HrExpense(models.Model):
         'communication': expense.communication,
         'internal_note': expense.internal_note,
         }
-        
+        if expense.chq_s_us:
+            pay_dict.update({'chq_s_us':expense.chq_s_us})
+        if expense.pay_p_up and expense.pay_p_up=='not_posted':
+            pay_dict.update({'pay_p_up':'not_posted','bank_id':expense.bank_id.id,'internal_request_tt':expense.internal_request_tt})
+            if expense.uploaded_document_tt:
+                pay_dict.update({'uploaded_document_tt':[(4, self.uploaded_document_tt.ids if self.uploaded_document_tt else False)]})
+
         if self.expense_type=='other_expense':
             if self.partner_id_preferred:
                 pay_dict.update({ 'partner_id': self.partner_id_preferred.id})
@@ -362,6 +402,6 @@ class BankChequeDetailsExpense(models.Model):
     amount = fields.Float('Amount')
     reconcile_date = fields.Date('Reconcile Date')
     register_payment_id=fields.Many2one('account.register.payments')
-    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status')
+    cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status',copy=False)
     
     		   			   			

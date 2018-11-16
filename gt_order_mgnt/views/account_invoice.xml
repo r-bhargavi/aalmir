@@ -102,7 +102,6 @@
                           <field name='customer_name_report'/>
                           <field name='destination_report'/>
                            <field name='report_company_name'/>
-                           <field name='origin' readonly="1" attrs="{'invisible':[('origin','!=','')]}"/>
                            <field name='company_currency_id' invisible='1'/>
                    </field>
                   <xpath expr="//field[@name='currency_id']" position="after">

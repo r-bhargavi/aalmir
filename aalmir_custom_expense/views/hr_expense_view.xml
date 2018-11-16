@@ -1,4 +1,42 @@
 <odoo>
+    
+    <record id="action_account_payments_payable_posted" model="ir.actions.act_window">
+            <field name="name">TT Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'outbound','group_by':'chq_s_us'}</field>
+            <field name="domain">[('state','=','posted')]</field>
+            <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+    </record>
+    <record id="action_account_payments_check" model="ir.actions.act_window">
+            <field name="name">Payments Cheque</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
+            <field name="domain">[('state','=','posted')]</field>
+            <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+    </record>
+    <menuitem action="action_account_payments_payable_posted" parent="hr_expense.menu_hr_expense_root" id="menu_action_account_payments_payable_posted"  sequence="12" groups="account.group_account_user"/>
+    <menuitem action="action_account_payments_check" parent="hr_expense.menu_hr_expense_root" id="menu_action_account_payments_check"  sequence="13" groups="account.group_account_user"/>
+
 <menuitem id="hr_expense.menu_hr_expense_configuration" name="Approval Configuration" parent="hr_expense.menu_hr_expense_root"
             sequence="100" groups="base.group_configuration"/>
     <!--<menuitem id="hr_expense.menu_expense_all" action="hr_expense.expense_all" name="New Expense123" parent="hr_expense.menu_hr_expense_root"/>-->
@@ -157,6 +195,10 @@
                                 <field name="is_bank_journal" readonly="1" invisible="1"/>
                                 <!--<field name="payment_method" string="Type" attrs="{'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>-->
                                 <field name="payment_method" attrs="{'required':[('is_bank_journal','=',True)],'invisible':[('is_bank_journal','=',False)]}" string="Type"/>
+                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft')],'readonly':[('state','not in',['approve','post'])],'invisible':[('payment_method','!=','neft')]}"/>
+
+                                <field name='bank_id' attrs="{'invisible':[('payment_method','!=','neft')],'required':[('payment_method','=','neft')],'readonly':[('state','not in',['approve','post'])]}"/>
+
                                 <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','approve')],'required':[('payment_method','=','cheque')]}"/>
                                 <field name="cheque_details" attrs="{'readonly':[('state','in',['draft','submit'])],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
                                         <tree editable="top">
@@ -176,8 +218,11 @@
                                 <field name="doc_name" invisible="1"/>
                                 <field name="communication"/>
                                 <field name="internal_note"/>
+                                <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
                                 <field name="uploaded_document" colspan="2" filename="doc_name" 
-                                         string="Upload Payment Docs"/>
+                                         string="Upload Payment Docs" attrs="{'invisible':[('pay_p_up','=','not_posted')]}"/>
+                                <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','not in',['approve','post','done'])],'invisible':[('pay_p_up','=',False)]}"/>
+
                                 </group>
                             </page>
                         </notebook>
