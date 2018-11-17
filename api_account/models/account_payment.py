@@ -118,6 +118,7 @@ class accountPayment(models.Model):
             # Set default partner type for the payment type
             self.payment_method=False
             self.journal_id=False
+            self.bank_id=False
             self.chq_s_us=''
             if self.payment_type == 'inbound':
                 self.partner_type = 'customer'
