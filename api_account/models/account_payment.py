@@ -103,6 +103,8 @@ class accountPayment(models.Model):
         print "dsfhdsjf========================"
     	if self.payment_method and self.payment_method=='neft' and self.payment_type=='outbound':
             self.pay_p_up='not_posted'
+#    	if self.payment_method and self.payment_method=='cheque':
+#            self.payment_method_code='check_printing'
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
