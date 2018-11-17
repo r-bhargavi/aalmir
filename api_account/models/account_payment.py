@@ -120,6 +120,7 @@ class accountPayment(models.Model):
             self.journal_id=False
             self.bank_id=False
             self.chq_s_us=''
+            self.pay_p_up=''
             if self.payment_type == 'inbound':
                 self.partner_type = 'customer'
             elif self.payment_type == 'outbound':
