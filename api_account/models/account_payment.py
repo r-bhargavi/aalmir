@@ -189,7 +189,7 @@ class accountPayment(models.Model):
                             bill_line=res.write({'bill_line':bill_line_vals})
                             print "bill_linebill_linebill_line",bill_line
                     print "res.bank_id.partner_id.id",res.bank_id.partner_id.id,res.partner_id.id
-                    if res.bank_id.partner_id.id!=res.partner_id.id:
+                    if res.bank_id and res.bank_id.partner_id.id!=res.partner_id.id:
                         raise UserError(_("Bank selected in Payment should have same Partner defined!!"))
 
                     wiz_id = self.env['fund.transfer.wizard'].create({'mail_details':''})
