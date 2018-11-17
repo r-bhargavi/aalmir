@@ -10,7 +10,7 @@
 			 <button name="post" position="after">
 		  	<button string='Send Fund Transfer Reminder' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|','|',('payment_type','!=','outbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
 		  	<button string='Post Funds' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|','|',('payment_type','!=','outbound'),('send_ftr_req','=',False),('pay_p_up','!=','not_posted')]}" type="object" class="btn-primary"/>
-                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|','|',('payment_type','!=','outbound'),('chq_s_us','!=','unsigned')]}" type="object" class="btn-primary"/>
+                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|',('payment_type','!=','outbound'),('chq_s_us','!=','unsigned')]}" type="object" class="btn-primary"/>
 
 		         </button>
 			 <field name="communication" position="after">
@@ -28,10 +28,11 @@
 		              <field name="pay_type" invisible="1"/>
 		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
                                 <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')]}"/>
-                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
                                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
+                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
+
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
 		              		<tree editable="top">
 		              			<field name="bank_name" required="1"/>
@@ -174,10 +175,11 @@
 		              <field name="pay_type" invisible="1"/>
 		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
                                 <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','not in',['draft','posted'])],'invisible':['|',('payment_type','!=','outbound'),('payment_method','!=','neft')]}"/>
-                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
                                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','not in',['draft','posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
+                              <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','=','outbound')],'invisible':['|',('payment_type','!=','outbound'),('cheque_status','!=','not_clear')]}"/>
+
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
 		              		<tree editable="top">
 		              			<field name="bank_name"/>	
