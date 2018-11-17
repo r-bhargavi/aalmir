@@ -72,6 +72,8 @@ class accountPayment(models.Model):
     uploaded_proof = fields.Many2many('ir.attachment','pay_attachment_fund_rel','fund_id','pay_id','Payment Proof',copy=False)
     internal_note_tt=fields.Text('Any remarks after transfer',track_visibility='always',copy=False)
     internal_request_tt=fields.Text('Note to write on transfer',track_visibility='always',copy=False)
+    bill_line = fields.One2many('payment.bill.line','payment_id','Bill/Receiving Details')
+
 
     
 #    @api.multi
@@ -173,6 +175,18 @@ class accountPayment(models.Model):
         check=super(accountPayment,self).post()
     	for res in self:
                 if res.pay_p_up and res.pay_p_up=='not_posted':
+                    print "res.invoice_idsres.invoice_ids",res.invoice_ids
+                    if res.invoice_ids:
+                        bill_line_vals,pick_ids,vals=[],[],{}
+                        for each_inv in res.invoice_ids:
+                            if each_inv.picking_ids:
+                                for each_pick in each_inv.picking_ids:
+                                    pick_ids.append(each_pick.id)
+                            vals={'receiving_id':[(4, pick_ids)]}
+                            vals.update({'bill_id':each_inv.id,'payterm_id':each_inv.payment_term_id.id})
+                            bill_line_vals.append((0,0,vals))
+                            bill_line=res.write({'bill_line':bill_line_vals})
+                            print "bill_linebill_linebill_line",bill_line
                     print "res.bank_id.partner_id.id",res.bank_id.partner_id.id,res.partner_id.id
                     if res.bank_id.partner_id.id!=res.partner_id.id:
                         raise UserError(_("Bank selected in Payment should have same Partner defined!!"))
@@ -218,6 +232,16 @@ class accountPayment(models.Model):
     def cheque_statuss_onchange(self):
     	if self.cheque_status and self.cheque_status=='cleared':
             self.chq_s_us='signed'
+            
+class PaymentBillLine(models.Model):
+    _name = 'payment.bill.line'
+    
+    payment_id = fields.Many2one('account.payment', 'PaymentID')
+    bill_id = fields.Many2one('account.invoice', 'Bill ID')
+    payterm_id = fields.Many2one('account.payment.term', 'Payterm ID')
+#    receiving_date = fields.Date(string='Receiving Date')
+    receiving_id = fields.Many2many('stock.picking','picking_bill_line_rel','pick','bill_line_id','Receiving IDS',copy=False,track_visibility='always')
+
 	
 class BankChequeDetails(models.Model):
     '''to store cheque details against bank'''

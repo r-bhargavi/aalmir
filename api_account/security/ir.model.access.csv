@@ -38,3 +38,4 @@ access_journal_voucher_bill,journal_voucher_bill,model_journal_voucher,account.g
 access_journal_voucher_line_bill,journal_voucher_line_bill,model_journal_voucher_line,account.group_account_invoice,1,0,0,0
 access_fund_transfer_approve_group_user,fund.transfer.approve.group.user,api_account.model_fund_transfer_approve,account.group_account_user,1,1,1,0
 access_fund_transfer_wizard_group_user,fund.transfer.wizard.group.user,api_account.model_fund_transfer_wizard,account.group_account_user,1,1,1,0
+access_pay_bill_line_group_user,pay.bill.line.group.user,api_account.model_payment_bill_line,account.group_account_user,1,1,1,0
