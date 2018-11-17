@@ -92,7 +92,7 @@
 		  </xpath>
 		</field>
 	</record>
-	<record id="account_pay_form_inherite_check" model="ir.ui.view">
+<!--	<record id="account_pay_form_inherite_check" model="ir.ui.view">
 		<field name="name">Account Payment Print Check Hide</field>
 		<field name="model">account.payment</field>
 		<field name="inherit_id" ref="account_check_printing.view_account_payment_form_inherited"></field>
@@ -103,7 +103,7 @@
 		  <button name="print_checks"  position="replace">
                     </button>
 		</field>
-	</record>
+	</record>-->
         <record id="invoice_supplier_form_inherit_new" model="ir.ui.view">
 		<field name="name">Account Invoice.New</field>
 		<field name="model">account.invoice</field>
