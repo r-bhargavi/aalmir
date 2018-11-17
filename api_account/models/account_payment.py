@@ -181,12 +181,13 @@ class accountPayment(models.Model):
                 if res.pay_p_up and res.pay_p_up=='not_posted' and res.payment_type=='outbound':
                     print "res.invoice_idsres.invoice_ids",res.invoice_ids
                     if res.invoice_ids:
-                        bill_line_vals,pick_ids,vals=[],[],{}
                         for each_inv in res.invoice_ids:
+                            bill_line_vals,pick_ids,vals=[],[],{}
+
                             if each_inv.picking_ids:
                                 for each_pick in each_inv.picking_ids:
                                     pick_ids.append(each_pick.id)
-                            vals={'receiving_id':[(4, pick_ids)]}
+                                vals={'receiving_id':[(4, pick_ids)]}
                             vals.update({'bill_id':each_inv.id,'payterm_id':each_inv.payment_term_id.id})
                             bill_line_vals.append((0,0,vals))
                             bill_line=res.write({'bill_line':bill_line_vals})
