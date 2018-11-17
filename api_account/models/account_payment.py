@@ -176,7 +176,9 @@ class accountPayment(models.Model):
     def post(self):
         check=super(accountPayment,self).post()
     	for res in self:
-                if res.pay_p_up and res.pay_p_up=='not_posted':
+                if res.payment_type=='outbound' and res.journal_id.type=='cash':
+                    res.write({'pay_p_up':'post'})
+                if res.pay_p_up and res.pay_p_up=='not_posted' and res.payment_type=='outbound':
                     print "res.invoice_idsres.invoice_ids",res.invoice_ids
                     if res.invoice_ids:
                         bill_line_vals,pick_ids,vals=[],[],{}
