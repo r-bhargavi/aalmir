@@ -101,7 +101,7 @@ class accountPayment(models.Model):
     @api.onchange('payment_method')
     def pay_method_onchange(self):
         print "dsfhdsjf========================"
-    	if self.payment_method and self.payment_method=='neft':
+    	if self.payment_method and self.payment_method=='neft' and self.payment_type=='outbound':
             self.pay_p_up='not_posted'
 
     @api.onchange('partner_id')
@@ -144,7 +144,7 @@ class accountPayment(models.Model):
     @api.multi
     def post_funds(self):
         confirm_form = self.env.ref('api_account.fund_transfer_approve_wiz_form', False)
-
+        print "confirm_formconfirm_formconfirm_form",confirm_form
         return {
                         'name':'Post Transfer Request',
                         'type': 'ir.actions.act_window',
