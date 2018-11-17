@@ -1,4 +1,6 @@
 <odoo>
+    <menuitem id="hr_expense.menu_expense_approved" name="Expenses To Pay" parent="account.menu_finance_payables" 
+            action="hr_expense.action_approved_expense" sequence="15"/>
     
     <record id="action_account_payments_payable_posted" model="ir.actions.act_window">
             <field name="name">TT Payments</field>
@@ -6,7 +8,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
             <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
-            <field name="domain">[('state','=','posted')]</field>
+            <field name="domain">[('state','=','posted'),('payment_type','=','outbound')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -23,7 +25,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
             <field name="context">{'default_payment_type': 'outbound','group_by':'chq_s_us'}</field>
-            <field name="domain">[('state','=','posted')]</field>
+            <field name="domain">[('state','=','posted'),('payment_type','=','outbound')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -61,7 +63,7 @@
             </field>
         </record>
      <record id="action_draft_expense_account" model="ir.actions.act_window">
-            <field name="name">Expenses Draft</field>
+            <field name="name">All Expenses</field>
             <field name="res_model">hr.expense</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
@@ -115,7 +117,7 @@
 
         <menuitem id="menu_expense_draft" name="All Expenses" parent="hr_expense.menu_hr_expense_root" groups="base.group_hr_user" 
             action="action_draft_expense" sequence="11"/>
-        <menuitem id="menu_expense_draft_account" name="Expenses" parent="account.menu_finance_payables" groups="base.group_hr_user" 
+        <menuitem id="menu_expense_draft_account" name="All Expenses" parent="account.menu_finance_payables" groups="base.group_hr_user" 
             action="action_draft_expense_account" sequence="11"/>
         <menuitem id="menu_vendor_bills" name="All Bills" parent="hr_expense.menu_hr_expense_root" groups="base.group_hr_user" 
             action="action_show_vendor_bills" sequence="11"/>
