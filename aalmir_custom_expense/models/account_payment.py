@@ -26,3 +26,10 @@ class accountPayment(models.Model):
 
     expense_pay = fields.Boolean('Expense Pay')
     expense_id = fields.Many2one('hr.expense', 'Expense')
+    
+    
+    @api.onchange('partner_type')
+    def _onchange_partner_type(self):
+        # Set partner_id domain
+        if self.partner_type:
+            return {'domain': {'partner_id': ['|',('employee', '=', True),(self.partner_type, '=', True)]}}

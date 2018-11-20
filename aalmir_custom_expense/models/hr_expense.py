@@ -64,6 +64,8 @@ class HrExpense(models.Model):
     def pay_method_onchange(self):
     	if self.payment_method and self.payment_method=='neft':
             self.pay_p_up='not_posted'
+        else:
+            self.pay_p_up=''
 
     @api.onchange('partner_id_preferred','employee_id')
     def _onchange_partner_emp(self):
@@ -94,6 +96,12 @@ class HrExpense(models.Model):
         return super(HrExpense, self).copy(default)
     
     
+    @api.multi
+    def cancel_expense(self):
+        if not self._context.get('call_from_pay',False):
+            self.payment_id.cancel()
+        self.write({'state':'draft','approved_by':False})
+        
     @api.multi
     def print_payment_receipt(self):
         return self.env['report'].get_action(self, 'aalmir_custom_expense.report_payment_account_new1')
@@ -273,9 +281,11 @@ class HrExpense(models.Model):
                         if expense.expense_type=='other_expense' and expense.partner_id_preferred:
                             emp_account = expense.partner_id_preferred.property_account_payable_id.id
                             name=expense.partner_id_preferred.name
+
                         else:
                             emp_account = expense.product_id.property_account_expense_id.id
                             name=expense.product_id.name
+
                 if not emp_account:
                     raise UserError(_("Please Define Partner for registering payment"))
 
@@ -324,19 +334,24 @@ class HrExpense(models.Model):
 
         if self.expense_type=='other_expense':
             if self.partner_id_preferred:
-                pay_dict.update({ 'partner_id': self.partner_id_preferred.id})
+                p_id=self.partner_id_preferred
+                pay_dict.update({ 'partner_id': p_id.id})
             else:
-                pay_dict.update({ 'partner_id': self.env.user.partner_id.id})
+                p_id=self.env.user.partner_id
+                pay_dict.update({ 'partner_id': p_id.id})
             
         else:
-            pay_dict.update({ 'partner_id': self.employee_id.address_home_id.id})
+            p_id=self.employee_id.address_home_id
+            pay_dict.update({ 'partner_id':p_id.id})
 
                    
-
+        print "pay_dictpay_dictpay_dict",pay_dict
         payment = self.env['account.payment'].create(pay_dict)
-        print "paymentpaymentpayment",payment,emp_account
+        print "paymentpaymentpayment",payment,payment.partner_id
         print "jhdgijedhjewd",payment.journal_id
         payment.post()
+        print "paymentpaymentpayme4444444444444444nt",payment,payment.partner_id
+
         if self.cheque_details:
             vals=[]
             for each in self.cheque_details:
@@ -344,6 +359,7 @@ class HrExpense(models.Model):
 					'partner_id':each.partner_id, 
 					'journal_id':each.journal_id,
 					'bank_name':each.bank_name.id,
+					'partner_id':payment.partner_id.id,
 					'communication': each.communication,
 					'cheque_no': each.cheque_no,
 					'branch_name': each.branch_name,
@@ -355,6 +371,7 @@ class HrExpense(models.Model):
 					'cheque_date': each.cheque_date,
 					'cheque_status':each.expense_id.cheque_status
                                         }))
+                each.write({'partner_id':payment.partner_id.id})
             print "valspppppppppppppppppppppppppppppppp",vals
             payment.write({'cheque_details':vals})
         if self.uploaded_document:
@@ -392,7 +409,7 @@ class BankChequeDetailsExpense(models.Model):
     
     expense_id = fields.Many2one('hr.expense','Payment Name')
     journal_id = fields.Many2one('account.journal',related="expense_id.bank_journal_id_expense",string='Journal')
-    partner_id = fields.Many2one('res.partner',related="expense_id.partner_id_preferred",string='Supplier/Customer')
+    partner_id = fields.Many2one('res.partner',related="expense_id.partner_id_preferred",string='Supplier/Customer',store=True)
     bank_name = fields.Many2one('cheque.bank.name','Bank Name')
     communication = fields.Char(related="expense_id.communication",string='Internal Note')
     #bank_id = fields.Many2one('res.partner.bank', 'Bank Name')
