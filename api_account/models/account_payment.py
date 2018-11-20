@@ -102,7 +102,6 @@ class accountPayment(models.Model):
     internal_request_tt=fields.Text('Note to write on transfer',track_visibility='always',copy=False)
     bill_line = fields.One2many('payment.bill.line','payment_id','Bill/Receiving Details')
 
-
     
 #    @api.multi
 #    def button_invoices(self):
@@ -126,11 +125,23 @@ class accountPayment(models.Model):
 #            'domain': [('id', 'in', [x.id for x in self.invoice_ids])],
 #        }
 
+    @api.multi
+    def cancel(self):
+        check=super(accountPayment,self).cancel()
+        if self.cheque_details:
+            for each_chq in self.cheque_details:
+                each_chq.unlink()
+        if self.expense_id:
+            self.expense_id.with_context({'call_from_pay':True}).cancel_expense()
+        return check
     @api.onchange('payment_method')
     def pay_method_onchange(self):
         print "dsfhdsjf========================"
     	if self.payment_method and self.payment_method=='neft' and self.payment_type=='outbound':
             self.pay_p_up='not_posted'
+        else:
+            self.pay_p_up=''
+
 #    	if self.payment_method and self.payment_method=='cheque':
 #            self.payment_method_code='check_printing'
 
