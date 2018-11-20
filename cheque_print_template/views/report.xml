@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+         <record id="paperformat_cheque_custom" model="report.paperformat">
+            <field name="name">Cheque A4</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">8</field>
+            <field name="margin_bottom">28</field>
+            <field name="margin_left">20</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">4</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <report
+            id="cheque_print_report"
+            model="bank.cheque.details"
+            string="cheque"
+            report_type="qweb-pdf"
+            name="cheque_print_template.report_cheque_print_template"
+            file="cheque_print_template.report_cheque_print_template"
+            paperformat="cheque_print_template.paperformat_cheque_custom"/>
+            />
+
+    </data>
+</openerp>

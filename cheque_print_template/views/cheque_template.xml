@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="report_cheque_print_template_document">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <style type="text/css">
+                            <t t-call="cheque_print_template.custom_style_layout"/>
+                        </style>
+                        <table  width="100%">
+                            <tr >
+                                <td width="70%">
+                                </td>
+                                <td class="text-right" width="30%" style="padding-right:45px;">
+                                        <span class="account_pay_layout" t-field="o.cheque_date" t-field-options='{"format": "dd-MM-yyyy"}'/>
+                                </td>
+                            </tr>
+                             <tr >
+                                <td colspan="2"  style="padding-right:15px;padding-top:15px;padding-top:25px">
+                                    <div class="row">
+                                    <div class="col-xs-8"></div>
+                                    <div class="col-xs-4" style="border-top:1px solid red;border-bottom:1px solid red;color:red; width:135px" >
+                                    <t t-if="o.journal_id.account_pay_cheque==True">
+                                        A/c. Payee Only
+                                    </t>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td colspan="2" style="padding-left:20px;padding-top:22px;padding-top:10px;" >
+                                    <t t-if="o.journal_id.account_pay_cheque==True">
+                                    <span t-field="o.partner_id.name"/>
+                                     </t>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td style="padding-left:60px;padding-top:40px;">
+                                     <span  t-field="o.check_amount_in_words"/>
+                                </td>
+                                <td rowspan="2" style="padding-left:60px;padding-top:40px;">
+                                     <span  t-field="o.amount"/>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td class="text-right" style="padding-right:60px;padding-top:20px;" height="30px">
+                                </td>
+                            </tr>
+                            <!--<tr >-->
+                                <!--<td>-->
+                                <!--</td>-->
+                                <!--<td  style="padding-right:60px;padding-top:55px;" >-->
+                                        <!--<span  t-field="o.company_id.name"/>-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        </table>
+                    </div>
+            </t>
+        </template>
+
+        <template id="report_cheque_print_template">
+             <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="cheque_print_template.report_cheque_print_template_document" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</openerp>

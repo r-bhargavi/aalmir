@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_account_payment_form_inherit_cheque" model="ir.ui.view">
+            <field name="name">view.account.payment.form.inherit.cheque</field>
+            <field name="model">account.payment</field>
+            <field name="priority" eval="1"/>
+            <field name="inherit_id" ref="api_account.view_account_payment_form_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='reconcile_date']" position="after">
+                       <button name="action_cheque_print" string="Cheque Print" type="object" icon="fa-check" groups="account.group_account_user"/>
+                       
+                        <field name="check_amount_in_words" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="account_pay_form_inherite_check" model="ir.ui.view">
+		<field name="name">Account Payment Print Check Hide</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_form"></field>
+		<field name="arch" type="xml">
+		  <field name="payment_method_id"  position="attributes">
+                        <attribute name='invisible'>1</attribute>  
+                    </field>
+		</field>
+	</record>
+        <record id="account_pay_form_inherite_check_12" model="ir.ui.view">
+		<field name="name">Account Payment Print Check Hide Amount in wrds</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account_check_printing.view_account_payment_form_inherited"></field>
+		<field name="arch" type="xml">
+		  <field name="check_amount_in_words"  position="attributes">
+                        <attribute name='invisible'>1</attribute>  
+                    </field>
+		  <button name="print_checks"  position="replace">
+                    </button>
+		</field>
+	</record>
+
+    </data>
+</openerp>

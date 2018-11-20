@@ -25,6 +25,9 @@ from openerp.tools.translate import _
 from openerp.exceptions import UserError, ValidationError
 import logging
 from urlparse import urljoin
+import json
+from openerp.tools import float_is_zero
+
 from urllib import urlencode
 import openerp.addons.decimal_precision as dp
 _logger = logging.getLogger(__name__)
@@ -33,7 +36,32 @@ class AccountInvoice(models.Model):
     _inherit='account.invoice'
 
     payment_documents = fields.One2many('payment.receipt.documents','invoice_id','Product Name')
-
+    @api.one
+    def _get_outstanding_info_JSON(self):
+        check=super(AccountInvoice,self)._get_outstanding_info_JSON()
+        self.env.cr.execute("select payment_id from account_invoice_payment_rel where invoice_id="+str(self.id) )
+    	pay_inv_rel_id=self.env.cr.fetchone()
+        print "pay_inv_rel_idpay_inv_rel_id",pay_inv_rel_id
+        if pay_inv_rel_id:
+            pay_id=self.env['account.payment'].browse(pay_inv_rel_id[0])
+            bill_line_vals,pick_ids,vals,rec_ids=[],[],{},[]
+            if self.picking_ids:
+                if pay_id.bill_line:
+                    bill_ids=[x.bill_id.id for x in pay_id.bill_line]
+                    print "bill_idsbill_ids",bill_ids
+                    if self.id in bill_ids:
+                        line_id=self.env['payment.bill.line'].search([('bill_id','=',self.id)])
+                        rec_ids=[x.receiving_id.id for x in line_id]
+                for each_pick in self.picking_ids:
+                    if each_pick.id not in rec_ids:
+                        pick_ids.append(each_pick.id)
+                        vals={'receiving_id':[(4, pick_ids)]}
+                        vals.update({'bill_id':self.id,'payterm_id':self.payment_term_id.id})
+                        print "val------------------------",vals
+                        bill_line_vals.append((0,0,vals))
+                        pay_id.write({'bill_line':bill_line_vals})
+        return check
+            
 class PaymentDocuments(models.Model):
     _name = "payment.receipt.documents"
 	
@@ -74,7 +102,6 @@ class accountPayment(models.Model):
     internal_request_tt=fields.Text('Note to write on transfer',track_visibility='always',copy=False)
     bill_line = fields.One2many('payment.bill.line','payment_id','Bill/Receiving Details')
 
-
     
 #    @api.multi
 #    def button_invoices(self):
@@ -98,11 +125,23 @@ class accountPayment(models.Model):
 #            'domain': [('id', 'in', [x.id for x in self.invoice_ids])],
 #        }
 
+    @api.multi
+    def cancel(self):
+        check=super(accountPayment,self).cancel()
+        if self.cheque_details:
+            for each_chq in self.cheque_details:
+                each_chq.unlink()
+        if self.expense_id:
+            self.expense_id.with_context({'call_from_pay':True}).cancel_expense()
+        return check
     @api.onchange('payment_method')
     def pay_method_onchange(self):
         print "dsfhdsjf========================"
     	if self.payment_method and self.payment_method=='neft' and self.payment_type=='outbound':
             self.pay_p_up='not_posted'
+        else:
+            self.pay_p_up=''
+
 #    	if self.payment_method and self.payment_method=='cheque':
 #            self.payment_method_code='check_printing'
 

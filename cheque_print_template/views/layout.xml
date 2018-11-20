@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+    <data>
+        <template id="custom_style_layout" >
+                <style type="text/css">
+                    .account_pay_layout{
+                        padding:15px !important;
+                        font-size:25px !important;
+                    }
+                     .table_line td{
+                border-top:none;
+                border-bottom:none;
+                border-left:1px solid black;
+                border-right:1px solid black;
+
+                }
+                </style>
+        </template>
+    </data>
+</openerp>
