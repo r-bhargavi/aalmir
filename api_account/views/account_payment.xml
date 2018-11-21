@@ -54,7 +54,7 @@
                                 <group>
 
                                 <field name="internal_note_tt" string="Remarks After Transfer" readonly="1"/>
-                               <field name="uploaded_proof" string="Payment Proof" widget="many2many_binary" readonly="1"/>
+                               <field name="uploaded_proof" string="Payment Proof" widget="many2many_binary"/>
                                                                                            </group>
 
                             </page>

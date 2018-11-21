@@ -295,7 +295,7 @@ class BankChequeDetails(models.Model):
     
     payment_id = fields.Many2one('account.payment','Payment Name')
     journal_id = fields.Many2one('account.journal',related="payment_id.journal_id",string='Journal')
-    partner_id = fields.Many2one('res.partner',related="payment_id.partner_id",string='Supplier/Customer')
+    partner_id = fields.Many2one('res.partner',related="payment_id.partner_id",string='Supplier/Customer',store=True)
     bank_name = fields.Many2one('cheque.bank.name','Bank Name')
     communication = fields.Char(related="payment_id.communication",string='Internal Note',track_visibility='always')
     cheque_no = fields.Char('Cheque No.',track_visibility='always')
