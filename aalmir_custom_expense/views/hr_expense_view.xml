@@ -245,7 +245,7 @@
                  </field>
                  <field name="state" position="before">
                         <button name="print_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': [('account_pay_id', '=',False)]}"/>
-                        <button name="cancel_expense" type="object" icon='fa-download' string="Cancel Expense" class="btn-primary"  attrs = "{'invisible': [('state', '!=','done')]}"/>
+                        <button name="cancel_expense" type="object" icon='fa-close' string="Cancel Expense" class="btn-primary"  attrs = "{'invisible': [('state', '!=','done')]}"/>
                 </field>
                  <xpath expr="//button[@name='approve_expenses']" position="attributes">
                     <attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>
