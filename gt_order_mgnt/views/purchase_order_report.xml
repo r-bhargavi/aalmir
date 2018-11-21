@@ -170,8 +170,8 @@
                                     <t t-esc="count"/>
                                 </td>
                                 <td>
-                                     <span t-field="line.name"/>
-                                  
+                                <t t-set="desc" t-value="line.name.replace(' ',u'\xa0').encode('utf-8')"/>
+                                    <t t-esc="desc"/>                                  
                                 </td>
                                 <t t-if="o.show_product_schedule">
                                   <td> <span t-esc="time.strftime('%d/%m/%Y',time.strptime(line.date_planned,'%Y-%m-%d %H:%M:%S'))"/> </td>
