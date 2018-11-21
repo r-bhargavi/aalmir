@@ -13,16 +13,36 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
+        pay_ids=self.env['account.payment'].search([])
+        for res in pay_ids:
+            if res.payment_method=='cheque':
+                for each_cheque in res.cheque_details:
+                    each_cheque._onchange_amount()
+        return True
+#        pay_ids=self.env['account.payment'].search([])
+#        for res in pay_ids:
+#            if res.invoice_ids:
+#                for each_inv in res.invoice_ids:
+#                    bill_line_vals,pick_ids,vals=[],[],{}
+#
+#                    if each_inv.picking_ids:
+#                        for each_pick in each_inv.picking_ids:
+#                            pick_ids.append(each_pick.id)
+#                        vals={'receiving_id':[(4, pick_ids)]}
+#                    vals.update({'bill_id':each_inv.id,'payterm_id':each_inv.payment_term_id.id})
+#                    bill_line_vals.append((0,0,vals))
+#                    bill_line=res.write({'bill_line':bill_line_vals})
+#                    print "bill_linebill_linebill_line",bill_line
 #        all_mat=self.env['raw.material.pricelist'].search([])
 #        for each in all_mat:
 #            each.write({'qty_range_8':each.qty_range_3,'qty_range_9':each.qty_range_3})
 #        return True
-        all_banks = self.env['res.partner.bank'].search([])
-        for each_bank in all_banks:
-            if each_bank.bank_id:
-                if each_bank.bank_id.bic:
-                    each_bank.write({'swift_code':each_bank.bank_id.bic})
-        return True
+#        all_banks = self.env['res.partner.bank'].search([])
+#        for each_bank in all_banks:
+#            if each_bank.bank_id:
+#                if each_bank.bank_id.bic:
+#                    each_bank.write({'swift_code':each_bank.bank_id.bic})
+#        return True
         all_prods = self.env['product.template'].search([])
         for each in all_prods:
             product_id=self.env['product.product'].search([('product_tmpl_id','=',each.id)],limit=1)

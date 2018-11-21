@@ -125,7 +125,7 @@
 			 <div>
 		                <field name="partner_id" 
                                 context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" 
-                                domain="[('employee','=',True),('supplier', '=', True),('parent_id','=',False)]" class="oe_inline" nolabel="1"/>
+                                domain="['|','|','|',('company_type','=','company'),('employee','=',True),('supplier', '=', True),('parent_id', '=', False)]" class="oe_inline" nolabel="1"/>
 			     <field name="check_partner"  class="oe_inline" nolabel="1" />
 			</div>
 		        <label for='partner_invoice_id' string='Bill Address'/>
