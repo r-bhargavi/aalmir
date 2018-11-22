@@ -92,6 +92,16 @@
 		  </xpath>
 		</field>
 	</record>
+	<record id="account_journal_form_inherite_check" model="ir.ui.view">
+		<field name="name">Account Journal</field>
+		<field name="model">account.journal</field>
+		<field name="inherit_id" ref="account.view_account_journal_form"></field>
+		<field name="arch" type="xml">
+                     <field name="outbound_payment_method_ids"  position="attributes">
+                        <attribute name='invisible'>1</attribute>  
+                       </field>
+		</field>
+	</record>
 
         <record id="invoice_supplier_form_inherit_new" model="ir.ui.view">
 		<field name="name">Account Invoice.New</field>

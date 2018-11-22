@@ -172,7 +172,7 @@ class HrExpense(models.Model):
             else:
                 self.write({'state': 'approve'})
         else:
-            self.write({'state': 'submit','approval_status':'app_not_required'})
+            self.write({'state': 'submit','approval_status':'app_required'})
         return True
 
     @api.multi
