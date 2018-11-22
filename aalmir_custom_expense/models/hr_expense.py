@@ -100,7 +100,7 @@ class HrExpense(models.Model):
     def cancel_expense(self):
         if not self._context.get('call_from_pay',False):
             self.payment_id.cancel()
-        self.write({'state':'draft','approved_by':False})
+        self.write({'state':'draft','approved_by':False,'payment_method':'','bank_journal_id_expense':False,'cheque_status':'','chq_s_us':'','is_bank_journal':False,'payment_id':False})
         
     @api.multi
     def print_payment_receipt(self):
