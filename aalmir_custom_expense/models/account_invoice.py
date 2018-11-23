@@ -20,12 +20,12 @@ class AccountInvoice(models.Model):
 #        elif self.employee_bill and self.employee_bill ==True:
 #            print "self._context-------------------",self._context
 #            return {'domain': {'partner_id': [('employee', '=', True)]}}
-    @api.depends('amount_total')
+    @api.depends('amount_total','state','origin')
     def _compute_check_total_tracker(self):
         print "yrfbfnmfdknkjfngkdjngkjdfbg-------------------------"
         for invoice in self:
             if invoice.type in ('in_invoice','in_refund'):
-                if not invoice.origin and invoice.state in ('draft'):
+                if not invoice.origin and invoice.state == 'draft':
                     print "if condition matched-----------------"
                     non_approval=self.env['approval.config.bill.line'].search([('partner_id','=',invoice.partner_id.id)])
                     print "non_approvalnon_ap123123provalnon_approval",non_approval
