@@ -51,9 +51,9 @@ class AccountInvoice(models.Model):
                     print "bill_idsbill_ids",bill_ids
                     if self.id in bill_ids:
                         line_id=self.env['payment.bill.line'].search([('bill_id','=',self.id)])
-                        rec_ids=[x.receiving_id.id for x in line_id]
+                        rec_ids=[x.receiving_id.ids for x in line_id]
                 for each_pick in self.picking_ids:
-                    if each_pick.id not in rec_ids:
+                    if each_pick not in rec_ids:
                         pick_ids.append(each_pick.id)
                         vals={'receiving_id':[(4, pick_ids)]}
                         vals.update({'bill_id':self.id,'payterm_id':self.payment_term_id.id})
