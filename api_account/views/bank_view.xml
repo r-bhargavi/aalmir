@@ -14,6 +14,7 @@
                 </field>
                 <field name="partner_id" position="attributes">
                     <attribute name="string">Partner</attribute>
+                    <attribute name="required">1</attribute>
                 </field>
                 <field name="bank_id" position="attributes">
                     <attribute name="required">1</attribute>
