@@ -13,12 +13,36 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-        pay_ids=self.env['account.payment'].search([])
-        for res in pay_ids:
-            if res.payment_method=='cheque':
-                for each_cheque in res.cheque_details:
-                    each_cheque._onchange_amount()
+        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].search([])
+#        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].browse(1)
+        for each_wh in warehouse_place_product_ids:
+            count_multi_line=0
+            for each_line in each_wh.multi_product_ids:
+                print "each_lineeach_line product",each_line.product_id.name,each_line.product_id.default_code
+                count_multi_line+=1
+                coutn_in_lines=0
+                approve_qty=0.0
+                for each_multi in each_line.multi_product_ids:
+                    coutn_in_lines+=1
+                    approve_qty+=each_multi.approve_qty
+                print "approve_qtyapprove_qty",approve_qty
+                print "coutn_in_linescoutn_in_lines",coutn_in_lines
+                each_line.write({'total_quantity':approve_qty})
+                if approve_qty==0.0:
+                    each_line.unlink()
+            print "count_multi_linecount_multi_line",count_multi_line
+#        pay_ids=self.env['account.payment'].search([])
+#        for res in pay_ids:
+#            if res.payment_method=='cheque':
+#                for each_cheque in res.cheque_details:
+#                    each_cheque._onchange_amount()
         return True
+#        pay_ids=self.env['account.payment'].search([])
+#        for res in pay_ids:
+#            if res.payment_method=='cheque':
+#                for each_cheque in res.cheque_details:
+#                    each_cheque._onchange_amount()
+#        return True
 #        pay_ids=self.env['account.payment'].search([])
 #        for res in pay_ids:
 #            if res.invoice_ids:
