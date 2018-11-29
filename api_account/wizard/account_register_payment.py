@@ -372,7 +372,7 @@ class AccountRegisterPayments(models.Model):
             payment.cheque_status=self.cheque_status
             payment.chq_s_us=self.chq_s_us
             payment.pay_p_up=self.pay_p_up
-            if payment.bank_id:
+            if self.bank_id:
                 payment.bank_id=self.bank_id.id
             payment.payment_from='multi'
             for bank_line in self.cheque_details:
