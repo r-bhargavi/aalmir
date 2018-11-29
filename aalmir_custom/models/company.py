@@ -28,8 +28,8 @@ class resCompany(models.Model):
                 print "approve_qtyapprove_qty",approve_qty
                 print "coutn_in_linescoutn_in_lines",coutn_in_lines
                 each_line.write({'total_quantity':approve_qty})
-#                if approve_qty==0.0:
-#                    each_line.unlink()
+                if approve_qty==0.0:
+                    each_line.unlink()
             print "count_multi_linecount_multi_line",count_multi_line
 #        pay_ids=self.env['account.payment'].search([])
 #        for res in pay_ids:
@@ -37,6 +37,12 @@ class resCompany(models.Model):
 #                for each_cheque in res.cheque_details:
 #                    each_cheque._onchange_amount()
         return True
+#        pay_ids=self.env['account.payment'].search([])
+#        for res in pay_ids:
+#            if res.payment_method=='cheque':
+#                for each_cheque in res.cheque_details:
+#                    each_cheque._onchange_amount()
+#        return True
 #        pay_ids=self.env['account.payment'].search([])
 #        for res in pay_ids:
 #            if res.invoice_ids:

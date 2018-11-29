@@ -579,10 +579,11 @@ class StockStoreLocationWizard(models.TransientModel):
 					mst.store_id=location_dest.id
 					mst.logistic_state='reserved'
 					mst.picking_id = False #backorder.id if backorder else False
-					for btch in mst.batch_id:
-						btch.store_id=location_dest.id
-						btch.picking_id = backorder.id if backorder else False
-						btch.logistic_state = 'reserved' if backorder else 'transit_in'
+#                                        commented by bhargavi
+#					for btch in mst.batch_id:
+#						btch.store_id=location_dest.id
+#						btch.picking_id = backorder.id if backorder else False
+#						btch.logistic_state = 'reserved' if backorder else 'transit_in'
 					multi_store_obj=self.env['store.multi.product.data']
 					# Transit IN multi product data id
 					transit_in = multi_store_obj.search([('store_id','=',location_dest.id),

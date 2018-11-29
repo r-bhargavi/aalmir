@@ -207,7 +207,7 @@ class PurchaseOrder(models.Model):
 
     show_delivery_address=fields.Boolean(string='Delivery Address',default=True,help="Show Delivery Address on print")
     internal_note=fields.Text('Internal Note')
-    converted_amount_total = fields.Monetary(string='Converted Total', compute='_get_converted_total')
+    converted_amount_total = fields.Monetary(string='Converted Total', compute='_get_converted_total',store=True)
     company_currency_id=fields.Many2one('res.currency','Company Currency', related='company_id.currency_id')
     allow_extra = fields.Boolean(string='Extra Receive',default=False,help="Allow Logistics to Receive Extra Quantity")
     
