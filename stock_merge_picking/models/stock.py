@@ -531,7 +531,7 @@ class StockMove(models.Model):
 						loose_btch = subset_sum_batches(numbers,reserve_qty)
 #					if not loose_btch:
 #						raise UserError("There are no group of Batches found for product \
-#						[{}]{} with referance to your Quantity {}#".format(
+#						[{}]{} with referance to your Quantity {}##".format(
 #						res.product_id.default_code,res.product_id.name,reserve_qty))
 					result_batches.extend(loose_btch)
 					

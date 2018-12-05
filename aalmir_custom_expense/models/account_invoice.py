@@ -44,7 +44,7 @@ class AccountInvoice(models.Model):
                          invoice.check_total=True
                 else:
                     print "ekse part-----345345----------------"
-                    self.check_total=False
+                    invoice.check_total=False
         print "self.check_totalself.check_totalself.check_total",invoice.check_total
   
             
