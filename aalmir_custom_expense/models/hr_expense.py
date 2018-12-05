@@ -361,7 +361,7 @@ class HrExpense(models.Model):
 					'journal_id':each.journal_id,
 					'bank_name':each.bank_name.id,
 					'partner_id':payment.partner_id.id,
-					'communication': each.communication,
+					'communication': each.expense_id.communication,
 					'cheque_no': each.cheque_no,
 					'branch_name': each.branch_name,
 					'amount': each.amount,
