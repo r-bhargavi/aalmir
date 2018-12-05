@@ -752,9 +752,10 @@ class StockPicking(models.Model):
         }
 
         pick_ids = self.env['stock.picking'].search([('origin','=',self.name),('name','ilike','RE')])._ids
-
+        print "pick_idspick_idspick_idspick_ids",pick_ids
         if len(pick_ids) > 1:
-            result['domain'] = "[('id','in',pick_ids)]"
+            result['domain'] = [('id','in',pick_ids)]
+            print "resultresultresultresult",result
         elif len(pick_ids) == 1:
             form = self.env.ref('stock.view_picking_form', False)
             form_id = form.id if form else False
