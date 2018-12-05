@@ -331,9 +331,11 @@ class productProduct(models.Model):
 		for product in self.browse(cr, uid, ids, context=ctx):
 		    id = product.id
 		    qty_available = float_round(quants.get(id, 0.0), precision_rounding=product.uom_id.rounding)
+                    print "qty_availableqty_availableqty_available",qty_available
 		    incoming_qty = float_round(moves_in.get(id, 0.0), precision_rounding=product.uom_id.rounding)
 		    outgoing_qty = float_round(moves_out.get(id, 0.0), precision_rounding=product.uom_id.rounding)
 		    virtual_available = float_round(quants.get(id, 0.0) + moves_in.get(id, 0.0) - moves_out.get(id, 0.0), precision_rounding=product.uom_id.rounding)
+                    print "incoming_qtyincoming_qty",incoming_qty,outgoing_qty,virtual_available
 		    res[id] = {
 		        'qty_available': qty_available,
 		        'incoming_qty': incoming_qty,

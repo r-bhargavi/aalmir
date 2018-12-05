@@ -76,6 +76,9 @@ class stockPicking(models.Model):
 		body = "<ul> <b><li>Picking list is Closed <li></li>	\
 				<li>Picked Quantity</li></b>"
 		for res in self.pack_operation_product_ids:
+#                    patch below line 80,81 added by bhargavi to handle internal tfr issue in qty
+                        if res.picking_id.picking_type_code=='internal' and res.picking_id.location_id.actual_location and res.picking_id.location_dest_id.usage == 'production':
+                            res.write({'qty_done':res.pick_qty,'product_qty':res.pick_qty})
 			body += '<li>Product : {} <b>{} {}</b></li>'.format(res.product_id.name,\
 						res.product_uom_id.name,res.pick_qty)
 			#res.qty_done = res.pick_qty

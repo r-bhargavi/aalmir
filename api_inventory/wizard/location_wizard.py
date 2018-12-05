@@ -415,7 +415,7 @@ class StockStoreLocationWizard(models.TransientModel):
 				
 			for op in rec.picking.pack_operation_product_ids:
 				if op.product_id.id not in product_ids:
-					op.qty_done=0.0					
+					op.qty_done=0.0	
 					
 			if not rec.dispatch_doc or not rec.note:
 				if rec.picking.sale_id:
