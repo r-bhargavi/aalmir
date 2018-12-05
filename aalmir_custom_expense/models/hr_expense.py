@@ -224,7 +224,8 @@ class HrExpense(models.Model):
             
         if self.payment_method and self.payment_method=='cheque':
             cheque_amt=sum(line.amount for line in self.cheque_details)
-            if self.total_amount!=cheque_amt:
+            print "total------------------",round(self.total_amount,2)-round(cheque_amt,2)
+            if round(self.total_amount,2)-round(cheque_amt,2)!=0.0:
                 raise UserError(_("Cheque Amount does not match with Expense Amount.Please check!!"))
 
         if not self.bank_journal_id_expense:
@@ -416,7 +417,7 @@ class BankChequeDetailsExpense(models.Model):
     cheque_no = fields.Char('Cheque No.')
     cheque_date = fields.Date('Cheque Date')
     branch_name = fields.Char('Bank Branch Name')
-    amount = fields.Float('Amount')
+    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
     reconcile_date = fields.Date('Reconcile Date')
     register_payment_id=fields.Many2one('account.register.payments')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status',copy=False)
