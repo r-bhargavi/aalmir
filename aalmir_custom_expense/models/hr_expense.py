@@ -299,7 +299,7 @@ class HrExpense(models.Model):
                 print "namenamename----------------",name,emp_account
                 move_line_data={
                         'type': 'dest',
-                        'name':name ,
+                        'name':name+'-'+expense.description ,
                         'price': total,
                         'account_id': emp_account,
                         'date_maturity': expense.date,
