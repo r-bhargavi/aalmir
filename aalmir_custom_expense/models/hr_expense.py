@@ -200,7 +200,7 @@ class HrExpense(models.Model):
         return {
             'date_maturity': line.get('date_maturity'),
             'partner_id': partner_id,
-            'name': line['name'][:64],
+            'name': line['name'][:64]+'-'+self.description,
             'debit': line['price'] > 0 and line['price'],
             'credit': line['price'] < 0 and -line['price'],
             'account_id': line['account_id'],
