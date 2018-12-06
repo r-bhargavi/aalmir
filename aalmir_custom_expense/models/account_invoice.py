@@ -25,7 +25,7 @@ class AccountInvoice(models.Model):
         print "yrfbfnmfdknkjfngkdjngkjdfbg-------------------------"
         for invoice in self:
             if invoice.type in ('in_invoice','in_refund'):
-                if not invoice.origin and invoice.state == 'draft':
+                if not invoice.origin and invoice.state in ('draft','waiting_approval'):
                     print "if condition matched-----------------"
                     non_approval=self.env['approval.config.bill.line'].search([('partner_id','=',invoice.partner_id.id)])
                     print "non_approvalnon_ap123123provalnon_approval",non_approval
