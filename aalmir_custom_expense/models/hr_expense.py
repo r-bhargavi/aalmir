@@ -100,6 +100,10 @@ class HrExpense(models.Model):
     def cancel_expense(self):
         if not self._context.get('call_from_pay',False):
             self.payment_id.cancel()
+            self.accoun_move_id.button_cancel()
+            if self.cheque_details:
+                for each_chq in self.cheque_details:
+                    each_chq.unlink()
         self.write({'state':'draft','approved_by':False,'payment_method':'','bank_journal_id_expense':False,'cheque_status':'','chq_s_us':'','is_bank_journal':False,'payment_id':False})
         
     @api.multi
@@ -188,10 +192,11 @@ class HrExpense(models.Model):
         '''
         if self.employee_id:
             partner_id = self.employee_id.address_home_id.commercial_partner_id.id
-        if self.expense_type=='other_expense' and self.partner_id_preferred:
+        elif self.expense_type=='other_expense' and self.partner_id_preferred:
             partner_id=self.partner_id_preferred.id
         else:
             partner_id=False
+        print "partner id==================",partner_id
         return {
             'date_maturity': line.get('date_maturity'),
             'partner_id': partner_id,
