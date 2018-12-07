@@ -162,23 +162,58 @@ class SaleOrderQuantityIncrease(models.TransientModel):
 			do_ids=self.env['stock.picking'].search([('origin','=',self.sale_id.name),('state','in',('done','transit','dispatch','delivered'))])
                         do_ids2=self.env['stock.picking'].search([('sale_id','=',self.sale_id.id),('state','in',('draft','confirmed'))],order="id desc")
                         print"TTTTTTTTTT", do_ids, do_ids2
+                        if not do_ids2:
+                            raise UserError(_("No Unreserved DO found for the product %s to subtract qty")%(line_wz.product_id.name))
+                        sum_qty=0.0
+
                         for dos in do_ids2:
-		           moves=self.env['stock.move'].search([('picking_id','=',dos.id)],order="id desc" )
+		           moves=self.env['stock.move'].search([('picking_id','=',dos.id),('product_id','=',line_wz.product_id.id)],order="id desc" )
+                           if not moves:
+                               raise UserError(_("No Moves found for the product %s to subtract qty")%(line_wz.product_id.name))
 		           for move in moves:
 	                  	if wiz_qty > 0:
 		                     if move.product_id.id == line_wz.product_id.id:
-		                             move.product_uom_qty -= wiz_qty
-		                             wiz_qty -= move.product_uom_qty 
+                                         sum_qty+=move.product_uom_qty
+                           print "sum_qtysum_qtysum_qtysum_qtysum_qtysum_qty",sum_qty 
+                        if sum_qty<wiz_qty:
+                            raise UserError(_("Qty in Picking is less then Qty mentioned to subtract for product %s")%(line_wz.product_id.name))
+                        for move in moves:
+                            print "wiz_qtywiz_qtywiz_qty",wiz_qty,move
+                            if wiz_qty>move.product_uom_qty:
+                                print "wiz qty-------------",wiz_qty,move.product_uom_qty
+                                wiz_qty -=move.product_uom_qty
+                                move.product_uom_qty =0.0
+                            else:
+                                move.product_uom_qty -= wiz_qty
+                                wiz_qty -= move.product_uom_qty
 			#if do_ids:
 			#	for picking in do_ids:
 			#		for operation in picking.pack_operation_product_ids:
 			#			if operation.product_id.id == line_wz.product_id.id:
 			#				qty_done += operation.qty_done
+                    elif wiz_qty and line_wz.status == 'add':
+                        do_ids_in_pa_avbl=self.env['stock.picking'].search([('origin','=',self.sale_id.name),('state','in',('partially_available','assigned'))])
+                        do_ids2_wa=self.env['stock.picking'].search([('sale_id','=',self.sale_id.id),('state','in',('draft','confirmed'))],order="id desc")
+
+                        if do_ids_in_pa_avbl:
+                            raise UserError(_("DO found in Partially or Available State.Please process or unresrve the Do completely to add qty!!"))
+
 		    
 		    if line_wz.qty:
 			if line_wz.total_qty and qty_done >= line_wz.total_qty:
 				raise UserError(_("Sale Order has Delivery order which validate you can not decrease the quantity"))
-			line_wz.sale_line_id.product_uom_qty=line_wz.total_qty
+                        if do_ids2_wa:
+                            print 'do_ids2_wado_ids2_wado_ids2_wa',do_ids2_wa
+                            move_ids = self.env['stock.move'].create({ 'date':line_wz.sale_line_id.order_id.date_order,
+						  'product_id':line_wz.product_id.id,'product_uom_qty':line_wz.qty,
+						  'product_uom':line_wz.sale_line_id.product_uom.id, 'picking_type_id':do_ids2_wa[0].picking_type_id.id,  
+						  'location_dest_id':do_ids2_wa[0].location_dest_id.id,
+						  'location_id':do_ids2_wa[0].location_id.id, 
+						  'picking_id':do_ids2_wa[0].id, 
+						  'name':line_wz.sale_line_id.order_id.name})
+                            self.env.cr.execute("update sale_order_line set product_uom_qty=%s where id = %s", (line_wz.total_qty, line_wz.sale_line_id.id))
+
+#                            line_wz.sale_line_id.write({'product_uom_qty':line_wz.total_qty})
 			body +='<li> Product : '+str(line_wz.product_id.name)+' from '+str(line_wz.sale_qty)+' To '+str(line_wz.total_qty)+'</li>'
 		body +='<li>'+'Reason: '+str(res.note)+'</li>'
 		res.sale_id.message_post(body)
