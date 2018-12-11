@@ -100,7 +100,7 @@ class HrExpense(models.Model):
     def cancel_expense(self):
         if not self._context.get('call_from_pay',False):
             self.payment_id.cancel()
-            self.accoun_move_id.button_cancel()
+            self.account_move_id.button_cancel()
             if self.cheque_details:
                 for each_chq in self.cheque_details:
                     each_chq.unlink()
