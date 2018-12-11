@@ -139,6 +139,7 @@ class LedgerwiseReport(models.Model):
 							'account':records.account_id.id,
 							'cd_account': cd_acc,
 							'jv_narration': jv_narrate,
+							'amount_currency': records.amount_currency,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -159,6 +160,7 @@ class LedgerwiseReport(models.Model):
 							'account':records.account_id.id,
                                                         'cd_account':cd_acc,
                                                         'jv_narration':jv_narrate,
+							'amount_currency': records.amount_currency,
 							'journal':records.journal_id.id,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
@@ -234,6 +236,7 @@ class LedgerwiseReport(models.Model):
 							'cd_account':cd_acc,
 							'jv_narration':jv_narrate,
 							'journal':records.journal_id.id,
+                                                        'amount_currency': records.amount_currency,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
 							'credit_amount':records.credit if records.credit else 0.0,
@@ -254,6 +257,7 @@ class LedgerwiseReport(models.Model):
 							'cd_account':cd_acc,
 							'jv_narration':jv_narrate,
 							'journal':records.journal_id.id,
+                                                        'amount_currency': records.amount_currency,
 							'po_number':po_number,
 							'narration':records.name if len(records.name)>2 else records.move_id.name,
 							'credit_amount':records.credit if records.credit else 0.0,
@@ -312,6 +316,7 @@ class LedgerwiseReport(models.Model):
 							'account':line.account_id.id,
 							'cd_account':cd_acc,
 							'jv_narration':jv_narrate,
+                                                        'amount_currency': line.amount_currency,
 							'journal':line.journal_id.id,
 							'narration':line.name if len(line.name)>2 else \
 										 line.move_id.name,
@@ -328,6 +333,7 @@ class LedgerwiseReport(models.Model):
 							'journal':line.journal_id.id,
                                                         'cd_account':cd_acc,
                                                         'jv_narration':jv_narrate,
+                                                        'amount_currency': line.amount_currency,
 							'narration':line.name if len(line.name)>2 \
 										else line.move_id.name,
 							'credit_amount':chq.amount if line.credit else 0.0,
@@ -385,6 +391,7 @@ class LedgerwiseReport(models.Model):
 						'cd_account':cd_acc,
 						'jv_narration':jv_narrate,
 						'journal':records.journal_id.id,
+                                                'amount_currency': records.amount_currency,
 						'narration':records.name if len(records.name)>2 \
 									else records.move_id.name,
 						'credit_amount':chq.amount if records.credit else 0.0,
@@ -400,6 +407,7 @@ class LedgerwiseReport(models.Model):
 						'journal':records.journal_id.id,
                                                 'cd_account':cd_acc,
                                                 'jv_narration':jv_narrate,
+                                                'amount_currency': records.amount_currency,
 						'narration':records.name if len(records.name)>2 \
 									else records.move_id.name,
 						'credit_amount':chq.amount if records.credit else 0.0,
@@ -433,6 +441,7 @@ class LedgerwiseReport(models.Model):
                                                     'journal':records.journal_id.id,
                                                     'cd_account':cd_acc,
                                                     'jv_narration':jv_narrate,
+                                                    'amount_currency': records.amount_currency,
                                                     'narration':records.name if len(records.name)>2 \
                                                                             else records.move_id.name,
                                                     'credit_amount':records.credit if records.credit else 0.0,
@@ -735,7 +744,9 @@ class ledgerwiseLine(models.Model):
     cd_account = fields.Many2many('account.account','ledger_line_account_rel','ledger_line_id','account_id',
      			'Cr/Dr Account',help="Showing corresponding Debit/Credit against line")
     move = fields.Many2one('account.move','Journal Entry')
-    amount_currency = fields.Many2one('res.currency', 'Amount Currency',related='move.amount_currency',store=True)
+    company_currency_id = fields.Many2one('res.currency', related='order_id.company_id.currency_id', readonly=True,
+        help='Utility field to express amount currency')
+    amount_currency = fields.Monetary(currency_field='company_currency_id',help="The amount expressed in an optional other currency if it is a multi-currency entry.")
 
     po_number = fields.Char('PO Number')
     jv_narration = fields.Char('JV Narration')
