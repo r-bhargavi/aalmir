@@ -158,7 +158,8 @@ class SaleOrderQuantityIncrease(models.TransientModel):
 		for line_wz in res.line_one2many:
 		    qty_done=0.0
 		    wiz_qty=line_wz.qty
-		    if wiz_qty and line_wz.status == 'substract':
+		    if wiz_qty>0.0 and line_wz.status == 'substract':
+                        print "call for subtract------------------------"
 		      #CH_N112 add code to check If delivery order is present or not
 			do_ids=self.env['stock.picking'].search([('origin','=',self.sale_id.name),('state','in',('done','transit','dispatch','delivered'))])
                         do_ids2=self.env['stock.picking'].search([('sale_id','=',self.sale_id.id),('state','in',('draft','confirmed'))],order="id desc")
@@ -176,17 +177,14 @@ class SaleOrderQuantityIncrease(models.TransientModel):
 		                     if move.product_id.id == line_wz.product_id.id:
                                          sum_qty+=move.product_uom_qty
                            print "sum_qtysum_qtysum_qtysum_qtysum_qtysum_qty",sum_qty 
-                        if sum_qty<wiz_qty:
-                            raise UserError(_("Qty in Picking is less then Qty mentioned to subtract for product %s")%(line_wz.product_id.name))
-                        for move in moves:
-                            print "wiz_qtywiz_qtywiz_qty",wiz_qty,move
-                            if wiz_qty>move.product_uom_qty:
-                                print "wiz qty-------------",wiz_qty,move.product_uom_qty
-                                wiz_qty -=move.product_uom_qty
-                                move.product_uom_qty =0.0
-                            else:
-                                move.product_uom_qty -= wiz_qty
-                                wiz_qty -= move.product_uom_qty
+                           if sum_qty<wiz_qty:
+                               raise UserError(_("Qty in Picking is less then Qty mentioned to subtract for product %s")%(line_wz.product_id.name))
+                           for move in moves:
+                               print "wiz_qtywiz_qtywiz_qty",wiz_qty,move
+                               if move.product_id.id == line_wz.product_id.id:
+
+                                    print "else part00000000000000000",wiz_qty
+                                    move.product_uom_qty -= wiz_qty
 			#if do_ids:
 			#	for picking in do_ids:
 			#		for operation in picking.pack_operation_product_ids:
