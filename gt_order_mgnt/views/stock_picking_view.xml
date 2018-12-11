@@ -149,7 +149,6 @@
             	<button name="do_print_picking" position="replace">
                 	<button name="aalmir_picking_print" string="Download" type="object" class="oe_highlight"
 	 			groups="stock.group_stock_user, gt_order_mgnt.group_sale_support" 
-	 			attrs="{'invisible':['|',('picking_type_code', 'in', ('internal','incoming')),('picking_type_code','=','outgoing'),('picking_status','=','draft')]}" 
 	 			/>
 			<!--button name="split_picking_data" string="Split &amp;Schedule Delivery" type="object"
  				class="oe_highlight" groups="gt_order_mgnt.group_sale_support" 
