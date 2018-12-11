@@ -152,6 +152,7 @@ class SaleOrderQuantityIncrease(models.TransientModel):
     @api.multi
     def save(self):
 	for res in self:
+                do_ids2_wa=[]
 		body ='Quantity Update : '+' '+'Date:'+str(date.today())
                 invoice_val=self.env['account.invoice']	
 		for line_wz in res.line_one2many:
@@ -211,7 +212,7 @@ class SaleOrderQuantityIncrease(models.TransientModel):
 						  'location_id':do_ids2_wa[0].location_id.id, 
 						  'picking_id':do_ids2_wa[0].id, 
 						  'name':line_wz.sale_line_id.order_id.name})
-                            self.env.cr.execute("update sale_order_line set product_uom_qty=%s where id = %s", (line_wz.total_qty, line_wz.sale_line_id.id))
+                        self.env.cr.execute("update sale_order_line set product_uom_qty=%s where id = %s", (line_wz.total_qty, line_wz.sale_line_id.id))
 
 #                            line_wz.sale_line_id.write({'product_uom_qty':line_wz.total_qty})
 			body +='<li> Product : '+str(line_wz.product_id.name)+' from '+str(line_wz.sale_qty)+' To '+str(line_wz.total_qty)+'</li>'

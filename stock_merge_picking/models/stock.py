@@ -512,11 +512,11 @@ class StockMove(models.Model):
 				
 				loose_batches=[]
 				print ";,,,,,,,,,",result_batches,reserve_qty
-				if reserve_qty <0 :
-					raise UserError("Error IN Quantity found for product [{}]{} \n Please \
-						Contact Administrator".format(
-								res.product_id.default_code,res.product_id.name))
-				elif reserve_qty>0 :
+#				if reserve_qty <0 :
+#					raise UserError("Error IN Quantity found for product [{}]{} \n Please \
+#						Contact Administrator#".format(
+#								res.product_id.default_code,res.product_id.name))
+				if reserve_qty>0 :
 					loose_batches=self.env['mrp.order.batch.number'].search([
 						('convert_product_qty','<',product_packaging_qty),
 						('store_id','!=',False),('logistic_state','in',('stored','transit_in')),
@@ -530,17 +530,17 @@ class StockMove(models.Model):
 					loose_btch = numbers
 					if round(qty_batches,2) > round(reserve_qty,2):
 						loose_btch = subset_sum_batches(numbers,reserve_qty)
-					if not loose_btch:
-						raise UserError("There are no group of Batches found for product \
-						[{}]{} with referance to your Quantity {}##".format(
-						res.product_id.default_code,res.product_id.name,reserve_qty))
+#					if not loose_btch:
+##						raise UserError("There are no group of Batches found for product \
+#						[{}]{} with referance to your Quantity {}###".format(
+#						res.product_id.default_code,res.product_id.name,reserve_qty))
 					result_batches.extend(loose_btch)
 					
-				if not loose_batches and round(reserve_qty,1) >0.0 and res.location_id.scrap_location==False:
-                                        print "resss---------",res
-					raise UserError("There are no group of Batches found for product \
-						[{}]{} with referance to your Quantity {}#".format(
-						res.product_id.default_code,res.product_id.name,reserve_qty))
+#				if not loose_batches and round(reserve_qty,1) >0.0 and res.location_id.scrap_location==False:
+#                                        print "resss---------",res
+#					raise UserError("There are no group of Batches found for product \
+#						[{}]{} with referance to your Quantity {}##".format(
+#						res.product_id.default_code,res.product_id.name,reserve_qty))
 				for batch in result_batches:
 					if not batch:
 						raise UserError("No Batch found for product [{}]{}".format(
