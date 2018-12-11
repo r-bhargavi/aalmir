@@ -205,13 +205,18 @@ class SaleOrderQuantityIncrease(models.TransientModel):
 				raise UserError(_("Sale Order has Delivery order which validate you can not decrease the quantity"))
                         if do_ids2_wa:
                             print 'do_ids2_wado_ids2_wado_ids2_wa',do_ids2_wa
-                            move_ids = self.env['stock.move'].create({ 'date':line_wz.sale_line_id.order_id.date_order,
-						  'product_id':line_wz.product_id.id,'product_uom_qty':line_wz.qty,
-						  'product_uom':line_wz.sale_line_id.product_uom.id, 'picking_type_id':do_ids2_wa[0].picking_type_id.id,  
-						  'location_dest_id':do_ids2_wa[0].location_dest_id.id,
-						  'location_id':do_ids2_wa[0].location_id.id, 
-						  'picking_id':do_ids2_wa[0].id, 
-						  'name':line_wz.sale_line_id.order_id.name})
+                            for each_do in do_ids2_wa:
+                                for each_move in each_do.move_lines:
+                                    if each_move.product_id.id==line_wz.product_id.id:
+                                        each_move.write({'product_uom_qty':each_move.product_uom_qty+line_wz.qty})
+                                    else:
+                                        move_ids = self.env['stock.move'].create({ 'date':line_wz.sale_line_id.order_id.date_order,
+                                                              'product_id':line_wz.product_id.id,'product_uom_qty':line_wz.qty,
+                                                              'product_uom':line_wz.sale_line_id.product_uom.id, 'picking_type_id':do_ids2_wa[0].picking_type_id.id,  
+                                                              'location_dest_id':do_ids2_wa[0].location_dest_id.id,
+                                                              'location_id':do_ids2_wa[0].location_id.id, 
+                                                              'picking_id':do_ids2_wa[0].id, 
+                                                              'name':line_wz.sale_line_id.order_id.name})
                         self.env.cr.execute("update sale_order_line set product_uom_qty=%s where id = %s", (line_wz.total_qty, line_wz.sale_line_id.id))
 
 #                            line_wz.sale_line_id.write({'product_uom_qty':line_wz.total_qty})
