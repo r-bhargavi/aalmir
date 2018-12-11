@@ -238,7 +238,7 @@ class PurchaseOrder(models.Model):
     @api.multi
     def button_cancel(self):
         res=super(PurchaseOrder,self).button_cancel()
-        if self.order_line[0].invoice_lines and each_po.order_line[0].invoice_lines.invoice_id.state!='cancel':
+        if self.order_line[0].invoice_lines and self.order_line[0].invoice_lines.invoice_id.state!='cancel':
             raise UserError(_('Please Cancel the related bills before cancelling PO!!'))
 
         self.payment_term_request=[]
