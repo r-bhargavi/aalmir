@@ -735,7 +735,6 @@ class ledgerwiseLine(models.Model):
     cd_account = fields.Many2many('account.account','ledger_line_account_rel','ledger_line_id','account_id',
      			'Cr/Dr Account',help="Showing corresponding Debit/Credit against line")
     move = fields.Many2one('account.move','Journal Entry')
-    amount_currency = fields.Many2one('res.currency', 'Amount Currency',related='move.amount_currency',store=True)
 
     po_number = fields.Char('PO Number')
     jv_narration = fields.Char('JV Narration')

@@ -43,7 +43,6 @@
 							<field name='date'/>
 							<field name='account'/>
 							<field name='move'/>
-							<field name='amount_currency'/>
 							<field name='narration' fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
 							<field name="debit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');"/>
 							<field name="credit_amount" fg_color="black:narration in ('OPENING BALANCE','CLOSING BALANCE');" />
