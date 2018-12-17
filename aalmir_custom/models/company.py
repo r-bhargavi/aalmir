@@ -13,21 +13,21 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-        so_ids_cancelled=self.env['purchase.order'].search([('state','=','done')])
-
-        po_ids_cancelled=self.env['purchase.order'].search([('state','=','cancel')])
-        if po_ids_cancelled:
-            print "po_ids_cancelledpo_ids_cancelledpo_ids_cancelled",po_ids_cancelled
-            for each_po in po_ids_cancelled:
-                if each_po.order_line[0].invoice_lines and each_po.order_line[0].invoice_lines.invoice_id.state!='cancel':
-                    print "each_po.order_line[0].invoice_lines.invoice_id",each_po.order_line[0].invoice_lines.invoice_id
-                    each_po.order_line[0].invoice_lines.invoice_id.signal_workflow('invoice_cancel')
-            return True
+#        po_ids_cancelled=self.env['purchase.order'].search([('state','=','cancel')])
+#        if po_ids_cancelled:
+#            print "po_ids_cancelledpo_ids_cancelledpo_ids_cancelled",po_ids_cancelled
+#            for each_po in po_ids_cancelled:
+#                if each_po.order_line[0].invoice_lines and each_po.order_line[0].invoice_lines.invoice_id.state!='cancel':
+#                    print "each_po.order_line[0].invoice_lines.invoice_id",each_po.order_line[0].invoice_lines.invoice_id
+#                    each_po.order_line[0].invoice_lines.invoice_id.signal_workflow('invoice_cancel')
+#            return True
 #        exp_ids=self.env['hr.expense'].search([('state','=','done'),('expense_type','=','emp_expense')])
+#        print "exp_idsexp_idsexp_idsexp_ids",exp_ids
 #        for each_exp in exp_ids:
 #            for each_je in each_exp.account_move_id:
 #                for each_move_line in each_je.line_ids:
 #                    if not each_move_line.partner_id:
+#                        print "each_move_lineeach_move_lineeach_move_line",each_move_line.move_id
 #                        each_move_line.write({'partner_id':each_exp.employee_id.address_home_id.commercial_partner_id.id})
 #        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].search([])
 ##        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].browse(1)
@@ -53,13 +53,6 @@ class resCompany(models.Model):
 #                for each_cheque in res.cheque_details:
 #                    each_cheque._onchange_amount()
 #        return True
-#        pay_ids=self.env['account.payment'].search([])
-#        for res in pay_ids:
-#            if res.payment_method=='cheque':
-#                for each_cheque in res.cheque_details:
-#                    each_cheque._onchange_amount()
-#        return True
-#        pay_ids=self.env['account.payment'].search([])
 #        for res in pay_ids:
 #            if res.invoice_ids:
 #                for each_inv in res.invoice_ids:
