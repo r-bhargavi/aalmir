@@ -51,7 +51,7 @@ class MrpProduction(models.Model):
 				search_id=self.env['sale.order.line.status'].search([('n_string','=','pre_stock')],limit=1) ## add status
 				if search_id:
 				    self.env['sale.order.line'].sudo().browse(rec.sale_line.id).write({'n_status_rel':[(4,search_id.id)]})
-				if wiz.batch_ids:
+				if wiz and wiz.batch_ids:
            				for batch in wiz.batch_ids:
 		               			batch.logistic_state='ready'
 		               			batch.approve_qty = batch.convert_product_qty

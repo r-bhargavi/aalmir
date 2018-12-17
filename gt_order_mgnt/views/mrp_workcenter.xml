@@ -790,8 +790,8 @@
                    <group>
                        
                         <group string="Actual Production Date">
-                            <field name="date_start" readonly="1"/>
-                            <field name="date_finished" readonly="1"/>
+                            <field name="date_start"/>
+                            <field name="date_finished"/>
                             <field name="delay" widget="float_time"/>
                         </group>
                         

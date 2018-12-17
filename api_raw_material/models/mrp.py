@@ -131,38 +131,72 @@ class MrpProduction(models.Model):
     def RM_Request_Mo(self):
         for record in self:
             if record.product_lines:
-               body='<b>Raw Materials Request sent to Logistic Department:</b>'
-               body +='<ul><li> Date. : '+str(date.today()) +'</li></ul>'
-               body +='<ul><li> Created By : '+str(self.env.user.name) +'</li></ul>'
-               body +='<ul><li> Manufacturing No. : '+str(record.name) +'</li></ul>'
-               body +='<ul><li> Product Name. : '+str(record.product_id.name) +'</li></ul>' 
-               body +='<ul><li> Product Qty. : '+str(record.product_qty) +'</li></ul>' 
-               body +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>" 
-               
-               lst=[]
-               for line in record.product_lines:
-                   #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
-	           #self.env.cr.execute(term_qry)
-	           #schedule_order=self.env.cr.fetchone()
-                   body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
-                   lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
-                       'qty':line.product_qty,'pending_qty':line.product_qty, 'rm_type':'stock'})) 
-               
-               rm_rqst=self.env['mrp.raw.material.request'].create({'production_id':record.id,
-                           'product_id':record.product_id.id,'required_qty':record.product_qty,
-                           'request_type':'normal',
-                           'required_uom_id':record.product_uom.id,
-                           'request_line_ids':lst,
-                           'request_date':record.date_planned}) 
-               body +="</table>"
-               body +='<ul><li> RM Request No. : '+str(rm_rqst.name) +'</li></ul>' 
-               
-               shifts=self.env['mrp.workorder.rm.shifts'].search([('production_id','=',record.id)])
-               shifts.write({'request_id':rm_rqst.id})
-                      
-               record.raw_request=True
-               record.message_post(body=body)
-               rm_rqst.message_post(body=body)
+                email_to=''
+                temp_id = self.env.ref('gt_order_mgnt.email_template_for_rm_request')
+                print "temp_idtemp_idtemp_id",temp_id
+                group = self.env['res.groups'].search([('name', '=', 'RM Request Approve')])
+                print "groupgroupgroupgroup",group
+                if group:
+                    user_ids = self.env['res.users'].sudo().search([('groups_id', 'in', [group.id])])
+                    print "user_idsuser_ids",user_ids
+                    email_to = ''.join([user.partner_id.email + ',' for user in user_ids])
+                    email_to = email_to[:-1]
+                    print "email_toemail_to",email_to
+                
+                body='<b>Raw Materials Request sent to Logistic Department:</b>'
+
+                body +='<ul><li> Date. : '+str(date.today()) +'</li></ul>'
+                body +='<ul><li> Created By : '+str(self.env.user.name) +'</li></ul>'
+                body +='<ul><li> Manufacturing No. : '+str(record.name) +'</li></ul>'
+                body +='<ul><li> Product Name. : '+str(record.product_id.name) +'</li></ul>' 
+                body +='<ul><li> Product Qty. : '+str(record.product_qty) +'</li></ul>' 
+                body +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>" 
+                lst=[]
+                for line in record.product_lines:
+                    #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
+                    #self.env.cr.execute(term_qry)
+                    #schedule_order=self.env.cr.fetchone()
+                    body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
+                    lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
+                        'qty':line.product_qty,'pending_qty':line.product_qty, 'rm_type':'stock'})) 
+                
+                rm_rqst=self.env['mrp.raw.material.request'].create({'production_id':record.id,
+                            'product_id':record.product_id.id,'required_qty':record.product_qty,
+                            'request_type':'normal',
+                            'required_uom_id':record.product_uom.id,
+                            'request_line_ids':lst,
+                            'request_date':record.date_planned}) 
+                base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                query = {'db': self._cr.dbname}
+                fragment = {
+                              'model': 'mrp.raw.material.request',
+                              'view_type': 'form',
+                              'id': rm_rqst.id,
+                             }
+                url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+                print "urlurl",url
+                text_link = _("""<a href="%s">%s</a> """) % (url,"VIEW REQUEST")
+                body +='<li> <b>RM Request :</b> '+str(text_link) +'</li>'
+
+                body +="</table>"
+                body +='<ul><li> RM Request No. : '+str(rm_rqst.name) +'</li></ul>'
+                print "bodybodybodybody",body
+                if temp_id:
+                   base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                   query = {'db': self._cr.dbname}
+                   temp_id.write({'body_html': body, 'email_to':email_to,
+                                  'email_from':self.env.user.login})
+                   values = temp_id.generate_email(rm_rqst.id)
+                   mail_mail_obj = self.env['mail.mail']
+                   msg_id = mail_mail_obj.create(values) 
+                   msg_id.send()	
+
+                shifts=self.env['mrp.workorder.rm.shifts'].search([('production_id','=',record.id)])
+                shifts.write({'request_id':rm_rqst.id})
+
+                record.raw_request=True
+                record.message_post(body=body)
+                rm_rqst.message_post(body=body)
 
     @api.multi
     def wastage_request(self):
@@ -215,7 +249,8 @@ class MrpProductionProductLine(models.Model):
    def _get_rawMaterialQty(self):
 	for record in self:
 		record.required_qty=record.product_qty - record.extra_qty
-		received_qty=request_qty=0.0
+                if not record.production_id.delivery_ids:
+                    received_qty=request_qty=0.0
 		for picking in record.production_id.delivery_ids:
 			if picking.state not in ('done','cancel'):
 				for line in picking.move_lines:

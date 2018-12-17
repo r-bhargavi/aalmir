@@ -219,7 +219,7 @@ class accountPayment(models.Model):
     	for res in self:
                 if res.payment_type=='outbound' and res.journal_id.type=='cash':
                     res.write({'pay_p_up':'post'})
-                if res.pay_p_up and res.pay_p_up=='not_posted' and res.payment_type=='outbound':
+                if res.pay_p_up and res.pay_p_up=='not_posted' and res.payment_type in ('outbound','transfer'):
                     print "res.invoice_idsres.invoice_ids",res.invoice_ids
                     if res.invoice_ids:
                         for each_inv in res.invoice_ids:
@@ -236,11 +236,15 @@ class accountPayment(models.Model):
                     print "res.bank_id.partner_id.id",res.bank_id.partner_id.id,res.partner_id.id
                     if res.bank_id and res.bank_id.partner_id.id!=res.partner_id.id:
                         raise UserError(_("Bank selected in Payment should have same Partner defined!!"))
-                    if res.bank_id and res.bank_id.partner_id.id==res.partner_id.id:
+                    if (res.bank_id and res.bank_id.partner_id.id==res.partner_id.id):
 
                         wiz_id = self.env['fund.transfer.wizard'].create({'mail_details':''})
                         print "wiz_idwiz_idwiz_id",wiz_id
                         wiz_id.with_context({'active_ids':res.id}).send_mail()
+                    elif res.destination_journal_id and res.payment_type=='transfer':
+                        wiz_id = self.env['fund.transfer.wizard'].create({'mail_details':''})
+                        print "wiz_idwiz_idwiz_id",wiz_id
+                        wiz_id.with_context({'active_ids':res.id,'internal_tfr':True}).send_mail()
     		amount=res.amount
     		if res.pay_type =='bank' and res.payment_method =='cheque':
     			n_amount=0

@@ -2092,8 +2092,8 @@ class MrpWorkcenterPructionline(models.Model):
     def change_state(self):
         for res in self:
         	if self._context.get('ready'):
-                        if not res.machine:
-		          raise UserError(_('Please Select Machine Before Lock  Work order..'))
+#                        if not res.machine:
+#		          raise UserError(_('Please Select Machine Before Lock Work order..'))
 		        if not res.req_product_qty and not res.each_batch_qty:
 		           raise UserError(_("Please Fill the Required Batch No. and Each Batch Qty..."))
                         if not res.batch_ids:
