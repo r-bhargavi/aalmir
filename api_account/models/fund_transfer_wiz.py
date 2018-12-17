@@ -68,19 +68,22 @@ class FundTRansferRequest(models.Model):
                 vendor_inv+=(str(each_inv.reference if each_inv.reference else '')+' '+str(each_inv.vendor_invoice_date))+','
         body ='<li> <b>Below are the details for Fund Transfer Requested.'+'</li>'
         body +='<li> <b>From Company :</b>'+str(record.company_id.name) +'</li>'
-        body +='<li> <b>Company Bank Account Name :</b>'+str(record.journal_id.name) +'</li>'
+        if record.payment_type!='transfer':
+            body +='<li> <b>Company Bank Account Name :</b>'+str(record.journal_id.name) +'</li>'
+        if record.payment_type=='transfer':
+            body +='<li> <b>From Bank :</b>'+str(record.journal_id.name) +'</li>'
+            body +='<li> <b>Transfer To :</b>'+str(record.destination_journal_id.name) +'</li>'
         body +='<li> <b>Payment Ref :</b>'+str(record.name) +'</li>'
-        body +='<li> <b>Vendor name :</b>'+str(record.partner_id.name) +'</li>'
+        body +='<li> <b>Partner name :</b>'+str(record.partner_id.name) +'</li>'
         if inv_ref:
-            body +='<li> <b>Vendor Bill Ref :</b>'+str(inv_ref) +'</li>'
-            body +='<li> <b>Vendor Invoice Details :</b>'+str(vendor_inv) +'</li>'
-
-        body +='<li> <b>Vendor Bank Account Number :</b>'+str(record.bank_id.acc_number) +'</li>'
-        body +='<li> <b>Vendor Bank IBAN :</b>'+str(record.bank_id.iban_number if record.bank_id.iban_number else '') +'</li>'
-        body +='<li> <b>Vendor Bank Account Name :</b>'+str(record.bank_id.account_name if record.bank_id.account_name else '') +'</li>'
-        body +='<li> <b>Vendor Bank Swift Code :</b>'+str(record.bank_id.swift_code if record.bank_id.swift_code else '') +'</li>'
-        body +='<li> <b>Vendor Bank Address :</b>'+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+','+str(record.bank_id.bank_id.state.name if record.bank_id.bank_id.state else '')+','+str(record.bank_id.bank_id.zip if record.bank_id.bank_id.zip else '')+','+str(record.bank_id.bank_id.country.name if record.bank_id.bank_id.country else '')+','+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+'</li>'
-
+            body +='<li> <b>Partner Bill Ref :</b>'+str(inv_ref) +'</li>'
+            body +='<li> <b>Partner Invoice Details :</b>'+str(vendor_inv) +'</li>'
+        if record.payment_type!='transfer':
+            body +='<li> <b>Partner Bank Account Number :</b>'+str(record.bank_id.acc_number) +'</li>'
+            body +='<li> <b>Partner Bank IBAN :</b>'+str(record.bank_id.iban_number if record.bank_id.iban_number else '') +'</li>'
+            body +='<li> <b>Partner Bank Account Name :</b>'+str(record.bank_id.account_name if record.bank_id.account_name else '') +'</li>'
+            body +='<li> <b>Partner Bank Swift Code :</b>'+str(record.bank_id.swift_code if record.bank_id.swift_code else '') +'</li>'
+            body +='<li> <b>Partner Bank Address :</b>'+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+','+str(record.bank_id.bank_id.state.name if record.bank_id.bank_id.state else '')+','+str(record.bank_id.bank_id.zip if record.bank_id.bank_id.zip else '')+','+str(record.bank_id.bank_id.country.name if record.bank_id.bank_id.country else '')+','+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+'</li>'
         body +='<li> <b>Total Amount requested :</b> '+str(record.amount) +''+str(record.currency_id.name) +'</li>'
         body +='<li> <b>Payment date :</b> '+str(record.payment_date) +'</li>'
         body +='<li> <b>Internal Note :</b> '+str(record.communication if record.communication else '') +'</li>'
@@ -140,6 +143,8 @@ class FundTRansferRequest(models.Model):
                     vendor_inv+=(str(each_inv.reference if each_inv.reference else '')+' '+str(each_inv.vendor_invoice_date))+','
 
             temp_id = self.env.ref('gt_order_mgnt.email_template_for_fund_transfer_request')
+            if self._context.get('internal_tfr',False):
+                temp_id = self.env.ref('gt_order_mgnt.email_template_for_int_transfer_request')
             if temp_id:
                base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 	       query = {'db': self._cr.dbname}
@@ -154,18 +159,24 @@ class FundTRansferRequest(models.Model):
                body ='<li><b>Below are the details for Fund Transfer Requested.'+'</li>'
                body +='<li> <b>TT Request :</b> '+str(text_link) +'</li>'
                body +='<li> <b>From Company :</b>'+str(record.company_id.name) +'</li>'
-               body +='<li> <b>Company Bank Account Name :</b>'+str(record.journal_id.name) +'</li>'
+               if not self._context.get('internal_tfr',False):
+                    body +='<li> <b>Company Bank Account Name :</b>'+str(record.journal_id.name) +'</li>'
+               if self._context.get('internal_tfr',False):
+                    body +='<li> <b>From Bank :</b>'+str(record.journal_id.name) +'</li>'
+                    body +='<li> <b>Transfer To :</b>'+str(record.destination_journal_id.name) +'</li>'
                body +='<li> <b>Payment Ref :</b>'+str(record.name) +'</li>'
-               body +='<li> <b>Vendor name :</b>'+str(record.partner_id.name) +'</li>'
-               if inv_ref:
-                   body +='<li> <b>Vendor Bill Ref :</b>'+str(inv_ref) +'</li>'
-                   body +='<li> <b>Vendor Invoice Details :</b>'+str(vendor_inv) +'</li>'
+               if not self._context.get('internal_tfr',False):
 
-               body +='<li> <b>Vendor Bank Account Number :</b>'+str(record.bank_id.acc_number) +'</li>'
-               body +='<li> <b>Vendor Bank IBAN :</b>'+str(record.bank_id.iban_number if record.bank_id.iban_number else '') +'</li>'
-               body +='<li> <b>Vendor Bank Account Name :</b>'+str(record.bank_id.account_name if record.bank_id.account_name else '') +'</li>'
-               body +='<li> <b>Vendor Bank Swift Code :</b>'+str(record.bank_id.swift_code if record.bank_id.swift_code else '') +'</li>'
-               body +='<li> <b>Vendor Bank Address :</b>'+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+','+str(record.bank_id.bank_id.state.name if record.bank_id.bank_id.state else '')+','+str(record.bank_id.bank_id.zip if record.bank_id.bank_id.zip else '')+','+str(record.bank_id.bank_id.country.name if record.bank_id.bank_id.country else '')+','+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+'</li>'
+                    body +='<li> <b>Partner name :</b>'+str(record.partner_id.name) +'</li>'
+                    if inv_ref:
+                        body +='<li> <b>Partner Bill Ref :</b>'+str(inv_ref) +'</li>'
+                        body +='<li> <b>Partner Invoice Details :</b>'+str(vendor_inv) +'</li>'
+
+                    body +='<li> <b>Partner Bank Account Number :</b>'+str(record.bank_id.acc_number) +'</li>'
+                    body +='<li> <b>Partner Bank IBAN :</b>'+str(record.bank_id.iban_number if record.bank_id.iban_number else '') +'</li>'
+                    body +='<li> <b>Partner Bank Account Name :</b>'+str(record.bank_id.account_name if record.bank_id.account_name else '') +'</li>'
+                    body +='<li> <b>Partner Bank Swift Code :</b>'+str(record.bank_id.swift_code if record.bank_id.swift_code else '') +'</li>'
+                    body +='<li> <b>Partner Bank Address :</b>'+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+','+str(record.bank_id.bank_id.state.name if record.bank_id.bank_id.state else '')+','+str(record.bank_id.bank_id.zip if record.bank_id.bank_id.zip else '')+','+str(record.bank_id.bank_id.country.name if record.bank_id.bank_id.country else '')+','+str(record.bank_id.bank_id.street if record.bank_id.bank_id.street else '')+'</li>'
 
                body +='<li> <b>Total Amount requested :</b> '+str(record.amount) +''+str(record.currency_id.name) +'</li>'
                body +='<li> <b>Payment date :</b> '+str(record.payment_date) +'</li>'

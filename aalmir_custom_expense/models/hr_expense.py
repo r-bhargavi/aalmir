@@ -333,8 +333,8 @@ class HrExpense(models.Model):
         }
         if expense.chq_s_us:
             pay_dict.update({'chq_s_us':expense.chq_s_us})
-        if expense.pay_p_up and expense.pay_p_up=='not_posted':
-            pay_dict.update({'pay_p_up':'not_posted','bank_id':expense.bank_id.id,'internal_request_tt':expense.internal_request_tt})
+        if expense.pay_p_up:
+            pay_dict.update({'pay_p_up':expense.pay_p_up,'bank_id':expense.bank_id.id,'internal_request_tt':expense.internal_request_tt})
             if expense.uploaded_document_tt:
                 pay_dict.update({'uploaded_document_tt':[(4, self.uploaded_document_tt.ids if self.uploaded_document_tt else False)]})
 

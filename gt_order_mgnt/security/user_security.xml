@@ -19,6 +19,12 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to get mails of fund transfer request</field>
     </record>
+     <record id="send_rm_request" model="res.groups">
+        <field name="name">RM Request Approve</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to get mails of raw material approval request</field>
+    </record>
      <record id="check_sign_request" model="res.groups">
         <field name="name">Check Sign</field>
         <field name="category_id" ref="base.module_category_usability"/>

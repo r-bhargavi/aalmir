@@ -33,3 +33,10 @@ class accountPayment(models.Model):
         # Set partner_id domain
         if self.partner_type:
             return {'domain': {'partner_id': ['|',('employee', '=', True),(self.partner_type, '=', True)]}}
+        
+    @api.onchange('payment_type')
+    def _onchange_payment_type(self):
+        # Set partner_id domain
+        if self.partner_id and self.payment_type=='transfer':
+            print "calllll to onchange pay type-------------------"
+            self.partner_id= False

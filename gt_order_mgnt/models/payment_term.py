@@ -535,10 +535,8 @@ class accountPayment(models.Model):
         else:
             if not self.expense_id:
                     bill,internal=False,False
-#                    if self.partner_type=='supplier':
                     if self.payment_type=='outbound':
                             bill = True
-#                    elif self.partner_type == False:
                     elif self.payment_type == 'transfer':
                             internal =True
 
@@ -548,27 +546,40 @@ class accountPayment(models.Model):
                             subject='API-ERP Bill Payment Alert:'
                             group = self.env['res.groups'].sudo().search([('name', '=', 'Bill Payment Email')])
                     if internal:
-                            subject='API-ERP Internal Payment Alert:'
+                            subject='API-ERP Internal Transfer Alert: Transferred against Payment Ref '+' '+str(self.name)+' '
                     for recipient in group.users:
                         if self.env.user.company_id.id in recipient.company_ids._ids:
                             if recipient.login not in recipient_partners:
                                     recipient_partners.append(str(recipient.login))
 
                     body = '<b><h3>{}</h3> '.format(self.env.user.company_id.name)
-                    body +='Payment Received : </b>' if self.partner_type =='customer' else '<b>Payment Paid :</b>'
+                    if self.payment_type!='transfer':
+                        body +='Payment Received : </b>' if self.partner_type =='customer' else '<b>Payment Paid :</b>'
                     if self.partner_id:
                             body +='<li> Customer  Name: ' +(self.partner_id.name) +'</li>'  if self.partner_type =='customer' else '<li> Vendor  Name: ' +(self.partner_id.name) +'</li>'
                     if bill or internal:
                             body +='<li> Payment Voucher No.: '+str(self.name) +'</li>'
                     else:
                             body +='<li> Payment Receipt No.: '+str(self.name) +'</li>'
-                    body +='<li> Payment Method: '+str(self.journal_id.name) +'</li>'
-                    if self.payment_method:
-                       body +='<li> Received Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'  if self.partner_type =='customer' else '<li> Paid Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'
+                    if self.payment_type!='transfer':
+
+                        body +='<li> Payment Method: '+str(self.journal_id.name) +'</li>'
+                    if self.payment_method and not self.payment_type=='transfer':
+
+                       body +='<li> Received Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>'  if self.partner_type =='customer' else '<li> Paid Type: '+str(dict(self.fields_get(allfields=['payment_method'])['payment_method']['selection'])[self.payment_method]) +'</li>' 
+                    if self.payment_type=='transfer':
+                        body +='<li> Payment From: '+str(self.journal_id.name) +'</li>'
+
+                        body +='<li> Type: '+'Internal Fund Transfer'+'</li>' 
+
                     if self.cheque_status:
                        body +='<li> Cheque Status: '+str(dict(self.fields_get(allfields=['cheque_status'])['cheque_status']['selection'])[self.cheque_status])+'</li>'
+                    if self.payment_type!='transfer':
 
-                    body +='<li> Received Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>' if self.partner_type =='customer' else '<li> Paid Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>'
+                        body +='<li> Received Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>' if self.partner_type =='customer' else '<li> Paid Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>'
+                    if self.payment_type=='transfer':
+                        body +='<li> Amount: '+str(self.amount) + str(self.currency_id.symbol)+'</li>'
+
                     body +='<li> Payment Date: '+str(self.payment_date)+'</li>'
                     body +='<li> Registered On: '+str(date.today())+'</li>'
                     type_p=''
@@ -576,7 +587,7 @@ class accountPayment(models.Model):
                     if self.communication:
                        body +='<li> Remarks: '+  str(self.communication)+'</li>'
                        if self.partner_type =='customer':
-                          type_p='  Payment Received for Invoice of  '
+                          type_p='  Payment Received for Invoice of  '+str(self.partner_id.name if self.partner_id else '') +' '+'for'+' '+str(self.name) 
                           body +='<br></br>' 
                           if self.invoice_ids:
 
@@ -598,7 +609,7 @@ class accountPayment(models.Model):
                           self.payment_from='invoice' 
                        subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+ str(self.partner_id.name)
                     if not self.invoice_ids:
-                       subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)+' against for '  +  str(self.partner_id.name)
+                       subject +=str(self.amount)+ str(self.currency_id.symbol) + str(type_p)
                     template_ids = self.env.ref('gt_order_mgnt.email_template_for_register_payment_received1')
                     template_ids.write({'body_html':body, 'lang':self.partner_id.lang,'subject':subject})
                     values = template_ids.generate_email(self.id)

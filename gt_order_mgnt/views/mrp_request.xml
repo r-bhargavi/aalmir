@@ -432,7 +432,7 @@
                         <field name="mrp_sec_qty" class="oe_inline" style="width:94px;"/>
                         <field name="mrp_sec_uom" style="width:100px;" />
                     </div >
-                     <label for="mrp_third_qty" string="Product Qty In Tube((Pcs*(L+T+B))/100)" 
+<!--                     <label for="mrp_third_qty" string="Product Qty In Tube((Pcs*(L+T+B))/100)" 
                       attrs="{'invisible':[('product_cat_type','!=','film')]}" />
                     <div attrs="{'invisible':[('product_cat_type','!=','film')]}">
                         <field name="mrp_third_qty" class="oe_inline" style="width:94px;" help="Pcs * (Lenght + Top + Bottom)/100"/>
@@ -444,7 +444,7 @@
                     <div attrs="{'invisible':[('product_cat_type','!=','film')]}">
                         <field name="mrp_third_qty_sheet" class="oe_inline" style="width:94px;" help="Pcs * (Width + Left + Right)/100"/>
                         <field name="mrp_third_uom_sheet" style="width:100px;" />
-                    </div>
+                    </div>-->
                 </xpath>
                <xpath expr="//page[@groups='mrp.group_mrp_routings']/button[@name='action_compute']"
                         position='attributes'>

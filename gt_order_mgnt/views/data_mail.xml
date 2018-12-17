@@ -229,7 +229,7 @@
         <record id="email_template_for_force_payment" model="mail.template">
             <field name="name">Force Payment</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP Advance Payment Alert :${object.partner_id.name},${object.name} has been Confirmed.</field>
+            <field name="subject">API-ERP Advance Payment Alert :${object.name} has been Confirmed.</field>
             <field name="email_to">${object.user_id.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>
             <field name="model_id" ref="sale.model_sale_order"/>
@@ -348,7 +348,7 @@
         <record id="email_template_for_invoice_vendor123" model="mail.template">
 		    <field name="name">Vendor Payment Detail</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP Bill Payment Alert:Payment release approved by you for ${object.partner_id.name}, ${object.origin}.</field>
+		    <field name="subject">API-ERP Bill Payment Alert:Payment release approved by you for ${object.origin}.</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_invoice"/>
@@ -369,7 +369,7 @@
         <record id="email_template_for_invoice_vendor_send_approval" model="mail.template">
 		    <field name="name">Vendor Payment Detail</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP Bill Payment Approval Requested ${object.partner_id.name}.</field>
+		    <field name="subject">API-ERP Bill Payment Approval Requested.</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_invoice"/>
@@ -390,7 +390,7 @@
         <record id="email_template_for_invoice_vendor_send_approval_reminder" model="mail.template">
 		    <field name="name">Vendor Payment Detail Reminder</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP Bill Payment Approval Reminder ${object.partner_id.name}.</field>
+		    <field name="subject">API-ERP Bill Payment Approval Reminder.</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_invoice"/>
@@ -411,7 +411,7 @@
         <record id="email_template_for_fund_transfer_request" model="mail.template">
 		    <field name="name">Funds Transfer Request</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">New Bank transfer request ${object.name} for ${(object.partner_id.name or '')} is created</field>
+		    <field name="subject">API-ERP Transfer Request Alert: New bank transfer requested for ${object.partner_id.name} of ${object.name}</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_payment"/>
@@ -429,10 +429,51 @@
 				</div>
                     ]]></field>
         </record>
+        <record id="email_template_for_int_transfer_request" model="mail.template">
+		    <field name="name">Internal Transfer Request</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">API-ERP Internal Transfer Request: New Internal Transfer Request ${object.name} is created</field>
+		    <field name="email_to">${object.user_id.email|safe}</field>
+		    <field name="lang">${object.partner_id.lang}</field>
+		     <field name="model_id" ref="account.model_account_payment"/>
+                    <!--field name="report_template" ref="gt_order_mgnt.report_invoice_aalmir"/-->
+                    <field name="report_name">Internal_Transfer_Details_${object.partner_id.name}_${(object.number or '').replace('/','_')}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html"><![CDATA[
+				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+				    <p>Dear Amir,</p>
+
+				    <p>This is to just inform you that you have been marked as a person who has approved the release of payment for the attached bill. </p>
+                                    <p>Note: No action is required by your side unless you want to stop the release of bill payment, once payment is done, you will be informed. </p>
+
+				</div>
+                    ]]></field>
+        </record>
+        <record id="email_template_for_rm_request" model="mail.template">
+		    <field name="name">RM Request</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">New RM Request for ${object.name} is created</field>
+		    <!--<field name="email_to">${object.user_id.email|safe}</field>-->
+		    <!--<field name="lang">${object.partner_id.lang}</field>-->
+		     <field name="model_id" ref="api_raw_material.model_mrp_raw_material_request"/>
+                    <!--field name="report_template" ref="gt_order_mgnt.report_invoice_aalmir"/-->
+                    <field name="report_name">RM_Details_${object.name}</field>
+		    <field name="auto_delete" eval="False"/>
+		    <field name="body_html"><![CDATA[
+				<div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+				    <p>Hello,</p>
+
+				    <p>This is to just inform you that you have been requested for approval on RM request raised</p>
+
+				</div>
+                    ]]></field>
+        </record>
         <record id="email_template_for_invoice_vendor_bill_approved" model="mail.template">
 		    <field name="name">Vendor Payment Detail Reminder</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP Bill Approved ${object.partner_id.name}.</field>
+		    <field name="subject">API-ERP Bill Approved.</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_invoice"/>
@@ -453,7 +494,7 @@
         <record id="email_template_for_invoice_vendor_bill_refused" model="mail.template">
 		    <field name="name">Vendor Payment Detail Reminder</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP Bill Refused ${object.partner_id.name}.</field>
+		    <field name="subject">API-ERP Bill Refused.</field>
 		    <field name="email_to">${object.user_id.email|safe}</field>
 		    <field name="lang">${object.partner_id.lang}</field>
 		     <field name="model_id" ref="account.model_account_invoice"/>

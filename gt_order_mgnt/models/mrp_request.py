@@ -635,8 +635,8 @@ class MrpProduction(models.Model):
 			
 		if rec.location_dest_id.quality_ck_loc and not rec.product_id.check_quality:
     			raise UserError("Product is not under quality check control. Please Select different Finished Location")
-    			
                 res=super(MrpProduction,self).action_confirm()
+                print "re--------------------------------",res
                 product_lst=[]
                 if rec.product_id.product_tmpl_id.discription_line:
                    for line in rec.product_id.product_tmpl_id.discription_line:
@@ -1056,7 +1056,7 @@ class n_manufacturing_request(models.Model):
     @api.multi
     def create_manufacturing_order(self):
     	# raise Error till manufacturing module is not installed.
-    	raise UserError('You dot\' have access to creaete Manufacturing Order\n Please Create Transfer Production')
+#    	raise UserError('You dot\' have access to creaete Manufacturing Order\n Please Create Transfer Production')
     	#raise UserError('Manufacturing module is not fully intalled')
 	context = self._context.copy()
 	context.update({'request_id':self.id, 'default_contract_id':self.contract_id.id})

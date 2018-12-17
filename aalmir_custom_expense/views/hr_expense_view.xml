@@ -8,7 +8,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
             <field name="context">{'default_payment_type': 'outbound','group_by':'pay_p_up'}</field>
-            <field name="domain">[('state','=','posted'),('payment_type','=','outbound'),('payment_method','=','neft')]</field>
+            <field name="domain">[('state','=','posted'),('payment_type','in',('outbound','transfer')),('payment_method','=','neft')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -25,7 +25,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
             <field name="context">{'default_payment_type': 'outbound','group_by':'chq_s_us'}</field>
-            <field name="domain">[('state','=','posted'),('payment_type','=','outbound'),('payment_method','=','cheque')]</field>
+            <field name="domain">[('state','=','posted'),('payment_type','=',('outbound','transfer')),('payment_method','=','cheque')]</field>
             <field name="view_id" ref="account.view_account_supplier_payment_tree"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
@@ -36,8 +36,10 @@
                 </p>
             </field>
     </record>
-    <menuitem action="action_account_payments_payable_posted" parent="hr_expense.menu_hr_expense_root" id="menu_action_account_payments_payable_posted"  sequence="12" groups="account.group_account_user"/>
-    <menuitem action="action_account_payments_check" parent="hr_expense.menu_hr_expense_root" id="menu_action_account_payments_check"  sequence="13" groups="account.group_account_user"/>
+    <menuitem parent="hr_expense.menu_hr_expense_root" name="Requests" id="menu_action_account_payments_main"  sequence="13" groups="account.group_account_user"/>
+
+    <menuitem action="action_account_payments_payable_posted" parent="menu_action_account_payments_main" id="menu_action_account_payments_payable_posted"  sequence="12" groups="account.group_account_user"/>
+    <menuitem action="action_account_payments_check" parent="menu_action_account_payments_main" id="menu_action_account_payments_check"  sequence="13" groups="account.group_account_user"/>
 
 <menuitem id="hr_expense.menu_hr_expense_configuration" name="Approval Configuration" parent="hr_expense.menu_hr_expense_root"
             sequence="100" groups="base.group_configuration"/>

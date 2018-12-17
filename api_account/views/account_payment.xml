@@ -9,7 +9,7 @@
 		<field name="arch" type="xml">
 			 <button name="post" position="after">
 		  	<button string='Send Fund Transfer Reminder' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|','|','|',('payment_method','=','cheque'),('payment_type','!=','outbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
-		  	<button string='Transfer Funds' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|','|','|',('payment_method','=','cheque'),('payment_type','=','inbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
+		  	<button string='Mark As Transferred' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|','|','|',('payment_method','=','cheque'),('payment_type','=','inbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
                         <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|','|','|',('payment_method','=','neft'),('state','!=','posted'),('payment_type','=','inbound'),('chq_s_us','=','signed')]}" type="object" class="btn-primary"/>
 
 		         </button>
@@ -27,7 +27,7 @@
 		         <field name="journal_id" position="after">
 		              <field name="pay_type" invisible="1"/>
 		              <field name="payment_method" attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}"/>
-                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')]}"/>
+                                <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','in',('outbound','transfer'))],'readonly':[('state','in',['posted'])],'invisible':['|',('payment_method','!=','neft'),('payment_type','not in',('transfer','outbound'))]}"/>
                                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
