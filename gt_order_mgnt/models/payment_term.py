@@ -535,9 +535,11 @@ class accountPayment(models.Model):
         else:
             if not self.expense_id:
                     bill,internal=False,False
-                    if self.partner_type=='supplier':
+#                    if self.partner_type=='supplier':
+                    if self.payment_type=='outbound':
                             bill = True
-                    elif self.partner_type == False:
+#                    elif self.partner_type == False:
+                    elif self.payment_type == 'internal':
                             internal =True
 
                     subject='API-ERP Invoice Payment Alert:'
