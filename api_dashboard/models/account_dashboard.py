@@ -66,7 +66,10 @@ class account_journal(models.Model):
         """return action based on type for related journals"""
         action_name = self._context.get('action_name', False)
         if not action_name:
-            if self.type == 'bank':
+            if self._context.get('acc_wise_journal_data') and self.type == 'bank':
+                action_name = 'action_account_moves_acc'
+
+            elif self.type == 'bank':
 #                action_name = 'action_bank_statement_tree'
                 action_name = 'action_move_journal_line'
             elif self.type == 'cash':
@@ -101,11 +104,17 @@ class account_journal(models.Model):
         })
         print "ctx final=====================",ctx
         ir_model_obj = self.pool['ir.model.data']
-        model, action_id = ir_model_obj.get_object_reference(self._cr, self._uid, 'account', action_name)
-        print "model and action idi-----------------",model,action_id
+        if self._context.get('acc_wise_journal_data') and self.type == 'bank':
+            model, action_id = ir_model_obj.get_object_reference(self._cr, self._uid, 'api_dashboard', action_name)
+        else:
+            model, action_id = ir_model_obj.get_object_reference(self._cr, self._uid, 'account', action_name)
+        print "model and action idi----1234------------",model,action_id
         action = self.pool[model].read(self._cr, self._uid, [action_id], context=self._context)[0]
-        action['context'] = ctx
-        if ctx.get('search_default_rejected'):
+        if self._context.get('acc_wise_journal_data') and self.type == 'bank':
+            action['domain']=[('account_id','=',self.default_debit_account_id.id)]
+            ctx.update({'group_by': 'account_id'})
+
+        elif ctx.get('search_default_rejected'):
             action['domain'] = [('state','=','rejected')]
         elif ctx.get('search_default_waiting_approval'):
             action['domain'] = [('state','=','waiting_approval')]
@@ -113,6 +122,8 @@ class account_journal(models.Model):
         else:
             action['domain'] = self._context.get('use_domain', [])
         print "domain=======================",action
+        action['context'] = ctx
+
         return action
 
 	

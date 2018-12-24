@@ -250,7 +250,8 @@
 		                    </a>
 		                </div>
 	                    </div>
-	                    <t t-if="dashboard.total_chq_cnt">
+
+                            <t t-if="dashboard.total_chq_cnt">
 	                    <div class="row" style="color:black;">
 		                <div class="col-xs-6">
 		                    <span title="Total Chequse">TOTAL(<t t-esc="dashboard.total_chq_cnt"/>)</span>
@@ -312,8 +313,16 @@
                                 <div class="col-xs-6 text-right">
                                     <span><t t-esc="dashboard.last_transaction"/></span>
                                 </div>
+                                                                <div class="col-xs-6">
+
+                                                <a type="object" name="open_action" context="{'action_name': 'action_account_moves_all_a'}" >View All Transactions</a>	                    
+                                                <a type="object" name="open_action" context="{'acc_wise_journal_data': True}" >Journal Items Account Wise</a>	                    
+                                                                                </div>
+
+
                     	</div>
         	    </div>
+
             	</t>
             </xpath>
         </field>

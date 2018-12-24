@@ -7,6 +7,14 @@
             <field name="type">request</field>
             <!--field name="show_on_dashboard" eval="False"/-->
         </record>
+    <record id="action_account_moves_acc" model="ir.actions.act_window">
+            <field name="context">{'journal_type':'general','group_by':'account_id'}</field>
+            <field name="name">Journal Items Account Wise</field>
+            <field name="res_model">account.move.line</field>
+            <field name="view_id" ref="account.view_move_line_tree"/>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
      </data>
 </openerp>
 
