@@ -274,7 +274,7 @@
                     <field name="refuse_reason" placeholder="Rejection Reason if any....." invisible="1"/>
                 </field>
                 <field name="employee_id" position="after">
-                    <field name="partner_id_preferred" domain="[('parent_id','=',False)]" attrs="{'invisible':[('expense_type','=','emp_expense')],'required':[('payment_method','=','cheque'),('expense_type','!=','emp_expense')],}"/>
+                    <field name="partner_id_preferred" domain="[('parent_id','=',False)]" attrs="{'invisible':[('expense_type','=','emp_expense')],'required':['|',('payment_method','=','cheque'),('expense_type','!=','emp_expense')],}"/>
                 </field>
                 
 

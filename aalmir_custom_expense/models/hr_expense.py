@@ -120,6 +120,7 @@ class HrExpense(models.Model):
 
         if self.bank_journal_id_expense.type =='cash' and self.state!='draft':
             self.is_bank_journal=False
+            self.cheque_status=''
             print "is it bank journal-----------------",self.is_bank_journal
 
 
@@ -200,7 +201,7 @@ class HrExpense(models.Model):
         return {
             'date_maturity': line.get('date_maturity'),
             'partner_id': partner_id,
-            'name': line['name'][:64]+'-'+self.description,
+            'name': str(line['name'][:64])+'-'+str(self.description),
             'debit': line['price'] > 0 and line['price'],
             'credit': line['price'] < 0 and -line['price'],
             'account_id': line['account_id'],
@@ -299,7 +300,7 @@ class HrExpense(models.Model):
                 print "namenamename----------------",name,emp_account
                 move_line_data={
                         'type': 'dest',
-                        'name':name+'-'+expense.description ,
+                        'name':str(name)+'-'+str(expense.description) ,
                         'price': total,
                         'account_id': emp_account,
                         'date_maturity': expense.date,
@@ -343,8 +344,8 @@ class HrExpense(models.Model):
                 p_id=self.partner_id_preferred
                 pay_dict.update({ 'partner_id': p_id.id})
             else:
-                p_id=self.env.user.partner_id
-                pay_dict.update({ 'partner_id': p_id.id})
+#                p_id=False
+                pay_dict.update({ 'partner_id': False})
             
         else:
             p_id=self.employee_id.address_home_id
