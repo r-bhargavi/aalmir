@@ -315,8 +315,8 @@
                                 </div>
                                                                 <div class="col-xs-6">
 
-                                                <a type="object" name="open_action" context="{'action_name': 'action_account_moves_all_a'}" >View All Transactions</a>	                    
-                                                <a type="object" name="open_action" context="{'acc_wise_journal_data': True}" >Journal Items Account Wise</a>	                    
+                                                <!--<a type="object" name="open_action" context="{'action_name': 'action_account_moves_all_a'}" >View All Transactions</a>-->	                    
+                                                <a type="object" name="open_action" context="{'acc_wise_journal_data': True}" >View All Transactions</a>	                    
                                                                                 </div>
 
 
