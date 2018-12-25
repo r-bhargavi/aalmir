@@ -112,7 +112,7 @@ class account_journal(models.Model):
         action = self.pool[model].read(self._cr, self._uid, [action_id], context=self._context)[0]
         if self._context.get('acc_wise_journal_data') and self.type == 'bank':
             action['domain']=[('account_id','=',self.default_debit_account_id.id)]
-            ctx.update({'group_by': 'account_id'})
+            ctx.update({'group_by': 'account_id','default_journal_id':False,'search_default_journal_id':False})
 
         elif ctx.get('search_default_rejected'):
             action['domain'] = [('state','=','rejected')]
