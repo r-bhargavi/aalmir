@@ -59,6 +59,13 @@ class stockPicking(models.Model):
      							('manufacturing','Manufacturing Transfer'),
 							('invt_loss','Inventory'),
 							('sen_to_produciton','Send To Production')])
+	@api.multi
+	def do_unreserve(self):
+            for res in self:
+                if any(op.pick_qty>0.0 for op in res.pack_operation_product_ids):
+                    raise UserError('You cannot Unreserve the picking as you ahve some qty left for unpick')
+            return super(stockPicking,self).do_unreserve()
+
      	
      	@api.model
      	def create(self,vals):
