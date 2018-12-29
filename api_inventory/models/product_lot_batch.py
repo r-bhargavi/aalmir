@@ -53,8 +53,8 @@ class stockMasterBatch(models.Model):
         product_id=fields.Many2one('product.product')
         picking_id=fields.Many2one('stock.picking')
         packaging = fields.Many2one('product.packaging' ,string="Packaging",copy=True)
-        total_quantity = fields.Float('Total Quantity',compute='_get_batches_data')
-        uom_id=fields.Many2one('product.uom',compute='_get_batches_data')
+        total_quantity = fields.Float('Total Quantity',compute='_get_batches_data',store=True)
+        uom_id=fields.Many2one('product.uom',compute='_get_batches_data',store=True)
 	logistic_state = fields.Selection([('draft','Draft'),('ready','Ready'),('transit_in','Transit-IN'),
     				('stored','In Store'),('reserved','Reserved'),('r_t_dispatch', 'Ready To Dispatch'),
     				('transit', 'Transit-OUT'),('dispatch','Dispatched'),('returned','Return'),
