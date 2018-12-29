@@ -58,7 +58,10 @@ class stockPicking(models.Model):
      	ntransfer_type = fields.Selection(selection_add=[('pre_stock','Move To Stock'),
      							('manufacturing','Manufacturing Transfer'),
 							('invt_loss','Inventory'),
-							('sen_to_produciton','Send To Production')])
+                                                        ('sen_to_produciton','Send To Production')])
+        
+                                                        
+#        checking whether the unoick is completly done before unreserving the picking
 	@api.multi
 	def do_unreserve(self):
             for res in self:
@@ -74,6 +77,12 @@ class stockPicking(models.Model):
      				raise UserError('You are trying to do Internal Transfer in Same-Location')
      				
      		res =super(stockPicking,self).create(vals)
+                if vals.get('origin'):
+                    pick_id=self.search([('name','=',vals.get('origin'))])
+                    if pick_id:
+                        res.write({'pick_ref':pick_id.id})
+                        if not pick_id.pick_ref:
+                            pick_id.write({'pick_ref':res.id})
      		if res.location_id.pre_ck and res.location_dest_id.actual_location:
      			res.ntransfer_type='pre_stock'
 			res.term_of_delivery=False
