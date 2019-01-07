@@ -100,12 +100,12 @@ class HrExpense(models.Model):
     @api.multi
     def cancel_expense(self):
         if not self._context.get('call_from_pay',False):
-            if self.account_move_id.state=='posted':
-                raise UserError(_("Please cancel Related Joural Entry first!"))
             if self.payment_id.state=='posted':
                 raise UserError(_("Please cancel related Payment First!"))
 #                self.payment_id.cancel()
 #        self.account_move_id.button_cancel()
+        if self.account_move_id.state=='posted':
+            raise UserError(_("Please cancel Related Joural Entry first!"))
         if self.cheque_details:
             for each_chq in self.cheque_details:
                 each_chq.unlink()
