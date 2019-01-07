@@ -314,8 +314,11 @@ class SaleOrder(models.Model):
         
     @api.multi
     def write(self, vals):
+        d_date=''
         if vals.get('delivery_day_type') == 'Date' or vals.get('delivery_date1'):
-            d_date = datetime.strptime(vals.get('delivery_date1'), '%Y-%m-%d')
+            print "vals------------------34535345345",vals
+            if vals.has_key('delivery_date1'):
+                d_date = datetime.strptime(vals.get('delivery_date1'), '%Y-%m-%d')
             d_order = datetime.strptime(self.create_date, '%Y-%m-%d %H:%M:%S')
             if d_date and d_order and d_date < d_order:
                 raise UserError('Delivery Date must be greater then Quotation Date')
@@ -476,7 +479,7 @@ class SaleOrder(models.Model):
 		   				if line.product_uom_qty >= item.min_quantity and line.product_uom_qty <= item.qty:
 							i_flag=False
 				if i_flag:
-					raise UserError(("Ordered qty {} is not found of delivery term {} for Product ' {}'".format(line.product_uom_qty,order.incoterm.id,line.product_id.name)))
+					raise UserError(("Ordered qty {} is not found for delivery term {} for Product ' {}'".format(line.product_uom_qty,order.incoterm.id,line.product_id.name)))
 		if product_create_flag:
 			n_flag='add'
 		

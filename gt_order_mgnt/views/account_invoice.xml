@@ -268,14 +268,13 @@
 			</div>
                                 <button name="show_payment_term" type="object" string="Request Payment Term" style="margin-left: 160px" colspan="2" attrs="{'invisible': [('visible_request_button','=',False)]}"/>
 		      		<field name="check_payment_term"  class="oe_inline" nolabel="1" invisible="1"/>
-                                                        <field name="visible_request_button" invisible="1" />
-
-                          <field name="delivery_date"  attrs="{'invisible':[('delivery_date','=',False)]}"/>
+                                <field name="visible_request_button" invisible="1" />
 		           <field name='lpo_number' attrs="{'invisible':[('lpo_number','=',False)]}" readonly='1'/>
                            <field name="invoice_due_date" invisible="1"/>
 		           <field name="paid_amount"  invisible="1"/>
-		           <field name="invoice_paid_date" attrs="{'invisible':[('state','!=','paid')]}"/>
-		           <field name="invoice_barcode" widget="BarCode128"  attrs="{'invisible':[('invoice_barcode','=',False)]}"/>
+<!--		           <field name="delivery_date"  attrs="{'invisible':[('delivery_date','=',False)]}"/>
+                           <field name="invoice_paid_date" attrs="{'invisible':[('state','!=','paid')]}"/>
+		           <field name="invoice_barcode" widget="BarCode128"  attrs="{'invisible':[('invoice_barcode','=',False)]}"/>-->
 		    </field>
 		     <div groups="base.group_multi_currency" position='replace'>
 		         <div groups="base.group_multi_currency">

@@ -531,15 +531,15 @@ class StockMove(models.Model):
 					if round(qty_batches,2) > round(reserve_qty,2):
 						loose_btch = subset_sum_batches(numbers,reserve_qty)
 #					if not loose_btch:
-##						raise UserError("There are no group of Batches found for product \
-#						[{}]{} with referance to your Quantity {}###".format(
+#						raise UserError("There are no group of Batches found for product \
+#						[{}]{} with referance to your Quantity {}####".format(
 #						res.product_id.default_code,res.product_id.name,reserve_qty))
 					result_batches.extend(loose_btch)
 					
 #				if not loose_batches and round(reserve_qty,1) >0.0 and res.location_id.scrap_location==False:
 #                                        print "resss---------",res
 #					raise UserError("There are no group of Batches found for product \
-#						[{}]{} with referance to your Quantity {}##".format(
+#						[{}]{} with referance to your Quantity {}###".format(
 #						res.product_id.default_code,res.product_id.name,reserve_qty))
 				for batch in result_batches:
 					if not batch:

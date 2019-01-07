@@ -38,7 +38,7 @@
 					 attrs="{'invisible':['|','|',('picking_type_code','!=','outgoing'),
 					 	('picking_status','=','draft'),('state','not in',('assigned','partially_available'))]}"
 					 groups="stock.group_stock_manager" class="oe_highlight"/>
-                               <button name="action_cancel" states="confirmed,draft,waiting" type="object" string="Cancel" class="oe_highlight"/>    
+                               <button name="action_cancel" states="assigned,confirmed,draft,waiting" type="object" string="Cancel" class="oe_highlight"/>    
 			</button>
 			
 			<field name="state" position="replace">
