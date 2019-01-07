@@ -77,7 +77,7 @@ class stockPicking(models.Model):
 				<li>Picked Quantity</li></b>"
 		for res in self.pack_operation_product_ids:
 #                    patch below line 80,81 added by bhargavi to handle internal tfr issue in qty
-                        if res.picking_id.picking_type_code=='internal' and res.picking_id.location_id.actual_location and res.picking_id.location_dest_id.usage == 'production':
+                        if res.picking_id.picking_type_code=='internal' and res.picking_id.location_id.actual_location and res.picking_id.location_dest_id.usage == 'production' and res.pick_qt>0.0:
                             res.write({'qty_done':res.pick_qty,'product_qty':res.pick_qty})
 			body += '<li>Product : {} <b>{} {}</b></li>'.format(res.product_id.name,\
 						res.product_uom_id.name,res.pick_qty)
@@ -121,7 +121,7 @@ class stocpackOperation(models.Model):
 				raise ValidationError("Picking List is Closed, Please Open it to perform picking operation.")
 			if res.pick_qty == res.qty_done:
 				raise ValidationError("You already Pick FULL Quantity Batches\n If you want to PICK Another Batch, Please UnPIck Some Batches")
-			picking_list=self.env['store.picking.list'].search([('picking_id','=',res.picking_id.id),
+			picking_list=picking_list.search([('picking_id','=',res.picking_id.id),
 									('product_id','=',res.product_id.id),
 									('pick_id','=',res.id)],limit=1)
 			
@@ -337,8 +337,9 @@ class stocpackOperation(models.Model):
 class storePikcingList(models.Model):
 	_name = "store.picking.list"
 
-	#store_name = fields.Many2one('n.warehouse.placed.product','Bin Location')
+#	store_name = fields.Many2one('n.warehouse.placed.product','Bin Location')
 	product_id = fields.Many2one('product.product', string="Product")
+	pick_full = fields.Boolean( string="Pick Full?")
 	picking_id = fields.Many2one('stock.picking', string="Stock Picking")
      	status = fields.Selection([('draft','draft'),('partial','Partial Pick'),('pick','Fully Pick')],default='draft')
      	pick_id = fields.Many2one('stock.pack.operation', string="Operation")
@@ -358,12 +359,17 @@ class storePikcingList(models.Model):
 					'target': 'current',
 					'res_id':self.picking_id.id,
 				    }
-	
-	dispatch_qty = fields.Float('Dispatch For Quantity',help="Quantity set to Dispatch by Sales Support")		
+	@api.multi
+	def process_selected(self):
+            if not any([q.pick_full for q in self.env['store.picking.list'].search([('pick_full','=',True)])]):
+                raise UserError('Please Select batch to Process Fully!!')
+            batches_selected=self.env['store.picking.list'].search([('pick_full','=',True)])
+            print "batches_selectedbatches_selected",batches_selected
+	dispatch_qty = fields.Float('To Dispatch Qty',help="Quantity set to Dispatch by Sales Support")		
 	dispatch_unit = fields.Many2one('product.uom','Unit')
-	qty_pick = fields.Float('Pick Quantity',compute="_get_quantity_data",help="Quantity is Picked by Store Operator")
+	qty_pick = fields.Float('Picked Quantity',compute="_get_quantity_data",help="Quantity is Picked by Store Operator")
 	pickunit = fields.Many2one('product.uom',compute="_get_quantity_data")
-	qty_to_pick = fields.Float('Quantity To Pick',compute="_get_quantity_data",help="Remaining Quantity to Picked by Store Operator")
+	qty_to_pick = fields.Float('Remaining to Pick',compute="_get_quantity_data",help="Remaining Quantity to Picked by Store Operator")
 	pick_unit = fields.Many2one('product.uom',compute="_get_quantity_data")
 	removel_strategy = fields.Many2one('product.removal',string="Picking Strategy")
 	
@@ -413,6 +419,7 @@ class storePikcingList(models.Model):
 		    view_data +=''' <form string="Picking List">
 				<header>
 					<button name="show_picking_list" class="btn-primary" string="Picking List" type="object"/>
+					<button name="process_selected" class="btn-primary" string="Process Selected" type="object"/>
 		    			<field name="status" widget="statusbar"/>
 				</header>
 			    	<group col="4">
@@ -422,24 +429,17 @@ class storePikcingList(models.Model):
 					    	<field name="dispatch_qty"  class="oe_inline" readonly="1"/>
 					    	<field name="dispatch_unit" class="oe_inline" readonly="1"/>
 					    </div>
-					    <label for="qty_pick"/>
-					    <div>
-					    	<field name="qty_pick" class="oe_inline" readonly="1"/>
-					    	<field name="pickunit" class="oe_inline" readonly="1"/>
-					    </div>
+                                            <field name="picking_id" readonly="1"  context="{'form_view_ref':'api_invnetory.store_picking_list_batch_form_view'}"/>
 					    <label for="qty_to_pick"/>
 					    <div>
 					    	<field name="qty_to_pick" class="oe_inline" readonly="1"/>
 					    	<field name="pick_unit" class="oe_inline" readonly="1"/>
 					    </div>
-					    
-					    <label for="removel_strategy"/>
+					    <label for="qty_pick"/>
 					    <div>
-					    	<field name="removel_strategy" class="oe_inline btn-primary" options="{'no_create': True, 'no_open': True}"/>
-					    	<button name="calculate_view" class="oe_inline btn-primary" string="Refresh" type="object"/>
+					    	<field name="qty_pick" class="oe_inline" readonly="1"/>
+					    	<field name="pickunit" class="oe_inline" readonly="1"/>
 					    </div>
-					    
-					    <field name="picking_id" readonly="1"  context="{'form_view_ref':'api_invnetory.store_picking_list_batch_form_view'}"/>
 				    </group>'''
 		            
 		    view ='<group col="1">'
@@ -588,10 +588,15 @@ class storePikcingList(models.Model):
 						   	     else:
 					     			view +='<td style="background-color:LimeGreen;"><font color="white"><ul><li><b>'+str(store_p1.name)+'</b></li>'
 							     view +='<li>'+str(len(store_p1.batch_id._ids))+str(pkg_unit)+'</li>'
-							     if store_p1.total_quantity:
-								view +='<li>'+str(store_p1.total_quantity)+str(store_p1.uom_id.name)+'</li>'
-							     text_link ='<button name="pick_operation" string="PICK" context={\'master_id\':%s,\'bin_id\':%s} type="object" class="btn-primary"/>'%(store_p1.id,search_id.id)
-							     view +='</ul><ul>'+text_link+'</ul></font></td>'
+                                                             view +='<li>'+str(store_p1.total_quantity)+str(store_p1.uom_id.name)+'</li>'
+							     text_link ='<button name="pick_operation" string="SPLIT" context={\'master_id\':%s,\'bin_id\':%s} type="object" class="btn-primary"/>'%(store_p1.id,search_id.id)
+                                                             pick_full_view='<field name="pick_full"/>'
+                                                             view +='</ul><ul>'+text_link+'</ul>'
+							     text_link_pfb ='<button name="process_full_batches" string="Pick Full Batch" context={\'master_id\':%s,\'bin_id\':%s} type="object" class="btn-primary"/>'%(store_p1.id,search_id.id)
+							     view +='<ul>'+text_link_pfb+'</ul>'
+                                                             view +='</ul><ul>'+pick_full_view+'</ul></font></td>'
+                                                             
+                                                                                                    
 							     if td >4:
 							     	view += '</tr><p><tr>'
 							     	td=1
@@ -642,7 +647,11 @@ class storePikcingList(models.Model):
 					'nodestroy' : True,
 					'flags': {'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
 				    }
-        	
+        @api.multi
+	def process_full_batches(self):
+            return self.with_context(call_fom_full_batch=True).pick_operation()
+            
+            
 	@api.multi
 	def pick_operation(self):
 		'''Pick Button from Bin View to show confirmation wizard'''
@@ -667,9 +676,23 @@ class storePikcingList(models.Model):
 					'default_pick_list':self.id,'default_master_batch':master_batch_id.id,
 					'default_t_qty':master_batch_id.total_quantity,
 					'default_picked_qty':self.qty_to_pick,
+					'default_operation_type':'split_tk',
 					'default_t_qty_unit':master_batch_id.uom_id.name})
 			if master_batch_id.total_quantity > rec.qty_to_pick:
+                            
 				context.update({'default_qty_warning':True})
+                        if self._context.get('call_fom_full_batch',False):
+                            add_vals={}
+                            add_vals.update({'picking_id':self.picking_id.id,'product_id':self.product_id.id,
+					'loc_bin_id':bin_id.id,'dest_bin_id':dest_id.id,
+					'pick_list':self.id,'master_batch':master_batch_id.id,
+					't_qty':master_batch_id.total_quantity,
+					'picked_qty':master_batch_id.total_quantity,
+					'operation_type':'keep',
+                                        't_qty_unit':master_batch_id.uom_id.id})
+                            wiz_id=self.env['store.pick.confirm.wizard'].create(add_vals)
+                            return wiz_id.process_picking()
+
 			if form_id:
 				return {'name' :'Pick Confirmation',
 					'type': 'ir.actions.act_window',
@@ -802,10 +825,12 @@ class storePikcingList(models.Model):
 
 			# Update Quantity in Stock Pack Operation
 			rec.pick_id.pick_qty = sum([x.convert_product_qty for x in rec.pick_id.batch_number])
-			
+			print "pick_operation_process",rec.dispatch_qty,rec.qty_pick
 			if rec.dispatch_qty == rec.qty_pick:
+                                print "rec.picking_id.idrec.picking_id.id",rec.picking_id.id
 				rec.status='pick'
 		    		form_id = self.env.ref('api_inventory.store_picking_list_batch_form_view')
+                                print "form_idform_idform_id",form_id
 				return {'name' :'Store Picking List',
 					'type': 'ir.actions.act_window',
 					'view_type': 'form',
@@ -834,4 +859,4 @@ class storePikcingList(models.Model):
 				'nodestroy' : False,
 				'flags': {'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
 				}
-    
+                                

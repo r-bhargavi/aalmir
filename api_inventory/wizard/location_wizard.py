@@ -161,7 +161,8 @@ class StockStoreLocationWizard(models.TransientModel):
 			if line.pack_id.inprocess_batches and pack_operation:
 					line.pack_id.inprocess_batches.write({'pack_id':pack_operation.id})
 			# Update Transfer Batches in Production request
- 			product_req_id.batches_ids = [(4,b.id) for b in line.batch_ids]
+                        for each_prod_req in product_req_id:
+                            each_prod_req.batches_ids = [(4,b.id) for b in line.batch_ids]
 	return True
     		
     @api.multi
@@ -289,6 +290,12 @@ class StockStoreLocationWizard(models.TransientModel):
     	   if line.batch_ids:
     	   	body=''
     	   	total_qty = sum([res.convert_product_qty if res.convert_product_qty else res.product_qty for res in line.batch_ids ])
+                #                                added by bhargavi
+
+                matser_batch_id.total_quantity=total_qty
+                matser_batch_id.uom_id=res.uom_id.id
+                #                                added by bhargavi
+
     	   	for res in line.batch_ids:
     	   		qty=res.convert_product_qty if res.convert_product_qty else res.product_qty
     	   		batches_data.append((0,0,{'product_id':line.product_id.id,'store_id':self.locations.id,

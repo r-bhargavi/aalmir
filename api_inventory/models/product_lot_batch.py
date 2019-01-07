@@ -53,8 +53,12 @@ class stockMasterBatch(models.Model):
         product_id=fields.Many2one('product.product')
         picking_id=fields.Many2one('stock.picking')
         packaging = fields.Many2one('product.packaging' ,string="Packaging",copy=True)
-        total_quantity = fields.Float('Total Quantity',compute='_get_batches_data')
-        uom_id=fields.Many2one('product.uom',compute='_get_batches_data')
+        #                                added by bhargavi store true
+
+        total_quantity = fields.Float('Total Quantity',compute='_get_batches_data',store=True)
+        uom_id=fields.Many2one('product.uom',compute='_get_batches_data',store=True)
+        #                                added by bhargavi
+
 	logistic_state = fields.Selection([('draft','Draft'),('ready','Ready'),('transit_in','Transit-IN'),
     				('stored','In Store'),('reserved','Reserved'),('r_t_dispatch', 'Ready To Dispatch'),
     				('transit', 'Transit-OUT'),('dispatch','Dispatched'),('returned','Return'),
@@ -69,7 +73,9 @@ class stockMasterBatch(models.Model):
     	
     	@api.multi
     	def _get_batches_data(self):
+                print "_get_batches_data_get_batches_data"
 		for res in self:
+                        print "resresresresresres",res
 			qty=0
 			uom=False
 			lot_id=False
@@ -79,10 +85,9 @@ class stockMasterBatch(models.Model):
 				uom=rec.uom_id.id	
 				lot_id = rec.lot_id.id
 				#date = rec.produce_qty_date
-				
-			res.total_quantity = qty
-			res.uom_id = uom
-			res.lot_id = lot_id
+                        res.total_quantity = qty
+                        res.uom_id = uom
+                        res.lot_id = lot_id
 			#res.inventory_date = date
 
  				

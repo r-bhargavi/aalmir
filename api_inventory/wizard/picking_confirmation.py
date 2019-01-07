@@ -86,6 +86,10 @@ class PickConfirmWizard(models.TransientModel):
 				new_id=rec.master_batch.copy()
 				#for bth in rec.child_ids:
 				rec.child_ids.write({'master_id':new_id.id})
+#                                added by bhargavi
+                                new_id.total_quantity+=qty
+                                rec.master_batch.total_quantity-=qty
+                                new_id.uom_id=rec.child_ids[0].uom_id.id
 				if rec.operation_type == 'split_tk' :
 					context.update({'master_id':new_id.id})
 		context.pop('picking_view',None)

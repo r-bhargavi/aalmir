@@ -154,6 +154,8 @@
 		<form string="Picking List">
 			<header>
 				<button name="show_picking_list" string="Picking List" type="object"/>
+                                <!--<button name="process_full_batches" class="btn-primary" string="Process Full" type="object"/>-->
+
 		    		<field name="status" widget="statusbar"/>
 			</header>
 	            	<group col="4">
@@ -162,19 +164,21 @@
 				    <div>
 				    	<field name="dispatch_qty"  class="oe_inline" readonly="1"/>
 				    	<field name="dispatch_unit" class="oe_inline" readonly="1"/>
+                                        <field name="pick_full" invisible="1"/>
 				    </div>
-				    <label for="qty_pick"/>
-				    <div>
-				    	<field name="qty_pick" class="oe_inline" readonly="1"/>
-				    	<field name="pickunit" class="oe_inline" readonly="1"/>
-				    </div>
+                                    <field name="picking_id" readonly="1"  context="{'form_view_ref':'api_invnetory.store_picking_list_batch_form_view'}"/>
+
 				    <label for="qty_to_pick"/>
 				    <div>
 				    	<field name="qty_to_pick" class="oe_inline" readonly="1"/>
 				    	<field name="pick_unit" class="oe_inline" readonly="1"/>
 				    </div>
-				    <field name="removel_strategy" options="{'no_create': True, 'no_open': True}"/>
-				    <field name="picking_id" readonly="1"  context="{'form_view_ref':'api_invnetory.store_picking_list_batch_form_view'}"/>
+                                    <label for="qty_pick"/>
+				    <div>
+				    	<field name="qty_pick" class="oe_inline" readonly="1"/>
+				    	<field name="pickunit" class="oe_inline" readonly="1"/>
+				    </div>
+				    <field name="removel_strategy" invisible="1"/>
 		            </group>
 	            	    <group name="data_test" col="1">
 		                    
@@ -182,6 +186,7 @@
                 </form>
             </field>
          </record>
+		                    
 
 	 <!--ACtion window to PickingLists -->  
     <record model="ir.actions.act_window" id="picking_list_view_action">

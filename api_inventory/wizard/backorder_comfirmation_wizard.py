@@ -369,7 +369,7 @@ class stock_backorder_confirmation(models.TransientModel):
     @api.model
     def _get_bacthes(self,pick_id):
     	''' This method is used to get batches for master Batches in wizard on validation in Move_to_Store picking '''
-    	data=[]
+    	data,completed_ids=[],[]
     	picking_obj = self.env['stock.picking']
     	mrp_id=self.env['mrp.production'].search([('name','=',pick_id.origin)],limit=1)
     	purchase=self.env['purchase.order'].search([('name','=',pick_id.origin)],limit=1)
@@ -439,6 +439,7 @@ class stock_backorder_confirmation(models.TransientModel):
 
 			# Quantity Comes from Manufacturing process
 			elif mrp_id:
+                                lots,batches=[],[]
 				bacthes_ids=batches_obj.search([('production_id','=',mrp_id.id),
 								('logistic_state','=','ready'),
 								('store_id','=',False),('product_qty','>',0),
@@ -448,8 +449,15 @@ class stock_backorder_confirmation(models.TransientModel):
 					completed_ids.append(batch.id)
 					lots.append(batch.lot_id.id)
 					btch +=1
-					if btch >= pckg_qty:
-						break
+#                                to allot batches to picking of mrp from input to stock location if picking not in done
+                                data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
+                                        'max_qty':res.pallet_no if res.secondary_pack else 1,
+                                        'batch_qty':len(batches),
+                                        'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
+                                        'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
+					
+                                if btch >= pckg_qty:
+                                        break
 					
 	except Exception as error:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
