@@ -31,6 +31,37 @@ from urllib import urlencode
 class productProduct(models.Model):
     _inherit = 'product.product'
     
+    
+    @api.multi
+    def create_Product_uom(self):
+        for record in self:
+            uom_type=[]
+            uom_categ=self.env['product.uom.categ'].search([('name','=','Weight')], limit=1)
+            if not uom_categ:
+               raise UserError(('Default Product UOM Category not found'))
+            p_uom_type=self.env['product.uom.type'].search([('string','=','pri_packaging')],limit=1)
+            if not p_uom_type:
+               raise UserError(('Default Primary Packaging Type not found'))
+            s_uom_unit=self.env['product.uom.type'].search([('string','=','sec_packaging')],limit=1)
+            if not s_uom_unit:
+               raise UserError(('Default Secondary Packaging Unit not found'))
+            uom_type.append((4,p_uom_type.id))
+            uom_type.append((4,s_uom_unit.id))
+            if record.raw_material_type.string =='pallet':
+               sec_uom_type=self.env['product.uom.type'].search([('string','=','product_packaging')],limit=1)
+               if not sec_uom_type:
+                  raise UserError(('Default Secondary Packaging Type not found'))
+               uom_type.append((4,sec_uom_type.id))
+            product_uom=self.env['product.uom'].create({'name':record.name,
+		                'product_id':self.id,'product_type':record.raw_material_type.id,
+		                'unit_type':uom_type, 'category_id':uom_categ.id})
+            record.packaging_uom_id=product_uom.id
+            body='<b>Packaging UOM Created of   '+str(record.name)  +'</b>'
+            body +='<li> Packaging UOM: '+str(product_uom.name) +'</li>'
+            body +='<li> Created By: '+str(self.env.user.name) +'</li>'
+            body +='<li> Created Date: '+str(date.today()) +'</li>' 
+            record.message_post(body=body)
+    
 #    qty_scrapped=fields.Float(compute='action_open_scrap',digits_compute=dp.get_precision('Product Unit of Measure'),string='Quantity Scrapped')
     
     

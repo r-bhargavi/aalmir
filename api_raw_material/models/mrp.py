@@ -159,13 +159,18 @@ class MrpProduction(models.Model):
                     body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
                     lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
                         'qty':line.product_qty,'pending_qty':line.product_qty, 'rm_type':'stock'})) 
-                
+                location_dest_id=record.location_dest_id
+#                to send respective stock location in rm request loction
+                rm_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',location_dest_id.location_id.id)])
+                print "rm_locationrm_locationrm_locationrm_location",rm_location
                 rm_rqst=self.env['mrp.raw.material.request'].create({'production_id':record.id,
                             'product_id':record.product_id.id,'required_qty':record.product_qty,
                             'request_type':'normal',
                             'required_uom_id':record.product_uom.id,
                             'request_line_ids':lst,
+                            'source_location':rm_location.id if rm_location else False,
                             'request_date':record.date_planned}) 
+#                            to send mail on rm request
                 base_url = self.env['ir.config_parameter'].get_param('web.base.url')
                 query = {'db': self._cr.dbname}
                 fragment = {
@@ -241,26 +246,24 @@ class MrpProductionProductLine(models.Model):
    request_qty=fields.Float('Requested Qty', compute='_get_rawMaterialQty')
    receive_qty=fields.Float('Received Qty', compute='_get_rawMaterialQty') 
    consumed_qty=fields.Float('Consumed Qty', compute='_get_rawMaterialQty')
-   remain_consumed=fields.Float('Remaining to Consumed Qty', compute='_get_rawMaterialQty')
-   remain_received=fields.Float('Remaining to Received Qty', compute='_get_rawMaterialQty')
+   remain_consumed=fields.Float('Remaining to Consume Qty', compute='_get_rawMaterialQty')
+   remain_received=fields.Float('Remaining to Receive Qty', compute='_get_rawMaterialQty')
    raw_materials_id=fields.One2many('workorder.raw.material', 'order_id','Raw Material Details')# to show rawmaterial details in workorders
    
    @api.multi
    def _get_rawMaterialQty(self):
 	for record in self:
+#            requested qty shud always remain same
 		record.required_qty=record.product_qty - record.extra_qty
-                if not record.production_id.delivery_ids:
-                    received_qty=request_qty=0.0
+                record.request_qty =record.required_qty    
+                received_qty=0.0
 		for picking in record.production_id.delivery_ids:
-			if picking.state not in ('done','cancel'):
-				for line in picking.move_lines:
-				   	if line.product_id.id == record.product_id.id:
-						request_qty += line.product_uom_qty
-			elif picking.state == 'done':
-				for line in picking.pack_operation_product_ids:
-					if line.product_id.id == record.product_id.id:
-						received_qty += line.qty_done
-		record.request_qty=request_qty
+                    print "pickingpickingpicking",picking
+                    if picking.state == 'done':
+                            record.production_id.write({'state':'ready'})
+                            for line in picking.pack_operation_product_ids:
+                                    if line.product_id.id == record.product_id.id:
+                                            received_qty += line.qty_done
 		record.receive_qty=received_qty
 		record.remain_received = round(record.required_qty - received_qty,2)
 		consumed_qty =0.00

@@ -1,5 +1,22 @@
 <?xml version="1.0"?>
 <odoo>
+    <!--add groups on expenses menu-->
+    <record id="hr_expense.menu_hr_expense_root" model="ir.ui.menu">
+    <field name="groups_id" eval="[(4,ref('base.group_configuration')),(4,ref('account.group_account_invoice')) ,(4,ref('account.group_account_user')) ,(4,ref('account.group_account_manager')),(4,ref('purchase.group_purchase_user')),(4,ref('purchase.group_purchase_manager')),(4,ref('base.group_hr_manager'))]"/>
+    </record>
+    
+    <!--add groups on manufacturing/products menu-->
+    <record id="mrp.menu_mrp_bom" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('gt_order_mgnt.mrp_admin_bom'))]"/>
+    </record>
+    <record id="base.menu_mrp_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('gt_order_mgnt.mrp_admin_bom'))]"/>
+    </record>
+    
+    <!--add groups on contacts menu-->
+    <record id="mail.menu_contacts" model="ir.ui.menu">
+    <field name="groups_id" eval="[(4,ref('base.group_erp_manager')),(4,ref('base.group_system')),(4,ref('base.group_hr_manager')),(4,ref('gt_order_mgnt.group_sale_support')),(4,ref('base.group_sale_manager'))]"/>
+    </record>
     <!-- start Wizard view for shift request -->
          <record id="mrp_work_order_shiftrequest_form" model="ir.ui.view">
         <field name="name">mrp.work.order.shiftrequest.form</field>
@@ -465,7 +482,8 @@
 
              <button name="button_start_working" position="replace">
              	<button name="button_start_working" string="Start" states="ready" class="oe_highlight"/>
-                <button type='object' name='split_order' string='Split' class='oe_highlight' invisible="context.get('mo_cal')" attrs="{'invisible':['|','|',('process_type','=','raw'),('state','not in',('draft','ready','pause')),('wk_rm_qty','&lt;=',0)]}"/>
+                <!--<button type='object' name='split_order' string='Split' class='oe_highlight' invisible="context.get('mo_cal')" attrs="{'invisible':['|','|',('process_type','=','raw'),('state','not in',('draft','ready','pause')),('wk_rm_qty','&lt;=',0)]}"/>-->
+                <button type='object' name='split_order' string='Split' class='oe_highlight'  invisible="1"/>
                 <button type='object' name='split_order' string='Change Machine' class='oe_highlight' invisible="context.get('mo_cal')"  context="{'change':True}"
                 	attrs="{'invisible':['|',('state','not in',('pause')),('wk_rm_qty','&lt;=',0)]}"/>
                 <button name="machine_maintenance" string="Maintenance Request" type="object" class="oe_highlight"
@@ -603,7 +621,7 @@
                            <field name='employee_name'/>
                            <field name='equal_qty' invisible='1'/>
                            <field name='supplier_batch_no'/>
-                           <button string='Edit' name='edit_batch' type='object'  attrs="{'invisible':['|',('state','in',('draft','ready','cancel','hold', 'done')),('product_qty','=',0)]}"
+                           <button string='Edit' name='edit_batch' type='object'  attrs="{'invisible':['|',('state','in',('draft','ready','cancel','hold', 'done')),('product_qty','>',0)]}"
                              icon='fa-pencil-square-o' context="{'edit_qty':True}"/>
                            <button name="change_produceqty" string="Issue"  type="object" 
                                   context="{'issue':True}" class="oe_highlight"  
@@ -1616,7 +1634,7 @@
 			</div>
                          <field name='reason' readonly="not context.get('edit_qty')" 
                            string='Wastage Reason'/>
-                         <label for='product_qty' string="Produced Qty"/>
+                         <label for='product_qty' string="Produced Qty" readonly="1"/>
 			<div >
 			    <field name="product_qty" class="oe_inline" nolabel="1"
                               readonly="not context.get('edit_qty')" />

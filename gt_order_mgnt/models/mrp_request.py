@@ -535,7 +535,7 @@ class MrpProduction(models.Model):
 		for p_produce in rec.move_created_ids2:
 			if p_produce.state == 'done':
 				p_qty += p_produce.product_uom_qty
-			
+                                
 		if rec.sale_line:
 		#CH_N078 >>> add code to send mail on production complete >>>
 			temp_id = self.env.ref('gt_order_mgnt.email_template_MRP_complete')
@@ -620,14 +620,27 @@ class MrpProduction(models.Model):
             }}
         result = super(MrpProduction,self).product_id_change(cr, uid, ids, product_id, product_qty, context)
         product = self.pool.get('product.product').browse(cr, uid, product_id, context=context)
+        if product.categ_id.cat_type=='film':
+            dest = self.pool.get('stock.location').search(cr, uid, [('name','ilike','Input'),('location_id.name', '=', 'SH'),('usage','=', 'internal')], context=context)
+        if product.categ_id.cat_type=='injection':
+            dest = self.pool.get('stock.location').search(cr, uid, [('name','ilike','Input'),('location_id.name', '=', 'DXB'),('usage','=', 'internal')], context=context)
+            
+        else:
+            dest = self.pool.get('stock.location').search(cr, uid, [('name','ilike','Input'),('location_id.name', '=', 'SH'),('usage','=', 'internal')], context=context)
+        print "destdest------------",dest
+        result['value'].update({'location_dest_id':self.pool.get('stock.location').browse(cr,uid,dest[0]).id})
         for res in product.packaging_ids:
 		if res.pkgtype == 'primary':
 			result['value'].update({'n_packaging':res.id})
+        print "result---------------",result
         return result
-        	
+        
+                
+#                override the confirm production button on mrp
     @api.multi
     def action_confirm(self):
 	for rec in self:
+#                move_ids,location_id,location_dest_id=[],[],[]
                 if not rec.product_id.product_tmpl_id.initial_weight:
                    raise UserError("Please Fill the Product Initial Weight")
 		if not rec.n_request_date and rec.request_line and rec.request_line.request_type != 'stock' and not rec.contract_id:
@@ -637,6 +650,9 @@ class MrpProduction(models.Model):
     			raise UserError("Product is not under quality check control. Please Select different Finished Location")
                 res=super(MrpProduction,self).action_confirm()
                 print "re--------------------------------",res
+#                for each_move in rec.move_created_ids:
+#                    location_id.append(each_move.location_id.id)
+#                    location_dest_id.append(each_move.location_dest_id.id)
                 product_lst=[]
                 if rec.product_id.product_tmpl_id.discription_line:
                    for line in rec.product_id.product_tmpl_id.discription_line:
@@ -790,7 +806,7 @@ class MrpProduction(models.Model):
                          
                           if not order.product.discription_line:
                              raise UserError(_('Please Fill  product Specification.')) 
-	return res
+	return 0
 
 
     product_qty = fields.Float('Quantity Scheduled', digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
@@ -1343,6 +1359,9 @@ class MrpBom(models.Model):
 			'product_qty':qty,'product_efficiency':1}))
             self.bom_line_ids=line_dict
             
+#            point1 in bom changes
+            
+    active = fields.Boolean('Active',default=True)
     sale_line = fields.Many2one('sale.order.line', 'Sale Line')        
     master_id = fields.Many2one('mrp.bom.master','BOM Code')
     product_weight = fields.Float('Weight of Product',digits=dp.get_precision('Stock Weight'),related="product_tmpl_id.initial_weight",readonly=True)
@@ -1353,6 +1372,7 @@ class MrpBom(models.Model):
     bom_packging_line = fields.One2many('mrp.bom.line','bom_packaging_id','Packaging Material')
     bom_wastage_ids=fields.One2many('mrp.bom.wastage.type','bom_id', string='Wastage Details')
     product_id = fields.Many2one('product.product', 'Product Name',help="Product for BOM",domain="[('product_tmpl_id.product_material_type.string','not in',('packaging','raw','asset'))]")
+    
     
     @api.multi 
     @api.depends('product_weight' ,'bom_wastage_ids')  
@@ -1645,7 +1665,7 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
-    product_qty = fields.Float('Product Quantity', required=True, digits_compute=dp.get_precision('Stock Weight'))
+    product_qty = fields.Float('Product Quantity', required=True, digits_compute=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')
     

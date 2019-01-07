@@ -98,7 +98,8 @@ class MrpRawmaterial(models.Model):
    	error_print =''
    	try:
 	       for rec in self:
-		   if rec.request_type == 'extra':
+#                   for both extra and normal reqest type of mrp production order internal pikcing shud get created
+		   if rec.request_type in ('extra','normal'):
 		   	location_1=False
 			if rec.production_id.product_id.categ_id.cat_type == 'film':
 				location_1='send_film_rm_picking'
@@ -149,7 +150,7 @@ class MrpRawmaterial(models.Model):
 		   for line in rec.request_line_ids:
 		   	line.reserve_status='approve'
 		   	
-		   if rec.request_type=='extra':
+		   if rec.request_type in ('extra','normal'):
 			   temp_id = self.env.ref('api_raw_material.email_template_extra_raw_material_approve')
 			   if temp_id:
 			       user_obj = self.env['res.users'].browse(self.env.uid)

@@ -1209,12 +1209,14 @@ class SaleOrderLine(models.Model):
         a refund made would automatically decrease the invoiced quantity, then there is a risk of reinvoicing
         it automatically, which may not be wanted at all. That's why the refund has to be created from the SO
         """
+        print "invoice comutation getting called---------------------"
         for line in self:
             qty_invoiced = 0.0
 	    n_status_rel=[]
 	    
             for invoice_line in line.invoice_lines:
                 if invoice_line.invoice_id.state in ('draft','open','paid'):	#add draft status CH_N118
+                    print "invoice_linehjbkjhkjhkjhkjhkjhkj",invoice_line.quantity,invoice_line.product_id.name
                     if invoice_line.invoice_id.type == 'out_invoice':
                         qty_invoiced += invoice_line.quantity
                     elif invoice_line.invoice_id.type == 'out_refund':

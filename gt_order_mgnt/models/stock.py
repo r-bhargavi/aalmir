@@ -1162,7 +1162,14 @@ class StockPackOperation(models.Model):
 	if not record.packaging_id:
 		for pkg in record.product_id.packaging_ids:
 			if pkg.pkgtype == 'primary' and not record.packaging_id:
-				record.packaging_id =pkg.id
+#                            if move has the packaging defined then priority goes to packaging defined in move
+                                line_id=self.env['stock.move'].search([('picking_id','=',picking_id),('product_id','=',product_id)],limit=1)
+                                if line_id.product_packaging and line_id.product_packaging.id!=pkg.id:
+                                    record.packaging_id =line_id.product_packaging.id
+                                else:
+                                    
+                                    record.packaging_id =pkg.id
+                                print "final packagin--------------------",record.packaging_id.name
 				break
 	return record
 

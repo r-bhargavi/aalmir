@@ -456,6 +456,8 @@ class ResPartnerSupplierType(models.Model):
     
 class HrEmployee(models.Model):
     _inherit='hr.employee'
+    
+#    for solving the operator name issue in work order issue wizard
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
@@ -465,7 +467,7 @@ class HrEmployee(models.Model):
                users=self.env['res.users'].search([('id','in',self._context.get('user_ids')[0][2])])
                for rec in users:
                		lst.append(rec.employee_ids._ids)
-               args.extend([('id','in',lst)])
+               args.extend([('id','in',rec.employee_ids._ids)])
         return super(HrEmployee,self).name_search(name, args, operator=operator, limit=limit)
         
         

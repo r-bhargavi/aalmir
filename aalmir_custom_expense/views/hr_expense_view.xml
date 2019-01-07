@@ -134,6 +134,12 @@
                 <field name="employee_id" position="after">
                     <field name="approval_by"/>
                 </field>
+                <field name="employee_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+                </field>
+                <field name="quantity" position="attributes">
+                <attribute name="invisible">1</attribute>
+                </field>
 		</field>
 	</record> 
     	<record id="hr_expense_inherit_form" model="ir.ui.view">

@@ -153,17 +153,34 @@ class MrpProductProduce(models.Model):
            raise UserError("Selected Qty is greater than Produced Qty.")'''
         if obj:
            for consume in self.consume_lines:
+               print "consumeconsumeconsume",consume
                line_date=self.env['mrp.production.product.line'].search([('production_id','=',obj.id),('product_id','=',consume.product_id.id)])
                if line_date:
                   for pro_date in line_date:
-                      pro_date.consumed_qty= pro_date.consumed_qty + consume.product_qty  
+                      pro_date.consumed_qty= pro_date.consumed_qty + consume.product_qty
+        print "lot_idlot_id",self.lot_id
         if self.lot_id and not self.lot_id.production_id:
            self.lot_id.production_id=obj.id
         if self.lot_id:
            self.lot_id.total_qty =self.product_qty
            self.lot_id.product_uom_id=self.product_uom_id.id
-           for batch_line in self.batch_ids:
-               batch_line.write({'lot_id':self.lot_id.id})
+#           create pikcing if no pick for mrp finished move from input to stock
+#           if pick already exist not in done then append the transfer to same pick
+           picking_type_2=self.env['stock.picking.type'].search([('code','=','internal'),('default_location_dest_id','=',obj.location_dest_id.id)],limit=1)
+           print "picking_type_2picking_type_2picking_type_2picking_type_2",picking_type_2
+           stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',obj.location_dest_id.location_id.id)])
+           pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
+           print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
+           if not pick_exist:
+              pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
+              print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
+           each=obj.move_created_ids[0]
+           self.env['stock.move'].create({'product_id':each.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':each.product_uom.id,'name':each.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+           pick_exist.action_confirm()
+        for batch_line in self.batch_ids:
+            op_id=pick_exist.pack_operation_product_ids
+            op_id.write({'batch_number':[(4, batch_line.id)]})
+            batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready'})
         body='<b>Produced Qty In Production:</b>'
         body +='<ul><li> Production No.   : '+str(obj.name) +'</li></ul>'
         body +='<ul><li> Lot No.          : '+str(self.lot_id.name) +'</li></ul>'
@@ -177,6 +194,8 @@ class MrpProductProduce(models.Model):
            obj.state ='in_production'
         return res
  
+ 
+# complete mo when done then serach for main move pick exist or not if not then create and alocate batches  to it
     @api.multi
     def api_do_produce(self):
     	for record in self:
@@ -187,8 +206,21 @@ class MrpProductProduce(models.Model):
 		if self.lot_id:
                    self.lot_id.total_qty =self.product_qty
                    self.lot_id.product_uom_id=self.product_uom_id.id
-		   for batch_line in self.batch_ids:
-		       batch_line.write({'lot_id':self.lot_id.id})
+                   picking_type_2=self.env['stock.picking.type'].search([('code','=','internal'),('default_location_dest_id','=',obj.location_dest_id.id)],limit=1)
+                   print "picking_type_2picking_type_2picking_type_2picking_type_2",picking_type_2
+                   stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',obj.location_dest_id.location_id.id)])
+                   pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
+                   print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
+                   if not pick_exist:
+                      pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
+                      print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
+                   each=obj.move_created_ids[0]
+                   self.env['stock.move'].create({'product_id':each.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':each.product_uom.id,'name':each.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+                   pick_exist.action_confirm()
+                for batch_line in self.batch_ids:
+                   op_id=pick_exist.pack_operation_product_ids
+                   op_id.write({'batch_number':[(4, batch_line.id)]})
+                   batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready'})
 	        production_id.state='done'
 		if production_id.state == 'done' and production_id.remain_wastage_qty:
                    raise UserError("Wastage Qty remaining in manufacturing order.") 
@@ -253,7 +285,8 @@ class MrpProductProduce(models.Model):
 
 		                body_html +="</table>" 
                                 body_html +="<br></br>"
-                                picking_type=self.env['stock.picking.type'].search([('code','=','incoming')],limit=1)
+                                picking_type=self.env['stock.picking.type'].search([('code','=','incoming'),('default_location_dest_id','=',production_id.location_dest_id.id)],limit=1)
+                                print "picking_typepicking_typepicking_type",picking_type
                                 return_picking=self.env['stock.picking'].create({'picking_type_id':picking_type.id,
                                        'location_dest_id':picking_type.default_location_dest_id.id ,
                                         'origin':production_id.name,

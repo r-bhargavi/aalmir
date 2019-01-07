@@ -231,6 +231,8 @@
 		<field name="arch" type="xml">
                    <field name="communication" position='attributes'>
                       <attribute name='string'>Internal Note</attribute>
+                      <attribute name='required'>1</attribute>
+                      <attribute name='attrs'>{}</attribute>
                    </field>
 		  <field name="communication" position="after">
                     

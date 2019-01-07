@@ -97,7 +97,7 @@
                  attrs="{'invisible':[('complete_produce','=',True)]}"
                  confirm="Are you sure you want to Transfer This Qty?"/>
 
-		<button name="api_do_produce" type="object" string="Closed MO" class="btn-primary"
+		<button name="api_do_produce" type="object" string="Close MO" class="btn-primary"
                   attrs="{'invisible':[('complete_produce','=',False)]}"
                   confirm="Are you sure you want to Close MO?"/>
 	  </button>
@@ -132,7 +132,8 @@
              <label for='product_qty' string="Select Quantity"/>
 	     <div>
                <!--field name="product_qty" colspan="2" class="oe_inline" nolabel="1"/-->
-                <field name="product_qty" colspan="2" on_change="on_change_qty(product_qty, consume_lines, context)"
+               <!--on wizard of produce batches in mo make product qty readonly-->
+                <field name="product_qty" readonly="1" colspan="2" on_change="on_change_qty(product_qty, consume_lines, context)"
                    class="oe_inline" nolabel="1"/>
 		<field name="product_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
 	     </div>

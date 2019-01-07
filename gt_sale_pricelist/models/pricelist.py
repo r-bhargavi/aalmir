@@ -526,7 +526,6 @@ class SaleOrderLine(models.Model):
         _logger.info('API-code.. add pricelist_item_ids.. to sale line')
         for line in self:
             if line.product_id and line.customer:
-#                commneted the s=initail serach for contract onoe
 #                cust_prod_ids = self.env['customer.product'].search([('product_id','=', line.product_id.id), ('pricelist_id.customer','=',line.customer.id),('pricelist_id.contract_use','=',False)])
                 cust_prod_ids = self.env['customer.product'].search([('product_id','=', line.product_id.id), ('pricelist_id.customer','=',line.customer.id)])
                 if cust_prod_ids:

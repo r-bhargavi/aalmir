@@ -238,8 +238,9 @@
 				    <field name="remain_wastage_qty" class="oe_inline" nolabel="1" 
 				                    readonly="1"/>
 				    <field name="remain_wastage_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+                                    <!--hiding use rm button when wastae remain qty is 0.0-->
 				    <button name="wastage_request" string="Use RM"  context="{'use_raw':True}"
-				    states='ready,in_production' type="object" class="oe_inline oe_highlight"/> 
+				    attrs="{'invisible':['|',('remain_wastage_qty', '=',0.0),('state','not in',('in_production','ready'))]}" type="object" class="oe_inline oe_highlight"/> 
 				</div>
                  </field>
               <xpath expr="//field[@name='product_lines']" position='replace'>

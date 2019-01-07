@@ -13,9 +13,10 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-        exp_id=self.env['hr.expense'],search([('expense_type','=','emp_expense')])
-        for each in exp_id:
-            each.partner_id_preferred=each.employee_id.address_home_id.id
+#        exp_id=self.env['hr.expense'],search([('expense_type','=','emp_expense')])
+#        for each in exp_id:
+#            each.partner_id_preferred=each.employee_id.address_home_id.id
+#        return True
 #        sp_pick_ref=self.env['stock.picking'].search([('origin','!=',''),('pick_ref','=',False),('location_id','in',(37,45,13))])
 #        print "sp_pick_refsp_pick_ref",sp_pick_ref,len(sp_pick_ref)
 #        for each in  sp_pick_ref:

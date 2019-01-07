@@ -498,8 +498,8 @@ class WorkOrderRawMaterial(models.Model):
    requested_qty=fields.Float('Requested Qty',help='Raw Material requsted Quantity Proceed by Logistics')
    receive_qty=fields.Float('Received Qty',help='Raw Material received Quantity') 
    consumed_qty=fields.Float('Consumed Qty', compute='raw_comsumed')
-   remain_consumed=fields.Float('Remaining to Consumed Qty', compute='_getrawqty')
-   remain_received=fields.Float('Remaining to Received Qty', compute='_getrawqty')
+   remain_consumed=fields.Float('Remaining to Consume Qty', compute='_getrawqty')
+   remain_received=fields.Float('Remaining to Receive Qty', compute='_getrawqty')
    report_qty=fields.Float('Job Card Qty')
    next_order_id=fields.Many2one('mrp.production.workcenter.line', 'WorkOrder No.')
 
