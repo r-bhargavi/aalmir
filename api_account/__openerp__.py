@@ -42,6 +42,7 @@
                 'wizard/report_ledgerwise_detailed.xml',
                 'wizard/report_ledgerwise_summary.xml',
                 'wizard/account_register_payment_view.xml',
+                'wizard/pay_cancel_reason.xml',
                 ],
     'demo': [],
     'test': [],

@@ -33,8 +33,9 @@
                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')]}"/>
                <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'required':[('payment_method','=','cheque')]}"/>
             </field>
+            <!--making internal note mandatory-->
              <field name="communication" position="replace">
-                 <field name="communication" string='Internal Note'/>
+                 <field name="communication" string='Internal Note' required="1" attrs="{'readonly':[('state','=','posted')]}"/>
                    <field name="doc_name"  invisible="1" />
 		   <field name="uploaded_document" filename="doc_name" attrs="{'invisible':[('pay_p_up','=','not_posted')]}"/>
                     <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'invisible':[('pay_p_up','=',False)]}"/>

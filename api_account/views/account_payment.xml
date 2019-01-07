@@ -10,7 +10,7 @@
 			 <button name="post" position="after">
 		  	<button string='Send Fund Transfer Reminder' groups="account.group_account_user" name="send_fund_tfr_req" attrs="{'invisible':['|','|','|',('payment_method','=','cheque'),('payment_type','!=','outbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
 		  	<button string='Mark As Transferred' name="post_funds" groups="gt_order_mgnt.send_fund_tfr_request"  attrs="{'invisible':['|','|','|',('payment_method','=','cheque'),('payment_type','=','inbound'),('send_ftr_req','=',False),('pay_p_up','=','post')]}" type="object" class="btn-primary"/>
-                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|','|','|',('payment_method','=','neft'),('state','!=','posted'),('payment_type','=','inbound'),('chq_s_us','=','signed')]}" type="object" class="btn-primary"/>
+                        <button string='Mark as Signed' name="sign_check" groups="gt_order_mgnt.check_sign_request"  attrs="{'invisible':['|','|','|','|',('payment_method','!=','cheque'),('payment_method','=','neft'),('state','!=','posted'),('payment_type','=','inbound'),('chq_s_us','=','signed')]}" type="object" class="btn-primary"/>
 
 		         </button>
 			 <field name="communication" position="after">
@@ -18,7 +18,9 @@
                               <field name="send_ftr_req"  invisible="1" />
                             <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
 
-		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=','not_posted')]}"/>
+		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('cancel_reason','!=','')],'invisible':[('cancel_reason','=','')]}"/>
+		              <field name="uploaded_document_cancel" filename="doc_name"  attrs="{'readonly':[('cancel_reason','!=',False)],'invisible':[('cancel_reason','=',False)]}"/>
+		              <field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
 		              <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=',False)]}"/>
 		         </field>
                          <field name="amount" position="after">
@@ -164,6 +166,7 @@
 		    </button>
                     <field name="communication" position='attributes'>
                       <attribute name='string'>Internal Note</attribute>
+                      <attribute name='required'>1</attribute>
 
                    </field>
 		    <field name="communication" position="after">
@@ -218,7 +221,8 @@
 		    		<field name="bank_name" />
 		        	<field name="journal_id" />
 		       		<field name="payment_id"/>
-		       		<field name="communication"/>
+                                <!--making internal note mandatory-->
+		       		<field name="communication" required="1"/>
 		        	<field name='amount' total="sum"/>
 		        	<field name='reconcile_date' />
 		        	<field name='cheque_status' />

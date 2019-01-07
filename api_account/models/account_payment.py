@@ -38,29 +38,65 @@ class AccountInvoice(models.Model):
     payment_documents = fields.One2many('payment.receipt.documents','invoice_id','Product Name')
     @api.one
     def _get_outstanding_info_JSON(self):
-        check=super(AccountInvoice,self)._get_outstanding_info_JSON()
-        self.env.cr.execute("select payment_id from account_invoice_payment_rel where invoice_id="+str(self.id) )
-    	pay_inv_rel_id=self.env.cr.fetchone()
-        print "pay_inv_rel_idpay_inv_rel_id",pay_inv_rel_id
-        if pay_inv_rel_id:
-            pay_id=self.env['account.payment'].browse(pay_inv_rel_id[0])
-            bill_line_vals,pick_ids,vals,rec_ids=[],[],{},[]
-            if self.picking_ids:
-                if pay_id.bill_line:
-                    bill_ids=[x.bill_id.id for x in pay_id.bill_line]
-                    print "bill_idsbill_ids",bill_ids
-                    if self.id in bill_ids:
-                        line_id=self.env['payment.bill.line'].search([('bill_id','=',self.id)])
-                        rec_ids=[x.receiving_id.ids for x in line_id]
-                for each_pick in self.picking_ids:
-                    if each_pick not in rec_ids:
-                        pick_ids.append(each_pick.id)
-                        vals={'receiving_id':[(4, pick_ids)]}
-                        vals.update({'bill_id':self.id,'payterm_id':self.payment_term_id.id})
-                        print "val------------------------",vals
-                        bill_line_vals.append((0,0,vals))
-                        pay_id.write({'bill_line':bill_line_vals})
-        return check
+        self.outstanding_credits_debits_widget = json.dumps(False)
+        if self.state == 'open':
+            domain = [('account_id', '=', self.account_id.id), ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id), ('reconciled', '=', False), ('amount_residual', '!=', 0.0)]
+            if self.type in ('out_invoice', 'in_refund'):
+                domain.extend([('credit', '>', 0), ('debit', '=', 0)])
+                type_payment = _('Outstanding credits')
+            else:
+                domain.extend([('credit', '=', 0), ('debit', '>', 0)])
+                type_payment = _('Outstanding debits')
+            info = {'title': '', 'outstanding': True, 'content': [], 'invoice_id': self.id}
+            lines = self.env['account.move.line'].search(domain)
+            currency_id = self.currency_id
+            if len(lines) != 0:
+                for line in lines:
+#                    showing outstandnig only adv not for expenses
+                    if not line.payment_id.expense_id:
+                    # get the outstanding residual value in invoice currency
+                        if line.currency_id and line.currency_id == self.currency_id:
+                            amount_to_show = abs(line.amount_residual_currency)
+                        else:
+                            amount_to_show = line.company_id.currency_id.with_context(date=line.date).compute(abs(line.amount_residual), self.currency_id)
+                        if float_is_zero(amount_to_show, precision_rounding=self.currency_id.rounding):
+                            continue
+                        info['content'].append({
+                            'journal_name': line.ref or line.move_id.name,
+                            'amount': amount_to_show,
+                            'currency': currency_id.symbol,
+                            'id': line.id,
+                            'position': currency_id.position,
+                            'digits': [69, self.currency_id.decimal_places],
+                        })
+                        info['title'] = type_payment
+                        self.outstanding_credits_debits_widget = json.dumps(info)
+                        self.has_outstanding = True
+#    @api.one
+#    def _get_outstanding_info_JSON(self):
+#        check=super(AccountInvoice,self)._get_outstanding_info_JSON()
+#        self.env.cr.execute("select payment_id from account_invoice_payment_rel where invoice_id="+str(self.id) )
+#    	pay_inv_rel_id=self.env.cr.fetchone()
+#        print "pay_inv_rel_idpay_inv_rel_id",pay_inv_rel_id
+#        if pay_inv_rel_id:
+#            pay_id=self.env['account.payment'].browse(pay_inv_rel_id[0])
+#            bill_line_vals,pick_ids,vals,rec_ids=[],[],{},[]
+#            if self.picking_ids:
+#                if pay_id.bill_line:
+#                    bill_ids=[x.bill_id.id for x in pay_id.bill_line]
+#                    print "bill_idsbill_ids",bill_ids
+#                    if self.id in bill_ids:
+#                        line_id=self.env['payment.bill.line'].search([('bill_id','=',self.id)])
+#                        rec_ids=[x.receiving_id.ids for x in line_id]
+#                for each_pick in self.picking_ids:
+#                    if each_pick not in rec_ids:
+#                        pick_ids.append(each_pick.id)
+#                        vals={'receiving_id':[(4, pick_ids)]}
+#                        vals.update({'bill_id':self.id,'payterm_id':self.payment_term_id.id})
+#                        print "val------------------------",vals
+#                        bill_line_vals.append((0,0,vals))
+#                        pay_id.write({'bill_line':bill_line_vals})
+#        return check
             
 class PaymentDocuments(models.Model):
     _name = "payment.receipt.documents"
@@ -72,7 +108,9 @@ class PaymentDocuments(models.Model):
 		
 class accountPayment(models.Model):
     _inherit='account.payment'
-
+    
+    cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
+    uploaded_document_cancel = fields.Binary(string='Upload Cancel Proof', default=False ,copy=False)
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
     uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always',copy=False)
@@ -127,13 +165,25 @@ class accountPayment(models.Model):
 
     @api.multi
     def cancel(self):
-        check=super(accountPayment,self).cancel()
-        if self.cheque_details:
-            for each_chq in self.cheque_details:
-                each_chq.unlink()
-        if self.expense_id:
-            self.expense_id.with_context({'call_from_pay':True}).cancel_expense()
-        return check
+        if not self._context.get('call_from_wiz'):
+            cofirm_form = self.env.ref('api_account.pay_cancel_wizard_view_form', False)
+            if cofirm_form:
+                return {
+                            'name':'Pay Cancel Wizard',
+                            'type': 'ir.actions.act_window',
+                            'view_type': 'form',
+                            'view_mode': 'form',
+                            'res_model': 'cancel.pay.reason.wizard',
+                            'views': [(cofirm_form.id, 'form')],
+                            'view_id': cofirm_form.id,
+                            'target': 'new'
+                        }
+                return True
+        else:
+           return super(accountPayment,self).cancel()
+
+    
+
     @api.onchange('payment_method')
     def pay_method_onchange(self):
         print "dsfhdsjf========================"

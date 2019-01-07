@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pay_cancel_wizard_view_form" model="ir.ui.view">
+        <field name="name">pay.cancel.reason.wizard.form</field>
+        <field name="model">cancel.pay.reason.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bill refuse reason">
+                <separator string="Reason to Cancel Payment"/>
+                <field name="description" string="Cancel Reason"  required="1"/>
+                <field name="uploaded_document_cancel" string="Cancel Proof"/>
+                <footer>
+                    <button string='Cancel Payment' name="pay_refuse_reason" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="pay_refuse_wizard_action" model="ir.actions.act_window">
+        <field name="name">Cancel Pay</field>
+        <field name="res_model">cancel.pay.reason.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="pay_cancel_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

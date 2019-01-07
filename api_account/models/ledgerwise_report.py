@@ -383,7 +383,9 @@ class LedgerwiseReport(models.Model):
 					flag=False # to avoid get entry amount
 					if chq.id in cheque_ids:
 						continue
-					cheque_ids.append(chq.id)
+#                                        to append chqs only when it doesnt have reconcile date if any future chq issue comes the have aloook at this loc
+#                                        if not chq.reconcile_date:
+                                        cheque_ids.append(chq.id)
 					# unreconcile cheques in previouos dates
 					if not chq.reconcile_date :
 						un_reconcile.append({'date':chq.cheque_date,
