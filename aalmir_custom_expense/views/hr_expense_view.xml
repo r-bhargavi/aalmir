@@ -222,6 +222,8 @@
                                 <field name="pay_date" attrs="{'invisible':[('account_pay_id','=',False)]}" readonly="1"/>
                                 <field name="account_move_id" readonly="1"/>
                                 <field name="doc_name" invisible="1"/>
+                                <!--making internal note mandatory-->
+                                <!--<field name="communication" required="1"/>-->
                                 <field name="communication"/>
                                 <field name="internal_note"/>
                                 <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>

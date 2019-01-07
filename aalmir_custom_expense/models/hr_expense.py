@@ -76,6 +76,7 @@ class HrExpense(models.Model):
             return {'domain': {'bank_id': [('partner_id', '=', self.partner_id_preferred.id)]}}
 
         elif self.employee_id:
+            self.partner_id_preferred=self.employee_id.address_home_id.id
             bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.employee_id.address_home_id.id),('active_account','=',True)])
             if len(bank_id)==1:
                 self.bank_id=bank_id.id
@@ -99,11 +100,15 @@ class HrExpense(models.Model):
     @api.multi
     def cancel_expense(self):
         if not self._context.get('call_from_pay',False):
-            self.payment_id.cancel()
-            self.account_move_id.button_cancel()
-            if self.cheque_details:
-                for each_chq in self.cheque_details:
-                    each_chq.unlink()
+            if self.account_move_id.state=='posted':
+                raise UserError(_("Please cancel Related Joural Entry first!"))
+            if self.payment_id.state=='posted':
+                raise UserError(_("Please cancel related Payment First!"))
+#                self.payment_id.cancel()
+#        self.account_move_id.button_cancel()
+        if self.cheque_details:
+            for each_chq in self.cheque_details:
+                each_chq.unlink()
         self.write({'state':'draft','approved_by':False,'payment_method':'','bank_journal_id_expense':False,'cheque_status':'','chq_s_us':'','is_bank_journal':False,'payment_id':False})
         
     @api.multi
