@@ -448,7 +448,7 @@ class SaleOrder(models.Model):
 
 			if line.pricelist_type == '3' and not line.sale_line_id:
 				product_create_flag=True
-			
+                                
 			if line.pricelist_type in ('1','4') and not line.n_approved_price_1:
     				product = line.product_id.with_context(lang=order.partner_id.lang,
 								partner=order.partner_id.id,
