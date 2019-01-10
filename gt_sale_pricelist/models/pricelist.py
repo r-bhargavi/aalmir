@@ -527,7 +527,7 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.product_id and line.customer:
 #                cust_prod_ids = self.env['customer.product'].search([('product_id','=', line.product_id.id), ('pricelist_id.customer','=',line.customer.id),('pricelist_id.contract_use','=',False)])
-                cust_prod_ids = self.env['customer.product'].search([('product_id','=', line.product_id.id), ('pricelist_id.customer','=',line.customer.id)])
+                cust_prod_ids = self.env['customer.product'].search([('product_id','=', line.product_id.id), ('pricelist_id','=',line.pricelist_id.id),('pricelist_id.customer','=',line.customer.id)])
                 if cust_prod_ids:
                     if cust_prod_ids[0].item_ids:
                         line.pricelist_item_ids = [(6,0,list(cust_prod_ids[0].item_ids._ids))]

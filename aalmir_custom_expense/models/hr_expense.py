@@ -62,6 +62,9 @@ class HrExpense(models.Model):
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',copy=False,track_visibility='always')
     internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
     
+    @api.onchange('expense_type')
+    def expense_type_onchange(self):
+        self.partner_id_preferred=False
     @api.onchange('payment_method')
     def pay_method_onchange(self):
     	if self.payment_method and self.payment_method=='neft':
