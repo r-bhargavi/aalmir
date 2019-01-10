@@ -11,6 +11,8 @@ from dateutil.relativedelta import relativedelta
 class HrExpense(models.Model):
     _inherit = "hr.expense"
     
+    cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
+    uploaded_document_cancel = fields.Many2many('ir.attachment','cancel_attachment_exp_rel','cancel_att','exp_id','Upload Cancel Proof',copy=False,track_visibility='always')
     name = fields.Char(string='Expense Description', readonly=True)
     account_pay_id = fields.Many2one('account.move', string='Payment Journal Entry', copy=False, track_visibility="onchange")
     payment_id = fields.Many2one('account.payment', string='Payment', copy=False, track_visibility="onchange")
@@ -99,17 +101,18 @@ class HrExpense(models.Model):
     
     @api.multi
     def cancel_expense(self):
-        if not self._context.get('call_from_pay',False):
-            if self.payment_id.state=='posted':
-                raise UserError(_("Please cancel related Payment First!"))
-#                self.payment_id.cancel()
-#        self.account_move_id.button_cancel()
-        if self.account_move_id.state=='posted':
-            raise UserError(_("Please cancel Related Joural Entry first!"))
-        if self.cheque_details:
-            for each_chq in self.cheque_details:
-                each_chq.unlink()
-        self.write({'state':'draft','approved_by':False,'payment_method':'','bank_journal_id_expense':False,'cheque_status':'','chq_s_us':'','is_bank_journal':False,'payment_id':False})
+        cofirm_form = self.env.ref('api_account.pay_cancel_wizard_view_form', False)
+        if cofirm_form:
+            return {
+                        'name':'Cancel Wizard',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'cancel.pay.reason.wizard',
+                        'views': [(cofirm_form.id, 'form')],
+                        'view_id': cofirm_form.id,
+                        'target': 'new'
+                    }
         
     @api.multi
     def print_payment_receipt(self):
