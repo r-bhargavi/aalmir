@@ -171,8 +171,8 @@ class HrExpense(models.Model):
         self.write({'user_id':self._uid})
         if self.expense_type=='other_expense':
             self.write({'employee_id':False})
-        if self.expense_type=='emp_expense':
-            self.write({'partner_id_preferred':False})
+#        if self.expense_type=='emp_expense':
+#            self.write({'partner_id_preferred':False})
         self.write({'bank_journal_id_expense':False})
         non_approval=self.env['approval.config.line'].search([('type_product','=',self.type_product.id)])
         print "non_approvalnon_approvalnon_approval",non_approval
