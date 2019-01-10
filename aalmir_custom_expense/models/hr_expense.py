@@ -62,9 +62,6 @@ class HrExpense(models.Model):
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',copy=False,track_visibility='always')
     internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
     
-    @api.onchange('expense_type')
-    def expense_type_onchange(self):
-        self.partner_id_preferred=False
     @api.onchange('payment_method')
     def pay_method_onchange(self):
     	if self.payment_method and self.payment_method=='neft':
@@ -293,6 +290,7 @@ class HrExpense(models.Model):
                         raise UserError(_("No Home Address found for the employee %s, please configure one.") % (expense.employee_id.name))
                     if expense.expense_type=='emp_expense':
                             print expense.employee_id.address_home_id
+                            expense.partner_id_preferred=expense.employee_id.address_home_id.id
                             emp_account = expense.employee_id.address_home_id.property_account_payable_id.id
                             name=expense.employee_id.name
                     else:
