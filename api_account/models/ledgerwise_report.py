@@ -28,6 +28,41 @@ from urlparse import urljoin
 from urllib import urlencode
 import openerp.addons.decimal_precision as dp
 _logger = logging.getLogger(__name__)
+from io import BytesIO,StringIO
+import xlwt
+import io
+from base64 import b64decode
+import base64
+
+from openerp import http
+from openerp.http import request
+from openerp.addons.web.controllers.main import serialize_exception,content_disposition
+from openerp.exceptions import ValidationError
+
+
+class Binary(http.Controller):
+ @http.route('/opt/download', type='http', auth="public")
+ @serialize_exception
+ def download_document(self,model,field,id,filename=None, **kw):
+    """ Download link for files stored as binary fields.
+    :param str model: name of the model to fetch the binary from
+    :param str field: binary field
+    :param str id: id of the record from which to fetch the binary
+    :param str filename: field holding the file's name, if any
+    :returns: :class:`werkzeug.wrappers.Response`
+    """
+    cr, uid, context = request.cr, request.uid, request.context
+    env = api.Environment(cr, 1, {})  
+    out_brw=env['output'].browse(int(id))
+    filecontent = base64.b64decode(out_brw.xls_output or '')
+    if not filecontent:
+        return request.not_found()
+    else:
+       if not filename:
+           filename = '%s_%s' % (model.replace('.', '_'), id)
+       return request.make_response(filecontent,
+                      [('Content-Type', 'application/octet-stream'),
+                       ('Content-Disposition', content_disposition(filename))])
 
 class LedgerwiseReport(models.Model):
     '''temporary Main table for ledgerwise details report'''
@@ -730,7 +765,153 @@ class LedgerwiseReport(models.Model):
         elif self.report_type=='summary':
         	return self.env['report'].get_action(self, 'api_account.report_ledgerwise_summary')
     	pass
-    			 								
+    
+    @api.multi
+    def print_detailed_excel(self):
+        self.ensure_one()
+        self.sent = True
+        self.search_report()
+        cr= self.env.cr
+        workbook = xlwt.Workbook()
+        style1 = xlwt.easyxf('pattern: pattern solid, fore_colour ice_blue;alignment: horiz centre;font: bold on; borders: left medium, top medium, bottom medium,right medium')
+        style2 = xlwt.easyxf('pattern: pattern solid, fore_colour ivory;alignment: horiz centre;font: bold on; borders: left medium, top medium, bottom medium,right medium')
+        Header_Text ='Ledgerwise Report'
+        sheet = workbook.add_sheet('Detailed Report')
+        sheet.col(0).width = 256 * 30
+        sheet.col(1).width = 256 * 30
+        sheet.col(2).width = 256 * 30
+        sheet.col(3).width = 256 * 30
+        sheet.col(4).width = 256 * 30
+        sheet.col(5).width = 256 * 30
+        sheet.write_merge(0, 0,0,5,'DETAILED REPORT',style1)
+        sheet.write(1, 0,'REPORT TYPE',style1)
+        sheet.write(1,1,'Detailed')
+        sheet.write(1, 2,'LEDGER TYPE',style1)
+        sheet.write(1, 4,'ACCOUNT',style1)
+        sheet.write(1, 5,self.account_id.name)
+        if self.ledger_type and self.ledger_type=='customer':
+            sheet.write(1, 3,'CUSTOMER')
+        elif self.ledger_type and self.ledger_type=='supplier':
+            sheet.write(1, 3,'SUPPLIER')
+        elif self.ledger_type and self.ledger_type=='ledger':
+            sheet.write(1, 3,'LEDGER')
+        elif self.ledger_type and self.ledger_type=='employee':
+            sheet.write(1, 3,'EMPLOYEE')
+        elif self.ledger_type and self.ledger_type=='bank_cash':
+            sheet.write(1, 3,'BANK & CASH')
+        sheet.write(3, 0,'FROM DATE',style1)
+        sheet.write(3, 1,self.from_date)
+        sheet.write(3, 2,'TO DATE',style1)
+        sheet.write(3, 3,self.to_date)
+        sheet.write(5, 0,'SL',style1)
+        sheet.write(5, 1,'Date',style1)
+        sheet.write(5, 2,'JRNL',style1)
+        sheet.write(5, 3,'Account',style1)
+        sheet.write(5, 4,'Cr/Dr Account',style1)
+        sheet.write(5, 5,'Ledger',style1)
+        sheet.write(5, 6,'Move',style1)
+        sheet.write(5, 7,'Entry Label',style1)
+        sheet.write(5, 8,'Credit',style1)
+        sheet.write(5, 9,'Debit',style1)
+        sheet.write(5, 10,'Balance',style1)
+        row=6
+        count=1
+        for line in self.ledgerwise_detailed_line:
+            name_acc=''
+            sheet.write(row,0,count)
+            sheet.write(row,1,line.date)
+            sheet.write(row,2,line.journal.name)
+            sheet.write(row,3,line.account.name)
+            self.env.cr.execute("select account_id from ledger_line_account_rel where ledger_line_id="+str(line.id) )
+            cr_dr=self.env.cr.fetchall()
+            if cr_dr:
+                for each in cr_dr:
+                    acc_brw=self.env['account.account'].browse(each)
+                    print "acc_brwacc_brw",acc_brw
+                    name_acc+=' '+','+acc_brw.name
+            sheet.write(row,4,name_acc)
+            sheet.write(row,5,line.partner_id.name)
+            sheet.write(row,6,line.move.name)
+            sheet.write(row,7,line.narration)
+            sheet.write(row,8,line.credit_amount)
+            sheet.write(row,9,line.debit_amount)
+            sheet.write(row,10,line.amount)
+            row+=1
+            count+=1
+        stream =BytesIO()
+        workbook.save(stream)
+        cr.execute(""" DELETE FROM output""")
+        attach_id = self.env['output'].create({'name':Header_Text+'.xls', 'xls_output': base64.b64encode(stream.getvalue())})
+        print "attach_idattach_id",attach_id
+        return {
+             'type' : 'ir.actions.act_url',
+             'url': '/opt/download?model=output&field=xls_output&id=%s&filename=LedegerwiseReport.xls'%(attach_id.id),
+             'target': 'new',
+            }
+            
+    @api.multi
+    def print_excel(self):
+        self.ensure_one()
+        self.sent = True
+        if self.report_type=='detail':
+            return self.print_detailed_excel()
+        self.search_report()
+        cr= self.env.cr
+        workbook = xlwt.Workbook()
+        style1 = xlwt.easyxf('pattern: pattern solid, fore_colour ice_blue;alignment: horiz centre;font: bold on; borders: left medium, top medium, bottom medium,right medium')
+        style2 = xlwt.easyxf('pattern: pattern solid, fore_colour ivory;alignment: horiz centre;font: bold on; borders: left medium, top medium, bottom medium,right medium')
+        Header_Text ='Ledgerwise Report'
+        sheet = workbook.add_sheet('Summary Report')
+        sheet.col(0).width = 256 * 30
+        sheet.col(1).width = 256 * 30
+        sheet.col(2).width = 256 * 30
+        sheet.col(3).width = 256 * 30
+        sheet.col(4).width = 256 * 30
+        sheet.col(5).width = 256 * 30
+        sheet.write_merge(0, 0,0,5,'SUMMARY REPORT',style1)
+        sheet.write(1, 0,'REPORT TYPE',style1)
+        sheet.write(1,1,'Summary')
+        sheet.write(1, 2,'LEDGER TYPE',style1)
+        if self.ledger_type and self.ledger_type=='customer':
+            sheet.write(1, 3,'CUSTOMER')
+        elif self.ledger_type and self.ledger_type=='supplier':
+            sheet.write(1, 3,'SUPPLIER')
+        elif self.ledger_type and self.ledger_type=='ledger':
+            sheet.write(1, 3,'LEDGER')
+        elif self.ledger_type and self.ledger_type=='employee':
+            sheet.write(1, 3,'EMPLOYEE')
+        elif self.ledger_type and self.ledger_type=='bank_cash':
+            sheet.write(1, 3,'BANK & CASH')
+        sheet.write(3, 0,'FROM DATE',style1)
+        sheet.write(3, 1,self.from_date)
+        sheet.write(3, 2,'TO DATE',style1)
+        sheet.write(3, 3,self.to_date)
+        sheet.write(5, 0,'SL',style1)
+        sheet.write(5, 1,'Account',style1)
+        sheet.write(5, 2,'Opening',style1)
+        sheet.write(5, 3,'Closing',style1)
+        row=6
+        count=1
+        for line in self.ledgerwise_account_line:
+            sheet.write(row,0,count)
+            sheet.write(row,1,line.account.name)
+            sheet.write(row,2,line.credit_amount)
+            sheet.write(row,3,line.debit_amount)
+            row+=1
+            count+=1
+        stream =BytesIO()
+        workbook.save(stream)
+        cr.execute(""" DELETE FROM output""")
+        attach_id = self.env['output'].create({'name':Header_Text+'.xls', 'xls_output': base64.b64encode(stream.getvalue())})
+        print "attach_idattach_id",attach_id
+        return {
+             'type' : 'ir.actions.act_url',
+             'url': '/opt/download?model=output&field=xls_output&id=%s&filename=LedegerwiseReport.xls'%(attach_id.id),
+             'target': 'new',
+            }
+            
+            
+            
 class ledgerwiseLine(models.Model):
     '''ledgerwise report line'''
     _name = "ledgerwise.report.line"

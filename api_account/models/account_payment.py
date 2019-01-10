@@ -110,7 +110,9 @@ class accountPayment(models.Model):
     _inherit='account.payment'
     
     cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
-    uploaded_document_cancel = fields.Binary(string='Upload Cancel Proof', default=False ,copy=False)
+#    uploaded_document_cancel = fields.Binary(string='Upload Cancel Proof', default=False ,copy=False)
+    uploaded_document_cancel = fields.Many2many('ir.attachment','cancel_attachment_pay_rel','cancel_att','pay_id','Upload Cancel Proof',copy=False,track_visibility='always')
+
     uploaded_document = fields.Binary(string='Uploaded Document', default=False , attachment=True)
     uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',track_visibility='always',copy=False)

@@ -18,8 +18,8 @@
                               <field name="send_ftr_req"  invisible="1" />
                             <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
 
-		              <field name="uploaded_document" filename="doc_name"  attrs="{'readonly':[('cancel_reason','!=','')],'invisible':[('cancel_reason','=','')]}"/>
-		              <field name="uploaded_document_cancel" filename="doc_name"  attrs="{'readonly':[('cancel_reason','!=',False)],'invisible':[('cancel_reason','=',False)]}"/>
+		              <field name="uploaded_document" filename="doc_name"/>
+		              <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('cancel_reason','!=',False)],'invisible':[('cancel_reason','=',False)]}"/>
 		              <field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
 		              <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'readonly':[('state','!=','draft')],'invisible':[('pay_p_up','=',False)]}"/>
 		         </field>

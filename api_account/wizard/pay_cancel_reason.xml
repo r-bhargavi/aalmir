@@ -5,11 +5,11 @@
         <field name="model">cancel.pay.reason.wizard</field>
         <field name="arch" type="xml">
             <form string="Bill refuse reason">
-                <separator string="Reason to Cancel Payment"/>
+                <separator string="Reason of Cancellation"/>
                 <field name="description" string="Cancel Reason"  required="1"/>
-                <field name="uploaded_document_cancel" string="Cancel Proof"/>
+                <field name="uploaded_document_cancel" widget="many2many_binary" string="Cancel Proof"/>
                 <footer>
-                    <button string='Cancel Payment' name="pay_refuse_reason" type="object" class="oe_highlight"/>
+                    <button string='Cancel' name="pay_refuse_reason" type="object" class="oe_highlight"/>
                     or
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
