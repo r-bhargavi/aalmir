@@ -183,7 +183,7 @@
                 <field name="product_id" position="after">
                     <field name="type_product" required="1" readonly="1"/>
                     <field name="cancel_reason" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
-                    <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name" readonly="1" attrs="{'invisible':[('uploaded_document_cancel','=',False)]}"/>
+                    <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <!--<field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('product_expense_account','!=',False)]}"/>-->
                     <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)]}"/>
 
