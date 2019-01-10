@@ -9,7 +9,7 @@
                 <field name="description" string="Cancel Reason"  required="1"/>
                 <field name="uploaded_document_cancel" widget="many2many_binary" string="Cancel Proof"/>
                 <footer>
-                    <button string='Cancel' name="pay_refuse_reason" type="object" class="oe_highlight"/>
+                    <button string='Confirm Cancel' name="pay_refuse_reason" type="object" class="oe_highlight"/>
                     or
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
