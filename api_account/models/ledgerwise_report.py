@@ -768,6 +768,8 @@ class LedgerwiseReport(models.Model):
     
     @api.multi
     def print_detailed_excel(self):
+        if not self.report_type:
+            raise UserError(_("No Report Type Defined!!!"))
         self.ensure_one()
         self.sent = True
         self.search_report()
