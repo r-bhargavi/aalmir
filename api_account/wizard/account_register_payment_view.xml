@@ -35,7 +35,7 @@
             </field>
             <!--making internal note mandatory-->
              <field name="communication" position="replace">
-                 <field name="communication" string='Internal Note' required="1" attrs="{'readonly':[('state','=','posted')]}"/>
+                 <field name="communication" string='Internal Note' required="1"/>
                    <field name="doc_name"  invisible="1" />
 		   <field name="uploaded_document" filename="doc_name" attrs="{'invisible':[('pay_p_up','=','not_posted')]}"/>
                     <field name="uploaded_document_tt" widget="many2many_binary" filename="doc_name"  attrs="{'invisible':[('pay_p_up','=',False)]}"/>
