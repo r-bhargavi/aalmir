@@ -206,13 +206,13 @@
                                 <field name="bank_journal_id_expense" domain="[('company_id', '=', company_id),('type','in',['bank','cash'])]" widget="selection" attrs="{'required':[('state','not in',['draft','submit','cancel'])]}"/>
                                 <field name="is_bank_journal" readonly="1" invisible="1"/>
                                 <!--<field name="payment_method" string="Type" attrs="{'required':[('bank_journal','=',True)],'invisible':[('bank_journal','=',False)]}"/>-->
-                                <field name="payment_method" attrs="{'required':[('is_bank_journal','=',True)],'invisible':[('is_bank_journal','=',False)],'readonly':[('state','in',['done'])}" string="Type"/>
+                                <field name="payment_method" attrs="{'required':[('is_bank_journal','=',True)],'invisible':[('is_bank_journal','=',False)],'readonly':[('state','=','done')]}" string="Type"/>
                                 <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft')],'readonly':[('state','not in',['approve','post'])],'invisible':[('payment_method','!=','neft')]}"/>
 
                                 <field name='bank_id' attrs="{'invisible':[('payment_method','!=','neft')],'required':[('payment_method','=','neft')],'readonly':[('state','not in',['approve','post'])]}"/>
 
                                 <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','approve')],'required':[('payment_method','=','cheque')]}"/>
-                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear')],'readonly':[('state','in',['done'])],'invisible':[('cheque_status','!=','not_clear')]}"/>
+                                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_method','=','cheque')],'readonly':[('state','in',['done'])],'invisible':[('cheque_status','!=','not_clear')]}"/>
 
                                 <field name="cheque_details" attrs="{'readonly':[('state','in',['draft','submit','done'])],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
                                         <tree editable="top">
