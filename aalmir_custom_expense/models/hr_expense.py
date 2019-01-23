@@ -341,6 +341,9 @@ class HrExpense(models.Model):
         'communication': expense.communication,
         'internal_note': expense.internal_note,
         }
+        if expense.cheque_status:
+            if expense.cheque_status=='cleared':
+                expense.chq_s_us='signed'
         if expense.chq_s_us:
             pay_dict.update({'chq_s_us':expense.chq_s_us})
         if expense.pay_p_up:

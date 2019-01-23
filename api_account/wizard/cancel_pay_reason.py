@@ -21,7 +21,13 @@ class PayCancelWizard(models.TransientModel):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', [])
         print "dfsfsdfs",self._context
-        if self._context.get('active_model',False)=='hr.expense':
+        if self._context.get('active_model',False)=='mrp.raw.material.request':
+            rm_brw=self.env['mrp.raw.material.request'].browse(active_ids)
+            rm_brw.write({'rm_reject_reason':self.description})
+            rm_brw.production_id.write({'rm_reject_reason':self.description})
+            rm_brw.reject_state()
+
+        elif self._context.get('active_model',False)=='hr.expense':
             exp_brw=self.env['hr.expense'].browse(active_ids)
             print "exp_brwexp_brw",exp_brw
             pay=exp_brw.payment_id
