@@ -185,7 +185,7 @@
                     <field name="cancel_reason" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <!--<field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('product_expense_account','!=',False)]}"/>-->
-                    <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)]}"/>
+                    <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('state','=','done')]}"/>
 
                 </field>
 <!--                <field name="bank_journal_id" position="attributes">
@@ -249,8 +249,8 @@
                  <field name="payment_mode" position="replace">
                  </field>
                  <field name="journal_id" position="after">
-                     <field name="requested_by"/>
-                    <field name="department"/>
+                     <field name="requested_by" attrs="{'readonly':[('state','=','done')]}"/>
+                    <field name="department" attrs="{'readonly':[('state','=','done')]}"/>
                     <field name="approval_status" readonly="1"/>
                      <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
                     <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>
@@ -276,7 +276,7 @@
                     <attribute name='invisible'>1</attribute>
                 </field>
                 <field name="product_id" position="before">
-                    <field name="expense_type" required="1"/>
+                    <field name="expense_type" required="1" attrs="{'readonly':[('state','=','done')]}"/>
                     <field name="uploaded_document_bill" colspan="2" filename="doc_name" 
                              string="Upload Bills" widget="many2many_binary"/>
                 </field>
@@ -284,7 +284,7 @@
                     <field name="refuse_reason" placeholder="Rejection Reason if any....." invisible="1"/>
                 </field>
                 <field name="employee_id" position="after">
-                    <field name="partner_id_preferred" domain="[('parent_id','=',False)]" attrs="{'invisible':[('expense_type','=','emp_expense')],'required':['|',('payment_method','=','cheque'),('expense_type','!=','emp_expense')],}"/>
+                    <field name="partner_id_preferred" domain="[('parent_id','=',False)]" attrs="{'invisible':[('expense_type','=','emp_expense')],'required':['|',('payment_method','=','cheque'),('expense_type','!=','emp_expense')],'readonly':[('state','=','done')]}"/>
                 </field>
                 
 
