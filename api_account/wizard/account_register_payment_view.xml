@@ -29,7 +29,7 @@
                 <field name="pay_type" invisible="1"/>
 		<field name="payment_method" attrs="{'invisible':[('pay_type','!=','bank')],'required':[('pay_type','=','bank')]}" />
                 <field name='pay_p_up' attrs="{'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')]}"/>
-                <field name='chq_s_us' attrs="{'required':['|',('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer','inbound']),('payment_method','=','cheque')],'invisible':['|',('payment_type','not in',['outbound','transfer','inbound']),('cheque_status','!=','not_clear')]}"/>
+                <field name='chq_s_us' attrs="{'required':[('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer']),('payment_method','=','cheque')],'invisible':['|',('payment_type','not in',['outbound','transfer']),('cheque_status','!=','not_clear')]}"/>
                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')]}"/>
                <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'required':[('payment_method','=','cheque')]}"/>
             </field>
