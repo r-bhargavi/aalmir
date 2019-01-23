@@ -33,7 +33,7 @@
                                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','in',['posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
-                              <field name='chq_s_us' attrs="{'required':['|',('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer','inbound'])],'invisible':['|',('payment_type','not in',['outbound','transfer','inbound']),('cheque_status','!=','not_clear')]}"/>
+                              <field name='chq_s_us' attrs="{'required':['|',('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer','inbound']),('payment_method','=','cheque')],'invisible':['|',('payment_type','not in',['outbound','transfer','inbound']),('cheque_status','!=','not_clear')]}"/>
 
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
 		              		<tree editable="top">
@@ -192,7 +192,7 @@
                                 <field name='bank_id' domain="[('partner_id','=',partner_id)]" attrs="{'invisible':['|',('payment_method','!=','neft'),('payment_type','!=','outbound')],'required':[('payment_method','=','neft'),('payment_type','=','outbound')],'readonly':[('state','not in',['draft','posted'])]}"/>
 
                               <field name='cheque_status' attrs="{'invisible':[('payment_method','!=','cheque')],'readonly':[('state','!=','draft')],'required':[('payment_method','=','cheque')]}"/>
-                              <field name='chq_s_us' attrs="{'required':['|',('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer','inbound'])],'invisible':['|',('payment_type','not in',['outbound','transfer','inbound']),('cheque_status','!=','not_clear')]}"/>
+                              <field name='chq_s_us' attrs="{'required':['|',('cheque_status','=','not_clear'),('payment_type','in',['outbound','transfer','inbound']),('payment_method','=','cheque')],'invisible':['|',('payment_type','not in',['outbound','transfer','inbound']),('cheque_status','!=','not_clear')]}"/>
 
 		              <field name="cheque_details" attrs="{'readonly':[('state','!=','draft')],'invisible':[('payment_method','!=','cheque')]}" context="{'default_cheque_status':cheque_status}" nolabel="1" colspan="4">
 		              		<tree editable="top">
