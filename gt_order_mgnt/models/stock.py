@@ -833,6 +833,7 @@ class StockPicking(models.Model):
                         inv_line=account_line.create({'invoice_id':invoice.id,'product_id':line.product_id.id, 
 				    'quantity':quantity,
 				    'lpo_documents':line.lpo_documents,
+				    'product_name':line.n_sale_order_line.prd_name if line.n_sale_order_line else '',
 				    'invoice_line_tax_ids': [(6, 0, [x.id for x in  line.n_sale_order_line.tax_id])],
 				    'uom_id':line.product_uom_id.id,'name':line.product_id.name, 
 				    'price_unit':line.n_sale_order_price,

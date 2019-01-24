@@ -360,6 +360,9 @@
                 <field name="date_due" position='after'>
                    <field name='report_company_name'/>
                   <field name="check_hs" />
+                  <field name="check_internal_code" />
+                  <field name="check_extranl_code" />
+                  <field name="check_prod_desc" />
                   <field name='check_invnumber'/>
 		  <field name='check_date_withnotcol'/>
 		  <field name='check_date_withcol'/>
@@ -458,6 +461,7 @@
                   <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
                    
                     <field name="product_hs_code" readonly='1' attrs="{'invisible':[('name','=','Deposit Product')]}"/>
+                    <field name="product_name" readonly='1'/>
                      <field name='lpo_documents' widget='many2many_tags' domain="[('sale_id_lpo','=',parent.sale_id)]" options="{'no_create': True, 'no_open': True}"/>
                     <field name='packaging_id' readonly='1' attrs="{'invisible':[('name','=','Deposit Product')]}"/>   
                      <field name='pack_qty' invisible='1'/>

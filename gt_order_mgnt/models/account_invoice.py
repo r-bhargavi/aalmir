@@ -39,6 +39,7 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     product_hs_code=fields.Char('Hs Code', related='product_id.product_hs_code')
+    product_name = fields.Char(string="Product Name")
     invoice_ids=fields.Many2one('account.invoice')
     gross_weight=fields.Float('Net Weight(Kg)', compute='grossweight')
     net_weight=fields.Float('Gross Weight(Kg)', compute='netweight')
@@ -361,6 +362,9 @@ class AccountInvoice(models.Model):
     check_origin=fields.Boolean(default=True)
     check_manuf=fields.Boolean(default=True)
     check_hs=fields.Boolean('Print HS Code on Report')
+    check_internal_code=fields.Boolean('Print Internal Code on Report',default=True)
+    check_extranl_code=fields.Boolean('Print External Code on Report',default=True)
+    check_prod_desc=fields.Boolean('Print Product Desc on Report',default=False)
     check_gross=fields.Boolean()
     check_net=fields.Boolean()
     check_ship=fields.Boolean()
