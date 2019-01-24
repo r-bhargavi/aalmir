@@ -311,7 +311,11 @@ class AccountPaymentTermRequest(models.Model):
 	    ids=[rec.customer_id.id] if rec.customer_id else []
 	    for res in rec.n_payment_term.n_partner_id:
 		ids.append(res.id)
-	    rec.n_payment_term.n_partner_id=[(6,0,ids)]
+            if self.purchase_id:
+                rec.n_payment_term.supplier_id=[(6,0,ids)]
+            else:
+                rec.n_payment_term.n_partner_id=[(6,0,ids)]
+
 	temp_id = self.env.ref('gt_order_mgnt.email_template_payment_term_accepted')
         if temp_id:
             user_obj = self.env['res.users'].browse(self.env.uid)
