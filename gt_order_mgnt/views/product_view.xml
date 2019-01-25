@@ -367,12 +367,24 @@
 		     <separator string="Product Documents" colspan="6" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>  
 		     <field name="product_upload" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}">
 		     	   <tree editable="bottom">
-				<field name="name" required="1"/>
+				<field name="name" required="0" invisible="1" readonly="1"/>
+				<field name="prod_spec_doc_name" required="1"/>
 				<field name="n_upload_doc" required="1" string="Document" filename="name"/>
 				<field name="customer_id" invisible="1"/>
-                        	<field name="create_uid" string="Upload User"/>
-				<field name="create_date" string="Upload Date"/>
+                        	<field name="create_uid" string="Uploaded By" readonly="1"/>
+				<field name="create_date" string="Upload Date" readonly="1"/>
 			   </tree>
+                           <form string="Product Documents">
+				   <group col="4">
+					<field name="lpo" invisible="1"/>
+					<field name="product_id" invisible="1"/>
+                                        <field name="prod_spec_doc_name"/>
+					<field name="customer_id" invisible="1"/>
+					<field name="n_upload_doc" string="Document name" filename="name"/>
+					<field name="create_uid" string="Uploaded By"/>
+					<field name="create_date" string="Upload Date"/>
+				   </group>
+				</form>
 		     </field>	
 		</page>
 		
@@ -439,6 +451,7 @@
 		                   <field name="time_cycle" string="Time for 1 cycle (hour)" invisible="1"/>
 		                   <field name="capacity_per_cycle" invisible="1"/>
 		             </tree>
+                             
 		         </field> 
 		         <separator string="Instruction for Manufacturing" colspan="4"/>
                             <field name="description_mrp" nolabel="1" 
@@ -456,7 +469,7 @@
                    	    <field name="seller_ids" context="{'default_product_tmpl_id': context.get('product_tmpl_id', active_id)}" groups="base.group_sale_salesman,gt_order_mgnt.group_sale_support,purchase.group_purchase_user"/>
 		</page>
 
-		<page string="Logistics Details" groups="stock.group_stock_user">
+		<page string="Logistics Details" groups="stock.group_stock_user,mrp.group_mrp_manager">
 			<separator string="Description for Logistics" colspan="4" />
 		   	<field name="description_picking" nolabel="1"
                                 placeholder="Description for Pickings (Rack, Row and Case Information)" colspan="4"/>
