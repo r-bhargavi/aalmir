@@ -277,6 +277,36 @@ class productProduct(models.Model):
 					removed +='<li><span style="color:green">'+str(attrs.attribute.name)+'</span></li>'
 			body += ('<ul> New Speficifation'+added+'</ul>' if added else '')+('<ul>Update Specification'+update+'</ul>' if update else '')+('<ul>Remove Specification'+removed+'</ul>' if removed else '')
 			body +="</li>"
+                        
+                        
+#                    if vals.get('product_upload'):
+#			added=''
+#			update=''
+#			removed=''
+#			body +="<li> Document Updated"
+#			for line in vals.get('discription_line'):
+#				if type(line[2]) == dict:
+#					if line[0]==0:
+#						unit=''
+#						if line[2].get('value'):
+#							unit=self.env['product.uom'].search([('id','=',line[2].get('unit'))])
+#						attribute=attributes_table.search([('id','=',line[2].get('attribute'))])
+#						added +='<li><span style="color:green">'+str(attribute.name)+'</span> : value: '+str(line[2].get('value'))+(' Unit : '+(unit.name) if unit else '')+'</li>'
+#					if line[0]==1:
+#						unit=''
+#						if line[2].get('unit'):
+#							unit=self.env['product.uom'].search([('id','=',line[2].get('unit'))])
+#						record=self.env['n.product.discription'].browse(line[1])
+#						attribute=attributes_table.search([('id','=',line[2].get('attribute'))])
+#						if line[2].get('attribute'):
+#							update +='<li><span style="color:green">'+str(record.attribute.name)+' <span style="color:black">TO </span>'+str(attribute.name)+': </span>'+(' value: '+str(line[2].get('value')) if line[2].get('value') else '' )+(' Unit : '+(unit.name) if unit else '')+'</li>'
+#						else:
+#							update +='<li><span style="color:green">'+record.attribute.name+': </span>'+(' value: '+str(line[2].get('value')) if line[2].get('value') else '' )+(' Unit : '+(unit.name) if unit else '')+'</li>'
+#				if line[0]==2:
+#					attrs=self.env['n.product.discription'].browse(line[1])
+#					removed +='<li><span style="color:green">'+str(attrs.attribute.name)+'</span></li>'
+#			body += ('<ul> New Speficifation'+added+'</ul>' if added else '')+('<ul>Update Specification'+update+'</ul>' if update else '')+('<ul>Remove Specification'+removed+'</ul>' if removed else '')
+#			body +="</li>"
 
 		if vals.get('description_sale'):
 			body +='<li><span style="color:blue">Sale Description Changed:</span>'+str(vals.get('description_sale'))+'</li>'
@@ -472,7 +502,7 @@ class productTemplate(models.Model):
            
     discription_line = fields.One2many('n.product.discription','product_id','Product Discription')
     description_mrp=fields.Text()
-    product_upload = fields.One2many('customer.upload.doc','tmpl_id') 
+    product_upload = fields.One2many('customer.upload.doc','tmpl_id',track_visibility='onchange') 
     progress_rate = fields.Integer("Product Profile",compute="_get_product_profile")
     progress_value = fields.Html('Values Not Filled',compute="_get_product_profile",readonly=True)
     #pvinvisible = fields.Boolean('Invisible Progress Details',help="Check this filed to show required details to complete this product profile")
