@@ -550,9 +550,10 @@ class customerUploadDoc(models.Model):
                return { 'type': 'ir.actions.client', 'tag': 'reload', }
 
 	name = fields.Char(string='Document Name')
+	prod_spec_doc_name = fields.Char(string='Prod Spec Doc Name',track_visibility='onchange')
 	state= fields.Selection([('draft','Draft'),('done','Done')],default='draft')
 	#n_customer_doc = fields.Binary(string='Uploaded Document', default=False , attachment=True)
-	n_upload_doc = fields.Binary(string='Uploaded Document', default=False , attachment=True)
+	n_upload_doc = fields.Binary(string='Uploaded Document', track_visibility='onchange',default=False , attachment=True)
 	sale_wizard_customer = fields.Many2one('order.confirm.wizard', string='sale wizard',)
 	sale_wizard_product = fields.Many2one('order.confirm.wizard', string='sale wizard',)
         sale_wizard_sale = fields.Many2one('order.confirm.wizard', string='sale wizard',)
@@ -560,7 +561,7 @@ class customerUploadDoc(models.Model):
         sale_tmpl_id=fields.Many2one('product.template')
         tmpl_id=fields.Many2one('product.template')
 	product_tmpl_id = fields.Many2one('product.template', string='Product Name',related='product_id.product_tmpl_id')
-	customer_id = fields.Many2one('res.partner', string='Customer')
+	customer_id = fields.Many2one('res.partner', string='Customer',track_visibility='always')
 	sale_id = fields.Many2one('sale.order', string='Sale Order') #customer_doc id
 	sale_id_product = fields.Many2one('sale.order', string='Sale Order') #product_doc_id
 	sale_id_lpo = fields.Many2one('sale.order', string='Sale Order') #LPO_doc_id
