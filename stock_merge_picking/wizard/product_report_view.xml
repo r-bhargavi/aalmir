@@ -5,6 +5,15 @@
             <field name="model">product.report</field>
             <field name="arch" type="xml">
               <form>
+                <header>
+                    <button type="object" name="print_report" string="Pdf Report" class="btn-primary" 
+                        icon='fa-download' />
+                   <button name="export_xls" type="object" 
+                       attrs="{'invisible':[('filter_by','in',('sale','running_sale'))]}"
+                       string="XLS Report" class="oe_highlight"
+                       context="{'xls_export':True}" icon="gtk-print"/>
+                   <button string="Cancel" class="btn-default btn-primary" special="cancel"/>
+                </header>
                 <group>
                     <group>
                        <field name='filter_option' required="context.get('product')"
@@ -62,36 +71,45 @@
                   </tree>
                  </field>
                </group>
-                 <footer>
-                   <button type="object" name="print_report" string="Pdf Report" class="btn-primary" 
-                        icon='fa-download' />
-                   <button name="export_xls" type="object" 
-                       attrs="{'invisible':[('filter_by','in',('sale','running_sale'))]}"
-                       string="XLS Report" class="oe_highlight"
-                       context="{'xls_export':True}" icon="gtk-print"/>
-                   <button string="Cancel" class="btn-default btn-primary" special="cancel"/>
-                </footer>
               </form>
               
             </field>
        </record>
+       	<record model="ir.ui.view" id="report_view_tree_inv_prod">
+		<field name="name">Report Tree View</field>
+	    		<field name="model">product.report</field>
+		    	<field name="arch" type="xml">
+		    	<tree string='Product Report'>
+		    		<field name="partner_id" />
+		    		<field name="report_type" />
+		    	</tree>
+	    	</field>
+	</record>
+    
        <record model="ir.actions.act_window" id="product_report_action">
         <field name="name">Product Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.report</field>
+        <field name="view_id" ref="report_view_tree_inv_prod"/>
+
         <field name="view_type">form</field>
-        <field name="view_mode">form</field>
+        <field name="view_mode">tree,form</field>
+
+        <!--<field name="view_mode">form</field>-->
         <field name="context">{'product':True}</field>
-        <field name='target'>new</field>
+        <field name='target'>current</field>
     </record>
       <record model="ir.actions.act_window" id="invoice_report_action">
         <field name="name">Invoice Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.report</field>
+        <field name="view_id" ref="report_view_tree_inv_prod"/>
+
+        <field name="view_mode">tree,form</field>
         <field name="view_type">form</field>
-        <field name="view_mode">form</field>
+        <!--<field name="view_mode">form</field>-->
         <field name="context">{'invoice':True}</field>
-        <field name='target'>new</field>
+        <field name='target'>current</field>
     </record>
     
      

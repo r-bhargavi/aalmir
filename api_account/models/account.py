@@ -9,6 +9,9 @@ from openerp.exceptions import UserError, ValidationError
 
 class accountMove(models.Model):
     _inherit = "account.move"
+#    uploaded_documents= fields.Many2many('ir.attachment','move_attachment_rel','move_doc','id','Upload Supporting Doc')
+    uploaded_document= fields.Many2many('ir.attachment','move_doc_rel','mv_id','att_id','Upload Supporting Doc')
+
     
     name = fields.Char(string='Number', required=True, copy=False, track_visibility='onchange',default='/')
     ref = fields.Char(string='Reference', copy=False,track_visibility='onchange')

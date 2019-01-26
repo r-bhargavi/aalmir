@@ -49,6 +49,8 @@ class JournalVoucher(models.Model):
 		return self.env.user.company_id or False
 
 	name=fields.Char()
+        uploaded_doc= fields.Many2many('ir.attachment','jo_voucher_attachment_rel','voucher_id','attach_id','Upload Supporting Doc')
+
 	partner_id=fields.Many2one('res.partner', 'Partner')
 	currency_id=fields.Many2one('res.currency', 'Currency',readonly=True, default=default_currency)
 	company_id = fields.Many2one('res.company', 'Company', default=default_company)
@@ -130,12 +132,15 @@ class JournalVoucher(models.Model):
 			# delete existing records and create new one
 			if record.move_id:
 				record.move_id.line_ids.unlink()
-				
-			move=self.env['account.move'].create({'line_ids':vals,
-								'date':record.date,
-								'journal_id':record.journal_id.id,
-								'name':record.name,
-								'narration':record.note})
+			move_vals={}
+                        move_vals={'line_ids':vals,
+                                    'date':record.date,
+                                    'journal_id':record.journal_id.id,
+                                    'name':record.name,
+                                    'narration':record.note}
+                        if record.uploaded_doc:
+                            move_vals.update({'uploaded_document':[(4, record.uploaded_doc.ids)]})
+			move=self.env['account.move'].create(move_vals)
 			record.move_id=move.id
 			move.post()
 			record.currency_id = from_currency.id

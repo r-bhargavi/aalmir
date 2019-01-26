@@ -442,6 +442,39 @@ def AmountToTextFractional(amountInt):
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"
+    
+    
+    def _get_counterpart_move_line_vals(self, invoice=False):
+        if self.payment_type == 'transfer':
+            name = self.name
+        else:
+            name = ''
+            if self.partner_type == 'customer':
+                if self.payment_type == 'inbound':
+                    name += _("Customer Payment")
+                elif self.payment_type == 'outbound':
+                    name += _("Customer Refund")
+            elif self.partner_type == 'supplier':
+                if self.payment_type == 'inbound':
+                    name += _("Vendor Refund")
+                elif self.payment_type == 'outbound' and self.expense_id:
+                    name += _(self.expense_id.name)
+                elif self.payment_type=='outbound' and not self.expense_id:
+                    name += _("Vendor Paymnet")
+
+            if invoice:
+                name += ': '
+                for inv in invoice:
+                    if inv.move_id:
+                        name += inv.number + ', '
+                name = name[:len(name)-2] 
+        return {
+            'name': name,
+            'account_id': self.destination_account_id.id,
+            'journal_id': self.journal_id.id,
+            'currency_id': self.currency_id != self.company_id.currency_id and self.currency_id.id or False,
+            'payment_id': self.id,
+        }
 
   
     @api.multi
