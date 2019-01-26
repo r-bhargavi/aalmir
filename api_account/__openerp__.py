@@ -28,10 +28,11 @@
                        <li>Bank Reconcilation </li>''',
     'author': 'Aalmir Plastic Industries',
     'website': 'http://aalmrplastic.com',
-    'depends': ['account','product','gt_order_mgnt'],
+    'depends': ['account','product','gt_order_mgnt','stock_merge_picking'],
     'data': [
                 'security/ir.model.access.csv',
                 'views/account_invoice_view.xml',
+                'views/account_move.xml',
                 'views/bank_view.xml',
                 'views/account_payment.xml',
                 'views/bank_reconcilation_view.xml',
