@@ -14,7 +14,7 @@ class IrActionsReportXml(models.Model):
 
     report_type = fields.Selection(selection_add=[("xlsx", "xlsx")])
 
-class ProductReport(models.TransientModel):
+class ProductReport(models.Model):
     _name='product.report'
    
     partner_id  = fields.Many2one('res.partner','Customer')
@@ -51,6 +51,7 @@ class ProductReport(models.TransientModel):
     def export_xls(self):
 	self.summary_value()
         report_name=model=''
+        print "self._contextself._contextself._context",self._context
         if self._context.get('product'):
            report_name='export_sale_xls.sale_report_xls.xlsx'
            model='sale.order.line'
@@ -281,7 +282,7 @@ class ProductReport(models.TransientModel):
 
        return { "type": "ir.actions.do_nothing",}
     
-class ProductReportLine(models.TransientModel):
+class ProductReportLine(models.Model):
     _name='product.report.line'
 
     report_id = fields.Many2one('product.report')
