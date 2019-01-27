@@ -114,9 +114,9 @@
     </record>
     
      
-     <menuitem id="menu_product_report" action="product_report_action" parent="gt_order_mgnt.menu_sales_support_report,account.group_account_user" sequence="11" name='Product Report'
+     <menuitem id="menu_product_report" action="product_report_action" parent="gt_order_mgnt.menu_sales_support_report" sequence="11" groups="account.group_account_user" name='Product Report'
       />
-    <menuitem id="menu_invoice_report" action="invoice_report_action" parent="gt_order_mgnt.menu_sales_support_report,account.group_account_user" sequence="12" name='Invoice Report' />
+    <menuitem id="menu_invoice_report" action="invoice_report_action" parent="gt_order_mgnt.menu_sales_support_report" groups="account.group_account_user" sequence="12" name='Invoice Report' />
      
      <menuitem action="invoice_report_action" id="menu_invoice_report_account"
               parent="account.menu_finance_reports" 
