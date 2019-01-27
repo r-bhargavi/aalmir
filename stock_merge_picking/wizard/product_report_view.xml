@@ -52,7 +52,8 @@
                </group>
 		<button type="object" name="summary_value" string="Search" class="btn-primary" />
 
-                <group invisible="not context.get('product')">
+                <!--<group invisible="not context.get('product')">-->
+                <group>
                   <field name='product_line' nolabel='1'>
                    <tree delete='0' default_order='order_date' create='0' edit='0'>
                        <field name='order_date'/>
