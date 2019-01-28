@@ -413,7 +413,7 @@ class StockPicking(models.Model):
      incoming_doc = fields.Many2many('ir.attachment','incoming_attachment_rel','incoming_doc','id','Incoming Documents', copy=False)
 
      purchase_id=fields.Many2one('purchase.order', string='Purchase Order',copy=True)
-     production_id=fields.Many2one('mrp.production', string="Manufacturing No.")
+     production_id=fields.Many2one('mrp.production', string="Manufacturing No.",copy=False)
      work_order_id=fields.Many2one('mrp.production.workcenter.line')
      request_sch_date_mo=fields.Datetime('Request By', related='work_order_id.date_planned')
      ## add boolean field for print report
