@@ -457,6 +457,11 @@ class ResPartnerSupplierType(models.Model):
 class HrEmployee(models.Model):
     _inherit='hr.employee'
     
+    operator=fields.Boolean('Operator?')
+    operator_type = fields.Selection([('injection','Injection'),('film','Film'),('both','Both')],
+    				string='Operator Type')
+
+    
 #    for solving the operator name issue in work order issue wizard
 
     @api.model

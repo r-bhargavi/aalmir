@@ -465,11 +465,43 @@ class MrpWorkorderMachinePause(models.Model):
 
 class MrpWorkorderMachineProduce(models.Model):
     _name = 'mrp.order.machine.produce'
+    
+    req_product_qty=fields.Float('Required',related='batch_id.req_product_qty',store=True)
+
+    
+    @api.onchange('employee_ids')
+    def _onchange_employee_ids(self):
+        if self.order_id:
+            return {'domain': {'employee_ids': [('id', 'in', self.order_id.employee_ids.ids)]}}
+
+    
+    @api.depends('batch_id')
+    def _check_txr(self):
+        print "check ro--------------------------"
+        for rec in self:
+            if rec.batch_id.batch_tfred==True:
+                print "yes matching----------------------"
+                rec.check_txr=True
+            print "selfkjhjstet tracjet======================================",rec.check_txr
+            
+    @api.depends('batch_id')
+    def _check_produced_qty(self):
+        print "check ro--------------------------"
+        for rec in self:
+            if rec.batch_id:
+                print "yes matching--------------s--------"
+                rec.produced_qty=rec.batch_id.convert_product_qty
+            print "selfkjhjstet tracjet======================================",rec.produced_qty
+
+
     @api.model
     def _get_uom_id(self):
         return self.env["product.uom"].search([('name','=','Kg')], limit=1, order='id')[0]
+    check_txr=fields.Boolean('Check Batch Transfer',compute='_check_txr') 
 
     product_qty=fields.Float('Product Qty')
+#    produced_qty=fields.Float('Produced Qty',compute='_check_produced_qty')
+    produced_qty=fields.Float('Produced Qty')
     production_id=fields.Many2one('mrp.production', string='Current Manufacturing No.')
     order_id=fields.Many2one('mrp.production.workcenter.line', string='Current Work Order No.')
     previous_order_id=fields.Many2one('mrp.production.workcenter.line', string='Previous Work Order No.')
@@ -484,7 +516,9 @@ class MrpWorkorderMachineProduce(models.Model):
     previous_batch_qty=fields.Float('Previous Batch Produced Qty',related='previous_batch_id.remain_used_qty')
     previous_uom_id=fields.Many2one('product.uom',related='previous_batch_id.uom_id')
     previous_batch_ids=fields.Many2many('mrp.order.batch.number',string='Previous Batch No.')
-    document=fields.Binary('Document')
+#    document=fields.Binary('Document')
+    document=fields.Many2many('ir.attachment','machine_produce_document_rel','produce_id','doc_id','Document')
+
     uom_id=fields.Many2one('product.uom')
     produce_date=fields.Datetime('Date', default=fields.Datetime.now)
     wastage_bool=fields.Boolean('Any Wastage')
@@ -500,6 +534,9 @@ class MrpWorkorderMachineProduce(models.Model):
     @api.multi
     def confirmation(self):
       for record in self:
+#        if record.check_txr==True:
+#            if record.batch_id.transferred_qty!=record.produced_qty:
+#              raise UserError("You are not allowed to make changes to this batch produced qty as the batch is already transferred!!")
         wast_qty=00.0
         if record.wastage_qty:
                   if record.previous_batch_id.uom_id.id !=record.wastage_uom.id:
@@ -514,20 +551,20 @@ class MrpWorkorderMachineProduce(models.Model):
         if record.previous_batch_id:
                   if record.previous_batch_id.uom_id.id != record.uom_id.id:
                      if record.uom_id.name =='Pcs':
-		        produce_qty=math.ceil(record.product_qty*record.product_id.weight) if record.product_qty else 0.0   
+		        produce_qty=math.ceil(record.produced_qty*record.product_id.weight) if record.product_qty else 0.0   
                      if record.uom_id.name =='m': 
                         qty_m=(record.order_id.qty/record.order_id.wk_required_qty)
-                        produce_qty=qty_m * record.product_qty
+                        produce_qty=qty_m * record.produced_qty
 
                   else:
-                       produce_qty=record.product_qty
+                       produce_qty=record.produced_qty
                   '''if record.previous_batch_id.remain_used_qty < (produce_qty + wast_qty):
                         raise UserError(_("You can not Produced Qty(%s)(%s) because your selected Previous Batch Remaining Qty(%s)(%s).")%(round((produce_qty + wast_qty),2),(record.previous_batch_id.uom_id.name),round(record.previous_batch_id.remain_used_qty,2) ,(record.previous_batch_id.uom_id.name)))'''
-      	if record.product_qty <0:
+      	if record.produced_qty <0:
       		raise UserError("Enter Proper Produce Quantity")
       	elif record.wastage_qty <0:
       		raise UserError("Enter Proper Wastage Quantity")
-	if record.product_qty==0 and record.wastage_qty ==0:
+	if record.produced_qty==0 and record.wastage_qty ==0:
 		raise UserError("Please Enter Produce quantity or Wastage quantity")
         if record.produced_line_id:
                 for line in record.produced_line_id:
@@ -540,7 +577,7 @@ class MrpWorkorderMachineProduce(models.Model):
         return {'context':context,"type": "ir.actions.do_nothing"}    
  
     @api.multi
-    @api.depends('product_qty','wastage_qty')
+    @api.depends('produced_qty','wastage_qty')
     def checkproduced_qty(self):
         for record in self:
             wastage_qty=0.0
@@ -554,16 +591,20 @@ class MrpWorkorderMachineProduce(models.Model):
                else:
                      wastage_qty=record.wastage_qty
                      
-            if record.product_qty:
+#            if record.product_qty:
+            if record.produced_qty:
                if record.uom_id.id !=record.wastage_uom.id:
 		   if record.uom_id.name =='Pcs':
-		      wastage_qty=math.ceil(record.product_qty *record.product_id.weight) if record.wastage_qty else 0.0
+		      wastage_qty=math.ceil(record.produced_qty *record.product_id.weight) if record.wastage_qty else 0.0
 		   if record.uom_id.name =='m':
                              qty_m=(record.order_id.wk_required_qty/record.order_id.qty)
                              wastage_qty=qty_m * record.wastage_qty
                else:
 		    wastage_qty=record.wastage_qty
-               if record.order_id.wk_required_qty < (wastage_qty + record.product_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty):
+#               if record.order_id.wk_required_qty < (wastage_qty + record.product_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty):
+               print "record.order_id.wk_required_qtyrecord.order_id.wk_required_qty",record.order_id.wk_required_qty,wastage_qty + record.produced_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty
+#               if record.order_id.wk_required_qty < (wastage_qty + record.produced_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty):
+               if record.req_product_qty < record.produced_qty:
                   record.warning_bool=True
                else:
                   record.warning_bool=False
@@ -584,9 +625,9 @@ class MrpWorkorderMachineProduce(models.Model):
                            if product.product_id.id == bom.product_id.id:
                               one_qty=0.0
                               if record.uom_id.name == 'Kg':
-                                 one_qty =((record.product_qty + wastage_qty) / record.product_id.weight)
+                                 one_qty =((record.produced_qty + wastage_qty) / record.product_id.weight)
                               else:
-                                 one_qty =(record.product_qty + wastage_qty)
+                                 one_qty =(record.produced_qty + wastage_qty)
                               for rec in record.produced_line_id:
                               	if rec.product_id.id == bom.product_id.id:
                               		rec.receive_qty=bom.product_qty *(one_qty)
@@ -603,17 +644,20 @@ class MrpWorkorderMachineProduce(models.Model):
     @api.multi
     def orderProduceqty(self):
         for record in self:
+            print "recordrecord",record.uom_id
             attachment=[]
             body=''
             next_order=0
-            if not record.product_qty and  record.wastage_bool:
+#            if not record.product_qty and  record.wastage_bool:
+            if not record.produced_qty and  record.wastage_bool:
                raise UserError(_("Please Fill Produce Qty ..."))
             else:
                order=self.env['mrp.production.workcenter.line'].search([('production_id','=',record.production_id.id),('sequence','>',record.order_id.sequence)], limit=1)
                if order:
                   next_order=order.id
                body='<b>Product Produced In Work Order:</b>'
-               body +='<ul><li> Produced Qty    : '+str(record.product_qty) +'</li></ul>'
+#               body +='<ul><li> Produced Qty    : '+str(record.product_qty) +'</li></ul>'
+               body +='<ul><li> Produced Qty    : '+str(record.produced_qty) +'</li></ul>'
                body +='<ul><li> Production No. : '+str(record.production_id.name) +'</li></ul>'
                body +='<ul><li> Work Order No.  : '+str(record.order_id.name) +'</li></ul>'
                body +='<ul><li> Batch Number   : '+str(record.batch_id.name) +'</li></ul>'
@@ -641,12 +685,15 @@ class MrpWorkorderMachineProduce(models.Model):
                if record.previous_batch_id:
                   if record.previous_batch_id.uom_id.id != record.uom_id.id:
 		     if record.uom_id.name =='Pcs':
-		        produce_qty=math.ceil(record.product_qty * record.product_id.weight) if record.product_qty else 0.0   
+#		        produce_qty=math.ceil(record.product_qty * record.product_id.weight) if record.product_qty else 0.0   
+		        produce_qty=math.ceil(record.produced_qty * record.product_id.weight) if record.produced_qty else 0.0   
                      if record.uom_id.name =='m': 
                         qty_m=(record.order_id.qty/record.order_id.wk_required_qty)
-                        produce_qty=qty_m * record.product_qty          
+#                        produce_qty=qty_m * record.product_qty          
+                        produce_qty=qty_m * record.produced_qty          
 		  else: 
-                    produce_qty=record.product_qty
+#                    produce_qty=record.product_qty
+                    produce_qty=record.produced_qty
 		  print"+++++++================",produce_qty , record.wastage_qty,record.previous_batch_id.remain_used_qty
                   '''if record.previous_batch_id.remain_used_qty < (produce_qty + wast_qty):
                         print"TTTttttttttt",record.previous_batch_id.remain_used_qty, wast_qty, produce_qty
@@ -655,16 +702,28 @@ class MrpWorkorderMachineProduce(models.Model):
 		  record.previous_batch_id.remain_used_qty -=(produce_qty + wast_qty)
                for emp in record.employee_ids:
                    name +='%s %s'%(emp.name,"\n") 
-               record.batch_id.write({'product_qty':record.batch_id.product_qty + record.product_qty,
+#               record.batch_id.write({'product_qty':record.batch_id.product_qty + record.product_qty,
+               record.batch_id.write({
+#                                    'product_qty':record.batch_id.product_qty + record.produced_qty,
+                                    'product_qty':record.produced_qty,
                                       'uom_id':record.uom_id.id,'next_order_id':next_order,
                                       'reason':record.wastage_reason, 'remark':record.remark,
-                                      'document':record.document,
                                        'employee_name':name,
                                        'produce_qty_date':record.produce_date,
-                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.product_qty),
+#                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.product_qty),
+                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.produced_qty),
                                        'supplier_batch_no':record.supplier_batch_no,
                                       'wastage_qty':record.batch_id.wastage_qty + record.wastage_qty,
                                       'prev_batch_id':record.previous_batch_id.id})
+               if record.document:
+                   record.batch_id.write({                                      
+                   'document':[(4, record.document.ids)]
+                    })
+               if record.employee_ids:
+                   record.batch_id.write({                                      
+                   'employee_ids':[(4, record.employee_ids.ids)]
+                    })
+               record.batch_id._check_ro()
                 
 class MrpWorkorderMachineProduceLine(models.Model):
     _name = 'mrp.order.machine.produce.line'  
@@ -680,10 +739,38 @@ class MrpWorkorderMachineProduceLine(models.Model):
 class MrpWorkorderBatchNo(models.Model):
     _name='mrp.order.batch.number'
     
+    @api.depends('batch_tfred')
+    def _check_ro(self):
+        print "check ro--------------------------"
+        for rec in self:
+            print "rec.product_qty",rec.product_qty,rec.convert_product_qty
+            if rec.batch_tfred==True:
+                print "yes matching----------------------"
+                rec.check_ro=True
+            print "selfkjhjstet tracjet======================================",rec.check_ro
+            
+    @api.depends('batch_tfred')
+    def _check_tfred_qty(self):
+        print "check ro--------------------------"
+        for rec in self:
+            print "rec.product_qty",rec.product_qty,rec.convert_product_qty
+            if rec.batch_tfred==True:
+                print "yes matching----------------------"
+                rec.transferred_qty=rec.convert_product_qty
+            else:
+                rec.transferred_qty=0.0
+            print "selfkjhjstet tracjet======================================",rec.transferred_qty
+
+    
     @api.model
     def _get_uom_id(self):
         return self.env["product.uom"].search([('name','=','Kg')], limit=1, order='id')[0]
+    employee_ids=fields.Many2many('hr.employee', string='Operators')
 
+
+    check_ro=fields.Boolean('Check RO',compute='_check_ro') 
+    batch_tfred=fields.Boolean('Batch Transferred') 
+    transferred_qty=fields.Float('Qty Transferred',compute='_check_tfred_qty') 
     name=fields.Char('Number',copy=False) 
     production_id=fields.Many2one('mrp.production', string='Manufacturing No.')
     order_id=fields.Many2one('mrp.production.workcenter.line', string=' Previous Work-Order No.')
@@ -809,7 +896,15 @@ class MrpWorkorderBatchNo(models.Model):
             
     @api.multi
     def print_batch_barcode(self):
-        return self.env['report'].get_action(self, 'gt_order_mgnt.report_batch_number_barcode')
+        self.env.cr.execute("select mrp_production_workcenter_line_id from mrp_order_batch_number_mrp_production_workcenter_line_rel where mrp_order_batch_number_id="+str(self.id) )
+    	wc_line_id=self.env.cr.fetchone()
+        print "wc_line_idwc_line_idwc_line_idwc_line_id",wc_line_id
+        print_type=self.env['mrp.production.workcenter.line'].browse(wc_line_id[0]).print_type
+        if print_type=='normal':
+            return self.env['report'].get_action(self, 'gt_order_mgnt.report_batch_number_barcode')
+        elif print_type=='detailed':
+            return self.env['report'].get_action(self, 'gt_order_mgnt.production_batch_number_print_wo_line')
+
    
     @api.one
     def save_batch(self):
@@ -894,6 +989,8 @@ class MrpWorkorderBatchNo(models.Model):
              
     @api.multi
     def change_produceqty(self):
+#        if self.batch_tfred==True:
+#              raise UserError("You are not allowed to make changes to this batch as the batch is already transferred!!")
         order=''
         workorder=self.env['mrp.production.workcenter.line']
         batchnumber=self.env['mrp.order.batch.number']
@@ -927,14 +1024,26 @@ class MrpWorkorderBatchNo(models.Model):
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
+        if self.employee_ids:
+            context.update({
+            'default_employee_ids':[(6,0,self.employee_ids.ids)],
+            })
 	context.update({'default_order_id':self.order_id.id, 'default_machine':self.machine.id,
                          'default_previous_order_id':self.order_id.batch_no_ids_prev[0].order_id.id if self.order_id.batch_no_ids_prev else '',
                        'default_batch_id':self.id,
-                     'default_product_qty':(self.req_product_qty - self.product_qty) if self.req_product_qty > self.product_qty else 0.0,'default_uom_id':self.uom_id.id,'default_user_id':self.order_id.user_ids.ids,
+                       'default_remark':self.remark,
+                       'default_wastage_reason':self.reason,
+                       'default_supplier_batch_no':self.supplier_batch_no,
+                       'default_produced_qty':self.product_qty,
+                     'default_product_qty':(self.req_product_qty - self.product_qty) if self.req_product_qty > self.product_qty else 0.0,'default_uom_id':self.uom_id.id if self.uom_id else self.order_id.wk_required_uom.id,'default_user_id':self.order_id.user_ids.ids,
                       'default_previous_order_ids':[(6,0,ids_cus)],
                         'supplier_batch':True if self.order_id.process_type == 'raw' else False,
                         'raw_material':True if self.order_id.raw_materials_id else False,
                        'default_product_id':self.product_id.id, 'default_production_id':self.production_id.id})
+        if self.document:
+            context.update({
+            'default_document':[(6,0,self.document.ids)],
+            })
 	raw_lst=[]
         for res in self:
 		if res.order_id.raw_materials_id:
@@ -1672,6 +1781,13 @@ class MrpWorkcenterPructionline(models.Model):
                     'context': context,
              }
              
+    @api.multi
+    def action_start_working(self):
+        res=super(MrpWorkcenterPructionline,self).action_start_working()
+        for rec in self:
+            rec.production_id.state='in_production'
+        return res
+             
     '''@api.multi
     def action_start_working(self):
         for record in self:
@@ -1788,15 +1904,36 @@ class MrpWorkcenterPructionline(models.Model):
         
     @api.multi
     def print_batch_barcode(self):
-        for line in self.batch_ids:
-            res=self.env['report'].get_action(self, 'gt_order_mgnt.report_workorder_batch_number_barcode')
+        if self.print_type=='normal':
+            for line in self.batch_ids:
+                res=self.env['report'].get_action(self, 'gt_order_mgnt.report_workorder_batch_number_barcode')
+        elif self.print_type=='detailed':
+            for line in self.batch_ids:
+                res= self.env['report'].get_action(self, 'gt_order_mgnt.production_batch_details_print_wo')
         return res
     @api.multi
     def select_all(self):
         for record in self:
             if record.batch_ids:
                for rec in record.batch_ids:
-                   rec.print_bool=True
+                   if rec.print_bool==True:
+                      rec.print_bool=False
+                   else:
+                       rec.print_bool=True
+    @api.multi
+    def print_batch_data(self):
+        form_id = self.env.ref('gt_order_mgnt.print_batches_data_form_view')
+        return {
+                'name' :'Print Batches Data',
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'print.batches.data',
+                'views': [(form_id.id, 'form')],
+                'view_id': form_id.id,
+                'target': 'new',
+#                'res_id':rec.picking_id.id,
+            }
   
     @api.multi
     @api.depends('workcenter_id')
@@ -1817,6 +1954,9 @@ class MrpWorkcenterPructionline(models.Model):
     user_ids=fields.Many2many('res.users', string='Assign To')
     total_product_qty=fields.Float('Total Produced Qty', compute='total_producedqty')
     total_uom_id=fields.Many2one('product.uom', string='Required Product Unit',compute='total_producedqty')
+    uom = fields.Many2one('product.uom', 'UoM',related='production_id.product_uom',store=True)
+
+
     duration=fields.Float('Duration')
     m_change=fields.Boolean('Machine Change', deafult=False)
     working_machine = fields.Many2one('machinery', string='Change Machine', )
@@ -1832,6 +1972,7 @@ class MrpWorkcenterPructionline(models.Model):
     remark=fields.Text('Remark')
     req_product_qty = fields.Integer('Required Batch Qty')
     each_batch_qty = fields.Integer('Each Batch Qty')
+    print_type=fields.Selection([('normal','Normal'),('detailed','Detailed')], default='normal', string='Print Type')    
     req_uom_id=fields.Many2one('product.uom')
     batch_ids=fields.Many2many('mrp.order.batch.number',string='Batch No.') 
     batch_no_ids_prev=fields.One2many('mrp.order.batch.number', 'next_order_id',string='Batch Details')
@@ -1881,6 +2022,7 @@ class MrpWorkcenterPructionline(models.Model):
     shift_produced=fields.Float('Shift Completed',compute='cal_shift', digits_compute=dp.get_precision('Product Unit of Measure'))  
     wk_required_qty = fields.Float('Required Quantity')
     wk_required_uom = fields.Many2one('product.uom')
+    n_packaging = fields.Many2one('product.packaging' ,string="Package Type")
     wk_rm_qty=fields.Float('Remaining Qty', compute='Rmqty')
     capacity_per_cycle_kg=fields.Float('Capacity Per Cycle KG', compute='Capacity_kg')
    # capacity_per_cycle_change=fields.Float('Capacity Per Cycle Change', compute='capacitychange')
@@ -2092,6 +2234,10 @@ class MrpWorkcenterPructionline(models.Model):
     def change_state(self):
         for res in self:
         	if self._context.get('ready'):
+#                    need to uncomment while gng live for bom
+#                        if res.production_id.state not in ('ready','in_production'):
+#                            raise UserError(_('Cannot  Work Order as MO is not in Ready to produce or Production state!!'))
+
 #                        if not res.machine:
 #		          raise UserError(_('Please Select Machine Before Lock Work order..'))
 		        if not res.req_product_qty and not res.each_batch_qty:

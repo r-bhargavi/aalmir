@@ -279,14 +279,30 @@
                                     <t t-set="count" t-value="count+1"/>
                                     <t t-esc="count"/>
                                 </td>
-                                <td>
-                                   <span t-if="line.product_id.default_code">
-                                    [<span t-esc="line.product_id.default_code"/>]</span>
-                                     <t t-if="line.external_no">
-                                    [<span t-esc="line.external_no"/>]
-                                     </t>
-                                     
-                                          <span t-esc="line.product_id.name"/>
+                                 <td>
+                                        <t t-if="line.invoice_id.check_internal_code">
+                                        [<t t-esc="line.product_id.default_code"/>]
+
+
+                                        </t>
+                                        <t t-if="line.invoice_id.check_extranl_code">
+                                            [<t t-esc="line.external_no"/>]
+
+
+                                        </t>
+                                        <t t-if="line.product_name">
+                                            <t t-esc="line.product_name"/>
+
+                                        </t>
+                                       <t t-if="not line.product_name">
+                                            <t t-esc="line.product_id.name"/>
+                                        </t>
+                                    <br></br>
+                                  <t t-if="line.invoice_id.check_prod_desc">
+                                            <t t-esc="line.name"/>
+
+                                        </t>
+                                    
                                       <br> </br>
                      
                                 </td>

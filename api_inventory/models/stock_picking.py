@@ -597,15 +597,15 @@ class stockPicking(models.Model):
 			if res.location_id.usage in ('inventory','production') and res.location_dest_id.pre_ck and res.ntransfer_type=='manufacturing' and not res.backorder_id:
 				batch_obj = self.env['mrp.order.batch.number']
 				batch_history_obj = self.env['mrp.order.batch.number.history']
-				for move in res.move_lines_related:
-					if res.origin:
-						product_req_id=self.env['n.manufacturing.request'].search([
-										('name','=',res.origin)])
-						if product_req_id:
-							move.production_req=[(4,product_req_id.id)]
-							product_req_id.n_state='manufacture'
-						else:
-							raise UserError('Production Request is not found of name {}'.format(res.origin))
+#				for move in res.move_lines_related:
+#					if res.origin:
+#						product_req_id=self.env['n.manufacturing.request'].search([
+#										('name','=',res.origin)])
+#						if product_req_id:
+#							move.production_req=[(4,product_req_id.id)]
+#							product_req_id.n_state='manufacture'
+#						else:
+#							raise UserError('Production Request is not found of name {}'.format(res.origin))
 				for line in res.pack_operation_product_ids:
 					if not line.packaging_id:
 						raise UserError("Please define Primary Packaging for product '{}' ".format(line.product_id.name))

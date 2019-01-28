@@ -9,34 +9,34 @@ import xlwt
 import io
 from base64 import b64decode
 import base64
-#from openerp import http
-#from odoo.http import request
-#from odoo.addons.web.controllers.main import serialize_exception,content_disposition
-#from odoo.exceptions import ValidationError
+from openerp import http
+from odoo.http import request
+from odoo.addons.web.controllers.main import serialize_exception,content_disposition
+from odoo.exceptions import ValidationError
 
-#class Binary(http.Controller):
-# @http.route('/opt/download', type='http', auth="public")
-# @serialize_exception
-# def download_document(self,model,field,id,filename=None, **kw):
-#    """ Download link for files stored as binary fields.
-#    :param str model: name of the model to fetch the binary from
-#    :param str field: binary field
-#    :param str id: id of the record from which to fetch the binary
-#    :param str filename: field holding the file's name, if any
-#    :returns: :class:`werkzeug.wrappers.Response`
-    #"""
-#    cr, uid, context = request.cr, request.uid, request.context
-#    env = api.Environment(cr, 1, {})  
-#    out_brw=env['output'].browse(int(id))
-#    filecontent = base64.b64decode(out_brw.xls_output or '')
-#    if not filecontent:
-#        return request.not_found()
-#    else:
-#       if not filename:
-#           filename = '%s_%s' % (model.replace('.', '_'), id)
-#       return request.make_response(filecontent,
-#                      [('Content-Type', 'application/octet-stream'),
-#                       ('Content-Disposition', content_disposition(filename))])
+class Binary(http.Controller):
+ @http.route('/opt/download', type='http', auth="public")
+ @serialize_exception
+ def download_document(self,model,field,id,filename=None, **kw):
+    """ Download link for files stored as binary fields.
+    :param str model: name of the model to fetch the binary from
+    :param str field: binary field
+    :param str id: id of the record from which to fetch the binary
+    :param str filename: field holding the file's name, if any
+    :returns: :class:`werkzeug.wrappers.Response`
+    """
+    cr, uid, context = request.cr, request.uid, request.context
+    env = api.Environment(cr, 1, {})  
+    out_brw=env['output'].browse(int(id))
+    filecontent = base64.b64decode(out_brw.xls_output or '')
+    if not filecontent:
+        return request.not_found()
+    else:
+       if not filename:
+           filename = '%s_%s' % (model.replace('.', '_'), id)
+       return request.make_response(filecontent,
+                      [('Content-Type', 'application/octet-stream'),
+                       ('Content-Disposition', content_disposition(filename))])
 
 
 #class DailyPaymentReport(models.TransientModel):

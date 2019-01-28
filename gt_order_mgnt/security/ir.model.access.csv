@@ -253,7 +253,7 @@ access_mrp_order_batch_number_sale_user,mrp_order_batch_number_sale_user,model_m
 access_mrp_order_batch_number_sale_support,mrp_order_batch_number_sale_support,model_mrp_order_batch_number,base.group_sale_manager,1,1,0,0
 access_mrp_order_batch_number_user,mrp_order_batch_number_user,model_mrp_order_batch_number,stock.group_stock_user,1,1,1,0
 access_mrp_order_batch_number_manager,mrp_order_batch_number_manager,model_mrp_order_batch_number,stock.group_stock_manager,1,1,1,0
-access_mrp_order_batch_number_mo_user,mrp_order_batch_number_mo_user,model_mrp_order_batch_number,mrp.group_mrp_user,1,1,0,0
+access_mrp_order_batch_number_mo_user,mrp_order_batch_number_mo_user,model_mrp_order_batch_number,mrp.group_mrp_user,1,1,1,0
 access_mrp_order_batch_number_mo_manager,mrp_order_batch_number_mo_manager,model_mrp_order_batch_number,mrp.group_mrp_manager,1,1,1,1
 ,,,,,,,
 access_product_raw_material_type_user,product_raw_material_type_user,gt_customer_products.model_product_raw_material_type,mrp.group_mrp_user,1,1,0,0
@@ -273,7 +273,7 @@ access_mrp_bom_wastage_type_mrp_user,mrp_bom_wastage_type_mrp_user,model_mrp_bom
 ,,,,,,,
 access_mrp_bom_purchase_user,mrp_bom_purchase_user,mrp.model_mrp_bom,purchase.group_purchase_user,1,0,0,0
 ,,,,,,,
-access_ workorder_product_discription_user, workorder.product.discription_user,model_workorder_product_discription,mrp.group_mrp_user,1,0,0,0
+access_ workorder_product_discription_user, workorder.product.discription_user,model_workorder_product_discription,mrp.group_mrp_user,1,0,1,0
 access_ workorder_product_discription_manager, workorder.product.discription_manager,model_workorder_product_discription,mrp.group_mrp_manager,1,1,1,1
 ,,,,,,,
 access_ mrp_work_order_jobcard_user,mrp.work.order.jobcard_user,model_mrp_work_order_jobcard,mrp.group_mrp_user,1,0,0,0
@@ -292,6 +292,7 @@ sales_access_product_uom_type_mrp,product_uom_type_mrp,gt_customer_products.mode
 access_ mrp_order_machine_produce_line,mrp_order_machine_produce_line,model_mrp_order_machine_produce_line,mrp.group_mrp_user,1,1,1,0
 ,,,,,,,
 access_mrp_product_produce_line,mrp_product_produce_line,mrp.model_mrp_product_produce_line,mrp.group_mrp_manager,1,1,1,0
+access_mrp_product_produce_line_mo_user,mrp_product_produce_line_mo_user,mrp.model_mrp_product_produce_line,mrp.group_mrp_user,1,0,1,0
 ,,,,,,,
 access_material_details_po,material_details,gt_sale_pricelist.model_material_details,purchase.group_purchase_user,1,0,0,0
 ,,,,,,,

@@ -63,6 +63,7 @@ class production_batch_details_parser(report_sxw.rml_parse):
 
     def _get_print_data(self,object):  
     	res=[]
+        print "objectobject",object
     	for rec in object.inprocess_batches:
 		if rec.print_bool:
 		     	res.append(rec)

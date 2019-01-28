@@ -41,6 +41,7 @@
         'security/record_rule.xml',
         'wizard/order_split_machine_change_view.xml',
         'wizard/reject_bill_reason.xml',
+        'wizard/print_batches_data.xml',
         'wizard/order_confirm_wizard_view.xml',
         'wizard/request_payment_term_wizard_view.xml',
         'wizard/order_confirm_by_sales_support_wizard_view.xml',
@@ -83,6 +84,9 @@
         'wizard/sale_order_lpo_view.xml',
         'views/payment_receipt_report.xml',
         'views/account_payment_receipt_report.xml',
+        'report/print_batch_details.xml',
+#        'report/print_batch_number.xml',
+
         
     ],
     'demo': [],

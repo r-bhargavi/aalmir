@@ -95,6 +95,8 @@
                             <td>Batch No.</td>
                             <td>Required Qty</td>
                             <td>Produced Qty</td>
+                            <td>Transferred Qty</td>
+                            <td>Transfer Status</td>
                            
                         </tr>
                         <t t-set="count" t-value="0" />
@@ -110,6 +112,9 @@
                                 </td>
                                 <td><span t-esc="l.req_product_qty" /><span t-field='l.uom_id.name'/></td>
                                 <td><span t-esc="l.product_qty" /><span t-field='l.uom_id.name'/></td>
+                                <td><span t-esc="l.transferred_qty"/></td>
+                                <td><span t-esc="l.batch_tfred"/></td>
+
                                 
                             </tr>
                         </t>
@@ -125,6 +130,8 @@
                             <td>Batch No.</td>
                             <td>Required Qty</td>
                             <td>Produced Qty</td>
+                            <td>Transferred Qty</td>
+                            <td>Transfer Status</td>
                             <td>User Name</td>
                             <td>Date</td> 
                              <td>Remark</td>
@@ -142,6 +149,8 @@
                                 </td>
                                 <td><span t-esc="l.batch_id.req_product_qty" /><span t-field='l.uom_id.name'/></td>
                                 <td><span t-esc="l.product_qty" /><span t-field='l.uom_id.name'/></td>
+                                <td><t t-esc="l.batch_id.transferred_qty"/></td>
+                                <td><t t-esc="l.batch_id.batch_tfred"/></td>
                                 <td><t t-esc="l.create_uid.name" /></td>
                                 <td><t t-esc="l.produce_date" /></td>
                                 <td><t t-esc="l.remark" /></td>

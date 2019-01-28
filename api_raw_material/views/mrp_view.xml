@@ -216,8 +216,14 @@
         <field name="model">mrp.production</field>
         <field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
         <field name="arch" type="xml">
+
+<!--            <xpath expr="//field[@name='routing_id']" position="attributes">
+                <attribute name='readonly'>1</attribute>
+             </xpath>-->
 	<!--CH_N048 -->
               <field name="user_id" position="after">
+                              <field name="rm_reject_reason" readonly="1" attrs="{'invisible':[('rm_reject_reason','=',False)]}"/>
+
 
 			       <label for='wastage_allow' string="Allowed Wastage Qty"/>
 				<div>
@@ -246,6 +252,7 @@
               <xpath expr="//field[@name='product_lines']" position='replace'>
                    <group colspan="4" attrs="{'invisible':['|',('raw_request', '=',False),('state','not in',('confirmed','ready'))]}" >
                       <field name='raw_request' invisible='1'/>
+                      <field name='is_reset_mo' invisible='1'/>
                      <div >
                          <label string='Raw Materials Request sent to Logistic Department.' style='color:green;margin-top:30px;font-weight: bold'  class="oe_inline"/>
                      </div>

@@ -158,13 +158,16 @@
 					</form>
 				</field>
 			      </page>
-				<page string="In-Production" groups="mrp.group_mrp_user" attrs="{'invisible':[('inprocess_batches','=',[])]}">
+				<!--<page string="In-Production" groups="mrp.group_mrp_user" attrs="{'invisible':[('inprocess_batches','=',[])]}">-->
+				<page string="In-Production" groups="mrp.group_mrp_user">
 			      	<group col="5" groups="mrp.group_mrp_user">
  					<button name="batch_create" string="Create New" type="object" class="oe_highlight oe_edit_only" groups="mrp.group_mrp_user" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>
  					<button name="produce_batch" string="Produce Batch" type="object" class="oe_highlight oe_edit_only" groups="mrp.group_mrp_user" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}" help="Update date and operator name on batch"/>
  					
- 					<button name="print_batches" string="Print" type="object" class="oe_highlight oe_edit_only" help="print batches barcode" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>
-					<button name="print_batches_details" string="Detail Print" type="object" class="oe_highlight oe_edit_only" help="print batches details" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>
+ 					<!--<button name="print_batches" string="Print" type="object" class="oe_highlight oe_edit_only" help="print batches barcode" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>-->
+ 					<button name="print_batches" string="Print" type="object" class="oe_highlight oe_edit_only" help="print batches barcode"/>
+					<!--<button name="print_batches_details" string="Detail Print" type="object" class="oe_highlight oe_edit_only" help="print batches details" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>-->
+					<button name="print_batches_details" string="Detail Print" type="object" class="oe_highlight oe_edit_only" help="print batches details"/>
 			      	</group>
 			
 				<field name="inprocess_batches"  nolabel="1" >
@@ -197,7 +200,8 @@
 				</field>
 			      </page>
 			      
-			      <page string="Produced Batches" groups="mrp.group_mrp_user" attrs="{'invisible':[('produce_batches','=',[])]}">
+			      <!--<page string="Produced Batches" groups="mrp.group_mrp_user" attrs="{'invisible':[('produce_batches','=',[])]}">-->
+			      <page string="Produced Batches" groups="mrp.group_mrp_user">
 			        <group col="6" >
 			        	<button name="produce_batch" string="Produce Batch" type="object" class="oe_highlight oe_edit_only" groups="mrp.group_mrp_user" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}" context="{'produce':True}" help="Update date and operator name on batch"/>
 			      		<button name="print_batches" string="Print" type="object" class="oe_highlight oe_edit_only" help="print batches barcode" context="{'produce':True}" attrs="{'invisible':[('state','not in','assigned','partialy_available')]}"/>

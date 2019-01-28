@@ -126,6 +126,7 @@ class SaleOrderInvoice(models.Model):
                               raise UserError('Your Invoice Is completed According to your Order qty.')
                           inv_line=account_line.create({'invoice_id':qty_invoice.id,
                                  'product_id':line.product_id.id, 'lpo_documents':line.lpo_documents,
+                                 'product_name':line.prd_name,
                                 'quantity':ln['qty'],'uom_id':line.product_uom.id, 
                                 'name':line.product_id.name, 'price_unit':line.price_unit,
                                 'account_id':line.product_id.property_account_income_id.id or line.product_id.categ_id.property_account_income_categ_id.id})

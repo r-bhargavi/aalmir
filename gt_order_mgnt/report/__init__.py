@@ -21,4 +21,7 @@
 
 import invoice_report
 import delivery_report
+import print_batch_details
+#import print_batch_number
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

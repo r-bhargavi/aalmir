@@ -175,13 +175,33 @@
                  </h2>
                <group>
                  <group string="Fill Informations">
+
                      <field name='warning_bool' invisible='1'/>
-                     <label for='product_qty' string="Produced Qty"/>
-		     <div>
-		        <field name="product_qty" class="oe_inline" nolabel="1" />
-			 <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
-		     </div>
+                     <label for='req_product_qty' string="Required Qty" readonly="1"/>
+		        <div >
+                        <field name='req_product_qty' class="oe_inline" nolabel="1" readonly="1"/>
+			   <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		        </div>
+                     <label for='produced_qty' string="Produced Qty" attrs="{'readonly': [('check_txr','=',True)]}"/>
+		        <div >
+                        <field name='produced_qty' class="oe_inline" nolabel="1" attrs="{'readonly': [('check_txr','=',True)]}"/>
+			   <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		        </div>
+                     <!--<label for='product_qty' string="Qty To Produce" attrs="{'readonly': [('check_txr','=',True)]}"/>-->
+                     <!--<label for='product_qty' string="Remaining To Produce in Batch" readonly="1" invisible="1"/>-->
+		     <!--<div>-->
+
+		        <!--<field name="product_qty" class="oe_inline" nolabel="1" attrs="{'readonly': [('check_txr','=',True)]}"/>-->
+		        <!--<field name="product_qty" class="oe_inline" nolabel="1" readonly="1" invisible="1"/>-->
+			 <!--<field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>-->
+		     <!--</div>-->
+                     <!--<div>-->
+                        <!--<field name='produced_qty' string="Produced Qty"/>-->
+                        <!--<field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>-->
+
                      <field name='produce_date' />
+                     <!--</div>-->
+                     
                      <field name='user_id' context="{'operator':True, 'order_id':order_id}" invisible='1'
                       options="{'no_create': True, 'no_open': True}"  widget='many2many_tags' />
                       <field name='employee_ids' widget='many2many_tags'  required='1'
@@ -201,9 +221,11 @@
                          <field name='previous_uom_id' class='oe_inline' nolabel='1' readonly='1'/>
                       </div>
                      <field name="batch_id" domain="[('order_id','=',order_id)]" string='Current Batch No' readonly='1'/>
+                    <field name='check_txr' string="Transferred" readonly="1"/>
+
                      <field name='bool_check' invisible='1'/>
                      <field name="remark" />
-                     <field name='document'  />
+                     <field name='document'  widget="many2many_binary"/>
                      <field name='document_name' invisible='1'/>
                  </group>
                   <group string="Current Operation Informations">
@@ -215,9 +237,9 @@
                        <field name='machine' readonly="1"/>
                       
                        <!--field name="wastage_bool"/-->
-                       <label for='wastage_qty' string="Wastage Qty"/>
+                       <label for='wastage_qty' string="Wastage Qty" attrs="{'readonly': [('check_txr','=',True)]}"/>
 		        <div >
-		           <field name="wastage_qty" class="oe_inline" nolabel="1"/>
+		           <field name="wastage_qty" class="oe_inline" nolabel="1" attrs="{'readonly': [('check_txr','=',True)]}"/>
 			   <field name="wastage_uom"  class="oe_inline" nolabel="1" readonly="1"/>
 		        </div>
                        <field name="wastage_reason"/>
@@ -228,8 +250,8 @@
                    <group string='To Consume' invisible="not context.get('raw_material')">
                       <field name='produced_line_id' nolabel="1" readonly='1'>
                          <tree >
-                             <field name="product_id" />
-		             <field name='product_qty' />
+                             <field name="product_id"/>
+		             <field name='product_qty'/>
                              <field name='receive_qty' />
                              <field name='consumed_qty' /> 
                              <field name='remain_consumed' />
@@ -319,6 +341,13 @@
         <field name="arch" type="xml">
           <field name="message_follower_ids" position="replace">
           </field>
+          <xpath expr="//group[@name='active_group']" position="before">
+                    <group string="Operator Details">
+                    <field name="operator"/>
+              <field name="operator_type" attrs="{'required': [('operator','=',True)],'invisible': [('operator','=',False)]}"/>                    </group>
+                </xpath>
+              
+             
         </field>
    </record>
   <!-- End Employee form-->
@@ -479,7 +508,6 @@
         <field name="model">mrp.production.workcenter.line</field>
         <field name="inherit_id" ref="mrp_operations.mrp_production_workcenter_form_view_inherit"></field>
         <field name="arch" type="xml"> 
-
              <button name="button_start_working" position="replace">
              	<button name="button_start_working" string="Start" states="ready" class="oe_highlight"/>
                 <!--<button type='object' name='split_order' string='Split' class='oe_highlight' invisible="context.get('mo_cal')" attrs="{'invisible':['|','|',('process_type','=','raw'),('state','not in',('draft','ready','pause')),('wk_rm_qty','&lt;=',0)]}"/>-->
@@ -587,6 +615,8 @@
                            
                             
                          <field name="remark" string='Instruction By supervisor'/>
+                        <!--<field name='print_type' string="Print Type" attrs="{'invisible':[('batch_ids','=',[])]}"/>-->
+
                           <label for='total_wastage_qty' string="Total Wastage Qty" 
                             attrs="{'invisible':[('total_wastage_qty','=',0)]}"/>
 		            <div attrs="{'invisible':[('total_wastage_qty','=',0)]}">
@@ -598,50 +628,62 @@
                       
                    </group>
                        
-                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
+<!--                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                         <button name="select_all" string="All" icon='fa-check'  type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />-->
+                        <button name="print_batch_data" string="Print" icon='fa-print'  type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                  <group>
                      <field name='batch_ids' nolabel='1' 
                            attrs="{'invisible':[('batch_ids','=',[])]}" readonly='1'>
                         <tree editable='bottom'>
                           <field name='print_bool' invisible='1'/>
+<!--                           <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
+                               class="oe_highlight" attrs="{'invisible':[('print_bool','=',True)]}" />-->
                            <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
-                               class="oe_highlight" attrs="{'invisible':[('print_bool','=',True)]}" />
+                               class="oe_highlight" invisible="1"/>
+<!--                           <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
+                               class="oe_highlight"  attrs="{'invisible':[('print_bool','=',False)]}"/>-->
                            <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
-                               class="oe_highlight"  attrs="{'invisible':[('print_bool','=',False)]}"/>
+                               class="oe_highlight"  invisible="1"/>
                            <!--field name='create_date' string='Created Date'/-->
                            <field name='name' string='Current Batch No.' readonly='1'/>      
+                           <field name='batch_tfred' string='Transferred' readonly='1'/>      
                            <field name='req_product_qty' sum='total'/>
                            <field name='product_qty' readonly='1' string="Produced Qty" sum='total'/>
+                           <field name='transferred_qty'  string="Transferred Qty"/>
                            <field name='wastage_qty' sum='total'/>
                            <field name='uom_id'/>
                            <!--field name='user_id'/-->
                            <field name='employee_name'/>
                            <field name='equal_qty' invisible='1'/>
                            <field name='supplier_batch_no'/>
-                           <button string='Edit' name='edit_batch' type='object'  attrs="{'invisible':['|',('state','in',('draft','ready','cancel','hold', 'done')),('product_qty','>',0)]}"
-                             icon='fa-pencil-square-o' context="{'edit_qty':True}"/>
+<!--                           <button string='Edit' name='edit_batch' type='object'  attrs="{'invisible':['|',('state','in',('draft','ready','cancel','hold', 'done'))]}"
+                             icon='fa-pencil-square-o' context="{'edit_qty':True}"/>-->
                            <button name="change_produceqty" string="Issue"  type="object" 
                                   context="{'issue':True}" class="oe_highlight"  
-                                  attrs="{'invisible':['|',('product_qty','!=',0),('state','in',('draft','ready','cancel','hold','done'))]}"/>
-                           <button name="change_produceqty" string="Add More" type="object"  
+                                  attrs="{'invisible':['|',('product_qty','>',0.0),('state','in',('draft','ready','cancel','hold','done'))]}"/>
+                           <button name="change_produceqty" string="Edit" type="object"  
                            class="oe_highlight"   context="{'more':True}"
                             attrs="{'invisible':['|',('equal_qty','=',True),('product_qty','=',0)]}"/>
-                          <button name="print_batch_barcode" string="Print" type="object"  
-                           class="oe_highlight"  icon='fa-print'/> 
+<!--                          <button name="print_batch_barcode" string="Print" type="object"  
+                           class="oe_highlight"  icon='fa-print'/> -->
                          <field name='state'  invisible='1'/>
                         </tree>
                      </field>
                     </group>
                      <group colspan="4">
                          <field name="extra_bool" invisible='1'/>
-                         <label for='extra_batch' string='Issue Extra Batch No.' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}"/>
+                         <!--<label for='extra_batch' string='Issue Extra Batch No.' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}"/>-->
+                         <label for='extra_batch' string='Issue Extra Batch No.'/>
                        <div>
-                         <field name='extra_batch' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}" class='oe_inline'/>
+                         <!--<field name='extra_batch' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}" class='oe_inline'/>-->
+                         <field name='extra_batch' class='oe_inline'/>
+<!--                         <button type='object' name='extra_batchnumber'  string='Issue' 
+                         attrs="{'invisible':['|',('issue_bool','=',False),('extra_bool','=',True)]}" class='oe_inline oe_highlight' />-->
                          <button type='object' name='extra_batchnumber'  string='Issue' 
-                         attrs="{'invisible':['|',('issue_bool','=',False),('extra_bool','=',True)]}" class='oe_inline oe_highlight' />
+                         class='oe_inline oe_highlight' />
                        </div>
                       </group>
  
@@ -831,15 +873,17 @@
                        <field name="user_ids" widget='many2many_tags' context="{'machines_name': True,'machine_id':machine}"    options="{'no_create': True, 'no_open': True}" invisible='1'/>
 <!-- attrs="{'invisible':[('machine','=',False)],'required':[('machine','!=',False)],'readonly':[('state','!=','draft')]}"/-->
                        <field name='employee_ids' widget='many2many_tags' 
-                        
+                        required="1"
                          options="{'no_create': True, 'no_open': True}"
                          context="{'employee':True, 'user_ids':user_ids}"/>
                        <field name='partner_id' options="{'no_create': True, 'no_open': True}"  readonly='1'/>
                        <field name="product"/>
+                        <field name="n_packaging" readonly="1"/>
+
                        <label for="qty" string='Manufacturing Qty'/>
                        <div>
                         <field name='qty' class="oe_inline" nolable='1' />
-                        <field name='uom' readonly='1' class="oe_inline" nolable='1' widget="selection"/>
+                        <field name='uom' readonly='1' class="oe_inline" nolable='1'/>
                       </div>
                          <!--label for="mrp_sec_qty" string="Required Quantity"
                              attrs="{'invisible':[('process_type','not in',('raw','film','cutting'))]}"/>
@@ -1610,6 +1654,9 @@
                    <group>
                     <field name='name' readonly='1' string="Batch No"/>
                     <field name='production_id' readonly='1'/>
+                    <field name='check_ro' string="Transferred" readonly="1"/>
+                    <field name='batch_tfred' invisible='1'/>
+                    <field name='transferred_qty' invisible='1'/>
                     <field name='produce_qty_date'  string='Produced Date'/>
                     <field name='order_id' readonly='1' string='Work Order No.'/>
                       <field name='employee_name'  readonly="not context.get('edit_qty')"/>
@@ -1618,9 +1665,12 @@
                           readonly="not context.get('edit_qty')"/--> 
                     <field name='supplier_batch_no' readonly="not context.get('edit_qty')"/>
                     <field name='remark' readonly="not context.get('edit_qty')"/>
-                    <field name='document' readonly="not context.get('edit_qty')"/>
+                    <field name='document' widget="many2many_binary" readonly="not context.get('edit_qty')"/>
                </group>
                      <group >
+                        <field name='employee_ids' invisible="1"/>
+
+                         
                         <label for='wastage_allow' string="Allowed Wastage Qty"/>
 			<div>
 			    <field name="wastage_allow" class="oe_inline" nolabel="1"   readonly="1" />
@@ -1637,7 +1687,9 @@
                          <label for='product_qty' string="Produced Qty" readonly="1"/>
 			<div >
 			    <field name="product_qty" class="oe_inline" nolabel="1"
-                              readonly="not context.get('edit_qty')" />
+                            attrs="{'readonly':[('check_ro','=',True)]}"
+                              />
+                            <!--readonly="not context.get('edit_qty')"--> 
 			    <field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
 			</div>
                     </group>

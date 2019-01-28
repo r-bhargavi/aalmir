@@ -198,7 +198,7 @@ class MrpProduction(models.Model):
     n_purchase_bool = fields.Boolean('Half Purchase')
     n_po =fields.Many2one('purchase.order' ,string="PO order")
     n_request_qty = fields.Float('Quantity Requested',help='Quantity Requested by Sale Support',related='request_line.n_order_qty')
-    n_produce_qty = fields.Float('Quantity Produced',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty')
+    n_produce_qty = fields.Float('Quantity Transferred',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty')
     produce_uom_id=fields.Many2one('product.uom', compute='_n_get_produced_qty')
     n_note = fields.Text('Instruction In PR',help='Instruction Given by Sale Support for Manufacture of this product',related='request_line.n_Note')
     n_approved_qty = fields.Float('Quantity Approved',help='Quantity Approved by Quality Check',compute='_get_approved_qty')
@@ -511,6 +511,15 @@ class MrpProduction(models.Model):
     @api.model
     def create(self, vals):
 	mo_id = super(MrpProduction, self).create(vals)
+        product = self.env['product.product'].browse(mo_id.product_id.id)
+        if product.categ_id.cat_type=='film':
+            dest = self.env['stock.location'].search([('name','ilike','Input'),('location_id.name', '=', 'SH'),('usage','=', 'internal')])
+        if product.categ_id.cat_type=='injection':
+            dest = self.env['stock.location'].search([('name','ilike','Input'),('location_id.name', '=', 'DXB'),('usage','=', 'internal')])
+            
+        else:
+            dest = self.env['stock.location'].search([('name','ilike','Input'),('location_id.name', '=', 'SH'),('usage','=', 'internal')])
+        mo_id.location_dest_id=dest.id
         if mo_id.name:
            mo_id.name ='%s, %s'%(mo_id.name, mo_id.product_id.name)
 	if mo_id.sale_line:
@@ -663,10 +672,12 @@ class MrpProduction(models.Model):
                 next_id=False
                 for orders in workorders:
                 	orders.next_order_id=next_id
+                	orders.n_packaging=orders.production_id.n_packaging.id if orders.production_id.n_packaging else False
                 	next_id=orders.id
-        		
                 if workorders[0]:
                    workorders[0].order_last=True
+                   workorders[0].each_batch_qty=workorders[0].production_id.n_packaging.qty if workorders[0].production_id.n_packaging else 0.0
+                   workorders[0].req_product_qty=math.ceil((workorders[0].production_id.product_qty/workorders[0].production_id.n_packaging.qty))  if workorders[0].production_id.n_packaging else 0.0
 
                 order_op=self.env['mrp.production.workcenter.line'].search([('production_id','=',rec.id)])
                 if order_op:
@@ -1452,6 +1463,9 @@ class MrpBom(models.Model):
     			raise UserError(_('Please Enter Product weight in product form'))
     		weight = product_id.weight if product_id else 0.0
     		for line1 in vals.get('bom_line_ids'):
+                        if not vals.get('workcenter_id'):
+                            raise UserError(_('Please Select Process in BoM Lines!!'))
+
     			if type(line1[2]) == dict:
     			    uom_id=line1[2].get('uom_name')
     			    if uom_id and uom_id.upper()=='PCS':
@@ -1491,48 +1505,65 @@ class MrpBom(models.Model):
     		if not product_id.weight:
     			raise UserError(_('Please Enter Product weight in product form'))
     		weight = product_id.weight if product_id else 0.0
+                print "valsvalsvals",vals
 	    	if vals.get('bom_line_ids'):
-	    		for line in vals.get('bom_line_ids'):
-	    			if type(line[2]) == dict:
-	    				uom=line[2].get('uom_name')
-    			    		if uom and uom.upper()=='KG':
-			    			if line[2].get('percentage')==0 or not line[2].get('percentage'):
-	    			    			raise UserError(_('Please Enter Percentage of Material'))
-	    					qty +=line[2].get('percentage')
-					elif uom and uom.upper()=='PCS':
-			    			if line[2].get('product_qty')==0:
-	    			    			raise UserError(_('Please Enter Quantity of Material'))
+                    for each in vals.get('bom_line_ids'):
+                        print "each-----------------",each
+                        if each[2] and each[2].get('percentage'):
+                            id_list.append(each[1])
+                            qty += each[2].get('percentage')
+                    print "qtyqtyqtyqtyqty now-------",qty
+                    if qty!=100.0:
+                        for each_line in record.bom_line_ids:
+                            if each_line.id not in id_list and each_line.uom_name.upper()=='KG':
+                                qty += each_line.percentage
+#                                print "line---------------",line
+#                                dxfdsdff
+#	    			if type(line[2]) == dict:
+#	    				uom=line[2].get('uom_name')
+#                                        print "uomuomuomuom",uom
+#    			    		if uom and uom.upper()=='KG':
+#			    			if line[2].get('percentage')==0 or not line[2].get('percentage'):
+#	    			    			raise UserError(_('Please Enter Percentage of Material'))
+#	    					qty +=line[2].get('percentage')
+                            elif each_line.uom_name and each_line.uom_name.upper()=='PCS':
+                                if each_line.product_qty==0:
+                                    raise UserError(_('Please Enter Quantity of Material'))
 
-					elif uom and uom.upper()=='KG' and not line[2].get('percentage'):
-			    			for rec in self.bom_line_ids:
-							if rec.id == line[1]:
-								qty += rec.percentage
-					elif line[2].get('percentage')==0 and line[1]:
-						raise UserError(_('Please Enter Percentage of Material'))
-					elif line[2].get('percentage') and line[1]:
-						for rec in self.bom_line_ids:
-						    if rec.uom_name.upper()=='KG':
-							if rec.id == line[1]:
-								qty += line[2].get('percentage')
-					elif line[2].get('product_qty')==0 and line[1]:
-	    					for rec in self.bom_line_ids:
-						    if rec.id == line[1] and rec.uom_name.upper()=='PCS' :
-	    			    				raise UserError(_('Please Enter Quantity of Material'))
-				elif line[0] != 2:
+#					elif uom and uom.upper()=='KG' and not line[2].get('percentage'):
+#			    			for rec in self.bom_line_ids:
+#							if rec.id == line[1]:
+#								qty += rec.percentage
+#					elif line[2].get('percentage')==0 and line[1]:
+#						raise UserError(_('Please Enter Percentage of Material'))
+#					elif line[2].get('percentage') and line[1]:
+#						for rec in self.bom_line_ids:
+#						    if rec.uom_name.upper()=='KG':
+##							if rec.id == line[1]:
+#                                                        qty += line[2].get('percentage')
+#                            elif each_line.product_qty==0:
+#                                    for rec in self.bom_line_ids:
+#                                        if rec.id == line[1] and rec.uom_name.upper()=='PCS' :
+#                                                    raise UserError(_('Please Enter Quantity of Material'))
+#				elif line[0] != 2:
+#                                        print "line-------",line
+#					for rec in self.bom_line_ids:
+#					    if rec.uom_name.upper()=='KG':
+#						if rec.id == line[1]:
+#                                                    id_list.append(rec.id)
+#                                                    qty += rec.percentage
+#		if id_list:
+#                        print "id list-----------",id_list
+#			for rec in self.bom_line_ids:
+#			    if rec.uom_name.upper()=='KG':
+#				if rec.id not in id_list:
+#                                        print "rec-------------",rec.id
+#					qty += rec.percentage
+#                                        print "qty--------------",qty
+                    print "qtyqtyqty12344",qty
 
-					for rec in self.bom_line_ids:
-					    if rec.uom_name.upper()=='KG':
-						if rec.id == line[1]:
-							id_list.append(rec.id)
-							qty += rec.percentage
-		if id_list:
-			for rec in self.bom_line_ids:
-			    if rec.uom_name.upper()=='KG':
-				if rec.id not in id_list:
-					qty += rec.percentage
-
-		if qty>0 and qty != 100.0 :
-			raise UserError(_('Component Percentage Total Should be Equals to 100'))
+                    if qty>0 and round(qty,1)!=round(100.0,1):
+                            raise UserError(_('Component Percentage Total Should be Equals to 100'))
 				
 		super(MrpBom,self).write(vals)
 		if vals.get('bom_line_ids') or vals.get('product_qty'):
@@ -1587,6 +1618,7 @@ class MrpBom(models.Model):
         result2 = []
 
         routing = (routing_id and routing_obj.browse(cr, uid, routing_id)) or bom.routing_id or False
+        print "routingrouting",routing
         if routing:
             for wc_use in routing.workcenter_lines:
                 result2.append(self._prepare_wc_line(
@@ -1652,7 +1684,7 @@ class MrpBomWastageType(models.Model):
     _name = "mrp.bom.wastage.type"
     
     name=fields.Many2one('wastage.type', string="Name")
-    value=fields.Float('Wastage %')
+    value=fields.Float('Wastage %',digits_compute=dp.get_precision('Wastage Percent Decimal'))
     workcenter_id= fields.Many2one('mrp.workcenter', string="Process") 
     bom_id=fields.Many2one('mrp.bom')
 
@@ -1665,14 +1697,16 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
-    product_qty = fields.Float('Product Quantity', required=True, digits_compute=dp.get_precision('BoM Line Qty Required'))
+    product_qty = fields.Float('Product Quantity', required=True, digits=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')
     
     uom_name= fields.Char('uom Name',related="product_id.uom_id.name",help="This field is used to make fields readonly ")
     percentage = fields.Float('Percentage(%)')
-    bom_packaging_id = fields.Many2one('mrp.bom','BOM',readonly=True)
-    workcenter_id= fields.Many2one('mrp.workcenter', string="Process", required=True)
+#    bom_packaging_id = fields.Many2one('mrp.bom','BOM',readonly=True)
+    bom_packaging_id = fields.Many2one('mrp.bom','BOM')
+#    workcenter_id= fields.Many2one('mrp.workcenter', string="Process", required=True)
+    workcenter_id= fields.Many2one('mrp.workcenter', string="Process")
     
 class MrpBomMaster(models.Model):
 	

@@ -54,21 +54,37 @@
 
                 <!--<group invisible="not context.get('product')">-->
                 <group>
-                  <field name='product_line' nolabel='1'>
+                  <field name='product_line' nolabel='1' invisible="context.get('invoice')">
                    <tree delete='0' default_order='order_date' create='0' edit='0'>
                        <field name='order_date'/>
-                       <field name='product_id'/>
+                       <field name='product_id' invisible="context.get('invoice')"/>
                        <field name='sale_id'/>
                        <field name='lpo_number'/>
-                       <field name='qty_ordered'/>
-                       <field name='qty_delivered'/>
-                       <field name='qty_remaining'/>
-                       <field name='product_uom'/>
-                       <field name='qty_invoiced'/>
-                       <field name='price_unit'/>
-                       <field name='delivery_ids'/>
+                       <field name='qty_ordered' invisible="context.get('invoice')"/>
+                       <field name='qty_delivered' invisible="context.get('invoice')"/>
+                       <field name='qty_remaining' invisible="context.get('invoice')"/>
+                       <field name='product_uom' invisible="context.get('invoice')"/>
+                       <field name='qty_invoiced' invisible="context.get('invoice')"/>
+                       <field name='price_unit' invisible="context.get('invoice')"/>
+                       <field name='delivery_ids' />
                        <field name='invoice_ids'/>
                        
+                  </tree>
+                 </field>
+                 <field name='invoice_line' nolabel='1' invisible="context.get('product')">
+                   <tree delete='0' default_order='order_date' create='0' edit='0'>
+                       <field name='partner_id'/>
+                       <field name='date_invoice' />
+                       <field name='inv_number'/>
+                       <field name='due_date'/>
+                       <field name='sale_id'/>
+                       <field name='total_amount'/>
+                       <field name='due_amount'/>
+                       <field name='currency_id'/>
+                       <field name='state'/>
+                       <field name='lpo_number'/>
+                       <field name='delivery_ids' />
+                       <field name='invoice_ids'/>
                   </tree>
                  </field>
                </group>
@@ -104,7 +120,7 @@
     </record>
     
      
-     <menuitem id="menu_product_report" action="product_report_action" parent="gt_order_mgnt.menu_sales_support_report" groups="account.group_account_user" sequence="11" name='Product Report'
+     <menuitem id="menu_product_report" action="product_report_action" parent="gt_order_mgnt.menu_sales_support_report" sequence="11" groups="account.group_account_user" name='Product Report'
       />
     <menuitem id="menu_invoice_report" action="invoice_report_action" parent="gt_order_mgnt.menu_sales_support_report" groups="account.group_account_user" sequence="12" name='Invoice Report' />
      

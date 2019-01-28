@@ -13,10 +13,10 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-#        exp_id=self.env['hr.expense'],search([('expense_type','=','emp_expense')])
-#        for each in exp_id:
-#            each.partner_id_preferred=each.employee_id.address_home_id.id
-#        return True
+        exp_id=self.env['hr.expense'].search([('expense_type','=','emp_expense')])
+        for each in exp_id:
+            each.partner_id_preferred=each.employee_id.address_home_id.id
+        return True
 #        sp_pick_ref=self.env['stock.picking'].search([('origin','!=',''),('pick_ref','=',False),('location_id','in',(37,45,13))])
 #        print "sp_pick_refsp_pick_ref",sp_pick_ref,len(sp_pick_ref)
 #        for each in  sp_pick_ref:
@@ -26,11 +26,11 @@ class resCompany(models.Model):
 #               if not pick_id.pick_ref:
 #                   pick_id.write({'pick_ref':each.id})
 #        return True
-        ssmb=self.env['stock.store.master.batch'].search([])
-        print "ssmbssmb",ssmb
-        for each in ssmb:
-            each._get_batches_data()
-        return True
+#        ssmb=self.env['stock.store.master.batch'].search([])
+#        print "ssmbssmb",ssmb
+#        for each in ssmb:
+#            each._get_batches_data()
+#        return True
 #        po_ids_cancelled=self.env['purchase.order'].search([('state','=','cancel')])
 #        if po_ids_cancelled:
 #            print "po_ids_cancelledpo_ids_cancelledpo_ids_cancelled",po_ids_cancelled

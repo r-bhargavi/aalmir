@@ -27,7 +27,9 @@
               <header>
                     <button name="approve_state" type="object" string="Approve" class="oe_edit_only oe_highlight" 
                      		attrs="{'invisible':[('state','!=','draft')]}"/>
-                    <button name="reject_state" type="object" string="Reject" class="oe_edit_only oe_highlight"
+<!--                    <button name="reject_state" type="object" string="Reject" class="oe_edit_only oe_highlight"
+                     		attrs="{'invisible':[('state','!=','draft')]}"/>-->
+                    <button name="reject_rm_request" type="object" string="Reject" class="oe_edit_only oe_highlight"
                      		attrs="{'invisible':[('state','!=','draft')]}"/>
 		    <button type="object" string="Cancel" class="oe_edit_only oe_highlight" name='cancel_state'
                       		attrs="{'invisible':[('state','in',('reject','cancel'))]}"/>
@@ -43,6 +45,8 @@
                       <field  name='mo_cancel' invisible='1'/>
                       <field name='name' readonly="1"/>
                       <field name='production_id' string="Manufacturing No." readonly="1"/>
+                      <field name="rm_reject_reason" readonly="1" attrs="{'invisible':[('rm_reject_reason','=',False)]}"/>
+
                       <label for='wastage_allow' string="Allowed Wastage Qty" attrs="{'invisible':[('wastage_allow','=',0)]}"/>
 			<div attrs="{'invisible':[('wastage_allow','=',0)]}">
 			    <field name="wastage_allow" class="oe_inline" nolabel="1" 
@@ -77,12 +81,14 @@
                   
                 <notebook >
                      <page string='Raw Material Details'>
-                         <field name="request_line_ids" nolabel="1" attrs="{'readonly':[('state', '!=', 'approve')]}" >
+                         <field name="request_line_ids" nolabel="1">
 		                <tree editable="bottom"  >
 		                  <field name="product_id" readonly="1"/>
-		                  <field name='qty'  readonly="1"/>
+		                  <field name='qty' readonly="1"/>
+		                  <field name='pick_qty' required="1"/>
+		                  <field name='extra_qty'/>
 		                  <field name='total_available_qty' readonly="1"/>
-                                  <field name='available_qty'/>
+                                  <field name='available_qty' readonly="1"/>
                                   <!--button name="reserve_do" type="object"  attrs="{'invisible':['|',('reserve_status','!=','approve'),('available_qty','&lt;=',0)]}" class="oe_highlight oe_edit_only" string="Reserve" /-->
 		                  <field name='uom_id' readonly="1"/>
 		                  <!--field name='pending_qty' readonly="1"/>

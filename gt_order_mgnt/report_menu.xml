@@ -38,19 +38,23 @@
        <report 
             id="report_workorder_batch_no_barcode"
             string="Batch No. Barcode"
-            model="mrp.production.workcenter.line" 
+            model="print.batches.data" 
             report_type="qweb-pdf"
             file="gt_order_mgnt.report_workorder_batch_number_barcode" 
             name="gt_order_mgnt.report_workorder_batch_number_barcode" 
-            menu="False"        />
+            menu="False"        
+            paperformat="api_inventory.paperformat_api_barcode"/>
+
         <report 
             id="report_batch_no_barcode"
             string="Batch No. Barcode"
             model="mrp.order.batch.number" 
             report_type="qweb-pdf"
             file="gt_order_mgnt.report_batch_number_barcode" 
-            name="gt_order_mgnt.report_batch_number_barcode" 
-        />
+            name="gt_order_mgnt.report_batch_number_barcode"
+            paperformat="api_inventory.paperformat_api_barcode"/>
+        
+ 
         <report 
             id="report_invoice_vendor1"
             string="Aalmir Vendor Invoice"

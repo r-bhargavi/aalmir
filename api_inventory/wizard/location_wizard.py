@@ -306,7 +306,9 @@ class StockStoreLocationWizard(models.TransientModel):
 				   'batch_history':[(0,0,{'operation':'logistics',
 				   	'description':'Received by Logistics({}) using Master-Batch {}'.format(self.picking.name,matser_batch_id.name)})]})
 		print "......................",self.locations,self.locations.product_type
+
 		if self.locations.product_type=='multi':
+                        print "self.locations,,,,,,,,,,,",self.locations
 			loc_id=self.locations
 			exist_pro = self.env['store.multi.product.data'].search([('product_id','=',line.product_id.id),
 							('Packaging_type','=',line.packaging.id),
@@ -441,6 +443,9 @@ class StockStoreLocationWizard(models.TransientModel):
 					line.master_batches.write({'store_id':False,'logistic_state':'dispatch',
 							'location_id':False,'picking_id':False})
 				elif rec.picking.picking_type_code=='internal':
+                                        if 'MO' in rec.picking.origin if rec.picking.origin else '':
+                                            if rec.picking.material_request_id:
+                                                rec.picking.material_request_id.production_id.write({'state':'ready'})
 					if rec.picking.location_dest_id.actual_location and rec.picking.location_id.actual_location:
 						new_company_id = rec.picking.location_dest_id.company_id.id
 						line.master_batches.write({'store_id':rec.store_dest_id.id,

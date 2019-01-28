@@ -24,7 +24,11 @@ class stock_immediate_transfer(models.TransientModel):
     def process(self):
     	self.ensure_one()
     	#from INput_location >> Stock(Transit IN)
-	if self.pick_id.picking_type_code =='internal' and self.pick_id.location_id.pre_ck and self.pick_id.location_dest_id.actual_location:   
+        if self.pick_id.material_request_id:
+            self.pick_id.material_request_id.production_id.write({'state':'ready'})
+
+#	if ('RMR' in self.pick_id.origin if self.pick_id.origin else '') or (self.pick_id.picking_type_code =='internal' and self.pick_id.location_id.pre_ck and self.pick_id.location_dest_id.actual_location):   
+	if (self.pick_id.picking_type_code =='internal' and self.pick_id.location_id.pre_ck and self.pick_id.location_dest_id.actual_location):   
 		product_data = []
 		for operation in self.pick_id.pack_operation_product_ids:
 			#if not operation.qty_done:
@@ -81,6 +85,7 @@ class stock_immediate_transfer(models.TransientModel):
 			'res_id':res_id.id,
 		    }
         #from  INventry loss/Purchase  >> INput_location (Purchase /Inventory Loss)
+#        elif ('MO' in self.pick_id.origin if self.pick_id.origin else '') or (self.pick_id.picking_type_code =='internal' and self.pick_id.location_dest_id.scrap_location==False and self.pick_id.location_id.usage == 'inventory' and self.pick_id.ntransfer_type !='manufacturing') or (self.pick_id.picking_type_code =='incoming'):
         elif (self.pick_id.picking_type_code =='internal' and self.pick_id.location_dest_id.scrap_location==False and self.pick_id.location_id.usage == 'inventory' and self.pick_id.ntransfer_type !='manufacturing') or (self.pick_id.picking_type_code =='incoming'):
                 product_data = []
 		for operation in self.pick_id.pack_operation_product_ids:
@@ -372,98 +377,100 @@ class stock_backorder_confirmation(models.TransientModel):
     	data,completed_ids=[],[]
     	picking_obj = self.env['stock.picking']
     	mrp_id=self.env['mrp.production'].search([('name','=',pick_id.origin)],limit=1)
+        print "mrp_idmrp_id",mrp_id
     	purchase=self.env['purchase.order'].search([('name','=',pick_id.origin)],limit=1)
+        print "purchasepurchasepurchase",purchase
     	sequence = self.env['ir.sequence'].search([('code','=','master.batch')])
     	operation_obj = self.env['stock.pack.operation']
     	batches_obj=self.env['mrp.order.batch.number']
 	    	
-    	try:
-	    	picking_id=picking_obj.search([('name','=',pick_id.origin)],limit=1) # check if picking is in chain operation and quantity comes from inventory loss
-	    	next= sequence.get_next_char(sequence.number_next_actual)
-	    	
-	    	if purchase or not picking_id:
-		    	for move in pick_id.move_lines_related:
-			    	move_id=self.env['stock.move'].search([('move_dest_id','=',move.id),('state','=','done')])
-			    	if move_id.picking_id:
-				    	picking_id = move_id.picking_id
-				    	break
-	    	for res in pick_id.pack_operation_product_ids:
-	    		if res.product_id.type != 'product':
-				# to Create Master Batches for only Stockable Product
-				continue
-				
-			pckg_qty=res.pallet_no if res.secondary_pack else 1
-			lots,batches=(),()
-			btch=0
-			# if Product Quantity is comes from Purchase/inventory Loss(Add Quantity)/Production
-			n_picking = picking_id
-			if picking_id:
-				if picking_id.state !='done':
-					raise ValueError('Previous Chain Operation is not performed Please Complete That Operation')
-				back_id=picking_id.id
-				while True:
-					new_id=picking_obj.search([('backorder_id','=',back_id),('state','=','done')])
-					if not new_id:
-						break
-					n_picking +=new_id
-					back_id = new_id.id
-				batches_ids=()
-				operation = operation_obj.search([('product_id','=',res.product_id.id),
-								  ('picking_id','in',n_picking._ids)])
-				for op in operation:
-					batches_ids += (op.batch_number._ids)
-					if not op.batch_number:
-						batches_ids += (op.produce_batches._ids)
-				search_batches=batches_obj.search([('logistic_state','=','ready'),
-						('store_id','=',False),('product_id','=',res.product_id.id),
-						('product_qty','>',0),('id','in',batches_ids)],order="id")
-				max_pallet=res.total_pallet_qty
-				for batch in search_batches:
-					batches += (batch.id,)
-					if batch.lot_id.id not in lots:
-						lots += (batch.lot_id.id,)
-					pckg_qty -= 1
-					btch += 1
-					if pckg_qty <= 0 or btch == res.pack_qty:
-						data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
-						'max_qty':res.pallet_no if res.secondary_pack else 1,
-						'batch_qty':len(batches),
-						'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
-						'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
-						next=next[:4]+str(int(next[4:])+1).zfill(5)
-						pckg_qty=res.pallet_no if res.secondary_pack else 1
-						lots,batches=(),()
-						max_pallet -= 1
-					if max_pallet <=0:
-						break
+#    	try:
+        picking_id=picking_obj.search([('name','=',pick_id.origin)],limit=1) # check if picking is in chain operation and quantity comes from inventory loss
+        next= sequence.get_next_char(sequence.number_next_actual)
 
-			# Quantity Comes from Manufacturing process
-			elif mrp_id:
-                                lots,batches=[],[]
-				bacthes_ids=batches_obj.search([('production_id','=',mrp_id.id),
-								('logistic_state','=','ready'),
-								('store_id','=',False),('product_qty','>',0),
-								('id','not in',tuple(completed_ids))])
-				for batch in bacthes_ids:
-					batches.append(batch.id)
-					completed_ids.append(batch.id)
-					lots.append(batch.lot_id.id)
-					btch +=1
-#                                to allot batches to picking of mrp from input to stock location if picking not in done
-                                data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
+        if purchase or not picking_id:
+                for move in pick_id.move_lines_related:
+                        move_id=self.env['stock.move'].search([('move_dest_id','=',move.id),('state','=','done')])
+                        if move_id.picking_id:
+                                picking_id = move_id.picking_id
+                                break
+        for res in pick_id.pack_operation_product_ids:
+                if res.product_id.type != 'product':
+                        # to Create Master Batches for only Stockable Product
+                        continue
+
+                pckg_qty=res.pallet_no if res.secondary_pack else 1
+                lots,batches=(),()
+                btch=0
+                # if Product Quantity is comes from Purchase/inventory Loss(Add Quantity)/Production
+                n_picking = picking_id
+                if picking_id:
+                        if picking_id.state !='done':
+                                raise ValueError('Previous Chain Operation is not performed Please Complete That Operation')
+                        back_id=picking_id.id
+                        while True:
+                                new_id=picking_obj.search([('backorder_id','=',back_id),('state','=','done')])
+                                if not new_id:
+                                        break
+                                n_picking +=new_id
+                                back_id = new_id.id
+                        batches_ids=()
+                        operation = operation_obj.search([('product_id','=',res.product_id.id),
+                                                          ('picking_id','in',n_picking._ids)])
+                        for op in operation:
+                                batches_ids += (op.batch_number._ids)
+                                if not op.batch_number:
+                                        batches_ids += (op.produce_batches._ids)
+                        search_batches=batches_obj.search([('logistic_state','=','ready'),
+                                        ('store_id','=',False),('product_id','=',res.product_id.id),
+                                        ('product_qty','>',0),('id','in',batches_ids)],order="id")
+                        max_pallet=res.total_pallet_qty
+                        for batch in search_batches:
+                                batches += (batch.id,)
+                                if batch.lot_id.id not in lots:
+                                        lots += (batch.lot_id.id,)
+                                pckg_qty -= 1
+                                btch += 1
+                                if pckg_qty <= 0 or btch == res.pack_qty:
+                                        data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
                                         'max_qty':res.pallet_no if res.secondary_pack else 1,
                                         'batch_qty':len(batches),
                                         'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
                                         'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
-					
-                                if btch >= pckg_qty:
+                                        next=next[:4]+str(int(next[4:])+1).zfill(5)
+                                        pckg_qty=res.pallet_no if res.secondary_pack else 1
+                                        lots,batches=(),()
+                                        max_pallet -= 1
+                                if max_pallet <=0:
                                         break
+
+                # Quantity Comes from Manufacturing process
+                elif mrp_id:
+                        lots,batches=[],[]
+                        bacthes_ids=batches_obj.search([('production_id','=',mrp_id.id),('product_id','=',res.product_id.id),
+                                                        ('logistic_state','=','ready'),
+                                                        ('store_id','=',False),('product_qty','>',0),
+                                                        ('id','not in',tuple(completed_ids))])
+                        for batch in bacthes_ids:
+                                batches.append(batch.id)
+                                completed_ids.append(batch.id)
+                                lots.append(batch.lot_id.id)
+                                btch +=1
+#                                to allot batches to picking of mrp from input to stock location if picking not in done
+                        data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
+                                'max_qty':res.pallet_no if res.secondary_pack else 1,
+                                'batch_qty':len(batches),
+                                'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
+                                'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
+
+                        if btch >= pckg_qty:
+                                break
 					
-	except Exception as error:
-		exc_type, exc_obj, exc_tb = sys.exc_info()
-		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-		_logger.error("API-EXCEPTION. Calculate master Batches data {} {} {}".format(repr(error),fname,exc_tb.tb_lineno))
-		raise UserError("API-EXCEPTION. {} Contact Administrator and check Log".format(error))
+#	except Exception as error:
+#		exc_type, exc_obj, exc_tb = sys.exc_info()
+#		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+#		_logger.error("API-EXCEPTION. Calculate master Batches data {} {} {}".format(repr(error),fname,exc_tb.tb_lineno))
+#		raise UserError("API-EXCEPTION. {} Contact Administrator and check Log".format(error))
 	return tuple(data)
 
 

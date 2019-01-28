@@ -67,6 +67,7 @@ class MrpProductProduce(models.Model):
            name=''
            for line in order:
                batch=self.env['mrp.order.batch.number'].search([('production_id','=',obj.id),('order_id','=',line.id)])
+               print "batch-------------------------",batch
                if batch:
                   for bt_batch in batch:
                       if bt_batch.product_qty > 0 and not bt_batch.lot_id:
@@ -74,6 +75,7 @@ class MrpProductProduce(models.Model):
                          qty +=bt_batch.product_qty 
                          uom   =bt_batch.uom_id.id
                          name=bt_batch.uom_id.name
+               print "qty----------------",qty,obj.product_uom.id,uom
                result.update({'production_id':obj.id, 'product_qty':0.0,'batch_ids':lst})
                if obj.product_uom.id != uom:
                   if name == 'm' and line.process_type == 'psheet' :
@@ -83,7 +85,7 @@ class MrpProductProduce(models.Model):
                   if name == 'Pcs':
                      total_qty=(qty * obj.product_id.weight )
                else:
-                     total_qty=(qty)
+                     total_qty=qty
            result.update({'produced_qty':total_qty,'produced_uom_id':obj.product_uom.id, 'lot_id':lot.id})
         if obj.product_uom:
            result.update({'product_uom_id':obj.product_uom.id})
@@ -169,18 +171,19 @@ class MrpProductProduce(models.Model):
            picking_type_2=self.env['stock.picking.type'].search([('code','=','internal'),('default_location_dest_id','=',obj.location_dest_id.id)],limit=1)
            print "picking_type_2picking_type_2picking_type_2picking_type_2",picking_type_2
            stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',obj.location_dest_id.location_id.id)])
-           pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
+           pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','not in',('done','cancel'))])
            print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
            if not pick_exist:
               pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
               print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
-           each=obj.move_created_ids[0]
-           self.env['stock.move'].create({'product_id':each.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':each.product_uom.id,'name':each.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+           print "moves ino bj-------------------",obj.move_created_ids
+           self.env['stock.move'].create({'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
            pick_exist.action_confirm()
+           pick_exist.action_assign()
         for batch_line in self.batch_ids:
             op_id=pick_exist.pack_operation_product_ids
             op_id.write({'batch_number':[(4, batch_line.id)]})
-            batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready'})
+            batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready','batch_tfred':True})
         body='<b>Produced Qty In Production:</b>'
         body +='<ul><li> Production No.   : '+str(obj.name) +'</li></ul>'
         body +='<ul><li> Lot No.          : '+str(self.lot_id.name) +'</li></ul>'
@@ -206,21 +209,22 @@ class MrpProductProduce(models.Model):
 		if self.lot_id:
                    self.lot_id.total_qty =self.product_qty
                    self.lot_id.product_uom_id=self.product_uom_id.id
-                   picking_type_2=self.env['stock.picking.type'].search([('code','=','internal'),('default_location_dest_id','=',obj.location_dest_id.id)],limit=1)
+                   picking_type_2=self.env['stock.picking.type'].search([('code','=','internal'),('default_location_dest_id','=',production_id.location_dest_id.id)],limit=1)
                    print "picking_type_2picking_type_2picking_type_2picking_type_2",picking_type_2
-                   stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',obj.location_dest_id.location_id.id)])
-                   pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
+                   stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',production_id.location_dest_id.location_id.id)])
+                   pick_exist=self.env['stock.picking'].search([('origin','=',production_id.name),('location_id','=',production_id.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
                    print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
                    if not pick_exist:
-                      pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
+                      pick_exist=self.env['stock.picking'].create({'origin':production_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
                       print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
-                   each=obj.move_created_ids[0]
-                   self.env['stock.move'].create({'product_id':each.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':each.product_uom.id,'name':each.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+                   self.env['stock.move'].create({'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
                    pick_exist.action_confirm()
+                   pick_exist.action_assign()
+
                 for batch_line in self.batch_ids:
                    op_id=pick_exist.pack_operation_product_ids
                    op_id.write({'batch_number':[(4, batch_line.id)]})
-                   batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready'})
+                   batch_line.write({'lot_id':self.lot_id.id,'production_id':production_id.id,'logistic_state':'ready'})
 	        production_id.state='done'
 		if production_id.state == 'done' and production_id.remain_wastage_qty:
                    raise UserError("Wastage Qty remaining in manufacturing order.") 

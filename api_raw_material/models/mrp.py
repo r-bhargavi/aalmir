@@ -4,6 +4,8 @@
 from openerp.osv import fields, osv
 from openerp import models, fields, api, exceptions, _
 import openerp.addons.decimal_precision as dp
+from openerp import workflow
+
 from datetime import datetime,date,timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools.translate import _
@@ -19,6 +21,28 @@ _logger = logging.getLogger(__name__)
 
 class MrpProduction(models.Model):
     _inherit='mrp.production'
+    
+    @api.multi
+    def confirm_prod_after_reset(self):
+        for record in self:
+            record.action_confirm()
+        
+    @api.multi
+    def reset_mo(self):
+        for rec in self:
+            workorders=self.env['mrp.production.workcenter.line'].search([('production_id','=',rec.id)], order='sequence desc')
+            if workorders:
+                for wo in workorders:
+                    wo.unlink()
+            rec.write({'is_reset_mo':True,'state':'draft','routing_id':rec.bom_id.routing_id.id,'raw_request':False})
+            for each_mv in rec.move_created_ids:
+                each_mv.action_cancel()
+                each_mv.unlink()
+#            for each_mr in rec.material_request_id:
+#                each_mr.unlink()
+            for each_prod in rec.product_lines:
+                each_prod.unlink()
+        return True
 
     ''''@api.multi
     def write (self, vals, update=True, mini=True):
@@ -35,19 +59,21 @@ class MrpProduction(models.Model):
     @api.model
     def _get_uom_id(self):
         return self.env["product.uom"].search([('name','=','Kg')], limit=1, order='id')[0]
-
+    
+    rm_reject_reason = fields.Char(string='RM Reject Reason',track_visibility='always' ,copy=False)
     product_lines= fields.One2many('mrp.production.product.line', 'production_id', 'Scheduled goods', readonly=False)
     raw_request=fields.Boolean(string='Hide RM Request Button', default=False)
+    is_reset_mo=fields.Boolean(string='Reset MO', default=False)
     material_request_id=fields.One2many('mrp.raw.material.request','production_id', 'RM Request No.')
     request_state=fields.Selection([('draft','Requested'),('approve','Approved'), ('reject','Rejeted'),('cancel','Cancelled')], string='Status', related='material_request_id.state')
     delivery_ids=fields.Many2many('stock.picking','mrp_stock_raw_material_rel','production_id',
-                                  'picking_id',string='Delivery Details')
+                                  'picking_id',string='Delivery Details',copy=False)
     total_wastage_qty=fields.Float('Produced Wastage Qty',compute='count_wastage_qty')
     remain_wastage_qty=fields.Float('Remaining Wastage Qty',compute='remain_wastage')
     requested_wastage_qty=fields.Float('Requested Wastage Qty')
     remain_wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
     wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
-    wastage_ids=fields.One2many('mrp.production.workcenter.line','production_id',string='Wastage Details')
+    wastage_ids=fields.One2many('mrp.production.workcenter.line','production_id',string='Wastage Details',copy=False)
     wastage_allow=fields.Float('Allowed Wastage', compute='allowwastage_mo')
     allow_wastage_uom_id=fields.Many2one('product.uom', default=_get_uom_id)
     wastage_batch_ids=fields.One2many('mrp.order.batch.number','production_id', compute='wastage_batches')

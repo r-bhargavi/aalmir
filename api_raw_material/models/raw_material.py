@@ -34,6 +34,8 @@ class MrpRawmaterial(models.Model):
    _inherit = ['mail.thread']
    _order='id desc'
    
+   
+   rm_reject_reason = fields.Char(string='RM Reject Reason',track_visibility='always' ,copy=False)
    name=fields.Char('Name')
    production_id=fields.Many2one('mrp.production', string='Production No.')
    request_line_ids=fields.One2many('mrp.raw.material.request.line','material_request_id',string='Request Line')
@@ -112,13 +114,16 @@ class MrpRawmaterial(models.Model):
 			data_obj = self.env['ir.model.data']
 			raw_picking_location1 = data_obj.get_object_reference('api_raw_material', location_1)[1]
 			picking_type1=self.env['stock.picking.type'].search([('id','=',raw_picking_location1)],limit=1)
+                        print "picking_type1picking_type1",picking_type1
 			procurement_id=self.env['procurement.group'].create({'name':rec.production_id.name,
 								      'move_type':'direct'})
 			lst=[]
 			picking=picking1=False
+                        if any(line.pick_qty == 0.0 for line in rec.request_line_ids):
+                            raise UserError(_("You cannot pick 0 qty for raw materials!!!"))
 			for line in rec.request_line_ids:
 				move_ids = self.env['stock.move'].create({ 'date':rec.request_date,
-						  'product_id':line.product_id.id,'product_uom_qty':line.qty,
+						  'product_id':line.product_id.id,'product_uom_qty':line.pick_qty,
 						  'product_uom':line.uom_id.id, 'picking_type_id':picking_type1.id,  
 						  'location_dest_id':picking_type1.default_location_dest_id.id,
 						  'location_id':rec.source_location.id, 
@@ -135,6 +140,8 @@ class MrpRawmaterial(models.Model):
 						picking1 = move.move_dest_id.picking_id
 						break 
 				rec.delivery_id=picking.id
+                                rec.production_id.delivery_ids= [(4,picking.id)]		# MO	
+
 			if picking1:
 				picking1.material_request_id=rec.id
 				picking1.production_id=rec.production_id.id
@@ -142,9 +149,9 @@ class MrpRawmaterial(models.Model):
 				picking1.next_prev_picking_id=[(4,picking.id)]
 				picking1.ntransfer_type ='rm_production'
 				rec.production_id.delivery_ids= [(4,picking1.id)]		# MO	
-			else:
-				error_print = "Routes are not set for Raw Material products, Please go to setting and set Injection or Film"		
-				raise 
+#			else:
+#				error_print = "Routes are not set for Raw Material products, Please go to setting and set Injection or Film"		
+#				raise 
 				
 		   rec.state ='approve'
 		   for line in rec.request_line_ids:
@@ -192,6 +199,22 @@ class MrpRawmaterial(models.Model):
    	except Exception as err:
    		raise UserError("Exception in Approval of raw Material Request -: {} ".format(error_print if error_print else err))
         return True
+    
+   @api.multi
+   def reject_rm_request(self):
+       cofirm_form = self.env.ref('api_account.pay_cancel_wizard_view_form', False)
+       if cofirm_form:
+            return {
+                        'name':'RM Reject Wizard',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'cancel.pay.reason.wizard',
+                        'views': [(cofirm_form.id, 'form')],
+                        'view_id': cofirm_form.id,
+                        'target': 'new'
+                    }
+        
            
    @api.multi
    def reject_state(self):
@@ -201,6 +224,7 @@ class MrpRawmaterial(models.Model):
 	       	   rec.state ='reject'
 		   for line in rec.request_line_ids:
 		   	line.reserve_status='reject'
+                   rec.production_id.write({'state':'rmr'})
 		   
 		   if rec.request_type=='extra':	
 			if not rec.note_mgnr:
@@ -243,8 +267,7 @@ class MrpRawmaterial(models.Model):
 			       body_html +="</table>"
 			       body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.raw.material.request',rec.id, context=self._context)
 			       n_emails=str(rec.production_id.user_id.login)
-
-
+                               
 			       temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
 			       temp_id.send_mail(rec.id)
    	except Exception as err:
@@ -254,6 +277,13 @@ class MrpRawmaterial(models.Model):
        
 class MrpRawmaterialLine(models.Model):
 	_name='mrp.raw.material.request.line'
+        
+
+        @api.depends('pick_qty','qty')
+        def _compute_extra_qty(self):
+            for rec in self:
+                rec.extra_qty=rec.pick_qty-rec.qty
+                print "selfkjhjstet tracjet======================================",rec.extra_qty
 
 	@api.multi
 	def get_available_qty(self):
@@ -271,6 +301,8 @@ class MrpRawmaterialLine(models.Model):
 	material_request_id=fields.Many2one('mrp.raw.material.request', 'Request No.')
 	product_id=fields.Many2one('product.product', string='Product')
 	qty=fields.Float('Required Qty',digits_compute=dp.get_precision('Stock qty'))
+	extra_qty=fields.Float('Extra Qty',digits_compute=dp.get_precision('Stock qty'),compute='_compute_extra_qty')
+	pick_qty=fields.Float('Pick Qty',digits_compute=dp.get_precision('Stock qty'))
 	uom_id=fields.Many2one('product.uom', string="Unit")
 
 	rm_type=fields.Selection([('stock','Stock'),('mo','MO'),('po','PO')], default='stock')

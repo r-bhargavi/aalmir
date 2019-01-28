@@ -14,8 +14,22 @@
         <t t-set="company" t-value="res_company"></t>
     </t>
     <t t-call="gt_sale_quotation.external_layout_header_aalmir" />
-    <t t-raw="0" />
+    <t t-raw="0"/>
     <t t-call="gt_sale_quotation.external_layout_footer_aalmir" />
+</template>
+<template id="aalmir_custom_external_layout_for_barcode">
+    <!-- Multicompany -->
+    <t t-if="not o and doc">
+        <t t-set="o" t-value="doc"/>
+    </t>
+    <t t-if="o and 'report_company_name' in o">
+        <t t-set="company" t-value="o.report_company_name"></t>
+    </t>
+    <t t-if="not o or not 'report_company_name' in o">
+        <t t-set="company" t-value="res_company"></t>
+    </t>
+        <t t-raw="0"/>
+
 </template>
 <template id="aalmir_custom_external_layout_picking">
     <!-- Multicompany -->

@@ -8,6 +8,9 @@ from datetime import datetime, date, time, timedelta
 
 class MrpProduction(models.Model):
     _inherit='mrp.production'
+
+    
+    state=fields.Selection([('draft', 'New'), ('cancel', 'Cancelled'), ('confirmed', 'Awaiting Raw Materials'),('rmr', 'Raw Materials Rejected'), ('ready', 'Ready to Produce'), ('in_production', 'Production Started'), ('done', 'Done')],string='Status', readonly=True,track_visibility='onchange', copy=False)
    
     @api.model
     def default_get(self,fields):
