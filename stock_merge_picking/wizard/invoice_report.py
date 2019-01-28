@@ -119,7 +119,7 @@ class product_report_parser(report_sxw.rml_parse):
                   args_list =(partner,status)
                   invoice_qry +=" and partner_id in %s AND state='%s' order by date_invoice"%args_list  
                else:
-                   invoice_qry +="and state !='cancel' and partner_id in {} order by date_invoice".format(all_partner_ids)
+                   invoice_qry +="and state !='cancel' and partner_id in {} order by date_invoice".format (tuple(all_partner_ids))
                    
         if object.filter_by =='all':
            if object.date_from and object.date_to:
@@ -127,7 +127,7 @@ class product_report_parser(report_sxw.rml_parse):
               invoice_qry +="state !='cancel' AND date_invoice >= '%s' AND date_invoice <= '%s' order by date_invoice"%args_list     
            else:
               invoice_qry +="select id from account_invoice where  state !='cancel' order by date_invoice"
-
+        print "invoice quryy---------------------",invoice_qry
 	_logger.info('Invoice-Report Query {}'.format(invoice_qry))
         self.cr.execute(invoice_qry)      
         invoice_ids=[i[0] for i in self.cr.fetchall()]

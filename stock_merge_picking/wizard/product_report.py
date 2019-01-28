@@ -16,12 +16,15 @@ class IrActionsReportXml(models.Model):
 
 class ProductReport(models.Model):
     _name='product.report'
+#    _rec_name = 'name'
    
+    name  = fields.Char('Report Ref')
     partner_id  = fields.Many2one('res.partner','Customer')
     product_ids=fields.Many2many('product.product','wiz_pro_rel','wiz_product_rel', string='Product')
     date_from=fields.Datetime('From Date')
     date_to=fields.Datetime('To Date')
     product_line=fields.One2many('product.report.line','report_id')
+    invoice_line=fields.One2many('invoice.report.line','report_id')
     filter_option=fields.Selection([('customer','Customer Wise'),('product','Product Wise'),('lpo',' LPO Number Wise')],string='Filter By')
     filter_by=fields.Selection([('customer','Customer Wise Invoice Report '),('all','All Customer Invoice Report '),('submission','Invoice Submission Report'),('sale','Sale Summary Report'),('running_sale','Running Sale Orders')],string='Filter By')
     lpo_id=fields.Many2many('customer.upload.doc','lpo_wiz_rel','lpo_rel_wiz', string='LPO Number')
@@ -92,9 +95,66 @@ class ProductReport(models.Model):
 			rec.summary_value()
 		else:
 			rec.product_line=[(6,0,[])]
+                        
+    def get_invoice_lines(self):
+        lines = []
+        invoice_history=False
+        all_partner_ids = []
+        for record in self:
+            record.invoice_line=[(6,0,[])]
+
+            if record.partner_id:
+               partners=record.partner_id.id
+               all_partner_ids.append(partners)
+            domain=[('type','in',('out_invoice', 'out_refund'))]
+            if record.lpo_id_inv:
+                    domain += [('document_id','in',record.lpo_id_inv.ids)]
+            if record.date_to and record.date_from:
+               domain +=[('date_invoice','<=',record.date_to),('date_invoice','>=',record.date_from)]
+            if record.partner_id and record.filter_by=='customer': 
+               domain +=['|',('partner_id.parent_id','in',all_partner_ids),('partner_id','in',all_partner_ids)]
+
+            if record.filter_by== 'submission':
+               domain +=['|',('partner_id.parent_id','in',all_partner_ids),('partner_id','in',all_partner_ids)]
+               if record.invoice_status != 'all':
+                  domain +=[('state','=',record.invoice_status)]
+               else:
+                  domain +=[('state','in',('draft','open','paid'))]
+
+            invoice_history = self.env['account.invoice'].search(domain)
+            for obj in invoice_history:
+                invoice = obj
+                lpo_number=''            
+                if obj.document_id:
+                    lpo_number = ','.join([ str(doc.lpo_number) for doc in obj.document_id ])
+                else:
+                    lpo_number = obj.sale_id.sale_lpo_number
+                sale_id = self.env['sale.order'].search([('name','=',invoice.origin)])
+                    
+                vals = {
+                    'partner_id': invoice.partner_id.id,
+                    'date_invoice':invoice.date_invoice,
+                    'inv_number':invoice.number,
+                    'due_date':invoice.date_due,
+                    'sale_id':sale_id.id if sale_id else False, 
+                    'total_amount':invoice.amount_total_signed,
+                    'due_amount':invoice.residual_signed,
+                    'currency_id':invoice.currency_id.id,
+                    'state':invoice.state,
+                    'lpo_number': lpo_number,
+                    'invoice_ids':[(4, invoice.id)],
+                    'delivery_ids':[(6, 0, [x.id for x in  obj.picking_ids])],
+                }
+                lines.append(vals)
+                lpo_number=''
+            print "lines--------------------------",lines
+            record.invoice_line=lines
+        return { "type": "ir.actions.do_nothing",}
 
     @api.multi
     def summary_value(self):
+        cr= self.env.cr
+        cr.execute(""" DELETE FROM output""")
         print "self._ontest999999999999",self._context
         val=[]
         product_id=[]
@@ -102,6 +162,8 @@ class ProductReport(models.Model):
         all_partners_and_children = {}
         all_partner_ids = []
         for record in self:
+            if self._context.get('invoice'):
+                return record.get_invoice_lines()
             record.product_line=[(6,0,[])]
             if record.partner_id:
                for partner in record.partner_id:
@@ -148,19 +210,22 @@ class ProductReport(models.Model):
                 invoice_line=self.env['account.invoice.line'].search(domain)
                 print "invoice_lineinvoice_line",invoice_line
                 final_qty=0.0
+                inv_list=[]
                 vals=[]
                 if invoice_line:
                     print"LLLLLLLLLLLLLLLLL",invoice_line,product_id
                     for line in invoice_line:
-                        val.append(({'sale_id':line.invoice_id.sale_id.id,
-                                 'qty_invoiced':line.quantity,
-                                 'product_uom':line.uom_id.id,
-                                 'order_date':line.invoice_id.date_invoice,
-                                 'price_unit':line.price_unit,
-                                 'product_id':line.product_id.id,
-                                 'lpo_number':line.invoice_id.sale_id.sale_lpo_number,
-                                 'invoice_ids':[(4, line.invoice_id.id)]
-                                 })) 
+                        if line.invoice_id.id not in inv_list:
+                            inv_list.append(line.invoice_id.id)
+                            val.append(({'sale_id':line.invoice_id.sale_id.id,
+                                     'qty_invoiced':line.quantity,
+                                     'product_uom':line.uom_id.id,
+                                     'order_date':line.invoice_id.date_invoice,
+                                     'price_unit':line.price_unit,
+                                     'product_id':line.product_id.id,
+                                     'lpo_number':line.invoice_id.sale_id.sale_lpo_number,
+                                     'invoice_ids':[(4, line.invoice_id.id)]
+                                     })) 
                 if record.report_type == 'summary':
                     import itertools as it
                     keyfunc = lambda x: x['product_id']
@@ -287,8 +352,43 @@ class ProductReport(models.Model):
 
         return { "type": "ir.actions.do_nothing",}
     
+    
+class InvoiceReportLine(models.Model):
+    _name='invoice.report.line'
+#    _rec_name = 'report_id'
+    print_bool=fields.Boolean('Print', default=True)
+    report_id = fields.Many2one('product.report')
+    partner_id = fields.Many2one('res.partner',string='Customer')
+    date_invoice=fields.Datetime('Date')
+    due_date=fields.Datetime('Due Date')
+    sale_id  = fields.Many2one('sale.order', string='Sale No.')
+    total_amount=fields.Float('Total amount')
+    due_amount=fields.Float('Due amount')
+    currency_id=fields.Many2one('res.currency',string='Currency')
+    state = fields.Selection([
+            ('draft','Draft'),
+            ('proforma', 'Pro-forma'),
+            ('proforma2', 'Pro-forma'),
+            ('open', 'Open'),
+            ('paid', 'Paid'),
+            ('cancel', 'Cancelled'),
+        ], string='Status', index=True, readonly=True, default='draft',
+        track_visibility='onchange', copy=False,
+        help=" * The 'Draft' status is used when a user is encoding a new and unconfirmed Invoice.\n"
+             " * The 'Pro-forma' status is used the invoice does not have an invoice number.\n"
+             " * The 'Open' status is used when user create invoice, an invoice number is generated. Its in open status till user does not pay invoice.\n"
+             " * The 'Paid' status is set automatically when the invoice is paid. Its related journal entries may or may not be reconciled.\n"
+             " * The 'Cancelled' status is used when user cancel invoice.")
+    lpo_number=fields.Char('LPO Number') 
+    delivery_ids=fields.Many2many('stock.picking' ,'form_pro_stock','form_stock_pro_rel',string='Delivery No.')
+    invoice_ids=fields.Many2many('account.invoice' ,'form_pro_invoice','form_invoice_pro_rel',
+                                 string='Invoice No.')
+    inv_number=fields.Char('Invoice Number') 
+    
 class ProductReportLine(models.Model):
     _name='product.report.line'
+#    _rec_name = 'report_id'
+
 
     report_id = fields.Many2one('product.report')
     order_date=fields.Datetime('Date')

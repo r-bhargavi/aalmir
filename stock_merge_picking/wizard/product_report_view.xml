@@ -54,21 +54,38 @@
 
                 <!--<group invisible="not context.get('product')">-->
                 <group>
-                  <field name='product_line' nolabel='1'>
+                  <field name='product_line' nolabel='1' invisible="context.get('invoice')">
                    <tree delete='0' default_order='order_date' create='0' edit='0'>
                        <field name='order_date'/>
-                       <field name='product_id'/>
+                       <field name='product_id' invisible="context.get('invoice')"/>
                        <field name='sale_id'/>
                        <field name='lpo_number'/>
-                       <field name='qty_ordered'/>
-                       <field name='qty_delivered'/>
-                       <field name='qty_remaining'/>
-                       <field name='product_uom'/>
-                       <field name='qty_invoiced'/>
-                       <field name='price_unit'/>
-                       <field name='delivery_ids'/>
+                       <field name='qty_ordered' invisible="context.get('invoice')"/>
+                       <field name='qty_delivered' invisible="context.get('invoice')"/>
+                       <field name='qty_remaining' invisible="context.get('invoice')"/>
+                       <field name='product_uom' invisible="context.get('invoice')"/>
+                       <field name='qty_invoiced' invisible="context.get('invoice')"/>
+                       <field name='price_unit' invisible="context.get('invoice')"/>
+                       <field name='delivery_ids' />
                        <field name='invoice_ids'/>
                        
+                  </tree>
+                 </field>
+                 <field name='invoice_line' nolabel='1' invisible="context.get('product')">
+                   <tree delete='0' default_order='order_date' create='0' edit='0'>
+                       <field name='print_bool'/>
+                       <field name='partner_id'/>
+                       <field name='date_invoice' />
+                       <field name='inv_number'/>
+                       <field name='due_date'/>
+                       <field name='sale_id'/>
+                       <field name='total_amount'/>
+                       <field name='due_amount'/>
+                       <field name='currency_id'/>
+                       <field name='state'/>
+                       <field name='lpo_number'/>
+                       <field name='delivery_ids' />
+                       <field name='invoice_ids'/>
                   </tree>
                  </field>
                </group>
@@ -76,25 +93,15 @@
               
             </field>
        </record>
-       	<record model="ir.ui.view" id="report_view_tree_inv_prod">
-		<field name="name">Report Tree View</field>
-	    		<field name="model">product.report</field>
-		    	<field name="arch" type="xml">
-		    	<tree string='Product Report'>
-		    		<field name="partner_id" />
-		    		<field name="report_type" />
-		    	</tree>
-	    	</field>
-	</record>
     
        <record model="ir.actions.act_window" id="product_report_action">
         <field name="name">Product Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.report</field>
-        <field name="view_id" ref="report_view_tree_inv_prod"/>
+        <field name="view_id" ref="view_product_report"/>
 
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">form</field>
 
         <!--<field name="view_mode">form</field>-->
         <field name="context">{'product':True}</field>
@@ -104,9 +111,9 @@
         <field name="name">Invoice Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.report</field>
-        <field name="view_id" ref="report_view_tree_inv_prod"/>
+        <field name="view_id" ref="view_product_report"/>
 
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">form</field>
         <field name="view_type">form</field>
         <!--<field name="view_mode">form</field>-->
         <field name="context">{'invoice':True}</field>
