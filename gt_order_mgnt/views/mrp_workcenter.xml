@@ -666,7 +666,7 @@
                                   attrs="{'invisible':['|',('product_qty','>',0.0),('state','in',('draft','ready','cancel','hold','done'))]}"/>
                            <button name="change_produceqty" string="Edit" type="object"  
                            class="oe_highlight"   context="{'more':True}"
-                            attrs="{'invisible':['|',('equal_qty','=',True),('product_qty','=',0)]}"/>
+                            attrs="{'invisible':['|',('batch_tfred','=',True),('product_qty','=',0)]}"/>
 <!--                          <button name="print_batch_barcode" string="Print" type="object"  
                            class="oe_highlight"  icon='fa-print'/> -->
                          <field name='state'  invisible='1'/>

@@ -58,17 +58,20 @@
                         </div> 
                         
                       </t>
-                        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by in ('all','customer')">
+                        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by in ('submission','all','customer')">
                        <tr>
                            <td><b>Invoice Date</b></td>
-                           <td><b>Invocie No.</b></td>
-                           <td><b>Customer Name</b></td>
-                           <td><b>Sale Order</b></td>
+                        <td><b>Customer Name</b></td>
                            <td><b>LPO No.</b></td>
+
+                           <td><b>Invocie No.</b></td>
+                           <td><b>Deliveries No.</b></td>
+                           <td><b>Sale Order</b></td>
                            <td><b>Sales Person</b></td>
                            <td><b>Payment Due Date</b></td>
                            <td><b>Total Amount</b></td>
                            <td><b>Due Amount</b></td>
+                           <td><b>Balance Amount</b></td>
                            <td><b>Currency</b></td>
                           
                            <td><b>Status</b></td>
@@ -78,16 +81,19 @@
 		                 <t t-foreach='val' t-as='line'> 
 		                     <tr style='page-break-inside: auto'>
 		                      <td><span t-esc="line['date']"/></td>
-		                       <td><span t-esc="line['number']"/></td>                               
-		                       <td><sapn t-esc="line['customer']"/></td>
-		                       <td><sapn t-esc="line['sale']"/></td>
-		                       <td><sapn t-esc="line['lpo']"/></td>
-		                       <td><sapn t-esc="line['salesperson']"/></td>
-		                       <td><sapn t-esc="line['due_date']"/></td>
-		                       <td><sapn t-esc="line['total']"/></td>
-		                       <td><sapn t-esc="line['due']"/></td>
-		                       <td><sapn t-esc="line['currency']"/></td>
-		                       <td><sapn t-esc="line['state']"/></td>
+                                        <td><span t-esc="line['customer']"/></td>
+		                       <td><span t-esc="line['lpo']"/></td>
+
+		                       <td><span t-esc="line['number']"/></td> 
+                                        <td><span t-esc="line['delivery_ids']"/></td>
+		                       <td><span t-esc="line['sale']"/></td>
+		                       <td><span t-esc="line['salesperson']"/></td>
+		                       <td><span t-esc="line['due_date']"/></td>
+		                       <td><span t-esc="line['total']"/></td>
+		                       <td><span t-esc="line['due']"/></td>
+		                       <td><span t-esc="line['total']-line['due']"/></td>
+		                       <td><span t-esc="line['currency']"/></td>
+		                       <td><span t-esc="line['state']"/></td>
 		                    </tr>
 		                 </t>
                             </t>
@@ -99,7 +105,7 @@
                          <td><b><span t-esc='due'/></b></td><td></td><td></td>
                      </tr>
                    </table>
-                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout:fixed;"  t-if="doc.filter_by =='submission'">
+<!--                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout:fixed;"  t-if="doc.filter_by =='submission'">
                        <tr>
                            <td><b>Invoice Date</b></td>
                            <td><b>Invocie No.</b></td>
@@ -114,10 +120,10 @@
 		                     <tr style='page-break-inside: auto'>
 		                      <td><span t-esc="line['date']"/></td>
 		                       <td><span t-esc="line['number']"/></td>                               
-		                       <td><sapn t-esc="line['sale']"/></td>
-		                       <td><sapn t-esc="line['lpo']"/></td>
-		                       <td><sapn t-esc="line['total']"/></td>
-		                       <td><sapn t-esc="line['currency']"/></td>
+		                       <td><span t-esc="line['sale']"/></td>
+		                       <td><span t-esc="line['lpo']"/></td>
+		                       <td><span t-esc="line['total']"/></td>
+		                       <td><span t-esc="line['currency']"/></td>
 		                    </tr>
 		              </t>
                          </t>
@@ -126,7 +132,7 @@
                       <td colspan='4' style='text-align:right'><b>Total</b></td>
                       <td><b><span t-esc='total'/></b></td><td></td>
                      </tr>
-                   </table>
+                   </table>-->
 
                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by == 'running_sale'">
                        <tr>
@@ -153,18 +159,18 @@
 		                      <td><span t-esc="line['date']"/></td>
 		                      <td><span t-esc="line['name']"/></td>   
                                      <t t-if='not doc.partner_id'>                           
-		                       <td><sapn t-esc="line['customer']"/></td>
+		                       <td><span t-esc="line['customer']"/></td>
                                      </t>
-		                       <td><sapn t-esc="line['lpo']"/></td>
-		                       <td><sapn t-esc="line['salesperson']"/></td>
-		                       <td><sapn t-esc="line['opportunity']"/></td>
-		                       <td><sapn t-esc="line['amount_total']"/></td>
-		                       <td><sapn t-esc="line['convert_amount']"/></td>
-		                       <td><sapn t-esc="line['currency']"/></td>
-                                       <td><sapn t-esc="line['invoice_val']"/></td>
+		                       <td><span t-esc="line['lpo']"/></td>
+		                       <td><span t-esc="line['salesperson']"/></td>
+		                       <td><span t-esc="line['opportunity']"/></td>
+		                       <td><span t-esc="line['amount_total']"/></td>
+		                       <td><span t-esc="line['convert_amount']"/></td>
+		                       <td><span t-esc="line['currency']"/></td>
+                                       <td><span t-esc="line['invoice_val']"/></td>
                                        <!--td><span t-esc="line['delivery_ids']"/></td>
                                        <td><span t-esc="line['invoice_no']"/></td>
-		                       <td><sapn t-esc="line['state']"/></td-->
+		                       <td><span t-esc="line['state']"/></td-->
 		                    </tr>
                                    <tr t-if="line['delivery_ids']">
                                      <td colspan='2'><b>Total Deliveries No.</b></td>

@@ -73,6 +73,13 @@
             <field name="comment">See Only Non-Film Products.
             			</field>
         </record>
+	<record id="group_get_alert_bom_prod_request" model="res.groups">
+            <field name="name">Get BoM Alert</field>
+            <field name="implied_ids" eval="[(4, ref('mrp.group_mrp_manager'))]"/>
+            <field name="category_id" ref="base.module_category_usability"/>
+            <field name="comment">Get Alert for BoM creation on new request.
+            			</field>
+        </record>
 
         <record id="group_sale_reception" model="res.groups">
             <field name="name">Sale Reception</field>

@@ -289,7 +289,8 @@
                         <tree>
                            <field name='order_id' string="Operation No."/>
 			   <field name='machine' string="Machine"/>
-			   <field name='product_qty' string="Produce Qty"/>
+			   <field name='product_qty' string="To Produce"/>
+			   <field name='produced_qty' string="Produced Qty"/>
 			   <field name='uom_id' string='Unit'/>
 			   <field name='previous_batch_id'/>
                            <field name='batch_id'/>

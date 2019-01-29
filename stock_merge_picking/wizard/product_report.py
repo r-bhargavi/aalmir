@@ -108,16 +108,16 @@ class ProductReport(models.Model):
                all_partner_ids.append(partners)
             domain=[('type','in',('out_invoice', 'out_refund'))]
             if record.lpo_id_inv:
-                    domain += [('document_id','in',tuple(data['form'].get('lpo_id_inv', False)))]
+                    domain += [('document_id','in',record.lpo_id_inv.ids)]
             if record.date_to and record.date_from:
-               domain +=[('date_invoice','<=',data['form'].get('date_to', False)),('date_invoice','>=',data['form'].get('date_from', False))]
+               domain +=[('date_invoice','<=',record.date_to),('date_invoice','>=',record.date_from)]
             if record.partner_id and record.filter_by=='customer': 
                domain +=['|',('partner_id.parent_id','in',all_partner_ids),('partner_id','in',all_partner_ids)]
 
             if record.filter_by== 'submission':
                domain +=['|',('partner_id.parent_id','in',all_partner_ids),('partner_id','in',all_partner_ids)]
                if record.invoice_status != 'all':
-                  domain +=[('state','=',data['form'].get('invoice_status',False))]
+                  domain +=[('state','=',record.invoice_status)]
                else:
                   domain +=[('state','in',('draft','open','paid'))]
 
@@ -142,7 +142,6 @@ class ProductReport(models.Model):
                     'currency_id':invoice.currency_id.id,
                     'state':invoice.state,
                     'lpo_number': lpo_number,
-                    'invoice_ids':[(4, invoice.id)],
                     'delivery_ids':[(6, 0, [x.id for x in  obj.picking_ids])],
                 }
                 lines.append(vals)
@@ -356,7 +355,6 @@ class ProductReport(models.Model):
 class InvoiceReportLine(models.Model):
     _name='invoice.report.line'
 #    _rec_name = 'report_id'
-
     report_id = fields.Many2one('product.report')
     partner_id = fields.Many2one('res.partner',string='Customer')
     date_invoice=fields.Datetime('Date')
