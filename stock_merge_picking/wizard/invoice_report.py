@@ -135,10 +135,16 @@ class product_report_parser(report_sxw.rml_parse):
            amount_total=sum(line.amount_total for line in self.pool.get('account.invoice').browse(self.cr,self.uid,invoice_ids))
            lpo_number=''
            for inv in self.pool.get('account.invoice').browse(self.cr,self.uid,invoice_ids):
+                pick_name=''
+
            	if inv.document_id:
                   	lpo_number = ','.join([ str(doc.lpo_number) for doc in inv.document_id ])
           	else:
           		lpo_number = inv.sale_id.sale_lpo_number
+                        
+                if inv.picking_ids:
+                    for picking in inv.picking_ids:
+                        pick_name +=str(picking.name)+','
                   	
                 vals = {
                   'date':inv.date_invoice,
@@ -152,7 +158,9 @@ class product_report_parser(report_sxw.rml_parse):
                   'due':inv.residual_signed,			#inv.payment_date_inv,
                   'currency':inv.currency_id.name,
                   'state':inv.state,
-                  'amount_total':amount_total
+                  'amount_total':amount_total,
+                    'delivery_ids':pick_name,
+
             }
                 lines.append(vals)
                 lpo_number=''

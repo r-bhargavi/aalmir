@@ -29,9 +29,9 @@ class ProductReport(models.Model):
     filter_by=fields.Selection([('customer','Customer Wise Invoice Report '),('all','All Customer Invoice Report '),('submission','Invoice Submission Report'),('sale','Sale Summary Report'),('running_sale','Running Sale Orders')],string='Filter By')
     lpo_id=fields.Many2many('customer.upload.doc','lpo_wiz_rel','lpo_rel_wiz', string='LPO Number')
     sale_ids=fields.Many2many('sale.order','sale_wiz_rel','rel_sale_wiz',string='Sale Order')
-    invoice_status=fields.Selection([('draft','Draft Invoice'),('open','Validate Invoice'),('paid','Paid Invoice'),('all','All Invoice')],string='Invoice Status')
+    invoice_status=fields.Selection([('draft','Draft Invoices'),('open','Open Invoices'),('paid','Paid Invoices'),('all','All Invoices')],string='Invoice Status')
     product_status=fields.Selection([('sale','Sale Order Wise'),('delivery','Deivery Order Wise'),('invoice','Invoice Wise ')],string='Search Status')
-    report_type=fields.Selection([('summary','Summary Report'),('detail','Detail Report')],string='Report  Type')
+    report_type=fields.Selection([('summary','Summary Report'),('detail','Detail Report')],string='Report Type')
     total_delivered=fields.Float('Total Delivered',compute='cal_qty')
     total_ordered=fields.Float('Total Ordered', compute='cal_qty')
     total_invoiced=fields.Float('Total Invoiced', compute='cal_qty')
@@ -137,12 +137,12 @@ class ProductReport(models.Model):
                     'inv_number':invoice.number,
                     'due_date':invoice.date_due,
                     'sale_id':sale_id.id if sale_id else False, 
+                    'salesperson':invoice.user_id.id if invoice.user_id else False, 
                     'total_amount':invoice.amount_total_signed,
                     'due_amount':invoice.residual_signed,
                     'currency_id':invoice.currency_id.id,
                     'state':invoice.state,
                     'lpo_number': lpo_number,
-                    'invoice_ids':[(4, invoice.id)],
                     'delivery_ids':[(6, 0, [x.id for x in  obj.picking_ids])],
                 }
                 lines.append(vals)
@@ -356,12 +356,12 @@ class ProductReport(models.Model):
 class InvoiceReportLine(models.Model):
     _name='invoice.report.line'
 #    _rec_name = 'report_id'
-    print_bool=fields.Boolean('Print', default=True)
     report_id = fields.Many2one('product.report')
     partner_id = fields.Many2one('res.partner',string='Customer')
-    date_invoice=fields.Datetime('Date')
-    due_date=fields.Datetime('Due Date')
+    date_invoice=fields.Date('Inv. Date')
+    due_date=fields.Date('Due Date')
     sale_id  = fields.Many2one('sale.order', string='Sale No.')
+    salesperson  = fields.Many2one('res.users', string='SalesPerson')
     total_amount=fields.Float('Total amount')
     due_amount=fields.Float('Due amount')
     currency_id=fields.Many2one('res.currency',string='Currency')
