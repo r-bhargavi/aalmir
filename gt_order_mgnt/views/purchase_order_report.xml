@@ -327,11 +327,11 @@
                                  <td style="vertical-align:bottom;width:32%">
                                     <t t-if="o.default_signature2">
                                         <t t-if="o.procurement_user.signature_image">
-                                           <img t-att-src="'data:image/png;base64,'+o.procurement_user.signature_image" width="100px" height="70px"/>
+                                           <img t-att-src="'data:image/png;base64,'+o.procurement_user.signature_image" width="200px" height="150px"/>
 		                       </t>
 		                       <t t-if="not o.procurement_user.signature_image">
                                            <t t-if="o.procurement_user.digital_signature">
-                                               <img t-att-src="'data:image/png;base64,'+o.procurement_user.digital_signature" width="100px" height="70px"/>
+                                               <img t-att-src="'data:image/png;base64,'+o.procurement_user.digital_signature" width="200px" height="150px"/>
                                            </t>
 		                       </t>
 		                  </t>     

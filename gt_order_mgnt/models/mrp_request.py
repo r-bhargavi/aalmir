@@ -1787,8 +1787,7 @@ class MrpBomLine(models.Model):
     
     uom_name= fields.Char('uom Name',related="product_id.uom_id.name",help="This field is used to make fields readonly ")
     percentage = fields.Float('Percentage(%)')
-#    bom_packaging_id = fields.Many2one('mrp.bom','BOM',readonly=True)
-    bom_packaging_id = fields.Many2one('mrp.bom','BOM')
+    bom_packaging_id = fields.Many2one('mrp.bom','BOM',readonly=True)
 #    workcenter_id= fields.Many2one('mrp.workcenter', string="Process", required=True)
     workcenter_id= fields.Many2one('mrp.workcenter', string="Process")
     

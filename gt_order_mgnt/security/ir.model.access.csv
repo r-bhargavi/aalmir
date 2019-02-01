@@ -106,7 +106,7 @@ access_contract_schedule,access.contract.schedule,model_contract_schedule,base.g
 ,,,,,,,
 access_customer_upload_doc_sales,access.customer.upload.doc,model_customer_upload_doc,base.group_sale_salesman,1,1,1,1
 access_customer_upload_doc_sale_support,access.customer.upload.doc,model_customer_upload_doc,gt_order_mgnt.group_sale_support,1,1,1,1
-access_customer_upload_doc_mrp,access.customer.upload.doc,model_customer_upload_doc,mrp.group_mrp_user,1,0,0,0
+access_customer_upload_doc_mrp,access.customer.upload.doc,model_customer_upload_doc,mrp.group_mrp_user,1,1,1,0
 access_customer_upload_doc_account,access.customer.upload.doc,model_customer_upload_doc,account.group_account_user,1,0,0,0
 access_customer_upload_doc_inventory_user,access.customer.upload.doc,model_customer_upload_doc,stock.group_stock_user,1,0,0,0
 access_customer_upload_doc_purchase,access.customer.upload.doc,model_customer_upload_doc,purchase.group_purchase_user,1,1,1,0
