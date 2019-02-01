@@ -218,7 +218,6 @@
         <field name="arch" type="xml">
 	<!--CH_N048 -->
               <field name="user_id" position="after">
-
 			       <label for='wastage_allow' string="Allowed Wastage Qty"/>
 				<div>
 				    <field name="wastage_allow" class="oe_inline" nolabel="1" readonly="1" />
