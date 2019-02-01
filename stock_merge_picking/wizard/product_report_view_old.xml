@@ -18,8 +18,7 @@
                     <group>
                        <field name='filter_option' required="context.get('product')"
                          invisible="not context.get('product')"/>
-                        <field name='name' invisible="context.get('product')" attrs="{'invisible':[('filter_by','!=','submission')]}"/>
-
+                       <field name='name'/>
                        <field name='product_status' attrs="{'invisible':[('filter_option','!=','product')],'required':[('filter_option','=','product')]}"/>
                        <field name='filter_by' required="context.get('invoice')"
                          invisible="not context.get('invoice')"/>
@@ -79,14 +78,13 @@
                         <field name='partner_id'/>
                        <field name='lpo_number'/>
                        <field name='inv_number'/>
-                        <field name='delivery_ids' />
+                       <field name='due_date'/>
                        <field name='sale_id'/>
-                       <field name='salesperson'/>
-                        <field name='due_date'/>
                        <field name='total_amount'/>
                        <field name='due_amount'/>
                        <field name='currency_id'/>
                        <field name='state'/>
+                       <field name='delivery_ids' />
                   </tree>
                  </field>
                </group>

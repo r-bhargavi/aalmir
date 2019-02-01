@@ -160,7 +160,8 @@ class MrpProduction(models.Model):
                 email_to=''
                 temp_id = self.env.ref('gt_order_mgnt.email_template_for_rm_request')
                 print "temp_idtemp_idtemp_id",temp_id
-                group = self.env['res.groups'].search([('name', '=', 'RM Request Approve')])
+#                group = self.env['res.groups'].search([('name', '=', 'RM Request Approve')])
+                group = self.env['res.groups'].search([('name', '=', 'RM Request Approve/Reject')])
                 print "groupgroupgroupgroup",group
                 if group:
                     user_ids = self.env['res.users'].sudo().search([('groups_id', 'in', [group.id])])

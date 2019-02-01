@@ -132,6 +132,7 @@ class MrpRawmaterial(models.Model):
 				picking=move_ids.picking_id
 			if picking:
 				picking.material_request_id=rec.id
+				picking.min_date=rec.request_date
                                 picking.origin=rec.production_id.name
 				picking.ntransfer_type ='rm_virtual'
 				rec.picking_ids = [(4,picking.id)]
@@ -144,6 +145,8 @@ class MrpRawmaterial(models.Model):
 
 			if picking1:
 				picking1.material_request_id=rec.id
+                                picking1.min_date=rec.request_date
+
 				picking1.production_id=rec.production_id.id
 				picking1.origin=rec.name
 				picking1.next_prev_picking_id=[(4,picking.id)]
@@ -171,7 +174,7 @@ class MrpRawmaterial(models.Model):
 			       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
 			       text_link = _("""<a href="%s">%s</a> """) % (url,rec.production_id.name)
 			       body_html = """<div> 
-				<p> <strong>Extra Raw Material Request Approved</strong><br/><br/>
+				<p> <strong>Raw Material Request Approved</strong><br/><br/>
 				 <b>Dear: %s,</b><br/>
 				 <b>Production Number :</b>%s ,<br/>
 				  <b>Customer Name :</b>%s ,<br/>

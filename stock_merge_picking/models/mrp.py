@@ -147,12 +147,13 @@ class MrpProductProduce(models.Model):
     
     @api.multi
     def do_produce(self):
+
         obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
         res=super(MrpProductProduce,self).do_produce()
         if obj.hold_order == 'hold':
            raise UserError("Manufacturing Order Hold by Production Department.Before Produce please confirmed to Production Department.")
-        '''if self.product_qty > self.produced_qty:
-           raise UserError("Selected Qty is greater than Produced Qty.")'''
+#        if self.product_qty != self.produced_qty:
+#           raise UserError("Selected Qty is not equal to Produced Qty.")
         if obj:
            for consume in self.consume_lines:
                print "consumeconsumeconsume",consume

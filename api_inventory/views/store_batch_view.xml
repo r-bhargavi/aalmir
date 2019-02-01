@@ -69,6 +69,11 @@
 				<field name="user_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
 				<field name="employee_name" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="remark" readonly="1" groups="mrp.group_mrp_user"/>
+				<field name="reason" groups="mrp.group_mrp_user"/>
+                                <field name='document'  widget="many2many_binary"/>
+
+				<field name="wastage_qty" groups="mrp.group_mrp_user"/>
+				<field name="supplier_batch_no" groups="mrp.group_mrp_user"/>
                                 <field name="sale_id" groups="gt_order_mgnt.group_sale_support" readonly="1"/>
 				<field name="logistic_state" readonly="1"/>
                                 <field name="picking_id" groups="gt_order_mgnt.group_sale_support,

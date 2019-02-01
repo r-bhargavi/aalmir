@@ -573,6 +573,8 @@ class MrpWorkorderMachineProduce(models.Model):
                        raise UserError(_("Raw Material(%s) Received Qty(%s) is not Enough ...")%((product.product_id.name),round(product.receive_qty -product.consumed_qty, 2)))'''
         context=self._context.copy()
         context.update({'confirm':True})
+        print "contextcontextcontext",context
+        fdd
         self.bool_check =True 
         return {'context':context,"type": "ir.actions.do_nothing"}    
  
@@ -2235,8 +2237,8 @@ class MrpWorkcenterPructionline(models.Model):
         for res in self:
         	if self._context.get('ready'):
 #                    need to uncomment while gng live for bom
-#                        if res.production_id.state not in ('ready','in_production'):
-#                            raise UserError(_('Cannot  Work Order as MO is not in Ready to produce or Production state!!'))
+                        if res.production_id.state not in ('ready','in_production'):
+                            raise UserError(_('Cannot  Work Order as MO is not in Ready to produce or Production state!!'))
 
 #                        if not res.machine:
 #		          raise UserError(_('Please Select Machine Before Lock Work order..'))

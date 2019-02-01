@@ -413,6 +413,7 @@ class StockStoreLocationWizard(models.TransientModel):
     	'''Use in Dispatch Delivery Order for batches selection from wizard.'''
     	try:
 		for rec in self:
+    	# MO	
 			if rec.wizard_line==[] or not rec.wizard_line:
 				raise ValueError("There is not record to process")
 			product_ids=[]
@@ -431,6 +432,11 @@ class StockStoreLocationWizard(models.TransientModel):
 					raise ValueError("Please Upload Dispatch Documents or add Remarks.")
 				
 			store_history=[]
+                        if rec.picking.material_request_id:
+                            rec.picking.material_request_id.production_id.write({'state':'ready'})
+#            to link backorder of rm request to mo prodiction
+                        if rec.picking.backorder_id and rec.picking.backorder_id.material_request_id:
+                            rec.picking.backorder_id.material_request_id.production_id.delivery_ids= [(4,rec.picking.id)]	
 			# call method in module directory(stock_picking.py)
 			if rec.dispatch_doc:
 				rec.picking.dispatch_doc=rec.dispatch_doc

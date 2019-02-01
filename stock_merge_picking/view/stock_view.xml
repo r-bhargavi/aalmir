@@ -46,7 +46,7 @@
 			</field>
                          
 			<field name="pack_operation_product_ids" position="attributes">
-				<attribute name="attrs">{'readonly':['|',('picking_status','!=','draft'),('state','in',('done','dispatch','transit','delivered'))]}</attribute>
+				<attribute name="attrs">{'readonly':['|',('picking_status','not in',['draft','pick_list']),('state','in',('done','dispatch','transit','delivered'))]}</attribute>
 			</field>
 		     </field>
 		</record>

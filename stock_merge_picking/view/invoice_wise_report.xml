@@ -13,7 +13,7 @@
                               <span>Invoice Report</span>
                              </t> 
                              <t t-if="doc.filter_by =='submission'">
-                                <span>Invoice Submission</span>
+                                <span>Invoice Submission </span>
                              </t>   
                              <t t-if="doc.filter_by =='running_sale'">
                                 <span>Running Sale Orders</span>
@@ -42,7 +42,7 @@
                               <p ><b>Date: <span ><t t-esc="time.strftime('%Y-%m-%d')" /></span></b></p>
                              <p ><b>To: <span ><span t-esc="doc.partner_id.name" /></span></b></p>
 		             <p ><b>Dear Sir,</b></p>
-                              <p style='margin-left:30px'>Please acknowledge receipt below original Invoice and Delivery
+                              <p style='margin-left:30px'>Please acknowledge receipt of below original Invoice and Delivery.
                             </p>
                           </div>
                          <div class='col-xs-4'>
@@ -51,27 +51,45 @@
                               <p><b>Sign: ___________________________</b></p>
                           </div>
                           <div class='col-xs-4'>
-                              <p><b>Submitted By: ____________________ </b></p><br></br>
-                              <p><b>Submitted Date: _______/_______/___________ </b></p><br></br>
-                              <p><b>Sign: ___________________________</b></p>
+                                <p ><b>Submitted By: <span ><t t-esc="doc.create_uid.name"/></span></b></p>
+                              <p>
+                                  <b>Sign: 
+                                <t t-if='doc.create_uid.signature_image'>
+                                  <span>
+                                      <!--<t t-esc="doc.create_uid.signature_image"/>-->
+                                    <img t-att-src="'data:image/png;base64,'+doc.create_uid.signature_image" width="100px" height="70px"/>
+
+                                  </span>
+                                  </t>
+                                  <t t-if='not doc.create_uid.signature_image'>
+
+                                 <t t-if='doc.create_uid.digital_signature'>
+                                  <span>
+                                      <!--<t t-esc="doc.create_uid.digital_signature"/>-->
+                                    <img t-att-src="'data:image/png;base64,'+doc.create_uid.digital_signature" width="100px" height="70px"/>
+
+                                  </span>
+                              </t>
+                                  
+                                  </t>
+                              </b>
+                              </p>
                           </div>
                         </div> 
                         
                       </t>
-                        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by in ('submission','all','customer')">
+                        <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by in ('all','customer')">
                        <tr>
                            <td><b>Invoice Date</b></td>
-                        <td><b>Customer Name</b></td>
+                            <td><b>Customer Name</b></td>
                            <td><b>LPO No.</b></td>
-
-                           <td><b>Invocie No.</b></td>
+                           <td><b>Invoice No.</b></td>
                            <td><b>Deliveries No.</b></td>
                            <td><b>Sale Order</b></td>
                            <td><b>Sales Person</b></td>
                            <td><b>Payment Due Date</b></td>
                            <td><b>Total Amount</b></td>
                            <td><b>Due Amount</b></td>
-                           <td><b>Balance Amount</b></td>
                            <td><b>Currency</b></td>
                           
                            <td><b>Status</b></td>
@@ -91,7 +109,6 @@
 		                       <td><span t-esc="line['due_date']"/></td>
 		                       <td><span t-esc="line['total']"/></td>
 		                       <td><span t-esc="line['due']"/></td>
-		                       <td><span t-esc="line['total']-line['due']"/></td>
 		                       <td><span t-esc="line['currency']"/></td>
 		                       <td><span t-esc="line['state']"/></td>
 		                    </tr>
@@ -105,34 +122,44 @@
                          <td><b><span t-esc='due'/></b></td><td></td><td></td>
                      </tr>
                    </table>
-<!--                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout:fixed;"  t-if="doc.filter_by =='submission'">
+                  <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout:fixed;"  t-if="doc.filter_by =='submission'">
                        <tr>
-                           <td><b>Invoice Date</b></td>
-                           <td><b>Invocie No.</b></td>
-                           <td><b>Sale Order</b></td>
+                           <td><b>Invoice Date</b></td>                           
                            <td><b>LPO No.</b></td>
+                           <td><b>Invoice No.</b></td>
+                            <td><b>Deliveries No.</b></td>
+                            <td><b>Payment Due Date</b></td>
                            <td><b>Total Amount</b></td>
+                           <td><b>Due Amount</b></td>
                            <td><b>Currency</b></td>
+                            <td><b>Status</b></td>
                         </tr>
                         <t t-set="val" t-value="get_view(doc)"/> 
                           <t t-if='val'>
 		                 <t t-foreach='val' t-as='line'> 
 		                     <tr style='page-break-inside: auto'>
 		                      <td><span t-esc="line['date']"/></td>
-		                       <td><span t-esc="line['number']"/></td>                               
-		                       <td><span t-esc="line['sale']"/></td>
-		                       <td><span t-esc="line['lpo']"/></td>
+                                        <td><span t-esc="line['lpo']"/></td>
+		                       <td><span t-esc="line['number']"/></td>  
+                                        <td><span t-esc="line['delivery_ids']"/></td>
+                                        <td><span t-esc="line['due_date']"/></td>
 		                       <td><span t-esc="line['total']"/></td>
+		                       <td><span t-esc="line['due']"/></td>
 		                       <td><span t-esc="line['currency']"/></td>
+                                        <td><span t-esc="line['state']"/></td>
 		                    </tr>
 		              </t>
                          </t>
                       <tr>
                        <t t-set="total" t-value="get_total(doc)"/> 
-                      <td colspan='4' style='text-align:right'><b>Total</b></td>
-                      <td><b><span t-esc='total'/></b></td><td></td>
+                        <t t-set="due" t-value="get_total_due(doc)"/> 
+
+                      <td colspan='5' style='text-align:right'><b>Total</b></td>
+                      <td><b><span t-esc='total'/></b></td>
+                        <td><b><span t-esc='due'/></b></td><td></td><td></td>
+
                      </tr>
-                   </table>-->
+                   </table>
 
                   <table class="table table-bordered" style="border: 1px solid #9999;margin-top:10px;width:100%;table-layout: fixed;" t-if="doc.filter_by == 'running_sale'">
                        <tr>

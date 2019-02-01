@@ -901,8 +901,8 @@ class n_manufacturing_request(models.Model):
 		raise UserError('Please Select proper Category')
 		
         result = super(n_manufacturing_request, self).create(vals)
-        if result.n_sale_order_line and result.n_order_qty > result.n_sale_order_line.pending_qty:
-		raise UserError(_('Your order more than pending quantity'))
+#        if result.n_sale_order_line and result.n_order_qty > result.n_sale_order_line.pending_qty:
+#		raise UserError(_('Your order more than pending quantity'))
         return result
 
     @api.multi
@@ -1007,8 +1007,8 @@ class n_manufacturing_request(models.Model):
 	#CH_N054  >>>>>>>>>>>>>
 	status_list=[]
 	
-	if self.n_order_qty > self.n_sale_order_line.pending_qty:
-		raise UserError(_('Your order more than pending quantity')) 
+#	if self.n_order_qty > self.n_sale_order_line.pending_qty:
+#		raise UserError(_('Your order more than pending quantity')) 
 		
 	self.n_state='draft'
 	self.request_type='sale'
@@ -1043,24 +1043,28 @@ class n_manufacturing_request(models.Model):
 		        product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
                         if bom_id:
-                            new_subject='New Production Request with ref %s'%str(self.name)
+                            new_subject='API-ERP Production Alert:BoM required,New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                         else:
-                            new_subject='BoM is not issued for Production Request %s'%str(self.name)
+                            new_subject='API-ERP Production Alert:New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                         print "new_subjectnew_subject",new_subject
 
 			body_html = """<div> 
-				<p> <strong>Production Request(New)</strong></p><br/>
-				<p>Dear %s,<br/>
+				<p> <strong>New production request is raised as per below details</strong></p><br/>
+				<p>Dear User,<br/>
 					<p>Request Number : <b>%s</b> </p>
 		    			<p>Product:<b>%s</b> </p>
+		    			<p>Instructions from Sale Support:<b>%s</b> </p>
+		    			<p>Requested completion date: <b>%s</b> </p>
+		    			<p>Sales Order Number:<b>%s</b> </p>
+		    			<p>Sales Person:<b>%s</b> </p>
 		    			<p>Quantity :<b>%s</b> \t%s </p>
 		    			<p>Packaging :<b>%s</b> </p>
 				</p>
-				</div>"""%(send_user_name,str(self.name),product_data,str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+				</div>"""%(str(self.name),product_data,str(self.n_Note),str(self.n_delivery_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
 			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                         print "body_htmlbody_htmlbody_html",body_html
                         if bom_id:
-                            body_html +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>" 
+                            body_html +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> Qty</th></tr>" 
                             for line in bom_id.bom_line_ids:
                                 #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
                                 #self.env.cr.execute(term_qry)
@@ -1078,6 +1082,11 @@ class n_manufacturing_request(models.Model):
 #                            text_link = _("""<a href="%s">%s</a> """) % (url,"VIEW REQUEST")
 #                            body_html +='<li> <b>RM Request :</b> '+str(text_link) +'</li>'
                             body_html +="</table>"
+                        else:
+                            body_html+= """<div> 
+
+				<p style="color:red"> <strong>No BOM created till now, BOM required.</strong></p><br/>
+				</div>"""
 			temp_id.write({'body_html': body_html,'subject':new_subject,
 					'email_to' : send_user, 'email_from': user_obj.partner_id.email})
                         print "send_usersend_user",send_user,body_html
@@ -1108,26 +1117,20 @@ class n_manufacturing_request(models.Model):
 			temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': user_obj.partner_id.email})
 			temp_id.send_mail(self.n_sale_line.id)
 	return True	
-
     @api.multi
-    def create_manufacturing_order(self):
-        user_obj = self.env['res.users'].browse(self.env.uid)
-
-	context = self._context.copy()
-        context.update({'request_id':self.id, 'default_contract_id':self.contract_id.id})
-        mo_form = self.env.ref('mrp.mrp_production_form_view', False)
-        print "Self>dfsfsdfsdfdsf",context
+    def send_reminder_bom(self):
         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
 
     	# raise Error till manufacturing module is not installed.
 #    	raise UserError('You dot\' have access to creaete Manufacturing Order\n Please Create Transfer Production')
     	#raise UserError('Manufacturing module is not fully intalled')
         temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
+        user_obj = self.env['res.users'].browse(self.env.uid)
+
         if temp_id and not bom_id:
                 group,send_user_name=False,''
                 recipient_partners=[]
-                if self.n_category.cat_type=='film':
-                        group = self.env['res.groups'].search([('name', '=', 'Get BoM Alert')])
+                group = self.env['res.groups'].search([('name', '=', 'Get BoM Alert')])
                 print "groupgroupgroupgroupgroupgroup",group
                 for groups in group:
                     for recipient in groups.users:
@@ -1137,25 +1140,38 @@ class n_manufacturing_request(models.Model):
 
                 send_user = ",".join(recipient_partners)
                 product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
-                new_subject='BoM Still Not Issued for Production Request with ref %s'%str(self.name)
-
+                new_subject='API-ERP BOM Alert: Production stopped for %s as BOM not available.'%str('['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                 body_html = """<div> 
-                        <p> <strong>Production Request(New)</strong></p><br/>
-                        <p>Dear %s,<br/>
-                                <p>Request Number : <b>%s</b> </p>
-                                <p>Product:<b>%s</b> </p>
-                                <p>Quantity :<b>%s</b> \t%s </p>
-                                <p>Packaging :<b>%s</b> </p>
-                        </p>
-                        </div>"""%(send_user_name,str(self.name),product_data,str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+                        <p> <strong>This is to inform you that manufacturing supervisor tried to create Manufacturing order for below request but was not successful as there is no BOM defined for %s</strong></p><br/>
+                        <p> <strong>Kindly issue BOM at your earliest so that MO can be planned and started.</strong></p><br/>
+                        <p>Dear User,<br/>
+					<p>Request Number : <b>%s</b> </p>
+		    			<p>Product:<b>%s</b> </p>
+		    			<p>Instructions from Sale Support:<b>%s</b> </p>
+		    			<p>Requested completion date: <b>%s</b> </p>
+		    			<p>Sales Order Number:<b>%s</b> </p>
+		    			<p>Sales Person:<b>%s</b> </p>
+		    			<p>Quantity :<b>%s</b> \t%s </p>
+		    			<p>Packaging :<b>%s</b> </p>
+				</p>
+				</div>"""%('['+str(self.n_product_id.default_code)+']'+' '+self.n_product_id.name,str(self.name),product_data,str(self.n_Note),str(self.n_delivery_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
                 body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                 print "body_htmlbody_htmlbody_html",body_html
                 temp_id.write({'body_html': body_html,'subject':new_subject,
                                 'email_to' : send_user, 'email_from': user_obj.partner_id.email})
                 print "send_usersend_user",send_user,body_html
                 temp_id.send_mail(self.n_sale_line.id)
-                raise UserError('You are not allwed to create MO request as the BoM is still not issued for Product')
+        return True
+    @api.multi
+    def create_manufacturing_order(self):
 
+	context = self._context.copy()
+        context.update({'request_id':self.id, 'default_contract_id':self.contract_id.id})
+        mo_form = self.env.ref('mrp.mrp_production_form_view', False)
+        print "Self>dfsfsdfsdfdsf",context
+        bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
+        if not bom_id:
+            raise UserError('You are not allwed to create MO request as the BoM is still not issued for Product')
         if mo_form:
                 return {
                     'type': 'ir.actions.act_window',

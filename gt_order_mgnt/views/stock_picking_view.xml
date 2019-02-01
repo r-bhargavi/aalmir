@@ -342,9 +342,9 @@
 			<field name="price_subtotal" sum="price_subtotal" readonly="1" groups="gt_order_mgnt.group_sale_support" invisible="1" />
                 </xpath>
 		<!--CH_N066 -->
-                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="replace">
+<!--                <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="replace">
 			<field name="qty_done" attrs="{'readonly': [('lots_visible', '=', True)]}" sum="qty_done"/>
-                </xpath>
+                </xpath>-->
                 <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='from_loc']" position="attributes">
 			<attribute name='invisible'>1</attribute>
                 </xpath>
@@ -579,8 +579,19 @@
 		 <field name="view_id" ref="stock.vpicktree"/>
                  <field name="domain">[('production_id','!=',False),('return_raw_picking','=',False)]</field> 
      </record>
+     <record model="ir.actions.act_window" id="action_raw_matrial_request_transfers">
+		<field name="name">Approve Raw Material</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">stock.picking</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		 <field name="view_id" ref="stock.vpicktree"/>
+                 <field name="domain">[('material_request_id','!=',False)]</field> 
+     </record>
 	  
      <menuitem action="action_raw_matrial_request" id="menu_raw_material" name="Approved Raw Material"
+            parent="stock.menu_stock_inventory_control" sequence="3"/>
+     <menuitem action="action_raw_matrial_request_transfers" id="menu_raw_material_transfers_to_approve" name="Approve Raw Material"
             parent="stock.menu_stock_inventory_control" sequence="2"/>
     </data>
 </openerp>
