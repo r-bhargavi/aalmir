@@ -13,7 +13,7 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-#        exp_id=self.env['hr.expense'],search([('expense_type','=','emp_expense')])
+#        exp_id=self.env['hr.expense'].search([('expense_type','=','emp_expense')])
 #        for each in exp_id:
 #            each.partner_id_preferred=each.employee_id.address_home_id.id
 #        return True
@@ -26,11 +26,11 @@ class resCompany(models.Model):
 #               if not pick_id.pick_ref:
 #                   pick_id.write({'pick_ref':each.id})
 #        return True
-        ssmb=self.env['stock.store.master.batch'].search([])
-        print "ssmbssmb",ssmb
-        for each in ssmb:
-            each._get_batches_data()
-        return True
+#        ssmb=self.env['stock.store.master.batch'].search([])
+#        print "ssmbssmb",ssmb
+#        for each in ssmb:
+#            each._get_batches_data()
+#        return True
 #        po_ids_cancelled=self.env['purchase.order'].search([('state','=','cancel')])
 #        if po_ids_cancelled:
 #            print "po_ids_cancelledpo_ids_cancelledpo_ids_cancelled",po_ids_cancelled
@@ -94,82 +94,127 @@ class resCompany(models.Model):
 #                if each_bank.bank_id.bic:
 #                    each_bank.write({'swift_code':each_bank.bank_id.bic})
 #        return True
-#        all_prods = self.env['product.template'].search([])
-#        count=1
-#
-#        for each in all_prods:
-#            product_id=self.env['product.product'].search([('product_tmpl_id','=',each.id)],limit=1)
-##            product_id=self.env['product.product'].search([('id','=',3611)],limit=1)
-#            if product_id:
-#                cus_pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id)],order='id desc')
-#                print "cus_pricelist_idcus_pricelist_id",cus_pricelist_id
-#                if cus_pricelist_id:
-#                    pricelist_id=self.env['product.pricelist.item'].search([('cus_product_id','in',(cus_pricelist_id.ids))],order='id desc')
-#                    print "pricelist_idpricelist_idpricelist_id",pricelist_id
-#                    if not pricelist_id:
-#    #                if no pricelist then sol
-#                        sol_id=self.env['sale.order.line'].search([('price_unit','>',0.0),('product_id','=',product_id.id),('order_id.state', 'in', ('sale','done'))],order='id desc',limit=1)
-#                        if not sol_id:
-#                            pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('price_unit','>',0.0),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
-#                            print "pol_idpol_idpol_idpol_id",pol_id
-#                            if not pol_id:
-#                                each.write({'list_price':0.0,'standard_price':0.0})
-#
-#    #                   else of pol
-#
-#                            else:
-#        #                        convertng price first to kg if the uom is MT
-#                                if pol_id.product_uom.name=='MT':
-#                                    print "yes the uom is MT----------------"
-#                                    price_pol=pol_id.price_unit/1000
-#                                else:
-#                                    price_pol=pol_id.price_unit
-#                                print "price_polprice_pol",price_pol
-#                                if pol_id.order_id.currency_id.id!=self.currency_id.id:
-#                                    print "currency not equalll-----------------",pol_id.order_id,pol_id.order_id.currency_id.name,self.currency_id.name
-#                                    from_currency = pol_id.order_id.currency_id
-#                                    to_currency = self.currency_id
-#                                    price_pol = from_currency.compute(price_pol, to_currency, round=False)
-#                                    print "price pol afre conversion=============",price_pol
-#                                each.write({'list_price':price_pol,'standard_price':price_pol})
-#
-#    #                    else of sol
-#
-#                        else:
-#                            print "sol_idsol_idsol_idsol_id",sol_id
-#        #                        convertng price first to kg if the uom is MT
-#                            if sol_id.product_uom.name=='MT':
-#                                price_sol=sol_id.price_unit/1000
-#                            else:
-#                                price_sol=sol_id.price_unit
-#                            print "price_solprice_solprice_sol",price_sol
-#                            if sol_id.p_currency_id.id!=self.currency_id.id:
-#                                from_currency = sol_id.p_currency_id
-#                                to_currency = self.currency_id
-#                                price_sol = from_currency.compute(price_sol, to_currency, round=False)
-#                            each.write({'list_price':price_sol,'standard_price':price_sol})
-#
-#    #                else of pricelist found
-#                    else:
-#                        print "pricelist_id.idspricelist_id.ids",pricelist_id.ids
-##                        self.env.cr.execute("""SELECT currency_id,min(fixed_price) 
-#                            FROM product_pricelist_item  
-#                            WHERE id IN %s group by currency_id#""", (tuple(pricelist_id.ids),))
-#                        price_fnd=self.env.cr.fetchall()
-#                        print "price_fndprice_fndprice_fndprice_fnd",price_fnd
-#                        curr_brw=self.env['res.currency'].browse(price_fnd[0][0])
-#                        print "curr_brwcurr_brwcurr_brw",curr_brw
-#                        if curr_brw.id!=self.currency_id.id:
-#                            from_currency = curr_brw
-#                            to_currency = self.currency_id
-#                            price_con = from_currency.compute(price_fnd[0][1], to_currency, round=False)
-#                            print "price price_con afre conversion=============",price_con
-#                            each.write({'list_price':price_con,'standard_price':price_con})
-#                        else:
-#                            each.write({'list_price':price_fnd[0][1],'standard_price':price_fnd[0][1]})
-#                    print "price_fnd[0][1]price_fnd[0][1]",price_fnd[0][1]
-#                    count+=1
-#                    print "count now updated-------------------",count,each.id,each.name
-#
-#        return True
-#    
+        all_prods = self.env['product.template'].search([])
+#        all_prods = self.env['product.template'].search([('id','=',3676)])
+        count=1
+
+        for each in all_prods:
+            product_id=self.env['product.product'].search([('product_tmpl_id','=',each.id)],limit=1)
+#            product_id=self.env['product.product'].search([('id','=',3676)],limit=1)
+            if product_id:
+                cus_pricelist_id=self.env['customer.product'].search([('product_id','=',product_id.id)],order='id desc')
+                print "cus_pricelist_idcus_pricelist_id",cus_pricelist_id
+                if cus_pricelist_id:
+                    pricelist_id=self.env['product.pricelist.item'].search([('cus_product_id','in',(cus_pricelist_id.ids))],order='id desc')
+                    print "pricelist_idpricelist_idpricelist_id",pricelist_id
+                    if not pricelist_id:
+    #                if no pricelist then sol
+                        sol_id=self.env['sale.order.line'].search([('price_unit','>',0.0),('product_id','=',product_id.id),('order_id.state', 'in', ('sale','done'))],order='id desc',limit=1)
+                        print "sol_idsol_idsol_idsol_id",sol_id
+                        if not sol_id:
+                            pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('price_unit','>',0.0),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
+                            print "pol_idpol_idpol_idpol_id",pol_id
+                            if not pol_id:
+                                each.write({'list_price':0.0,'standard_price':0.0})
+
+    #                   else of pol
+
+                            else:
+        #                        convertng price first to kg if the uom is MT
+                                if pol_id.product_uom.name=='MT':
+                                    print "yes the uom is MT----------------"
+                                    price_pol=pol_id.price_unit/1000
+                                else:
+                                    price_pol=pol_id.price_unit
+                                print "price_polprice_pol",price_pol
+                                if pol_id.order_id.currency_id.id!=self.currency_id.id:
+                                    print "currency not equalll-----------------",pol_id.order_id,pol_id.order_id.currency_id.name,self.currency_id.name
+                                    from_currency = pol_id.order_id.currency_id
+                                    to_currency = self.currency_id
+                                    price_pol = from_currency.compute(price_pol, to_currency, round=False)
+                                    print "price pol afre conversion=============",price_pol
+                                each.write({'list_price':price_pol,'standard_price':price_pol})
+
+    #                    else of sol
+
+                        else:
+                            print "sol_idsol_idsol_idsol_id",sol_id
+        #                        convertng price first to kg if the uom is MT
+                            if sol_id.product_uom.name=='MT':
+                                price_sol=sol_id.price_unit/1000
+                            else:
+                                price_sol=sol_id.price_unit
+                            print "price_solprice_solprice_sol",price_sol
+                            if sol_id.p_currency_id.id!=self.currency_id.id:
+                                from_currency = sol_id.p_currency_id
+                                to_currency = self.currency_id
+                                price_sol = from_currency.compute(price_sol, to_currency, round=False)
+                            each.write({'list_price':price_sol,'standard_price':price_sol})
+
+    #                else of pricelist found
+                    else:
+                        print "pricelist_id.idspricelist_id.ids",pricelist_id.ids
+                        self.env.cr.execute("""SELECT currency_id,min(fixed_price) 
+                            FROM product_pricelist_item  
+                            WHERE id IN %s and fixed_price>0.0 group by currency_id""", (tuple(pricelist_id.ids),))
+                        price_fnd=self.env.cr.fetchall()
+                        print "price_fndprice_fndprice_fndprice_fnd",price_fnd
+                        curr_brw=self.env['res.currency'].browse(price_fnd[0][0])
+                        print "curr_brwcurr_brwcurr_brw",curr_brw
+                        if curr_brw.id!=self.currency_id.id:
+                            from_currency = curr_brw
+                            to_currency = self.currency_id
+                            price_con = from_currency.compute(price_fnd[0][1], to_currency, round=False)
+                            print "price price_con afre conversion=============",price_con
+                            each.write({'list_price':price_con,'standard_price':price_con})
+                        else:
+                            each.write({'list_price':price_fnd[0][1],'standard_price':price_fnd[0][1]})
+                    print "price_fnd[0][1]price_fnd[0][1]",price_fnd[0][1]
+                    count+=1
+                    print "count now updated-------------------",count,each.id,each.name
+                else:
+#                if no pricelist then sol
+                    sol_id=self.env['sale.order.line'].search([('price_unit','>',0.0),('product_id','=',product_id.id),('order_id.state', 'in', ('sale','done'))],order='id desc',limit=1)
+                    print "sol_idsol_idsol_idsol_id",sol_id
+                    if not sol_id:
+                        pol_id=self.env['purchase.order.line'].search([('product_id','=',product_id.id),('price_unit','>',0.0),('order_id.state','in',('to approve','sent po','purchase','done'))],order='id desc',limit=1)
+                        print "pol_idpol_idpol_idpol_id",pol_id
+                        if not pol_id:
+                            each.write({'list_price':0.0,'standard_price':0.0})
+
+#                   else of pol
+
+                        else:
+    #                        convertng price first to kg if the uom is MT
+                            if pol_id.product_uom.name=='MT':
+                                print "yes the uom is MT----------------"
+                                price_pol=pol_id.price_unit/1000
+                            else:
+                                price_pol=pol_id.price_unit
+                            print "price_polprice_pol",price_pol
+                            if pol_id.order_id.currency_id.id!=self.currency_id.id:
+                                print "currency not equalll-----------------",pol_id.order_id,pol_id.order_id.currency_id.name,self.currency_id.name
+                                from_currency = pol_id.order_id.currency_id
+                                to_currency = self.currency_id
+                                price_pol = from_currency.compute(price_pol, to_currency, round=False)
+                                print "price pol afre conversion=============",price_pol
+                            each.write({'list_price':price_pol,'standard_price':price_pol})
+
+#                    else of sol
+
+                    else:
+                        print "sol_idsol_idsol_idsol_id",sol_id
+    #                        convertng price first to kg if the uom is MT
+                        if sol_id.product_uom.name=='MT':
+                            price_sol=sol_id.price_unit/1000
+                        else:
+                            price_sol=sol_id.price_unit
+                        print "price_solprice_solprice_sol",price_sol
+                        if sol_id.p_currency_id.id!=self.currency_id.id:
+                            from_currency = sol_id.p_currency_id
+                            to_currency = self.currency_id
+                            price_sol = from_currency.compute(price_sol, to_currency, round=False)
+                        each.write({'list_price':price_sol,'standard_price':price_sol})
+
+        return True
+    
