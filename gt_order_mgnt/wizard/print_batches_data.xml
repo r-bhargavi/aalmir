@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="print_batches_data_form_view" model="ir.ui.view">
+        <field name="name">print.batches.data.form.view</field>
+        <field name="model">print.batches.data</field>
+        <field name="arch" type="xml">
+            <form string="Print Batches Data">
+                     <group>
+                     <field name='batch_ids' nolabel='1' 
+                           >
+                        <tree editable='bottom'>
+                          <field name='print_bool' invisible="1"/>
+                           <field name='name' string='Current Batch No.' readonly='1'/>      
+                           <field name='req_product_qty' sum='total' readonly='1'/>
+                           <field name='product_qty' readonly='1' string="Produced Qty" sum='total'/>
+                           <field name='transferred_qty'  string="Transferred Qty" readonly='1'/>
+                           <field name='wastage_qty' sum='total' readonly='1'/>
+                           <field name='uom_id' readonly='1'/>
+                           <field name='employee_name' readonly='1'/>
+                           <field name='equal_qty' invisible='1'/>
+                           <field name='supplier_batch_no' readonly='1'/>
+                        </tree>
+                     </field>
+                    </group>
+                <field name="wo_id" invisible="1"/>
+                <footer>
+                    <button string='Print Detailed' name="print_detailed_batches" type="object" class="oe_highlight"/>
+                    <button string='Print Normal' name="print_normal_batches" type="object" class="oe_highlight"/>
+                    <!--<button string='Select/Unselect All' name="select_unselect_all" type="object" class="oe_highlight"/>-->
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="print_batches_data_form_view_action" model="ir.actions.act_window">
+        <field name="name">Print Batches Data</field>
+        <field name="res_model">print.batches.data</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="print_batches_data_form_view"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

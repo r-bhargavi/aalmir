@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+	<template id="production_batch_details_print_wo">
+	    <t t-call="report.html_container">
+		<t t-foreach="docs.wo_id" t-as="o">
+		        <div class="page" style="font-family: Calibri;">
+		        	<table class="table table-condensed" >
+		        	<t t-set="count" t-value="0" />
+                  	   	<t t-set="data_val" t-value="0" />
+                  	   	<t t-set="count_val" t-value="get_print_data(docs.wo_id)" />
+                  	   	<t t-set="customer" t-value="get_customer_data(docs.wo_id)" />
+                  	   	<t t-set="external_code" t-value="get_external_code(docs.wo_id)" />
+                  	   	<t t-set="extra_val" t-value="get_new_val(docs.wo_id)" />
+                  	   	<t t-set="extra_data" t-value="get_new_data(docs.wo_id)" />
+                  	   	<t t-foreach="(len(count_val)/2)+1" t-as="l">
+                  	   	    <tr> 
+                  	   	       <td>
+                  	   	       	<t t-set="barcode_data" t-value="get_barcode_data(count_val,count)" />
+                  	   	        <t t-set="data_val" t-value="get_quantity(count_val,count)" />
+                  	   		<t t-if="data_val">
+                  	   	        
+                  	   		   <table class="table table-condensed" style="width:40%;border: 2px solid black !important;">
+		  	   			<tr>
+		  	   				<td width="25%" style="font-weight: bold;">Customer Name</td>
+		  	   				<td colspan="3">
+		  	   					<p t-esc="customer"/>
+		  	   				</td>
+		  	   			</tr>
+		  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Product Desc.</td>
+                  	   				<td colspan="3">
+                  	   					<p t-esc="o.product.name" />
+                  	   				</td>
+                  	   			</tr>
+		  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Internal Number</td>
+                  	   				<td>
+                  	   					<p t-esc="o.product.default_code"/>
+                  	   				</td>
+                  	   				<td width="25%" style="font-weight: bold;">Batch Number</td>
+                  	   				<td>
+                  	   					<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128',barcode_data, 500, 100)" style="width:150px;height:30px"/>
+                  	   					<p t-esc="barcode_data" style="margin-left:35px"/>
+                  	   				</td>
+          	   				</tr>
+                  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Work Order Number</td>
+                  	   				<td>
+                  	   					<p t-esc="o.name"/>
+                  	   				</td>
+                  	   				<td width="25%" style="font-weight: bold;">Quantity</td>
+                  	   				<td>
+                  	   					<p t-esc="data_val" />
+                  	   				</td>
+                  	   			</tr>
+                  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Packaging</td>
+                  	   				<td>
+                  	   					<p t-esc="o.n_packaging.name" />
+                  	   				</td>
+                                                        <td width="25%" style="font-weight: bold;">
+          	   						<t t-if="extra_val">
+                  	   						<p t-esc="extra_val" />
+  	   							</t>
+          	   					</td>
+          	   					<td>
+          	   						<t t-if="extra_data">
+                  	   						<p t-esc="extra_data" />
+          	   						</t>
+          	   					</td>
+                  	   			</tr>
+                  	   		    </table>
+                  	   		</t>
+                  	   		<t t-set="count" t-value="count+1" />
+					</td>
+					
+					<td>
+                  	   		<t t-set="barcode_data" t-value="get_barcode_data(count_val,count)" />
+                  	   		<t t-set="data_val" t-value="get_quantity(count_val,count)" />
+                  	   		<t t-if="data_val">
+                  	   		   <table class="table table-condensed" style="width:40%;border: 2px solid black !important;">
+		  	   			<tr>
+		  	   				<td width="25%" style="font-weight: bold;">Customer Name</td>
+		  	   				<td colspan="3">
+		  	   					<p t-esc="customer"/>
+		  	   				</td>
+		  	   			</tr>
+		  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Product Desc.</td>
+                  	   				<td colspan="3">
+                  	   					<p t-esc="o.product.name" />
+                  	   				</td>
+                  	   			</tr>
+		  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Internal Number</td>
+                  	   				<td>
+                  	   					<p t-esc="o.product.default_code"/>
+                  	   				</td>
+                  	   				<td width="25%" style="font-weight: bold;">Batch Number</td>
+                  	   				<td>
+                  	   					<img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128',barcode_data, 500, 100)" style="width:150px;height:30px"/>
+                  	   					<p t-esc="barcode_data" style="margin-left:35px"/>
+                  	   				</td>
+          	   				</tr>
+                  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Work Order Number</td>
+                  	   				<td>
+                  	   					<p t-esc="o.name"/>
+                  	   				</td>
+                  	   				
+                  	   				<td width="25%" style="font-weight: bold;">Quantity</td>
+                  	   				<td>
+                  	   					<p t-esc="data_val" />
+                  	   				</td>
+                  	   			</tr>
+                  	   			<tr>
+                  	   				<td width="25%" style="font-weight: bold;">Packaging</td>
+                  	   				<td>
+                  	   					<p t-esc="o.n_packaging.name" />
+                  	   				</td>
+          	   					<td width="25%" style="font-weight: bold;">
+          	   						<t t-if="extra_val">
+                  	   						<p t-esc="extra_val" />
+  	   							</t>
+          	   					</td>
+          	   					<td>
+          	   						<t t-if="extra_data">
+                  	   						<p t-esc="extra_data" />
+          	   						</t>
+          	   					</td>
+                  	   			</tr>
+                  	   		    </table>
+                  	   		</t>
+                  	   		<t t-set="count" t-value="count+1" />
+					</td>
+				      </tr>
+				</t>
+				</table>
+	        	</div>
+		</t>
+	    </t>
+	</template>
+	
+	<report 
+            id="action_print_production_batch_detail_wo"
+            string="Production_batches_details WO"
+            model="print.batches.data" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.production_batch_details_print_wo" 
+            name="gt_order_mgnt.production_batch_details_print_wo" 
+            paperformat="api_inventory.paperformat_api_barcode"/>
+
+</data>
+</openerp>
+
