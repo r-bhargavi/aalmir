@@ -9,7 +9,7 @@
             <field name="name">BoM Line Qty Required</field>
             <field name="digits">6</field>
         </record>
-    
+        
        <!--Material type data -->
         <record id="attribute_data1" model="n.product.discription.value">
             <field name="name">Product Type</field>

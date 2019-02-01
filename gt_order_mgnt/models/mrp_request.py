@@ -1665,14 +1665,15 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
-    product_qty = fields.Float('Product Quantity', required=True, digits_compute=dp.get_precision('BoM Line Qty Required'))
+    product_qty = fields.Float('Product Quantity', required=True, digits=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')
     
     uom_name= fields.Char('uom Name',related="product_id.uom_id.name",help="This field is used to make fields readonly ")
     percentage = fields.Float('Percentage(%)')
     bom_packaging_id = fields.Many2one('mrp.bom','BOM',readonly=True)
-    workcenter_id= fields.Many2one('mrp.workcenter', string="Process", required=True)
+#    workcenter_id= fields.Many2one('mrp.workcenter', string="Process", required=True)
+    workcenter_id= fields.Many2one('mrp.workcenter', string="Process")
     
 class MrpBomMaster(models.Model):
 	

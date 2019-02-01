@@ -290,7 +290,7 @@ class AccountInvoice(models.Model):
     def payment_invoice_date(self):
         for record in self:
             stock=0
-           
+            days=0
             if record.type == 'out_invoice':
                 stock=self.env['stock.picking'].search([('origin','=',record.origin),('state','=','delivered')], limit=1)
             if record.type == 'in_invoice':
