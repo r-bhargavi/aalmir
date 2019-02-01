@@ -27,13 +27,13 @@
               <header>
                     <button name="approve_state" groups="gt_order_mgnt.send_rm_request" type="object" string="Approve" class="oe_edit_only oe_highlight" 
                      		attrs="{'invisible':['|',('request_type','=','extra'),('state','!=','draft')]}"/>
-                    <button name="approve_state" groups="gt_order_mgnt.send_rm_extra_request" type="object" string="Approve" class="oe_edit_only oe_highlight" 
+                    <button name="approve_state" groups="gt_order_mgnt.send_rm_extra_request" type="object" string="Approve Extra RM" class="oe_edit_only oe_highlight" 
                      		attrs="{'invisible':['|',('request_type','=','normal'),('state','!=','draft')]}"/>
 <!--                    <button name="reject_state" type="object" string="Reject" class="oe_edit_only oe_highlight"
                      		attrs="{'invisible':[('state','!=','draft')]}"/>-->
                     <button name="reject_rm_request" groups="gt_order_mgnt.send_rm_request" type="object" string="Reject" class="oe_edit_only oe_highlight"
                      		attrs="{'invisible':['|',('request_type','=','extra'),('state','!=','draft')]}"/>
-                    <button name="reject_rm_request" groups="gt_order_mgnt.send_rm_extra_request" type="object" string="Reject" class="oe_edit_only oe_highlight"
+                    <button name="reject_rm_request" groups="gt_order_mgnt.send_rm_extra_request" type="object" string="Reject Extra RM" class="oe_edit_only oe_highlight"
                      		attrs="{'invisible':['|',('request_type','=','normal'),('state','!=','draft')]}"/>
 		    <button type="object" string="Cancel" class="oe_edit_only oe_highlight" name='cancel_state'
                       		attrs="{'invisible':[('state','in',('reject','cancel'))]}"/>
