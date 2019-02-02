@@ -2,6 +2,8 @@ from openerp import api,models,fields, _
 import openerp.addons.decimal_precision as dp
 from openerp.exceptions import UserError, ValidationError
 from datetime import date,datetime,timedelta
+from openerp import tools, SUPERUSER_ID
+
 from urlparse import urljoin
 from urllib import urlencode
 
@@ -109,6 +111,7 @@ class MrpCompleteDate(models.Model):
 				self.n_line_id.new_date_bool=True  ##write for approvaL of new date
 			
 			if temp_id:
+                            recipient_partners=[]
                             user_obj = self.env['res.users'].browse(self.env.uid)
                             group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
                             for recipient in group.users:
@@ -116,6 +119,7 @@ class MrpCompleteDate(models.Model):
                                      recipient_partners.append(recipient.login)
                             recipient_partners.append(self.n_line_id.order_id.user_id.login)
                             recipient_partners = ",".join(recipient_partners)
+                            print "recipient_partnersrecipient_partners",recipient_partners
 			    model_id= self.n_mo.id if self.n_mo else self.n_po.id
 			    model_name = 'mrp.production' if self.n_mo else 'purchase.order'
 			    name_str = 'Purchase Date Re-Scheduled' if self.n_po else 'Manufacture Date Re-Scheduled'
@@ -127,7 +131,9 @@ class MrpCompleteDate(models.Model):
 				'id': model_id,
 			    }
                             n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-                            n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                            n_prev_date=''
+                            if self.n_prevoiusdate:
+                                n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                             body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
@@ -141,6 +147,8 @@ class MrpCompleteDate(models.Model):
 		    			<p>For reason:<b>%s</b> </p>
 				</p>
 				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',n_prev_date or '',n_date, self.env.user.login or '',self.n_reason or '')
+                            print "body_htmlbody_htmlbody_html",model_name,model_id
+
 			    body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, model_name,model_id, context=self._context)
 			    temp_id.write({'body_html': body_html, 'email_to' : recipient_partners, 'email_from': self.env.user.login})
 			    temp_id.send_mail(model_id)

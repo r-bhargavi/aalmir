@@ -1035,7 +1035,7 @@ class n_manufacturing_request(models.Model):
                                  }
                         url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                         print "urlurl",url
-                        text_link = _("""<a href="%s">%s</a> """) % (url,"REQUEST NUM")
+                        text_link = _("""<a href="%s">%s</a> """) % (url,self.name)
 	    		group,send_user_name=False,''
 	    		recipient_partners=[]
     			if self.n_category.cat_type=='film':
@@ -1150,7 +1150,7 @@ class n_manufacturing_request(models.Model):
                          }
                 url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                 print "urlurl",url
-                text_link = _("""<a href="%s">%s</a> """) % (url,"REQUEST NUM")
+                text_link = _("""<a href="%s">%s</a> """) % (url,self.name)
                 group,send_user_name=False,''
                 recipient_partners=[]
                 group = self.env['res.groups'].search([('name', '=', 'Get BoM Alert')])
