@@ -126,8 +126,8 @@ class MrpCompleteDate(models.Model):
 				'view_type': 'form',
 				'id': model_id,
 			    }
-                            n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
-                            n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
+                            n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                            n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                             body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
