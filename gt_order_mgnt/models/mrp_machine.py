@@ -574,7 +574,6 @@ class MrpWorkorderMachineProduce(models.Model):
         context=self._context.copy()
         context.update({'confirm':True})
         print "contextcontextcontext",context
-        fdd
         self.bool_check =True 
         return {'context':context,"type": "ir.actions.do_nothing"}    
  
