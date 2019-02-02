@@ -1077,12 +1077,12 @@ class n_manufacturing_request(models.Model):
 			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                         print "body_htmlbody_htmlbody_html",body_html
                         if bom_id:
-                            body_html +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> Qty</th></tr>" 
-                            for line in bom_id.bom_line_ids:
+                            body_html +="<table class='table' style='font-family:arial; text-align:left;'><tr><th>BoM Name </th></tr>" 
+                            for line in bom_id:
                                 #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
                                 #self.env.cr.execute(term_qry)
                                 #schedule_order=self.env.cr.fetchone()
-                                body_html +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
+                                body_html +="<tr><td>%s</td></tr>"%(str(line.code)) 
 #                            base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 #                            query = {'db': self._cr.dbname}
 #                            fragment = {

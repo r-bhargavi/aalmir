@@ -131,22 +131,20 @@ class MrpCompleteDate(models.Model):
 				'id': model_id,
 			    }
                             n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-                            n_prev_date=''
-                            if self.n_prevoiusdate:
-                                n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                             body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
 				<p> <strong> Manufacture completion Date Re-Scheduled </strong></p><br/>
 				<p>This is to inform you that below sale order completion date is modified.</p>
 					<p>Sale order No-: <b>%s</b> </p>
+					<p>Manufacturing Ref-: <b>%s</b> </p>
 		    			<p>Product:<b>%s has Re-Schedule 
                                         <p>From Previous Completion Date:<b> %s</b> </p>
                                         <p>To New production Completion date: <b>%s</b> </p>
                                         <p>By:<b> %s</b> </p>
 		    			<p>For reason:<b>%s</b> </p>
 				</p>
-				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',n_prev_date or '',n_date, self.env.user.login or '',self.n_reason or '')
+				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',self.n_prevoiusdate1 or '',n_date, self.env.user.login or '',self.n_reason or '')
                             print "body_htmlbody_htmlbody_html",model_name,model_id
 
 			    body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, model_name,model_id, context=self._context)

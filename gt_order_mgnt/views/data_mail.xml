@@ -108,7 +108,7 @@
         <record id="template_change_date_mrp" model="mail.template">
             <field name="name">Schedule Date Change MRP</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP production completion date change Alert : ${(object.product_id.name)}</field>
+            <field name="subject">API-ERP Manufacturing Alert : ${(object.product_id.name)} production completion date change</field>
             <!--<field name="email_to">${object.team_id.user_id.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>-->
             <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
