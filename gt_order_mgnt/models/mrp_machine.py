@@ -538,6 +538,7 @@ class MrpWorkorderMachineProduce(models.Model):
 #            if record.batch_id.transferred_qty!=record.produced_qty:
 #              raise UserError("You are not allowed to make changes to this batch produced qty as the batch is already transferred!!")
         wast_qty=00.0
+        print "recordrecordrecordrecord",record
         if record.wastage_qty:
                   if record.previous_batch_id.uom_id.id !=record.wastage_uom.id:
 		     if record.previous_batch_id.uom_id.name =='Pcs':
@@ -575,6 +576,7 @@ class MrpWorkorderMachineProduce(models.Model):
         context.update({'confirm':True})
         print "contextcontextcontext",context
         self.bool_check =True 
+        return {"type": "ir.actions.do_nothing"}    
         return {'context':context,"type": "ir.actions.do_nothing"}    
  
     @api.multi
@@ -1029,6 +1031,7 @@ class MrpWorkorderBatchNo(models.Model):
             context.update({
             'default_employee_ids':[(6,0,self.employee_ids.ids)],
             })
+        machine_produce_id=self.env['mrp.order.machine.produce'].search([('batch_id','=',self.id),('order_id','=',self.order_id.id)])
 	context.update({'default_order_id':self.order_id.id, 'default_machine':self.machine.id,
                          'default_previous_order_id':self.order_id.batch_no_ids_prev[0].order_id.id if self.order_id.batch_no_ids_prev else '',
                        'default_batch_id':self.id,
@@ -1072,6 +1075,9 @@ class MrpWorkorderBatchNo(models.Model):
 				                    	'product_qty':bom.product_qty *(one_qty)}))
 	context.update({'produced_line_id':raw_lst})	                                       
         mo_form = self.env.ref('gt_order_mgnt.mrp_work_order_machine_produce_form', False)
+        res_id=False
+        if machine_produce_id:
+            res_id=machine_produce_id.id
         if mo_form:
                 return {
                     'name':'Produced Qty in Batch',
@@ -1081,6 +1087,7 @@ class MrpWorkorderBatchNo(models.Model):
                     'res_model': 'mrp.order.machine.produce',
                     'views': [(mo_form.id, 'form')],
                     'view_id': mo_form.id,
+                    'res_id': res_id,
                     'target': 'new',
                     'context': context,
              }
