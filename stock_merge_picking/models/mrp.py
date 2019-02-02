@@ -100,7 +100,13 @@ class MrpProductProduce(models.Model):
     produced_qty=fields.Float()
     produced_uom_id=fields.Many2one('product.uom' ,'Unit')
     remain_lines = fields.One2many('mrp.product.produce.line', 'produce_remain_id', 'Products Consumed')
-    #product_qty=fields.Float(compute='productqty')
+    actual_qty=fields.Float(compute='compute_actual_qty')
+    
+    @api.depends('batch_ids')
+    def compute_actual_qty(self):
+        if self.batch_ids:
+            for each in self.batch_ids:
+                self.actual_qty+=each.convert_product_qty
 
     @api.multi
     @api.onchange('complete_produce')
@@ -150,10 +156,13 @@ class MrpProductProduce(models.Model):
 
         obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
         res=super(MrpProductProduce,self).do_produce()
+        if not self.batch_ids:
+            raise UserError("Please Select Batches to Transfer Qty")
+
         if obj.hold_order == 'hold':
            raise UserError("Manufacturing Order Hold by Production Department.Before Produce please confirmed to Production Department.")
-#        if self.product_qty != self.produced_qty:
-#           raise UserError("Selected Qty is not equal to Produced Qty.")
+        if self.product_qty != self.actual_qty:
+           raise UserError("Selected Qty is not equal to Produced Qty in Batches Selected")
         if obj:
            for consume in self.consume_lines:
                print "consumeconsumeconsume",consume

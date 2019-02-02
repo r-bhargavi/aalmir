@@ -70,7 +70,6 @@
 				<field name="employee_name" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="remark" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="reason" groups="mrp.group_mrp_user"/>
-                                <field name='document'  widget="many2many_binary"/>
 
 				<field name="wastage_qty" groups="mrp.group_mrp_user"/>
 				<field name="supplier_batch_no" groups="mrp.group_mrp_user"/>
