@@ -1052,12 +1052,12 @@ class n_manufacturing_request(models.Model):
 		       	send_user = ",".join(recipient_partners)
 		        product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
-                        if notbom_id:
+                        if not bom_id:
                             new_subject='API-ERP Production Alert:BoM required,New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                         else:
                             new_subject='API-ERP Production Alert:New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                         print "new_subjectnew_subject",new_subject
-                        n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
+                        n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 
 			body_html = """<div> 
                                 <p>Dear User,<br/>
@@ -1164,7 +1164,7 @@ class n_manufacturing_request(models.Model):
                 send_user = ",".join(recipient_partners)
                 product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                 new_subject='API-ERP BOM Alert: Production stopped for %s as BOM not available.'%str('['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
-                n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
+                n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 
                 body_html = """<div> 
                         <p>Dear User,<br/>
