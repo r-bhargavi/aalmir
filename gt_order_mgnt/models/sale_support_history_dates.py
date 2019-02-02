@@ -109,6 +109,12 @@ class MrpCompleteDate(models.Model):
 				self.n_line_id.new_date_bool=True  ##write for approvaL of new date
 			
 			if temp_id:
+                            group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
+                            for recipient in group.users:
+                                if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
+                                     recipient_partners.append(recipient.login)
+                            recipient_partners.append(self.n_line_id.order_id.user_id.login)
+                            recipient_partners = ",".join(recipient_partners)
 			    model_id= self.n_mo.id if self.n_mo else self.n_po.id
 			    model_name = 'mrp.production' if self.n_mo else 'purchase.order'
 			    name_str = 'Purchase Date Re-Scheduled' if self.n_po else 'Manufacture Date Re-Scheduled'
@@ -120,14 +126,21 @@ class MrpCompleteDate(models.Model):
 				'view_type': 'form',
 				'id': model_id,
 			    }
+                            n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
+                            n_prev_date=datetime.strftime(datetime.strptime(self.n_prevoiusdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d 00:00:00')           
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-			    body_html = """<div>
-		    <p> <strong> %s </strong></p><br/>
-		    <p>Dear Sir/Madam,<br/>
-			Your sale order No-:<b> %s </b> product_no-:'%s ' has Re-Schedule on Date :<b>%s \n by %s , \n </b>For reason %s<br/>
-		    </p>
-		    </div>"""%(name_str,str(self.n_line_id.order_id.name) or '',str(self.n_line_id.product_id.name) or '' +str(self.n_line_id.product_id.default_code) or '',self.n_nextdate or '', self.env.user.login or '',self.n_reason or '')
-
+                            body_html = """<div> 
+                                <p>Dear Sir/Madam,<br/>
+				<p> <strong> Manufacture completion Date Re-Scheduled </strong></p><br/>
+				<p>This is to inform you that below sale order completion date is modified.</p>
+					<p>Sale order No-: <b>%s</b> </p>
+		    			<p>Product:<b>%s has Re-Schedule 
+                                        <p>From Previous Completion Date:<b> %s</b> </p>
+                                        <p>To New production Completion date: <b>%s</b> </p>
+                                        <p>By:<b> %s</b> </p>
+		    			<p>For reason:<b>%s</b> </p>
+				</p>
+				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',n_prev_date or '',n_date, self.env.user.login or '',self.n_reason or '')
 			    body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, model_name,model_id, context=self._context)
 			    temp_id.write({'body_html': body_html, 'email_to' : recipient_partners, 'email_from': self.env.user.login})
 			    temp_id.send_mail(model_id)
