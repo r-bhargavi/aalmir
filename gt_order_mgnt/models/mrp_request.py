@@ -1073,7 +1073,7 @@ class n_manufacturing_request(models.Model):
 		    			<p>Quantity :<b>%s</b> \t%s </p>
 		    			<p>Packaging :<b>%s</b> </p>
 				</p>
-				</div>"""%(str(text_link),product_data,str(self.n_Note if self.n_Note else ''),str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+				</div>"""%(str(text_link),product_data,str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
 			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                         print "body_htmlbody_htmlbody_html",body_html
                         if bom_id:
@@ -1180,7 +1180,7 @@ class n_manufacturing_request(models.Model):
 		    			<p>Quantity :<b>%s</b> \t%s </p>
 		    			<p>Packaging :<b>%s</b> </p>
 				</p>
-				</div>"""%(str(text_link),'['+str(self.n_product_id.default_code)+']'+' '+self.n_product_id.name,str(self.n_Note if self.n_Note else ''),str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+				</div>"""%(str(text_link),'['+str(self.n_product_id.default_code)+']'+' '+self.n_product_id.name,str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
                 body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                 print "body_htmlbody_htmlbody_html",body_html
                 temp_id.write({'body_html': body_html,'subject':new_subject,
