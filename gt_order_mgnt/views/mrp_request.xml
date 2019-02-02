@@ -794,6 +794,7 @@
 				</div>
 				<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="1" />
                                 <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>
+                                <field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Customer.'/>
 				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>
 		            	<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
 		           </group>
