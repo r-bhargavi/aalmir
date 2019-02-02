@@ -1165,7 +1165,16 @@ class n_manufacturing_request(models.Model):
                 product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                 new_subject='API-ERP BOM Alert: Production stopped for %s as BOM not available.'%str('['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                 n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-
+                print "sdfdsfsdf",str(text_link)
+                print '['+str(self.n_product_id.default_code)+']'+' '+str(self.n_product_id.name)
+                print str(self.n_Note) or ''
+                print str(n_date)
+                print str(self.n_sale_order_line.order_id.name)
+                print str(self.n_sale_order_line.order_id.partner_id.name)
+                print str(self.n_sale_order_line.order_id.user_id.name)
+                print str(self.n_order_qty)
+                print str(self.n_unit.name)
+                print str(self.n_packaging.name)
                 body_html = """<div> 
                         <p>Dear User,<br/>
                         <p>This is to inform you that manufacturing supervisor tried to create Manufacturing order for below request but was not successful as there is no BOM defined for %s</p>
@@ -1174,13 +1183,13 @@ class n_manufacturing_request(models.Model):
 		    			<p>Product:<b>%s</b> </p>
 		    			<p>Instructions from Sale Support:<b>%s</b> </p>
 		    			<p>Requested completion date: <b>%s</b> </p>
-		    			<p>Sales Order Number:<b>%s</b> </p>
+		    			<p>Sales Order Number:<b>%s</b></p>
                                         <p>Customer Name:<b>%s</b> </p>
 		    			<p>Sales Person:<b>%s</b> </p>
-		    			<p>Quantity :<b>%s</b> \t%s </p>
-		    			<p>Packaging :<b>%s</b> </p>
+		    			<p>Quantity :<b>%s</b>%s</p>
+		    			<p>Packaging :<b>%s</b></p>
 				</p>
-				</div>"""%(str(text_link),'['+str(self.n_product_id.default_code)+']'+' '+self.n_product_id.name,str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+				</div>"""%('['+str(self.n_product_id.default_code)+']'+' '+str(self.n_product_id.name),str(text_link),'['+str(self.n_product_id.default_code)+']'+' '+str(self.n_product_id.name),str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
                 body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                 print "body_htmlbody_htmlbody_html",body_html
                 temp_id.write({'body_html': body_html,'subject':new_subject,
