@@ -916,6 +916,7 @@ class n_manufacturing_request(models.Model):
 
     name=fields.Char('Production Request No.')
     n_sale_line = fields.Many2one('sale.order', 'Sale Line')
+    n_partner_id = fields.Many2one(related='n_sale_line.partner_id', string="Customer")
     n_sale_order_line = fields.Many2one('sale.order.line', 'Sale Order Line')
     n_delivery_date = fields.Datetime('Requested Date')
     n_order_qty = fields.Float('Order Qty')
