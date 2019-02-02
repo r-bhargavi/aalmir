@@ -109,6 +109,7 @@ class MrpCompleteDate(models.Model):
 				self.n_line_id.new_date_bool=True  ##write for approvaL of new date
 			
 			if temp_id:
+                            user_obj = self.env['res.users'].browse(self.env.uid)
                             group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
                             for recipient in group.users:
                                 if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
@@ -118,7 +119,6 @@ class MrpCompleteDate(models.Model):
 			    model_id= self.n_mo.id if self.n_mo else self.n_po.id
 			    model_name = 'mrp.production' if self.n_mo else 'purchase.order'
 			    name_str = 'Purchase Date Re-Scheduled' if self.n_po else 'Manufacture Date Re-Scheduled'
-			    user_obj = self.env['res.users'].browse(self.env.uid)
 			    base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 			    query = {'db': self._cr.dbname}
 			    fragment = {
