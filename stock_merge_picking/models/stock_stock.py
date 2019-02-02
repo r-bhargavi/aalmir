@@ -26,6 +26,37 @@ from openerp.exceptions import UserError
 class stock_picking(osv.osv):
     _inherit='stock.picking'
     
+    
+#    to not allow the backorder to be reserved in any case
+    def _create_backorder(self, cr, uid, picking, backorder_moves=[], context=None):
+        """ Move all non-done lines into a new backorder picking. If the key 'do_only_split' is given in the context, then move all lines not in context.get('split', []) instead of all non-done lines.
+        """
+        if not backorder_moves:
+            backorder_moves = picking.move_lines
+        backorder_move_ids = [x.id for x in backorder_moves if x.state not in ('done', 'cancel')]
+        if 'do_only_split' in context and context['do_only_split']:
+            backorder_move_ids = [x.id for x in backorder_moves if x.id not in context.get('split', [])]
+
+        if backorder_move_ids:
+            backorder_id = self.copy(cr, uid, picking.id, {
+                'name': '/',
+                'move_lines': [],
+                'pack_operation_ids': [],
+                'backorder_id': picking.id,
+            })
+            backorder = self.browse(cr, uid, backorder_id, context=context)
+            self.message_post(cr, uid, picking.id, body=_("Back order <em>%s</em> <b>created</b>.") % (backorder.name), context=context)
+            move_obj = self.pool.get("stock.move")
+            move_obj.write(cr, uid, backorder_move_ids, {'picking_id': backorder_id}, context=context)
+
+            if not picking.date_done:
+                self.write(cr, uid, [picking.id], {'date_done': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)}, context=context)
+            self.action_confirm(cr, uid, [backorder_id], context=context)
+#            self.action_assign(cr, uid, [backorder_id], context=context)
+            return backorder_id
+        return False
+
+    
     def action_assign(self, cr, uid, ids, context=None):
         print "pciking moves action assign------------------------"
         """ Check availability of picking moves.
