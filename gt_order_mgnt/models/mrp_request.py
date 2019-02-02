@@ -1031,7 +1031,7 @@ class n_manufacturing_request(models.Model):
                         fragment = {
                                   'model': 'n.manufacturing.request',
                                   'view_type': 'form',
-                                  'id': record.id,
+                                  'id': self.id,
                                  }
                         url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                         print "urlurl",url
@@ -1146,7 +1146,7 @@ class n_manufacturing_request(models.Model):
                 fragment = {
                           'model': 'n.manufacturing.request',
                           'view_type': 'form',
-                          'id': record.id,
+                          'id': self.id,
                          }
                 url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                 print "urlurl",url
