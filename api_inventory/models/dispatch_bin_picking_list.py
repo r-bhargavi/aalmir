@@ -60,6 +60,7 @@ class stockPicking(models.Model):
      	@api.model
      	def create(self,vals):
      		res =super(stockPicking,self).create(vals)
+                print "res------------------------",res
      		if res.location_id.pre_ck:
      			res.ntransfer_type='pre_stock'
      		return res
