@@ -105,6 +105,7 @@ class MrpWorkorderBatchNo(models.Model):
 	master_id = fields.Many2one('stock.store.master.batch', 'Master Batch')
 	
 	batch_history=fields.One2many('mrp.order.batch.number.history','batch_id',string="Batch History")
+
 	
         _sql_constraints = [('name_unique', 'unique(name)', 'Batch-Number already exists.')]
 	pack_id = fields.Many2one('stock.pack.operation', 'Operation') 

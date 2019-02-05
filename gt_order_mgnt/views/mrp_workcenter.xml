@@ -207,6 +207,9 @@
                       <field name='employee_ids' widget='many2many_tags'  required='1'
                          options="{'no_create': True, 'no_open': True}"
                          context="{'employee':True, 'user_ids':user_id}"/>
+                      <field name='supplier_btc_no' widget='many2many_tags'
+                         options="{'no_create': True, 'no_open': True}"
+                       />
                      <field name='supplier_batch_no' invisible="not context.get('supplier_batch')"
                            required="context.get('supplier_batch')"/>
 
@@ -666,7 +669,7 @@
                                   attrs="{'invisible':['|',('product_qty','>',0.0),('state','in',('draft','ready','cancel','hold','done'))]}"/>
                            <button name="change_produceqty" string="Edit" type="object"  
                            class="oe_highlight"   context="{'more':True}"
-                            attrs="{'invisible':['|',('batch_tfred','=',True),('product_qty','=',0)]}"/>
+                            attrs="{'invisible':[('product_qty','=',0)]}"/>
 <!--                          <button name="print_batch_barcode" string="Print" type="object"  
                            class="oe_highlight"  icon='fa-print'/> -->
                          <field name='state'  invisible='1'/>

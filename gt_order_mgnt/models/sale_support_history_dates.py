@@ -135,7 +135,7 @@ class MrpCompleteDate(models.Model):
                             body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
 				<p> <strong> Manufacture completion Date Re-Scheduled </strong></p><br/>
-				<p>This is to inform you that below sale order completion date is modified.</p>
+				<p>This is to inform you that below sale order completion date is updated.</p>
 					<p>Sale order No-: <b>%s</b> </p>
 					<p>Manufacturing Ref-: <b>%s</b> </p>
 		    			<p>Product:<b>%s has Re-Schedule 

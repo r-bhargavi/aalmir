@@ -473,6 +473,23 @@ class MrpWorkorderMachineProduce(models.Model):
     def _onchange_employee_ids(self):
         if self.order_id:
             return {'domain': {'employee_ids': [('id', 'in', self.order_id.employee_ids.ids)]}}
+        
+    @api.onchange('supplier_btc_no')
+    def _onchange_supplier_btc_no(self):
+        batches=[]
+        if self.production_id:
+            rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.production_id.id)])
+            print "rm_idsrm_idsrm_ids",rm_ids
+            if rm_ids:
+                pick_ids=self.env['stock.picking'].search([('material_request_id','=',rm_ids.id),('state','=','done')])
+                print "pick_idspick_idspick_ids",pick_ids
+                if pick_ids:
+                    for each in pick_ids:
+                        if each.store_ids:
+                            for each_store in each.store_ids:
+                                for each_batches in each_store.batches_ids:
+                                    batches.append(each_batches.batch_number.id)
+            return {'domain': {'supplier_btc_no': [('id', 'in', batches)]}}
 
     
     @api.depends('batch_id')
@@ -527,6 +544,7 @@ class MrpWorkorderMachineProduce(models.Model):
     wastage_reason=fields.Text('Reason')
     user_id=fields.Many2many('res.users', string='User Group')
     employee_ids=fields.Many2many('hr.employee', string='Operators Name')
+    supplier_btc_no=fields.Many2many('mrp.order.batch.number', string='Supplier Batch Number')
     supplier_batch_no=fields.Char('Supplier Batch No.')
     produced_line_id=fields.One2many('mrp.order.machine.produce.line','produced_id',compute='checkproduced_qty',store=True)
     warning_bool=fields.Boolean('Give warning for product qty', default=False)
@@ -712,6 +730,7 @@ class MrpWorkorderMachineProduce(models.Model):
                                       'uom_id':record.uom_id.id,'next_order_id':next_order,
                                       'reason':record.wastage_reason, 'remark':record.remark,
                                        'employee_name':name,
+                                       'user_id':self.env.user.id,
                                        'produce_qty_date':record.produce_date,
 #                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.product_qty),
                                        'remain_used_qty':record.batch_id.remain_used_qty +(record.produced_qty),
@@ -1027,10 +1046,26 @@ class MrpWorkorderBatchNo(models.Model):
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
+        batches=[]
+        if self.production_id:
+            rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.production_id.id)])
+            print "rm_idsrm_idsrm_ids",rm_ids
+            if rm_ids:
+                for each_rm in rm_ids:
+                    pick_ids=self.env['stock.picking'].search([('material_request_id','=',each_rm.id),('state','=','done')])
+                    print "pick_idspick_idspick_ids",pick_ids
+                    if pick_ids:
+                        for each in pick_ids:
+                            if each.store_ids:
+                                for each_store in each.store_ids:
+                                    for each_batches in each_store.batches_ids:
+                                        batches.append(each_batches.batch_number.id)
         if self.employee_ids:
             context.update({
             'default_employee_ids':[(6,0,self.employee_ids.ids)],
             })
+        if batches:
+            context.update({'default_supplier_btc_no':[(6,0,[batches[0]])],})
         machine_produce_id=self.env['mrp.order.machine.produce'].search([('batch_id','=',self.id),('order_id','=',self.order_id.id)])
 	context.update({'default_order_id':self.order_id.id, 'default_machine':self.machine.id,
                          'default_previous_order_id':self.order_id.batch_no_ids_prev[0].order_id.id if self.order_id.batch_no_ids_prev else '',
@@ -1077,7 +1112,7 @@ class MrpWorkorderBatchNo(models.Model):
         mo_form = self.env.ref('gt_order_mgnt.mrp_work_order_machine_produce_form', False)
         res_id=False
         if machine_produce_id:
-            res_id=machine_produce_id.id
+            res_id=machine_produce_id[0].id
         if mo_form:
                 return {
                     'name':'Produced Qty in Batch',
@@ -1665,7 +1700,7 @@ class MrpWorkcenterPructionline(models.Model):
                    batch=self.env['mrp.order.batch.number'].create({'name':final_code,'product_id':record.product.id,
                                        'production_id':record.production_id.id,
                                        'sale_line_id':record.production_id.sale_line.id if record.production_id.sale_line else False,
-                                       'order_id':record.id,'uom_id':record.req_uom_id.id,
+                                       'order_id':record.id,'uom_id':record.wk_required_uom.id,
                                        'machine':record.machine.id,'wastage_allow':wastage_qty,
                                        'req_product_qty':qty})
                    req -=record.each_batch_qty

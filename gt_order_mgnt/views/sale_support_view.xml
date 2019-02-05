@@ -183,6 +183,15 @@
             <field name="domain">[('state','=','done')]</field>
         </record>
         
+        <record id="action_prod_orders" model="ir.actions.act_window">
+            <field name="name">Production Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">n.manufacturing.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="domain">[('n_state','in',['new','draft'])]</field>
+        </record>
+        
     <menuitem id="main_menu_sale_support" name="Sale Support" sequence="11" groups="gt_order_mgnt.group_sale_support" />
     	<menuitem id="menu_sale_support" name="Sale Support" parent="main_menu_sale_support" sequence="5" />
     		<!--menuitem action="action_sale_support" id="menu_action_sale_support" name="Sale Support Dashboard" parent="menu_sale_support" sequence="3" /-->
@@ -191,6 +200,7 @@
     		<menuitem id="menu_action_sale_support_quotation" name="Quotations" parent="menu_sale_support_sales" sequence="3" action="sale.action_quotations"/>
        		<menuitem id="menu_action_sale_support_sale_order" name="Sale Orders" parent="menu_sale_support_sales" sequence="6" action="action_sale_orders"/>
        		<menuitem id="menu_action_sale_support_done_order" name="Done Orders" parent="menu_sale_support_sales" sequence="9" action="action_done_orders"/>
+       		<menuitem id="menu_action_sale_support_prod_order" name="Production Orders" parent="menu_sale_support_sales" sequence="10" action="action_prod_orders"/>
        		
 	<menuitem id="menu_sales_support_product_form" name="Products" action="product.product_template_action"  parent="main_menu_sale_support"/>
 	

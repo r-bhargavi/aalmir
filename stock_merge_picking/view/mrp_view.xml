@@ -95,7 +95,7 @@
           <button name="do_produce" position="replace">
                 <button name="do_produce" type="object" string="Transfer" class="btn-primary"
                  attrs="{'invisible':[('complete_produce','=',True)]}"
-                 confirm="Are you sure you want to Transfer This Qty?"/>
+                 />
 
 		<button name="api_do_produce" type="object" string="Close MO" class="btn-primary"
                   attrs="{'invisible':[('complete_produce','=',False)]}"

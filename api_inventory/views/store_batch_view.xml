@@ -66,14 +66,14 @@
 				</div>
 				<field name="produce_qty_date" readonly="1"/>
 				<field name="store_id" readonly="1"/>
-				<field name="user_id" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+				<field name="user_id" string="Supervisor Name" readonly="1" options="{'no_create': True, 'no_open': True}"/>
 				<field name="employee_name" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="remark" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="reason" groups="mrp.group_mrp_user"/>
 
 				<field name="wastage_qty" groups="mrp.group_mrp_user"/>
-				<field name="supplier_batch_no" groups="mrp.group_mrp_user"/>
-                                <field name="sale_id" groups="gt_order_mgnt.group_sale_support" readonly="1"/>
+				<field name="supplier_batch_no" groups="mrp.group_mrp_user" attrs="{'invisible':[('supplier_batch_no','=',False)]}"/>
+                       <field name="sale_id" groups="gt_order_mgnt.group_sale_support" readonly="1"/>
 				<field name="logistic_state" readonly="1"/>
                                 <field name="picking_id" groups="gt_order_mgnt.group_sale_support,
 								stock.group_stock_user" readonly="1"/>

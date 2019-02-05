@@ -48,6 +48,17 @@
             ]]>
             </field>
         </record>
+	<record id="email_template_for_bom_approval" model="mail.template">
+            <field name="name">BOM Approval Requested</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-ERP MRP Alert BOM Requested for Approval</field>
+            <field name="model_id" ref="gt_order_mgnt.model_mrp_bom"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
 	<!--CH_N045 -->
 
        <!-- Start Email Template for Send Mail to Maitenance Department -->
@@ -108,7 +119,7 @@
         <record id="template_change_date_mrp" model="mail.template">
             <field name="name">Schedule Date Change MRP</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP Manufacturing Alert : ${(object.product_id.name)} production completion date change</field>
+            <field name="subject">API-ERP Manufacturing Alert : ${(object.product_id.name)} production completion date updated</field>
             <!--<field name="email_to">${object.team_id.user_id.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>-->
             <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>

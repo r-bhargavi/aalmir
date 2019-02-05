@@ -197,6 +197,7 @@ class MrpProduction(models.Model):
                             'request_line_ids':lst,
                             'source_location':rm_location.id if rm_location else False,
                             'request_date':record.date_planned}) 
+                record.write({'state':'requestrm'})
 #                            to send mail on rm request
                 base_url = self.env['ir.config_parameter'].get_param('web.base.url')
                 query = {'db': self._cr.dbname}

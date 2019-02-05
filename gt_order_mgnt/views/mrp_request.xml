@@ -1,5 +1,28 @@
 <?xml version="1.0"?>
 <odoo>
+    
+    <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+            <field name="name">Manufacturing Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,gantt</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="mrp.view_mrp_production_filter"/>
+            <field name="context">{'group_by':'state'}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a manufacturing order.
+              </p><p>
+                A manufacturing order, based on a bill of materials, will
+                consume raw materials and produce finished products.
+              </p><p>
+                Manufacturing orders are usually proposed automatically based
+                on customer requirements or automated rules like the minimum
+                stock rule.
+              </p>
+            </field>
+        </record>
    <!-- Start Mrp Hold with Work Orders-->
           <record id="mrp_production_hold_form" model="ir.ui.view">
 		<field name="name">mrp.production.hold.form</field>
@@ -487,7 +510,7 @@
               </button>
 	   <field name="product_id" position="attributes">
 		 <attribute name="options">{'no_create': True}</attribute>
-		 <attribute name="attrs">{'readonly':[('request_line', '!=',False)]}</attribute>
+		 <attribute name="attrs">{'readonly':['|',('state','!=','draft'),('request_line', '!=',False)]}</attribute>
 	  </field>
 	  <field name="location_src_id" position="attributes">
 	  	 <attribute name="attrs">{'invisible': [('state','=','draft')]}</attribute>
@@ -506,7 +529,7 @@
 	  </field>
           <field name="bom_id" position="replace">
                <field name="bom_id"  
-		domain="['|',('product_id','=',product_id),'&amp;', ('product_tmpl_id.product_variant_ids','=',product_id), ('product_id','=',False)]"
+		domain="['|',('product_id','=',product_id),'&amp;', ('product_tmpl_id.product_variant_ids','=',product_id), ('product_id','=',False),('state','=','approve')]"
              	context="{'default_product_id': product_id, 'default_product_tmpl_id': product_tmpl_id}" on_change="bom_id_change(bom_id)" />
           </field>
           <xpath expr="//field[@name='move_created_ids2']/tree/button[@icon='terp-gtk-jump-to-ltr']" position="attributes">
@@ -547,7 +570,7 @@
                  <button name="print_order" string="Download" type="object"  class="oe_highlight" />
                  <button type='object' name='mrp_hold' string='Hold MO' class="oe_highlight" 
                     attrs="{'invisible': ['|',('hold_order','=','hold'),('state','in',('cancel','done'))]}"/>
-                    <button string='Reset MO' name="reset_mo" attrs="{'invisible':[('state','!=','rmr')]}" type="object" class="btn-primary"/>
+                    <button string='Reset MO' name="reset_mo" attrs="{'invisible':[('state','not in',['rmr','cancel'])]}" type="object" class="btn-primary"/>
                     <!--<button string='Reset MO' name="reset_mo" type="object" class="btn-primary"/>-->
 
                  <button type='object' name='mrp_hold' string='Unhold MO' 
@@ -583,7 +606,7 @@
                 <field name="request_line" string="Production Request" readonly="1" attrs="{'invisible': [('request_line', '=',False)]}"/>
            </field>
             <field name="product_id" position="before">
-               <field name='partner_id' attrs="{'readonly': [('request_line', '!=',False)]}" />
+               <field name='partner_id' attrs="{'readonly': ['|',('state','!=','draft'),('request_line', '!=',False)]}" />
             </field>
 	   <field name="date_planned" position="before">
 	         <label for='n_produce_qty' string="Quantity Produced" 
@@ -675,6 +698,7 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form string="production_request">
+                
 		<field name="n_sale_line" invisible="1"/>
                  <field name="contract_id" invisible="1"/>
 		<field name="n_exist_pr" invisible="1"/>
@@ -774,7 +798,8 @@
             <form string="production_request">
 		<header>
 			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary" />
-			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder"/>
+			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder" attrs="{'invisible':[('bom_reminder_visible','=',False)]}"/>
+			<button name="send_reminder_to_create_mo" type="object"  string="Send Reminder MO" attrs="{'invisible':[('mo_reminder_visible','=',False)]}"/>
 			<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>
 			<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to Cancel Production Request?" class="btn-primary"/>
 			<!--<button name="create_production_transfer" type="object" string="Transfer Production"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary"/>-->
@@ -783,6 +808,11 @@
 		<sheet>
 			<field name="n_sale_line" invisible="1"/>
 		        <field name="contract_id" invisible="1"/>
+		        <field name="bom_reminder_visible" invisible="1"/>
+		        <field name="mo_reminder_visible" invisible="1"/>
+		        <field name="reminder_sent" invisible="1"/>
+                        <label col="2" string="BoM Reminder has been sent" style="color:red;" attrs="{'invisible': [('reminder_sent','=',False)]}"/>
+
 			<group name="n_data" col="4">
 			   <group col="2">
                                 <field name="name" string="Production Request No." readonly="1"/>
@@ -936,6 +966,16 @@
             <field name="model">mrp.bom</field>
             <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//form/sheet" position="before">
+                <header>
+                <button type="object" name="send_for_approval" string="Send For Approval" class="btn-primary" attrs="{'invisible':[('state','not in',['draft'])]}"/>
+                <button type="object" name="send_approval_reminder" string="Send Approval" class="btn-primary" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
+                <button type="object" name="approve_bom" string="Approve BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
+                <button type="object" name="reject_bom" string="Reject BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
+                <button type="object" name="set_bom_to_draft" string="Set to Draft" class="btn-primary" attrs="{'invisible':[('state','not in',['reject'])]}"/>
+                 <field name="state" widget="statusbar"/>
+                </header>
+                </xpath>
              <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="replace">
                  <field name="product_id" on_change="onchange_product_id(product_id, product_qty)" domain="[('product_material_type.string', 'in',('raw','component' ,'grinding'))]" options="{'no_create':True}"/>
              </xpath>
@@ -955,8 +995,8 @@
                   <attribute name='options'>{'no_create': True, 'no_open': True}</attribute>
               </field>
                <notebook position='before'>
-                   <separator string="Wastage in Each Process" colspan="4"/>
-		           <field name='bom_wastage_ids' nolable='1'>
+                   <separator string="Wastage in Each Process" colspan="4" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+		           <field name='bom_wastage_ids' nolable='1' attrs="{'readonly':[('state','not in',['draft'])]}">
 		               <tree editable='bottom'>
 		                    <field name='name' required='1'/>
 		                    <field name='value' required='1' sum='total'/>
@@ -992,6 +1032,9 @@
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='attribute_value_ids']" position="attributes">
                   <attribute name="invisible">1</attribute>
+              </xpath>
+              <xpath expr="//field[@name='bom_line_ids']" position="attributes">
+                  <attribute name="attrs">{'readonly':[('state','not in',['draft'])]}</attribute>
               </xpath>
                <xpath expr="//field[@name='type']" position="attributes">
                   <attribute name="invisible">1</attribute>

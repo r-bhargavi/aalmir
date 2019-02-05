@@ -160,45 +160,45 @@ class MrpRawmaterial(models.Model):
 		   for line in rec.request_line_ids:
 		   	line.reserve_status='approve'
 		   	
-		   if rec.request_type in ('extra','normal'):
-			   temp_id = self.env.ref('api_raw_material.email_template_extra_raw_material_approve')
-			   if temp_id:
-			       user_obj = self.env['res.users'].browse(self.env.uid)
-			       base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-			       query = {'db': self._cr.dbname}
-			       fragment = {
-				    'model': 'mrp.production',
-				     'view_type': 'form',
-				     'id': rec.production_id.id,
-				      }
-			       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-			       text_link = _("""<a href="%s">%s</a> """) % (url,rec.production_id.name)
-			       body_html = """<div> 
-				<p> <strong>Raw Material Request Approved</strong><br/><br/>
-				 <b>Dear: %s,</b><br/>
-				 <b>Production Number :</b>%s ,<br/>
-				  <b>Customer Name :</b>%s ,<br/>
-				  <b>Product Name :</b>%s ,<br/>
-				  <b>Allowed Wastage :</b>%s %s,<br/>
-				  <b>  Wastage Qty : %s %s</b><br/>
-				  <b>  Required Qty : %s %s</b><br/>
-				  <b>  Reason : </b>%s<br/>
-				  <b>  Production Remark : </b>%s<br/>
-				  <b>  Manager Remark : </b>%s
-				</p>
-				</div>"""%(rec.production_id.user_id.name, text_link or '',rec.production_id.partner_id.name, 
-				    rec.product_id.name, rec.wastage_allow,
-				   rec.allow_wastage_uom_id.name,
-				  rec.wastage_qty, rec.wastage_uom_id.name, rec.required_qty, 
-				 rec.required_uom_id.name,rec.reason, rec.note, rec.note_mgnr)
-			       body_html +="<table class='table' style='width:50%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>"                  
-			       for line in rec.request_line_ids:
-				   body_html +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.qty), str(line.uom_id.name)) 
-			       body_html +="</table>"
-			       body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.raw.material.request',rec.id, context=self._context)
-			       n_emails=str(rec.production_id.user_id.login)
-			       temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
-			       temp_id.send_mail(rec.id)
+#		   if rec.request_type in ('extra','normal'):
+#			   temp_id = self.env.ref('api_raw_material.email_template_extra_raw_material_approve')
+#			   if temp_id:
+#			       user_obj = self.env['res.users'].browse(self.env.uid)
+#			       base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+#			       query = {'db': self._cr.dbname}
+#			       fragment = {
+#				    'model': 'mrp.production',
+#				     'view_type': 'form',
+#				     'id': rec.production_id.id,
+#				      }
+#			       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+#			       text_link = _("""<a href="%s">%s</a> """) % (url,rec.production_id.name)
+#			       body_html = """<div> 
+#				<p> <strong>Raw Material Request Approved</strong><br/><br/>
+#				 <b>Dear: %s,</b><br/>
+#				 <b>Production Number :</b>%s ,<br/>
+#				  <b>Customer Name :</b>%s ,<br/>
+#				  <b>Product Name :</b>%s ,<br/>
+#				  <b>Allowed Wastage :</b>%s %s,<br/>
+#				  <b>  Wastage Qty : %s %s</b><br/>
+#				  <b>  Required Qty : %s %s</b><br/>
+#				  <b>  Reason : </b>%s<br/>
+#				  <b>  Production Remark : </b>%s<br/>
+#				  <b>  Manager Remark : </b>%s
+#				</p>
+#				</div>#"""%(rec.production_id.user_id.name, text_link or '',rec.production_id.partner_id.name, 
+#				    rec.product_id.name, rec.wastage_allow,
+#				   rec.allow_wastage_uom_id.name,
+#				  rec.wastage_qty, rec.wastage_uom_id.name, rec.required_qty, 
+#				 rec.required_uom_id.name,rec.reason, rec.note, rec.note_mgnr)
+#			       body_html +="<table class='table' style='width:50%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>"                  
+#			       for line in rec.request_line_ids:
+#				   body_html +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.qty), str(line.uom_id.name)) 
+#			       body_html +="</table>"
+#			       body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.raw.material.request',rec.id, context=self._context)
+#			       n_emails=str(rec.production_id.user_id.login)
+#			       temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
+#			       temp_id.send_mail(rec.id)
    	except Exception as err:
    		raise UserError("Exception in Approval of raw Material Request -: {} ".format(error_print if error_print else err))
         return True
@@ -234,45 +234,45 @@ class MrpRawmaterial(models.Model):
 				error_print="Pleas fill the Manager Remark...."
 				raise 
 
-			temp_id = self.env.ref('api_raw_material.email_template_extra_raw_material_reject')
-			if temp_id:
-			       user_obj = self.env['res.users'].browse(self.env.uid)
-			       base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-			       query = {'db': self._cr.dbname}
-			       fragment = {
-				    'model': 'mrp.production',
-				     'view_type': 'form',
-				     'id': rec.production_id.id,
-				      }
-			       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-			       text_link = _("""<a href="%s">%s</a> """) % (url,rec.production_id.name)
-			       body_html = """<div> 
-				<p> <strong>Extra Raw Material Request Rejected</strong><br/><br/>
-				 <b>Dear: %s,</b><br/>
-				 <b>Production Number :</b>%s ,<br/>
-				 <b>Customer Name :</b>%s ,<br/>
-				  <b>Product Name :</b>%s ,<br/>
-				  <b>Allowed Wastage :</b>%s %s,<br/>
-				  <b>  Wastage Qty : %s %s</b><br/>
-				  <b>  Required Qty : %s %s</b><br/>
-				  <b>  Reason : </b>%s<br/>
-				  <b>  Production Remark : </b>%s<br/>
-				  <b>  Manager Remark : </b>%s
-				</p>
-				</div>"""%(rec.production_id.user_id.name, text_link or '',rec.production_id.partner_id.name,
-				    rec.product_id.name, rec.wastage_allow,
-				   rec.allow_wastage_uom_id.name,
-				  rec.wastage_qty, rec.wastage_uom_id.name, rec.required_qty, 
-				 rec.required_uom_id.name,rec.reason, rec.note, rec.note_mgnr)
-			       body_html +="<table class='table' style='width:50%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>"                  
-			       for line in rec.request_line_ids:
-				   body_html +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.qty), str(line.uom_id.name)) 
-			       body_html +="</table>"
-			       body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.raw.material.request',rec.id, context=self._context)
-			       n_emails=str(rec.production_id.user_id.login)
-                               
-			       temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
-			       temp_id.send_mail(rec.id)
+#			temp_id = self.env.ref('api_raw_material.email_template_extra_raw_material_reject')
+#			if temp_id:
+#			       user_obj = self.env['res.users'].browse(self.env.uid)
+#			       base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+#			       query = {'db': self._cr.dbname}
+#			       fragment = {
+#				    'model': 'mrp.production',
+#				     'view_type': 'form',
+#				     'id': rec.production_id.id,
+#				      }
+#			       url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+#			       text_link = _("""<a href="%s">%s</a> """) % (url,rec.production_id.name)
+#			       body_html = """<div> 
+#				<p> <strong>Extra Raw Material Request Rejected</strong><br/><br/>
+#				 <b>Dear: %s,</b><br/>
+#				 <b>Production Number :</b>%s ,<br/>
+#				 <b>Customer Name :</b>%s ,<br/>
+#				  <b>Product Name :</b>%s ,<br/>
+#				  <b>Allowed Wastage :</b>%s %s,<br/>
+#				  <b>  Wastage Qty : %s %s</b><br/>
+#				  <b>  Required Qty : %s %s</b><br/>
+#				  <b>  Reason : </b>%s<br/>
+#				  <b>  Production Remark : </b>%s<br/>
+#				  <b>  Manager Remark : </b>%s
+#				</p>
+#				</div>#"""%(rec.production_id.user_id.name, text_link or '',rec.production_id.partner_id.name,
+#				    rec.product_id.name, rec.wastage_allow,
+#				   rec.allow_wastage_uom_id.name,
+#				  rec.wastage_qty, rec.wastage_uom_id.name, rec.required_qty, 
+#				 rec.required_uom_id.name,rec.reason, rec.note, rec.note_mgnr)
+#			       body_html +="<table class='table' style='width:50%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>"                  
+#			       for line in rec.request_line_ids:
+#				   body_html +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.qty), str(line.uom_id.name)) 
+#			       body_html +="</table>"
+#			       body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.raw.material.request',rec.id, context=self._context)
+#			       n_emails=str(rec.production_id.user_id.login)
+#                               
+#			       temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
+#			       temp_id.send_mail(rec.id)
    	except Exception as err:
    		raise UserError("{} ".format(error_print if error_print else err))
        
