@@ -1068,8 +1068,8 @@ class n_manufacturing_request(models.Model):
                         n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 
 			body_html = """<div> 
-                                <p>Dear User,<br/>
-				<p> <strong>New production request is raised as per below details</strong></p><br/>
+                                <strong><p>Dear User,<br/>
+				<p>New production request is raised as per below details</strong></p><br/>
 				
 					<p>Request Number : <b>%s</b> </p>
 		    			<p>Product:<b>%s</b> </p>
@@ -1191,12 +1191,12 @@ class n_manufacturing_request(models.Model):
                 send_user = ",".join(recipient_partners)
                 product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                 bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
-                new_subject='API-ERP Production Alert:MO is still not created for request reference %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
+                new_subject='Production Reminder: Awaiting timeline for Production request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name+', '+self.n_partner_id.name)
                 n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 
                 body_html = """<div> 
-                        <p>Dear User,<br/>
-                        <p> <strong>New production request is raised but the response from production is yet not received,PLease find below details of request</strong></p><br/>
+                        <strong><p>Dear User,<br/>
+                        <p>Below production request was raised but the response from production is yet not received, Awaiting production timeline.</strong></p>
                                 <p>Request Number : <b>%s</b> </p>
                                 <p>Product:<b>%s</b> </p>
                                 <p>Instructions from Sale Support:<b>%s</b> </p>
