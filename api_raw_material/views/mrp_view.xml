@@ -278,7 +278,7 @@
                     <notebook style='margin-top:20px'>
                        <page string="Raw Material Delivery's" attrs="{'invisible':[('delivery_ids','=',[])]}">
 		            <field name='delivery_ids' readonly="1" attrs="{'invisible':[('delivery_ids','=',[])]}">
-		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done') and min_date &lt; current_date" string="Picking list">
+		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done','delivered') and min_date &lt; current_date" string="Picking list">
 				    <field name="name"/>
 				    <field name="date" invisible="1"/>
 				    <field name="min_date"/>
@@ -309,7 +309,7 @@
                                </form>
                             </field>
 		            <field name='material_request_id' readonly="1" attrs="{'invisible':[('material_request_id','=',[])]}">
-		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done')">
+		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done','delivered')">
 				    <field name="name"/>
 				    <field name="request_date"/>
 				    <field name="request_type"/>

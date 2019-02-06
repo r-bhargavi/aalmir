@@ -1645,7 +1645,7 @@ class MrpBom(models.Model):
                              send_user_name=recipient.name
 
                 send_user = ",".join(recipient_partners)
-                new_subject='API-ERP BOM Approval Alert: BoM Approval Requested for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
+                new_subject='BOM Approval Alert: BoM Approval Requested for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
                 body_html = """<div> 
                         <p>Dear User,<br/>
                         <p>Kindly Approve BOM at your earliest so that MO can be planned and started.</p><br/>

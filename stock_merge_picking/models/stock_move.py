@@ -56,7 +56,7 @@ class stock_picking(osv.osv):
 	    
             order = {'confirmed': 0, 'waiting': 1, 'assigned': 2,'transit':3,'delivered':4,}
             order_inv = {0: 'confirmed', 1: 'waiting', 2: 'assigned', 3: 'transit', 4: 'delivered'}
-            lst = [order[x.state] for x in pick.move_lines if x.state not in ('cancel', 'done')]
+            lst = [order[x.state] for x in pick.move_lines if x.state not in ('cancel', 'done','delivered')]
             if pick.move_type == 'one':
                 res[pick.id] = order_inv[min(lst)]
             else:
