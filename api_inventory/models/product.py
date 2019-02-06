@@ -40,6 +40,8 @@ class productTemplate(models.Model):
 	master_btch_count = fields.Char('Master Batches',compute='_get_batches_data')
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
+	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count_mo')
+        prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
 	bill_count = fields.Char('#Bills',compute='_get_bill_data')
 	bin_location_count = fields.Integer('#Bin Location',compute='_get_batches_data')
 	
@@ -77,6 +79,19 @@ class productTemplate(models.Model):
 			expense_ids = self.env['hr.expense'].search([('product_id','in',product_id)])
 			res.expenses_count = str(len(expense_ids))
 	@api.multi
+	def _get_prod_orders_data(self):
+            for res in self:
+                prod_count=0.0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+                product_id = [p.id for p in product_id]
+
+                prod_req_ids = self.env['n.manufacturing.request'].search([('n_product_id','in',product_id),('n_state','in',['new','draft'])])
+                print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
+                if prod_req_ids:
+                    for each in prod_req_ids:
+                        prod_count += each.n_order_qty
+                res.prod_count=str(prod_count)
+	@api.multi
 	def _get_bill_data(self):
             for res in self:
                 product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
@@ -88,7 +103,6 @@ class productTemplate(models.Model):
                     for each in inv_line_ids:
                         if each.invoice_id.id not in inv_ids:
                             inv_ids.append(each.invoice_id.id)
-                            print "len(inv_ids)len(inv_ids)",len(inv_ids)
                     res.bill_count = str(len(inv_ids))
 
 	@api.multi
@@ -126,6 +140,40 @@ class productTemplate(models.Model):
 		    'views': [(order_tree.id, 'tree'),(order_form.id, 'form')],
 		    'view_id': order_form.id,
 		    'domain':[('product_id','in',product_id)],
+		    'target': 'current',
+		 }
+        @api.multi
+        def _bom_orders_count_mo(self):
+            Production = self.env['mrp.production']
+            res = {}
+            for rec in self:
+                count=0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
+                mo_ids = Production.search([('product_id', '=', product_id.id),('state','not in',['done','cancel'])])
+                print "mo_idsmo_idsmo_idsmo_ids",mo_ids
+                if mo_ids:
+                    print "mo_idsmo_idsmo_ids",mo_ids
+                    for each_mo in mo_ids:
+                        count+=each_mo.product_qty-each_mo.n_produce_qty
+                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty
+            rec.mo_count=str(count)
+            return res
+
+	@api.multi
+	def open_prod_orders(self):
+		order_tree = self.env.ref('gt_order_mgnt.n_production_request_tree', False)
+		order_form = self.env.ref('gt_order_mgnt.mrp_production_request_form', False)
+		product_id = self.env['product.product'].search([('product_tmpl_id','=',self.id)])
+		product_id = [p.id for p in product_id]
+		return {
+		    'name':"'{}'Production Orders".format(self.name),
+		    'type': 'ir.actions.act_window',
+		    'view_type': 'form',
+		    'view_mode': 'tree',
+		    'res_model': 'n.manufacturing.request',
+		    'views': [(order_tree.id, 'tree'),(order_form.id, 'form')],
+		    'view_id': order_form.id,
+		    'domain':[('n_product_id','in',product_id)],
 		    'target': 'current',
 		 }
 	
@@ -181,7 +229,20 @@ class productTemplate(models.Model):
 			
 class productProduct(models.Model):
 	_inherit = "product.product"
+        
 
+	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count')
+	prod_count = fields.Char('#Production Orders',compute='_prod_orders_count')
+	@api.multi
+	def _prod_orders_count(self):
+            for res in self:
+                prod_count=0.0
+                prod_req_ids = self.env['n.manufacturing.request'].search([('n_product_id','=',res.id),('n_state','in',['new','draft'])])
+                print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
+                if prod_req_ids:
+                    for each in prod_req_ids:
+                        prod_count += each.n_order_qty
+                res.prod_count=str(prod_count)
 	@api.multi
 	def open_inventory_location(self):
 		return self.product_tmpl_id.open_inventory_location()
@@ -193,11 +254,11 @@ class productProduct(models.Model):
 	def open_expenses(self):
 		return self.product_tmpl_id.open_expenses()
 	@api.multi
+	def open_prod_orders(self):
+		return self.product_tmpl_id.open_prod_orders()
+	@api.multi
 	def open_bills(self):
 		return self.product_tmpl_id.open_bills()
-	@api.multi
-	def open_expenses(self):
-		return self.product_tmpl_id.open_expenses()
 
 	@api.multi
 	def open_child_batches(self):
@@ -290,7 +351,20 @@ class productProduct(models.Model):
 			domain + ['&', ('location_dest_id', operator, location_ids), '!', ('location_id', operator, location_ids)],
 			domain + ['&', ('location_id', operator, location_ids), '!', ('location_dest_id', operator, location_ids)]
 		    )
-		    
+        @api.multi
+        def _bom_orders_count(self):
+            Production = self.env['mrp.production']
+            res = {}
+            count=0
+            for product_id in self:
+                mo_ids = Production.search([('product_id', '=', product_id.id),('state','not in',['done','cancel'])])
+                print "mo_idsmo_idsmo_idsmo_ids",mo_ids
+                if mo_ids:
+                    for each_mo in mo_ids:
+                        count+=each_mo.n_request_qty-each_mo.n_produce_qty
+            product_id.mo_count=str(count)
+            return res
+
     ## inherite code to update forcasting 
 	@api.v7
 	def _product_available(self, cr, uid, ids, field_names=None, arg=False, context=None):

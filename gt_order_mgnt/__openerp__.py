@@ -45,6 +45,7 @@
         'wizard/order_confirm_wizard_view.xml',
         'wizard/request_payment_term_wizard_view.xml',
         'wizard/order_confirm_by_sales_support_wizard_view.xml',
+        'wizard/approve_bom_wizard_view.xml',
         'views/data_mail.xml',
         'views/sale_support_view.xml', 
         'views/sale_view.xml',

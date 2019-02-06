@@ -165,6 +165,11 @@ class MrpProduction(models.Model):
     		rec.quality_pcs = rec.product_id.weight *rec.product_qty 
     
     @api.multi
+    @api.depends('routing_id')
+    def compute_routing(self):
+        if self.routing_id:
+            self.route_id=self.routing_id.id
+    @api.multi
     @api.depends('workcenter_lines.date_planned','workcenter_lines.date_planned_end')
     def _get_completion_date(self):
     	for rec in self:
@@ -185,6 +190,7 @@ class MrpProduction(models.Model):
                             string='Routing Process') 
     production_reqst_id=fields.Many2one('production.request.detail')
     sale_id=fields.Many2one('sale.order' , string="Sale Order")
+    route_id=fields.Many2one('mrp.routing' , string="Routing",compute='compute_routing')
     n_client_date =fields.Datetime('Requested Completion Date',help='Requested Completion Date')
 #    n_request_date=fields.Datetime('Expected Completion Date',help='Expected Completion Date',store="Ture",compute="_get_completion_date")
     n_request_date=fields.Datetime('Expected Completion Date',help='Expected Completion Date')
@@ -643,6 +649,7 @@ class MrpProduction(models.Model):
 		if res.pkgtype == 'primary':
 			result['value'].update({'n_packaging':res.id})
         print "result---------------",result
+        result['value'].update({'bom_id':False,'routing_id':False})
         return result
         
                 
@@ -785,14 +792,17 @@ class MrpProduction(models.Model):
                           lst=[]
                           for bom in self.env['mrp.bom.line'].browse(rm_append):
                                pcs_qty=(rec.product_qty/rec.product_id.weight)
-                               rm_qty=self.env['mrp.production.product.line'].search(
+                               rm_ids=self.env['mrp.production.product.line'].search(
                                				[('product_id','=',bom.product_id.id),
-                               				 ('production_id','=',rec.id)]).product_qty
-                               if bom.product_id and bom.workcenter_id.process_id.process_type == 'injection':
-                                  lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
-                                    'qty':(rm_qty),'production_id':rec.id,
-                                    'next_order_id':order.id,
-                                    'original_qty':(rm_qty)})) 
+                               				 ('production_id','=',rec.id)])
+                               if rm_ids:
+                                  for each_rm in rm_ids:
+                                     rm_qty=each_rm.product_qty
+                                     if bom.product_id and bom.workcenter_id.process_id.process_type == 'injection':
+                                        lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
+                                          'qty':(rm_qty),'production_id':rec.id,
+                                          'next_order_id':order.id,
+                                          'original_qty':(rm_qty)})) 
                           order.raw_materials_id=lst      
                           
                        if order.process_id.process_type == 'other':
@@ -947,6 +957,7 @@ class n_manufacturing_request(models.Model):
     #CH_N045 add>>
     n_exist_pr = fields.Boolean(string='Exist', default=False)
     reminder_sent = fields.Boolean(string='Reminder sent', default=False)
+    reminder_mo_sent = fields.Boolean(string='Reminder MO sent', default=False)
     bom_reminder_visible = fields.Boolean(string='BoM reminder', compute='_compute_bom_reminder_visibility')
     mo_reminder_visible = fields.Boolean(string='Mo Create reminder', compute='_compute_mo_reminder_visibility')
     contract_id=fields.Many2one('customer.contract' ,string="Contract Name")
@@ -1066,7 +1077,10 @@ class n_manufacturing_request(models.Model):
                             new_subject='API-ERP Production Alert:New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
                         print "new_subjectnew_subject",new_subject
                         n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-
+                        if not self.n_Note:
+                            note=''
+                        else:
+                            note=self.n_Note
 			body_html = """<div> 
                                 <strong><p>Dear User,<br/>
 				<p>New production request is raised as per below details</strong></p><br/>
@@ -1081,7 +1095,7 @@ class n_manufacturing_request(models.Model):
 		    			<p>Quantity :<b>%s</b> \t%s </p>
 		    			<p>Packaging :<b>%s</b> </p>
 				</p>
-				</div>"""%(str(text_link),product_data,str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+				</div>"""%(str(text_link),product_data,note,str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
 			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                         print "body_htmlbody_htmlbody_html",body_html
                         if bom_id:
@@ -1113,30 +1127,30 @@ class n_manufacturing_request(models.Model):
                         print "send_usersend_user",send_user,body_html
 			temp_id.send_mail(self.n_sale_line.id)
 			
-		if self.n_exist_pr:
-		    temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
-		    if temp_id:
-			base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-			query = {'db': self._cr.dbname}
-			fragment = {
-			    'model': 'sale.order',
-			    'view_type': 'form',
-			    'id': self.n_sale_line.id,
-			}
-			url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-			text_link = _("""<a href="%s">%s</a> """) % (url,self.n_sale_line.name)
-
-			body_html = """<div> 
-		<p> <strong>Production Request Again</strong></p><br/>
-		<p>Dear %s,<br/>
-		    <b>%s </b>Production Request sent : for <b>%s </b>  Product:%s Of Quantity :%s<br/>
-		</p>
-		</div>"""%(self.n_sale_line.user_id.name or '', user_obj.name or '', text_link,str(self.n_product_id.product_tmpl_id.name),str(self.n_order_qty))
-
-			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
-			n_emails=str(self.n_sale_line.user_id.login)
-			temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': user_obj.partner_id.email})
-			temp_id.send_mail(self.n_sale_line.id)
+#		if self.n_exist_pr:
+#		    temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
+#		    if temp_id:
+#			base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+#			query = {'db': self._cr.dbname}
+#			fragment = {
+#			    'model': 'sale.order',
+#			    'view_type': 'form',
+#			    'id': self.n_sale_line.id,
+#			}
+#			url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+#			text_link = _("""<a href="%s">%s</a> """) % (url,self.n_sale_line.name)
+#
+#			body_html = """<div> 
+#		<p> <strong>Production Request Again</strong></p><br/>
+#		<p>Dear %s,<br/>
+#		    <b>%s </b>Production Request sent : for <b>%s </b>  Product:%s Of Quantity :%s<br/>
+#		</p>
+#		</div>#"""%(self.n_sale_line.user_id.name or '', user_obj.name or '', text_link,str(self.n_product_id.product_tmpl_id.name),str(self.n_order_qty))
+#
+#			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
+#			n_emails=str(self.n_sale_line.user_id.login)
+#			temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': user_obj.partner_id.email})
+#			temp_id.send_mail(self.n_sale_line.id)
 	return True
     
     
@@ -1193,10 +1207,13 @@ class n_manufacturing_request(models.Model):
                 bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
                 new_subject='Production Reminder: Awaiting timeline for Production request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name+', '+self.n_partner_id.name)
                 n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-
+                if not self.n_Note:
+                    note=''
+                else:
+                    note=self.n_Note
                 body_html = """<div> 
                         <strong><p>Dear User,<br/>
-                        <p>Below production request was raised but the response from production is yet not received, Awaiting production timeline.</strong></p>
+                        <p>Below production request was raised but the response from production is yet not received, Awaiting production timeline.</strong></p><br/>
                                 <p>Request Number : <b>%s</b> </p>
                                 <p>Product:<b>%s</b> </p>
                                 <p>Instructions from Sale Support:<b>%s</b> </p>
@@ -1207,12 +1224,13 @@ class n_manufacturing_request(models.Model):
                                 <p>Quantity :<b>%s</b> \t%s </p>
                                 <p>Packaging :<b>%s</b> </p>
                         </p>
-                        </div>"""%(str(text_link),product_data,str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+                        </div>"""%(str(text_link),product_data,note,str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
                 body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
                 print "body_htmlbody_htmlbody_html",body_html
                 temp_id.write({'body_html': body_html,'subject':new_subject,
                                 'email_to' : send_user, 'email_from': user_obj.partner_id.email})
                 print "send_usersend_user",send_user,body_html
+                self.write({'reminder_mo_sent':True})
                 temp_id.send_mail(self.n_sale_line.id)
 	return True
     @api.multi
@@ -1283,8 +1301,11 @@ class n_manufacturing_request(models.Model):
         mo_form = self.env.ref('mrp.mrp_production_form_view', False)
         print "Self>dfsfsdfsdfdsf",context
         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
+        if bom_id and bom.state!='approve':
+            raise UserError('You are not allowed to create MO request as the BoM is still not approved')
+
         if not bom_id:
-            raise UserError('You are not allwed to create MO request as the BoM is still not issued for Product')
+            raise UserError('You are not allowed to create MO request as the BoM is still not issued for Product')
         if mo_form:
                 return {
                     'type': 'ir.actions.act_window',
@@ -1579,9 +1600,14 @@ class MrpBom(models.Model):
       
     bom_packging_line = fields.One2many('mrp.bom.line','bom_packaging_id','Packaging Material')
     bom_wastage_ids=fields.One2many('mrp.bom.wastage.type','bom_id', string='Wastage Details')
+    one_time_wastage_ids=fields.One2many('mrp.bom.wastage.one.time','bom_id', string='One Time Wastage')
     product_id = fields.Many2one('product.product', 'Product Name',help="Product for BOM",domain="[('product_tmpl_id.product_material_type.string','not in',('packaging','raw','asset'))]")
     state = fields.Selection([('draft','Draft'),('sent_for_app','Sent For Approval'),('approve','Approved'),
-   			   ('reject','Rejeted')],default='draft')
+   			   ('reject','Rejected')],default='draft',track_visibility='always' )
+    general_remarks=fields.Text('General Remarks',track_visibility='always' )
+    remarks=fields.Text('Remarks on Approval',track_visibility='always' )
+    refuse_reason = fields.Char(string='Reject Reason',track_visibility='always' )
+
     
     
     
@@ -1591,6 +1617,9 @@ class MrpBom(models.Model):
         
     @api.multi
     def send_for_approval(self):
+        if not self.bom_line_ids:
+            raise UserError(_('Please Enter Raw Material/Components before sending for approval!!'))
+
         temp_id = self.env.ref('gt_order_mgnt.email_template_for_bom_approval')
         user_obj = self.env['res.users'].browse(self.env.uid)
 
@@ -1637,10 +1666,34 @@ class MrpBom(models.Model):
         return True
     @api.multi
     def approve_bom(self):
-        self.write({'state':'approve'})
+       cofirm_form = self.env.ref('gt_order_mgnt.approve_bom_wizard_wizard_view_form', False)
+       if cofirm_form:
+            return {
+                        'name':'Approve BOM',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'approve.bom.wizard',
+                        'views': [(cofirm_form.id, 'form')],
+                        'view_id': cofirm_form.id,
+                        'target': 'new'
+                    }
+#        self.write({'state':'approve'})
     @api.multi
     def reject_bom(self):
-        self.write({'state':'reject'})
+       cofirm_form = self.env.ref('api_account.pay_cancel_wizard_view_form', False)
+       if cofirm_form:
+            return {
+                        'name':'Reject BOM',
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'cancel.pay.reason.wizard',
+                        'views': [(cofirm_form.id, 'form')],
+                        'view_id': cofirm_form.id,
+                        'target': 'new'
+                    }
+#        self.write({'state':'reject'})
     @api.multi 
     @api.depends('product_weight' ,'bom_wastage_ids')  
     def totalwastage_weight(self):
@@ -1941,6 +1994,13 @@ class MrpBomWastageType(models.Model):
     
     name=fields.Many2one('wastage.type', string="Name")
     value=fields.Float('Wastage %',digits_compute=dp.get_precision('Wastage Percent Decimal'))
+    workcenter_id= fields.Many2one('mrp.workcenter', string="Process") 
+    bom_id=fields.Many2one('mrp.bom')
+class MrpBomWastageOneTime(models.Model):
+    _name = "mrp.bom.wastage.one.time"
+    
+    name=fields.Many2one('wastage.type', string="Name")
+    value=fields.Float('Wastage Kg',digits_compute=dp.get_precision('Wastage Percent Decimal'))
     workcenter_id= fields.Many2one('mrp.workcenter', string="Process") 
     bom_id=fields.Many2one('mrp.bom')
 

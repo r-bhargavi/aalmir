@@ -247,6 +247,12 @@
                 <attribute name='create'>0</attribute>
                 <attribute name='delete'>0</attribute>
              </xpath>
+             <xpath expr="//field[@name='routing_id']" position="attributes">
+                <attribute name='invisible'>1</attribute>
+             </xpath>
+             <xpath expr="//field[@name='routing_id']" position="before">
+                    <field name="route_id"/>
+             </xpath>
              <xpath expr="//field[@name='workcenter_lines']" position="before">
                <button name="open_scheduleworkorder" type="object" class="oe_highlight" icon="fa-calendar"
                             string='Re-Schedule Orders' attrs="{'invisible':['|',('planned_status','=','unplanned'),('workorder_count','=',0)]}" />
@@ -493,6 +499,9 @@
               </button>
                <button name="%(mrp.act_mrp_product_produce)d" position="attributes">
                 <attribute name="string">Transfer</attribute>
+                <attribute name="attrs">{}</attribute>
+                <attribute name="states">''</attribute>
+		 <attribute name="attrs">{'invisible':[('state', '!=','in_production')]}</attribute>
                </button>
                <button name="action_assign"   position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -528,7 +537,7 @@
 		 <attribute name="attrs">{'readonly':[('state', '!=','draft')]}</attribute>
 	  </field>
           <field name="bom_id" position="replace">
-               <field name="bom_id"  
+               <field name="bom_id" required="1" 
 		domain="['|',('product_id','=',product_id),'&amp;', ('product_tmpl_id.product_variant_ids','=',product_id), ('product_id','=',False),('state','=','approve')]"
              	context="{'default_product_id': product_id, 'default_product_tmpl_id': product_tmpl_id}" on_change="bom_id_change(bom_id)" />
           </field>
@@ -811,7 +820,9 @@
 		        <field name="bom_reminder_visible" invisible="1"/>
 		        <field name="mo_reminder_visible" invisible="1"/>
 		        <field name="reminder_sent" invisible="1"/>
+		        <field name="reminder_mo_sent" invisible="1"/>
                         <label col="2" string="BoM Reminder has been sent" style="color:red;" attrs="{'invisible': [('reminder_sent','=',False)]}"/>
+                        <label col="2" string="Reminder to create MO has been sent" style="color:red;" attrs="{'invisible': [('reminder_mo_sent','=',False)]}"/>
 
 			<group name="n_data" col="4">
 			   <group col="2">
@@ -959,7 +970,41 @@
 	<menuitem action="n_production_request_action" id="menu_production_request_new" name="New Request" parent="menu_production_request" sequence="1" />
 	<menuitem action="n_production_request_action_history1" id="menu_production_request_history" name="Request History" parent="menu_production_request" sequence="2" />
 	<menuitem action="gt_order_mgnt.production_detail_action_menu" id="outsourcing_request_from_menu" name="Outsource Request Form" parent="menu_production_request" sequence="3" />
-	
+	    <record id="master_bom_form_view" model="ir.ui.view">
+        <field name="name">Master BOM Form view</field>
+        <field name="model">mrp.bom.master</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Master BOM">
+              <sheet>
+                <group>
+		    <field name="name" required="1"/>
+		</group>
+		<notebook>
+			<page string="Components">
+				<field name="master_line">
+					<tree editable="bottom">
+						<field name="product_id" domain="[('product_material_type.string', 'in',('raw','component'))]" options="{'no_open':True,'no_create':True}"/>
+						<field name="uom_name" readonly="1"/>
+						<field name="quantity" attrs="{'readonly':[('uom_name','=','Kg')],'required':[('uom_name','!=','Kg')]}"/>
+						<field name="percentage" attrs="{'readonly':[('uom_name','!=','Kg')],'required':[('uom_name','=','Kg')]}"/>
+						<field name="master_id" invisible="1"/>
+					</tree>
+					<form create='false' edit='false' delete='false'>
+						<field name="product_id" readonly="1"/>
+						<field name="uom_name" readonly="1"/>
+						<field name="quantity" attrs="{'required':[('uom_name','!=','Kg')],'readonly':[('uom_name','=','Kg')]}"/>
+						<field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
+						<field name="master_id" invisible="1"/>
+					</form>
+				</field>
+			</page>
+		</notebook>
+	       </sheet>
+            </form>
+        </field>
+    </record>
+       
   <!--BOM -->
        <record model="ir.ui.view" id="view_mrp_bom_form_view_aalmir">
             <field name="name">mrp.bom.form</field>
@@ -969,9 +1014,9 @@
                 <xpath expr="//form/sheet" position="before">
                 <header>
                 <button type="object" name="send_for_approval" string="Send For Approval" class="btn-primary" attrs="{'invisible':[('state','not in',['draft'])]}"/>
-                <button type="object" name="send_approval_reminder" string="Send Approval" class="btn-primary" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
+                <button type="object" name="send_approval_reminder" string="Send Approval Reminder" class="btn-primary" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
                 <button type="object" name="approve_bom" string="Approve BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
-                <button type="object" name="reject_bom" string="Reject BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
+                <button type="object" name="reject_bom" string="Reject BOM"  class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app','approve'])]}"/>
                 <button type="object" name="set_bom_to_draft" string="Set to Draft" class="btn-primary" attrs="{'invisible':[('state','not in',['reject'])]}"/>
                  <field name="state" widget="statusbar"/>
                 </header>
@@ -983,19 +1028,22 @@
                                     <field name="product_qty"/>
              </xpath>-->
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom']" position="after">
-               <field name="uom_name" invisible="0"/>
-               <field name="product_uom" invisible="0"/>
-               <field name="routing_id" invisible="0"/>
-               <field name="bom_packaging_id" invisible="0"/>
+               <field name="uom_name" invisible="1"/>
+               <field name="product_uom" invisible="1"/>
+               <field name="routing_id" invisible="1"/>
+               <field name="bom_packaging_id" invisible="1"/>
                <field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
                <field name='workcenter_id' options="{'no_open':True,'no_create':True}" context="{'bom_true':True,'routing':parent.routing_id}"/>
               </xpath>
               <field name='routing_id' position='attributes'>
                   <attribute name='required'>1</attribute>
+                <attribute name="attrs">{'readonly':[('state','not in',['draft'])]}</attribute>
                   <attribute name='options'>{'no_create': True, 'no_open': True}</attribute>
               </field>
                <notebook position='before'>
                    <separator string="Wastage in Each Process" colspan="4" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+                   <notebook>
+                   <page string="Whole Process Wastage" attrs="{'readonly':[('state','not in',['draft'])]}">
 		           <field name='bom_wastage_ids' nolable='1' attrs="{'readonly':[('state','not in',['draft'])]}">
 		               <tree editable='bottom'>
 		                    <field name='name' required='1'/>
@@ -1004,14 +1052,33 @@
                                         context="{'bom_true':True,'routing':parent.routing_id}"/>
 		               </tree>
 		           </field>
+                   </page> 
+                   <page string="One Time Wastage" attrs="{'readonly':[('state','not in',['draft'])]}">
+		           <field name='one_time_wastage_ids' nolable='1' attrs="{'readonly':[('state','not in',['draft'])]}">
+		               <tree editable='bottom'>
+		                    <field name='name' required='1'/>
+		                    <field name='value' required='1' sum='total'/>
+		               </tree>
+		           </field>
+                   </page> 
+                   </notebook>
                </notebook>
                <field name="product_tmpl_id" position='attributes'>
                	  <attribute name='invisible'>1</attribute>
                   <attribute name='options'>{'no_create': True}</attribute>
                </field>
                <field name="product_id" position='replace'>
-               	  <field name='product_id' required='1' options="{'no_create': True, 'no_open': True}"/>
+               	  <field name='product_id' attrs="{'readonly':[('state','not in',['draft'])]}" required='1' options="{'no_create': True, 'no_open': True}"/>
+               	  <field name='general_remarks' attrs="{'readonly':[('state','not in',['draft'])]}"/>
+               	  <field name='remarks' attrs="{'readonly':[('state','not in',['sent_for_app'])],'invisible':[('remarks','=',False)]}"/>
+               	  <field name='refuse_reason' attrs="{'readonly':[('refuse_reason','!=',False)],'invisible':[('refuse_reason','=',False)]}"/>
                </field>
+                <xpath expr="//notebook[2]/page[1]" position="attributes">
+                  <attribute name="string">Raw Materials/Components Composition</attribute>
+              </xpath>
+<!--                <xpath expr="//notebook[2]" position="before">
+                  <attribute name="separator">Raw Materials Composition</attribute>
+              </xpath>-->
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="attributes">
                   <attribute name="attrs">{'readonly':[('uom_name','=','Kg')]}</attribute>
               </xpath>
@@ -1066,7 +1133,7 @@
               	  <label for="product_weight"/>
                    <div>
                         <field name="product_weight" class="oe_inline" required="1"/> <label string="Kg/Unit" class="oe_inline"/>
-                        <field name="active" string="Active"/>
+                        <!--<field name="active" string="Active"/>-->
                    </div>
                   <label for="weight"/>
                    <div>
@@ -1077,8 +1144,8 @@
 
                 </page>
               <field name="code" position="replace">
-                        <field name='code' string='Bom Name' />
-              		<field name="master_id" string="BOM Code" options="{'no_open':True,'no_create':True}"/>
+                        <field name='code' string='Bom Name' attrs="{'readonly':[('state','not in',['draft'])]}"/>
+              		<field name="master_id" string="BOM Code" attrs="{'readonly':[('state','not in',['draft'])]}" options="{'no_open':True,'no_create':True}"/>
                         <field name="active"/>
                         <field name="date_start"/>
                        <field name="date_stop"/>
@@ -1092,9 +1159,9 @@
               <field name="company_id" position="attributes">
               		<attribute name="readonly">1</attribute>
               </field>
-              <xpath expr="//notebook/page[1]" position="inside">
+              <xpath expr="//notebook[2]" position="after">
               	    <separator string="Packaging Materials"/> 
-		    <field name="bom_packging_line" position="attributes">
+		    <field name="bom_packging_line" position="attributes" attrs="{'readonly':[('state','not in',['draft'])]}">
 		    	<tree editable="top">
               			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
                             	<field name="product_uom" options="{'no_open':True,'no_create':True}" />
@@ -1125,44 +1192,13 @@
                    <field name="product_tmpl_id" position="before">
               		<field name="code" string='Bom Name'/>
                  </field>
+                   <field name="product_uom" position="after">
+              		<field name="state" string='State'/>
+                 </field>
 	    </field>
        </record>
 
-    <record id="master_bom_form_view" model="ir.ui.view">
-        <field name="name">Master BOM Form view</field>
-        <field name="model">mrp.bom.master</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <form string="Master BOM">
-              <sheet>
-                <group>
-		    <field name="name" required="1"/>
-		</group>
-		<notebook>
-			<page string="Components">
-				<field name="master_line">
-					<tree editable="bottom">
-						<field name="product_id" domain="[('product_material_type.string', 'in',('raw','component'))]" options="{'no_open':True,'no_create':True}"/>
-						<field name="uom_name" readonly="1"/>
-						<field name="quantity" attrs="{'readonly':[('uom_name','=','Kg')],'required':[('uom_name','!=','Kg')]}"/>
-						<field name="percentage" attrs="{'readonly':[('uom_name','!=','Kg')],'required':[('uom_name','=','Kg')]}"/>
-						<field name="master_id" invisible="1"/>
-					</tree>
-					<form create='false' edit='false' delete='false'>
-						<field name="product_id" readonly="1"/>
-						<field name="uom_name" readonly="1"/>
-						<field name="quantity" attrs="{'required':[('uom_name','!=','Kg')],'readonly':[('uom_name','=','Kg')]}"/>
-						<field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
-						<field name="master_id" invisible="1"/>
-					</form>
-				</field>
-			</page>
-		</notebook>
-	       </sheet>
-            </form>
-        </field>
-    </record>
-       
+
     <record model="ir.actions.act_window" id="n_action_bom_master">
         <field name="name">Master BOM</field>
         <field name="type">ir.actions.act_window</field>

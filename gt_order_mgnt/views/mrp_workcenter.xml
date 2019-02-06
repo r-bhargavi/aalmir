@@ -209,9 +209,10 @@
                          context="{'employee':True, 'user_ids':user_id}"/>
                       <field name='supplier_btc_no' widget='many2many_tags'
                          options="{'no_create': True, 'no_open': True}"
+                         attrs="{'invisible': [('previous_batch_id','!=',False)]}"
                        />
-                     <field name='supplier_batch_no' invisible="not context.get('supplier_batch')"
-                           required="context.get('supplier_batch')"/>
+<!--                     <field name='supplier_batch_no' invisible="not context.get('supplier_batch')"
+                           required="context.get('supplier_batch')"/>-->
 
                      <field name='previous_batch_id' options="{'no_create': True}" 
                      domain="[('remain_used_qty','!=',0)]"
@@ -595,7 +596,7 @@
                       <label for='req_product_qty' string="Required Batchs No." />
 		      <div>
 	                <field name="req_product_qty" class="oe_inline" nolabel="1"
-                                readonly='0'/>
+                                readonly='1'/>
                          <!--attrs="{'readonly':['|',('req_product_qty','!=',0),('extra_bool','=',True)]}"-->
                         <field name='batch_unit' class="oe_inline" nolabel="1" readonly='1'/>
                      
@@ -605,7 +606,7 @@
                          <div>
 		                 <field name='each_batch_qty' class="oe_inline" nolabel="1"
                                   attrs="{'readonly':[('batch_ids','!=',[])]}"/>
-                                <field name="req_uom_id"  class="oe_inline" nolabel="1" 
+                                <field name="wk_required_uom"  class="oe_inline" nolabel="1" 
                                   attrs="{'readonly':[('batch_ids','!=',[])]}" options="{'no_create': True, 'no_open': True}"/>
                                 <span  attrs="{'invisible':[('process_type','!=','cutting')]}" nolabel="1">/</span>
                                  <field name='cutting_pac_qty' class="oe_inline" nolabel="1" attrs="{'invisible':[('process_type','!=','cutting')]}" readonly='1'/>
