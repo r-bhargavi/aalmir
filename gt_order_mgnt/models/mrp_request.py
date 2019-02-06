@@ -1301,7 +1301,7 @@ class n_manufacturing_request(models.Model):
         mo_form = self.env.ref('mrp.mrp_production_form_view', False)
         print "Self>dfsfsdfsdfdsf",context
         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
-        if bom_id and bom.state!='approve':
+        if bom_id and bom_id.state!='approve':
             raise UserError('You are not allowed to create MO request as the BoM is still not approved')
 
         if not bom_id:
