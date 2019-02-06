@@ -1082,8 +1082,8 @@ class n_manufacturing_request(models.Model):
                         else:
                             note=self.n_Note
 			body_html = """<div> 
-                                <p>Dear User,<br/>
-				<p> <strong>New production request is raised as per below details</strong></p><br/>
+                                <strong><p>Dear User,<br/>
+				<p>New production request is raised as per below details</strong></p><br/>
 				
 					<p>Request Number : <b>%s</b> </p>
 		    			<p>Product:<b>%s</b> </p>

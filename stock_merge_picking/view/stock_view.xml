@@ -19,6 +19,8 @@
 			
 			<button name="do_unreserve" position="replace">
                  		<button name="do_unreserve" string="Unreserve" groups="gt_order_mgnt.group_sale_support" type="object" attrs="{'invisible': ['|','|',('picking_status','!=','draft'),('quant_reserved_exist', '=', False),('picking_type_code','!=','outgoing')]}"/>
+                                <!--to make the unreserver visible for consulmabe prodcts at partailly avbl and abvbl state-->
+                                <button name="do_unreserve" string="Unreserve" groups="gt_order_mgnt.group_sale_support" type="object" attrs="{'invisible': ['|','|','|',('picking_status','!=','draft'),('quant_reserved_exist', '=', True),('picking_type_code','!=','outgoing'),('state', 'not in', ['partially_available','assigned'])]}"/>
                  		<button name="do_unreserve" string="Unreserve" groups="stock.group_stock_manager" type="object" attrs="{'invisible': ['|','|',('picking_status','not in',('draft','pick_list')),('quant_reserved_exist', '=', False),('picking_type_code','!=','internal')]}"/>
 			</button>
 			
