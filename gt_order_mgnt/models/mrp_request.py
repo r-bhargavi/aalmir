@@ -1772,8 +1772,8 @@ class MrpBom(models.Model):
     			raise UserError(_('Please Enter Product weight in product form'))
     		weight = product_id.weight if product_id else 0.0
     		for line1 in vals.get('bom_line_ids'):
-                        if not vals.get('workcenter_id'):
-                            raise UserError(_('Please Select Process in BoM Lines!!'))
+#                        if not vals.get('workcenter_id'):
+#                            raise UserError(_('Please Select Process in BoM Lines!!'))
 
     			if type(line1[2]) == dict:
     			    uom_id=line1[2].get('uom_name')
