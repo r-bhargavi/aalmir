@@ -749,6 +749,7 @@ class MrpWorkorderMachineProduce(models.Model):
                    record.batch_id.write({                                      
                    'employee_ids':[(4, record.employee_ids.ids)]
                     })
+               record.production_id.write({'state':'in_production'})
                record.batch_id._check_ro()
                 
 class MrpWorkorderMachineProduceLine(models.Model):
