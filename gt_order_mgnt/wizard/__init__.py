@@ -13,3 +13,4 @@ import sale_support_wizard
 import stock_return_picking
 import reject_bill_reason
 import print_batches_data
+import approve_bom_wizard

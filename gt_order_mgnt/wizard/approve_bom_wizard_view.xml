@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="approve_bom_wizard_wizard_view_form" model="ir.ui.view">
+        <field name="name">approve.bom.wizard.form</field>
+        <field name="model">approve.bom.wizard</field>
+        <field name="arch" type="xml">
+            <form string="BOM Approval Description">
+                <separator string="Any Remarks on Approval"/>
+                <field name="description"/>
+                <footer>
+                    <button string='Approve BOM' name="approve_bom_now" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" special="cancel" class="oe_highlight"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="approve_bom_wizard_form" model="ir.actions.act_window">
+        <field name="name">Approve BoM</field>
+        <field name="res_model">approve.bom.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="approve_bom_wizard_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

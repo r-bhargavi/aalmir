@@ -4,14 +4,14 @@
         <field name="name">pay.cancel.reason.wizard.form</field>
         <field name="model">cancel.pay.reason.wizard</field>
         <field name="arch" type="xml">
-            <form string="Bill refuse reason">
-                <separator string="Reason of Cancellation"/>
-                <field name="description" string="Cancel Reason"  required="1"/>
-                <field name="uploaded_document_cancel" widget="many2many_binary" string="Cancel Proof"/>
+            <form string="BOM Rejection">
+                <separator string="Reason of rejection"/>
+                <field name="description" string="Rejection reason"  required="1"/>
+                <field name="uploaded_document_cancel" widget="many2many_binary" string="Upload any supporting document"/>
                 <footer>
-                    <button string='Confirm Cancel' name="pay_refuse_reason" type="object" class="oe_highlight"/>
-                    or
-                    <button string="Cancel" class="oe_link" special="cancel"/>
+                    <button string='Reject BOM' name="pay_refuse_reason" type="object" class="oe_highlight"/>
+                   
+                    <button string="Cancel" class="oe_highlight" special="cancel"/>
                 </footer>
            </form>
         </field>

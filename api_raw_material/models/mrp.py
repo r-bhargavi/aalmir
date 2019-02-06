@@ -97,20 +97,22 @@ class MrpProduction(models.Model):
                record.remain_wastage_qty=record.total_wastage_qty 
                
     @api.multi
-    @api.depends('product_id.weight','bom_id.bom_wastage_ids', 'product_qty','mrp_sec_qty')
+    @api.depends('product_id.weight','bom_id.one_time_wastage_ids','bom_id.bom_wastage_ids', 'product_qty','mrp_sec_qty')
     def allowwastage_mo(self):
         for record in self:
             qty=0.0
+            total1=0.0
             weight=0.0#record.product_id.initial_weight - record.product_id.weight if  record.product_id.initial_weight else record.product_id.weight
             if record.bom_id and record.product_id.weight:
                total=sum(line.value for line in record.bom_id.bom_wastage_ids)
                weight=((record.product_id.weight)*total ) /100
-                  
+            if record.bom_id.one_time_wastage_ids:
+                total1=sum(line.value for line in record.bom_id.one_time_wastage_ids)
             if record.product_uom.name == 'Pcs':
                qty=record.product_qty
             if record.product_uom.name == 'Kg':
                qty=record.mrp_sec_qty
-            record.wastage_allow = qty * (weight)
+            record.wastage_allow = (qty * (weight))+total1
             
     @api.multi
     @api.depends('wastage_ids')
@@ -282,7 +284,15 @@ class MrpProductionProductLine(models.Model):
    def _get_rawMaterialQty(self):
 	for record in self:
 #            requested qty shud always remain same
-		record.required_qty=record.product_qty - record.extra_qty
+                div_var=0.0
+                if record.production_id.bom_id.one_time_wastage_ids:
+                    no_of_one_time_wastage_ids=sum(line.value for line in record.production_id.bom_id.one_time_wastage_ids)
+                print "record.production_id.bom_id.record.production_id.bom_id.",record.production_id.bom_id.code
+                no_of_component_ids=len(record.production_id.bom_id.bom_line_ids.ids)
+                print "no_of_one_time_wastage_idsno_of_one_time_wastage_ids",no_of_one_time_wastage_ids,no_of_component_ids
+                div_var=float(no_of_one_time_wastage_ids)/float(no_of_component_ids)
+                print "div_vardiv_vardiv_var",div_var
+		record.required_qty=record.product_qty + div_var - record.extra_qty
                 record.request_qty =record.required_qty    
                 received_qty=0.0
 		for picking in record.production_id.delivery_ids:

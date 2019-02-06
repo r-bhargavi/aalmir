@@ -129,7 +129,7 @@
               domain="[('production_id','=',production_id),('lot_id','=',False),('product_qty','&gt;',0)]"
               options="{'no_create': True}" />
               <!-- attrs="{'required': [('product_qty', '&gt;', 0)],'readonly':[('complete_produce','=',True)]}" /-->
-             <label for='product_qty' string="Select Quantity" invisible="0"/>
+             <label for='product_qty' string="Qty To Transfer" invisible="0"/>
 	     <div>
                <!--field name="product_qty" colspan="2" class="oe_inline" nolabel="1"/-->
                <!--on wizard of produce batches in mo make product qty readonly-->

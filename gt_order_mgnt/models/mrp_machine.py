@@ -579,7 +579,7 @@ class MrpWorkorderMachineProduce(models.Model):
                        produce_qty=record.produced_qty
                   '''if record.previous_batch_id.remain_used_qty < (produce_qty + wast_qty):
                         raise UserError(_("You can not Produced Qty(%s)(%s) because your selected Previous Batch Remaining Qty(%s)(%s).")%(round((produce_qty + wast_qty),2),(record.previous_batch_id.uom_id.name),round(record.previous_batch_id.remain_used_qty,2) ,(record.previous_batch_id.uom_id.name)))'''
-      	if record.produced_qty <0:
+      	if record.produced_qty <=0:
       		raise UserError("Enter Proper Produce Quantity")
       	elif record.wastage_qty <0:
       		raise UserError("Enter Proper Wastage Quantity")
@@ -722,7 +722,11 @@ class MrpWorkorderMachineProduce(models.Model):
 		  record.previous_batch_id.used_qty +=(produce_qty + wast_qty)
 		  record.previous_batch_id.remain_used_qty -=(produce_qty + wast_qty)
                for emp in record.employee_ids:
-                   name +='%s %s'%(emp.name,"\n") 
+                   name +='%s %s'%(emp.name,"\n")
+               supp_name=''
+               if record.supplier_btc_no:
+                  for supp in record.supplier_btc_no:
+                     supp_name +='%s %s'%(supp.name,"\n") 
 #               record.batch_id.write({'product_qty':record.batch_id.product_qty + record.product_qty,
                record.batch_id.write({
 #                                    'product_qty':record.batch_id.product_qty + record.produced_qty,
@@ -734,7 +738,7 @@ class MrpWorkorderMachineProduce(models.Model):
                                        'produce_qty_date':record.produce_date,
 #                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.product_qty),
                                        'remain_used_qty':record.batch_id.remain_used_qty +(record.produced_qty),
-                                       'supplier_batch_no':record.supplier_batch_no,
+                                       'supplier_batch_no':supp_name,
                                       'wastage_qty':record.batch_id.wastage_qty + record.wastage_qty,
                                       'prev_batch_id':record.previous_batch_id.id})
                if record.document:
