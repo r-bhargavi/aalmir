@@ -284,7 +284,7 @@ class MrpProductionProductLine(models.Model):
    def _get_rawMaterialQty(self):
 	for record in self:
 #            requested qty shud always remain same
-                div_var=0.0
+                div_var,no_of_one_time_wastage_ids,no_of_component_ids=0.0,0.0,0.0
                 if record.production_id.bom_id.one_time_wastage_ids:
                     no_of_one_time_wastage_ids=sum(line.value for line in record.production_id.bom_id.one_time_wastage_ids)
                 print "record.production_id.bom_id.record.production_id.bom_id.",record.production_id.bom_id.code

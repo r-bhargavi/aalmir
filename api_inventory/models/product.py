@@ -41,7 +41,10 @@ class productTemplate(models.Model):
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
 	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count_mo')
+	mo_count_var = fields.Float('#Manufacturing',store=True,compute='_count_mo')
         prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
+        in_count = fields.Char('#Incoming Count',compute='_get_in_data')
+        prod_count_var = fields.Float('#Production Orders',store=True,compute='_get_prod_orders_count')
 	bill_count = fields.Char('#Bills',compute='_get_bill_data')
 	bin_location_count = fields.Integer('#Bin Location',compute='_get_batches_data')
 	
@@ -91,6 +94,31 @@ class productTemplate(models.Model):
                     for each in prod_req_ids:
                         prod_count += each.n_order_qty
                 res.prod_count=str(prod_count)
+	@api.multi
+	def _get_in_data(self):
+            for res in self:
+                prod_count=0.0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+                product_id = [p.id for p in product_id]
+
+                prod_req_ids = self.env['stock.move'].search([('product_id','in',product_id),('state','in',['assigned'])])
+                print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
+                if prod_req_ids:
+                    for each in prod_req_ids:
+                        prod_count += each.product_uom_qty
+                res.in_count=str(prod_count)
+	@api.multi
+        @api.depends('prod_count')
+	def _get_prod_orders_count(self):
+            for res in self:
+                if res.prod_count:
+                    res.prod_count_var=res.prod_count
+	@api.multi
+        @api.depends('mo_count')
+	def _count_mo(self):
+            for res in self:
+                if res.mo_count:
+                    res.mo_count_var=res.mo_count
 	@api.multi
 	def _get_bill_data(self):
             for res in self:
@@ -176,6 +204,22 @@ class productTemplate(models.Model):
 		    'domain':[('n_product_id','in',product_id)],
 		    'target': 'current',
 		 }
+	@api.multi
+	def open_in_orders(self):
+		order_tree = self.env.ref('stock.view_move_tree', False)
+		product_id = self.env['product.product'].search([('product_tmpl_id','=',self.id)])
+		product_id = [p.id for p in product_id]
+		return {
+		    'name':"'{}'Move IN Orders".format(self.name),
+		    'type': 'ir.actions.act_window',
+		    'view_type': 'form',
+		    'view_mode': 'tree',
+		    'res_model': 'stock.move',
+		    'views': [(order_tree.id, 'tree')],
+		    'view_id': order_tree.id,
+		    'domain':[('product_id','in',product_id)],
+		    'target': 'current',
+		 }
 	
 	@api.multi
 	def open_bills(self):
@@ -256,6 +300,9 @@ class productProduct(models.Model):
 	@api.multi
 	def open_prod_orders(self):
 		return self.product_tmpl_id.open_prod_orders()
+	@api.multi
+	def open_in_orders(self):
+		return self.product_tmpl_id.open_in_orders()
 	@api.multi
 	def open_bills(self):
 		return self.product_tmpl_id.open_bills()

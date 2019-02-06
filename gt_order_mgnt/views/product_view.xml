@@ -1,6 +1,34 @@
 <?xml version="1.0"?>
 <odoo>
+    	<record id="product_template_only_form_view_api_inherit_package" model="ir.ui.view">
+		<field name="name">Product Form Package</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="arch" type="xml">
+<!--                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object"
+                            name="action_open_scrap"
+                            attrs="{'invisible':[('type', '!=', 'product')]}"
+                            class="oe_stat_button" icon="fa-building-o">
+                            <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
+                        </button>
+                </xpath>-->
+                <field name="packaging_ids"  position="replace"/>
+                <field name="default_code" position="replace" />
+                <field name="barcode" position="replace"/>
+		</field>
+	</record>
      <!-- Start Inherit Product tree view -->
+	<record id="stock_template_tree_view_inherite" model="ir.ui.view">
+		<field name="name">Stock product Template Tree view</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="stock.view_stock_product_template_tree"/>
+		<field name="arch" type="xml">
+                      <field name="qty_available" position='replace' />
+                      <!--<field name="volume" position='replace' />-->
+                      <field name="virtual_available" position='replace'/>
+                </field>
+        </record>
 	<record id="product_template_tree_view_inherite" model="ir.ui.view">
 		<field name="name">product Template Tree view</field>
 		<field name="model">product.template</field>
@@ -9,9 +37,15 @@
                       <field name="type" position='replace' />
                       <!--<field name="volume" position='replace' />-->
                       <field name="volume" position='replace'>
-		     		<field name="qty_reserved"/>
-		     		<field name="uom_id" invisible="not context.get('msq')"/>
-		     		<field name="reordering_min_qty" string="Minimum Stock Qty" invisible="not context.get('msq')"/>
+                        <field name="qty_reserved"/>
+
+                           <field name="qty_available"/>
+                            <field name="virtual_available"/>
+                        <field name="reordering_min_qty" string="Minimum Stock Qty" invisible="not context.get('msq')"/>
+<!--                        <field name="prod_count_var" string="Production Count"/>
+                        <field name="mo_count_var" string="MO Count"/>-->
+
+                        <field name="uom_id" invisible="not context.get('msq')"/>
                       </field>
                       <field name="standard_price" position='attributes'>
                       		<attribute name='group'>gt_order_mgnt.group_sale_support</attribute>
@@ -99,25 +133,7 @@
 		</field>
 	</record>
 
-	<record id="product_template_only_form_view_api_inherit_package" model="ir.ui.view">
-		<field name="name">Product Form Package</field>
-		<field name="model">product.template</field>
-		<field name="inherit_id" ref="product.product_template_only_form_view"/>
-		<field name="arch" type="xml">
-<!--                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button type="object"
-                            name="action_open_scrap"
-                            attrs="{'invisible':[('type', '!=', 'product')]}"
-                            class="oe_stat_button" icon="fa-building-o">
-                            <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
-                        </button>
-                </xpath>-->
-                <field name="packaging_ids"  position="replace"/>
-                <field name="default_code" position="replace" />
-                <field name="barcode" position="replace" />
 
-		</field>
-	</record>
 	<!--record id="product_template_form_view_invoice_policy_inheriten" model="ir.ui.view">
 		<field name="name">Product Invoice Form</field>
 		<field name="model">product.template</field>
@@ -244,6 +260,8 @@
 		  <field name="uom_id" position="replace">
 		  	<field name="internal_name" />
 		  	<field name="n_product_type" readonly="1" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>
+<!--		  	<field name="prod_count_var"/>
+		  	<field name="mo_count_var"/>-->
                         <label for="n_calculator_id" string="Product Descriptions" attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}"/>
                     	<div attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}">
                         	<field name="n_calculator_id" readonly="1"  nolabel="1" class="oe_inline"/>

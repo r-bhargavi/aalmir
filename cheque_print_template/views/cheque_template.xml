@@ -2,49 +2,34 @@
 <openerp>
     <data>
         <template id="report_cheque_print_template_document">
-                <t t-foreach="docs" t-as="o">
+<t t-foreach="docs" t-as="o">
                     <div class="page">
                         <style type="text/css">
                             <t t-call="cheque_print_template.custom_style_layout"/>
                         </style>
-                        <table  width="100%">
-                            <tr >
-                                <td width="70%">
-                                </td>
-                                <td class="text-right" width="30%" style="padding-right:45px;">
-                                        <span class="account_pay_layout" t-field="o.cheque_date" t-field-options='{"format": "dd-MM-yyyy"}'/>
-                                </td>
-                            </tr>
-                             <tr >
-                                <td colspan="2"  style="padding-right:15px;padding-top:15px;padding-top:25px">
-                                    <div class="row">
-                                    <div class="col-xs-8"></div>
-                                    <div class="col-xs-4" style="border-top:1px solid red;border-bottom:1px solid red;color:red; width:135px" >
+                        <table width="100%">
+                            <tr>
+                                <td width="35%" align="right"></td>
+                                <td width="55%" align="left"><div class="col-xs-4" style="border-top:1px solid red;border-bottom:1px solid red;color:red; width:135px">
                                     <t t-if="o.journal_id.account_pay_cheque==True">
-                                        A/c. Payee Only
-                                    </t>
-                                    </div>
-                                    </div>
-                                </td>
+                                        A/c. Payee Only                                    </t>
+                                  </div>   </td>
+                              <td align="right" width="10%" >
+                                        <span style="font-size:1.5em; " class="account_pay_layout" t-field="o.cheque_date" t-field-options="{&quot;format&quot;: &quot;dd-MM-yyyy&quot;}"/> </td>
                             </tr>
-                            <tr >
-                                <td colspan="2" style="padding-left:20px;padding-top:22px;padding-top:10px;" >
+                            <tr>
+                                <td colspan="3" style="padding-left:0px; padding-top:110px;">
                                     <t t-if="o.journal_id.account_pay_cheque==True">
-                                    <span t-field="o.partner_id.name"/>
-                                     </t>
-                                </td>
+                                     <span style="font-size:1.5em;" t-field="o.partner_id.name"/></t>  </td>
                             </tr>
-                            <tr >
-                                <td style="padding-left:60px;padding-top:40px;">
-                                     <span  t-field="o.check_amount_in_words"/>
-                                </td>
-                                <td rowspan="2" style="padding-left:60px;padding-top:40px;">
-                                     <span  t-field="o.amount"/>
-                                </td>
+                            <tr>
+                                <td colspan="2" style="padding-left:0px; padding-top:30px; line-height:4em;">
+                                     <span style="font-size:1.5em;" t-field="o.check_amount_in_words"/>                                  </td>
+                                <td rowspan="2" style="padding-left:110px; padding-top:70px;">
+                                    <strong>**</strong><span style="font-size:1.5em;" t-field="o.amount"/><strong>** </strong>                                </td>
                             </tr>
-                            <tr >
-                                <td class="text-right" style="padding-right:60px;padding-top:20px;" height="30px">
-                                </td>
+                            <tr>
+                                <td height="30px" colspan="2" class="text-right" style="padding-right:60px;padding-top:20px;">                                </td>
                             </tr>
                             <!--<tr >-->
                                 <!--<td>-->
@@ -56,7 +41,7 @@
                         </table>
                     </div>
             </t>
-        </template>
+                </template>
 
         <template id="report_cheque_print_template">
              <t t-call="report.html_container">
