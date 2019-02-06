@@ -1,5 +1,27 @@
 <?xml version="1.0"?>
 <odoo>
+    <record id="mrp.mrp_bom_form_action" model="ir.actions.act_window">
+            <field name="name">Bill of Materials</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.bom</field>
+            <field name="context">{'group_by':'state'}</field>
+
+            <field name="domain">[]</field> <!-- force empty -->
+            <field name="view_type">form</field>
+            <field name="search_view_id" ref="mrp.view_mrp_bom_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a bill of material.
+              </p><p>
+                Bills of Materials allow you to define the list of required raw
+                materials used to make a finished product; through a manufacturing
+                order or a pack of products.
+              </p><p>
+                Odoo uses these BoMs to automatically propose manufacturing
+                orders according to procurement needs.
+              </p>
+            </field>
+        </record>
     
     <record id="mrp.mrp_production_action" model="ir.actions.act_window">
             <field name="name">Manufacturing Orders</field>
