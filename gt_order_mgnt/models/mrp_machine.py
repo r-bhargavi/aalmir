@@ -465,10 +465,21 @@ class MrpWorkorderMachinePause(models.Model):
 
 class MrpWorkorderMachineProduce(models.Model):
     _name = 'mrp.order.machine.produce'
+    @api.multi
+    @api.depends('order_id')
+    def compute_first_wo(self):
+        for record in self: 
+            if record.order_id:
+                print "recorf,mjk,nk",record.order_id.sequence,type(record.order_id.sequence)
+                if record.order_id.sequence==1:
+                   record.first_order=True
+                else:
+                   record.first_order=False
     
     req_product_qty=fields.Float('Required',related='batch_id.req_product_qty',store=True)
 
-    
+    first_order = fields.Boolean('First Order',compute='compute_first_wo')
+
     @api.onchange('employee_ids')
     def _onchange_employee_ids(self):
         if self.order_id:
@@ -691,6 +702,7 @@ class MrpWorkorderMachineProduce(models.Model):
                   body +='<ul><li style="color:red"> Reason         : '+str(self.wastage_reason) +'</li></ul>'
                record.order_id.message_post(body=body)
                record.production_id.message_post(body=body)
+               record.production_id.write({'state':'in_production'})
                record.bool_check =False 
                name=''
                wast_qty=produce_qty=0.0
@@ -724,7 +736,7 @@ class MrpWorkorderMachineProduce(models.Model):
                for emp in record.employee_ids:
                    name +='%s %s'%(emp.name,"\n")
                supp_name=''
-               if record.supplier_btc_no:
+               if record.supplier_btc_no and record.first_order==True:
                   for supp in record.supplier_btc_no:
                      supp_name +='%s %s'%(supp.name,"\n") 
 #               record.batch_id.write({'product_qty':record.batch_id.product_qty + record.product_qty,
@@ -749,7 +761,6 @@ class MrpWorkorderMachineProduce(models.Model):
                    record.batch_id.write({                                      
                    'employee_ids':[(4, record.employee_ids.ids)]
                     })
-               record.production_id.write({'state':'in_production'})
                record.batch_id._check_ro()
                 
 class MrpWorkorderMachineProduceLine(models.Model):
@@ -1997,6 +2008,21 @@ class MrpWorkcenterPructionline(models.Model):
             if record.batch_ids:
                record.total_product_qty=sum(line.product_qty for line in record.batch_ids)
                record.total_uom_id=record.batch_ids[0].uom_id.id
+    @api.multi
+    @api.depends('req_product_qty')
+    def compute_req_qty(self):
+        for record in self: 
+            if record.req_product_qty:
+               record.req_product_qty_comp=record.req_product_qty
+    
+    @api.multi
+    @api.depends('sequence')
+    def compute_first_wo(self):
+        for record in self: 
+            if record.sequence==1:
+               record.first_order=True
+            else:
+               record.first_order=False
     
     date_planned_end=fields.Datetime(compute='endtime')
     user_ids=fields.Many2many('res.users', string='Assign To')
@@ -2019,6 +2045,7 @@ class MrpWorkcenterPructionline(models.Model):
                                ('4', '4x'),('5', '5x')], string='Production Output', default='1')
     remark=fields.Text('Remark')
     req_product_qty = fields.Integer('Required Batch Qty')
+    req_product_qty_comp = fields.Integer('Required Batch Qty',compute='compute_req_qty')
     each_batch_qty = fields.Integer('Each Batch Qty')
     print_type=fields.Selection([('normal','Normal'),('detailed','Detailed')], default='normal', string='Print Type')    
     req_uom_id=fields.Many2one('product.uom')

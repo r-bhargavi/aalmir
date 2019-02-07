@@ -200,6 +200,7 @@
                         <!--<field name="uom_id"  class="oe_inline" nolabel="1" readonly="1"/>-->
 
                      <field name='produce_date' />
+                     <field name='first_order' invisible="1"/>
                      <!--</div>-->
                      
                      <field name='user_id' context="{'operator':True, 'order_id':order_id}" invisible='1'
@@ -209,7 +210,7 @@
                          context="{'employee':True, 'user_ids':user_id}"/>
                       <field name='supplier_btc_no' widget='many2many_tags'
                          options="{'no_create': True, 'no_open': True}"
-                         attrs="{'invisible': [('previous_batch_id','!=',False)]}"
+                         attrs="{'invisible': [('first_order','=',False)]}"
                        />
 <!--                     <field name='supplier_batch_no' invisible="not context.get('supplier_batch')"
                            required="context.get('supplier_batch')"/>-->
@@ -596,8 +597,11 @@
                       <label for='req_product_qty' string="Required Batchs No." />
 		      <div>
 	                <field name="req_product_qty" class="oe_inline" nolabel="1"
-                                readonly='1'/>
-                         <!--attrs="{'readonly':['|',('req_product_qty','!=',0),('extra_bool','=',True)]}"-->
+                                invisible="1"/>
+	                <field name="req_product_qty_comp" class="oe_inline" nolabel="1"
+                                />
+                        <!--attrs="{'readonly':['|',('req_product_qty','!=',0),('extra_bool','=',True)]}"-->
+                         
                         <field name='batch_unit' class="oe_inline" nolabel="1" readonly='1'/>
                      
 			
