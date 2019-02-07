@@ -1604,7 +1604,7 @@ class MrpBom(models.Model):
     bom_wastage_ids=fields.One2many('mrp.bom.wastage.type','bom_id', string='Wastage Details')
     one_time_wastage_ids=fields.One2many('mrp.bom.wastage.one.time','bom_id', string='One Time Wastage')
     product_id = fields.Many2one('product.product', 'Product Name',help="Product for BOM",domain="[('product_tmpl_id.product_material_type.string','not in',('packaging','raw','asset'))]")
-    state = fields.Selection([('draft','Draft'),('sent_for_app','Sent For Approval'),('approve','Approved'),
+    state = fields.Selection([('draft','Draft'),('sent_for_app','Sent For Approval'),('app_rem_sent','Approval Reminder Sent'),('approve','Approved'),
    			   ('reject','Rejected')],default='draft',track_visibility='always' )
     general_remarks=fields.Text('General Remarks',track_visibility='always' )
     remarks=fields.Text('Remarks on Approval',track_visibility='always' )
@@ -1665,6 +1665,55 @@ class MrpBom(models.Model):
 #                self.message_post(body=body_html)
                 temp_id.send_mail(self.id)
                 self.write({'state':'sent_for_app'})
+        return True
+    @api.multi
+    def send_approval_reminder(self):
+        if not self.bom_line_ids:
+            raise UserError(_('Please Enter Raw Material/Components before sending for approval!!'))
+
+        temp_id = self.env.ref('gt_order_mgnt.email_template_for_bom_approval')
+        user_obj = self.env['res.users'].browse(self.env.uid)
+
+        if temp_id:
+                base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                query = {'db': self._cr.dbname}
+                fragment = {
+                          'model': 'mrp.bom',
+                          'view_type': 'form',
+                          'id': self.id,
+                         }
+                url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+                print "urlurl",url
+                text_link = _("""<a href="%s">%s</a> """) % (url,self.code)
+                group,send_user_name=False,''
+                recipient_partners=[]
+                group = self.env['res.groups'].search([('name', '=', 'Can Approve/Reject BOM')])
+                print "groupgroupgroupgroupgroupgroup",group
+                for groups in group:
+                    for recipient in groups.users:
+                        if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
+                             recipient_partners.append(recipient.login)
+                             send_user_name=recipient.name
+
+                send_user = ",".join(recipient_partners)
+                new_subject='BOM Approval Reminder Alert: BoM Approval Reminder for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
+                body_html = """<div> 
+                        <p>Dear User,<br/>
+                        <p>Kindly Approve BOM at your earliest so that MO can be planned and started.</p><br/>
+		    			<p>Product:<b>%s</b> </p>
+		    			<p>Request Ref:<b>%s</b> </p>
+		    			<p>BOM Code:<b>%s</b> </p>
+		    			<p>Created By<b>%s</b> </p>
+				</p>
+				</div>"""%('['+str(self.product_id.default_code)+']'+' '+str(self.product_id.name),str(text_link),str(self.code),str(self.env.user.name))
+                body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.bom',self.id, context=self._context)
+                print "body_htmlbody_htmlbody_html",body_html
+                temp_id.write({'body_html': body_html,'subject':new_subject,
+                                'email_to' : send_user, 'email_from': self.env.user.email})
+                print "send_usersend_user",send_user,body_html
+#                self.message_post(body=body_html)
+                temp_id.send_mail(self.id)
+                self.write({'state':'app_rem_sent'})
         return True
     @api.multi
     def approve_bom(self):
