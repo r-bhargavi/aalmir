@@ -1038,7 +1038,6 @@ class MrpWorkorderBatchNo(models.Model):
         else:
 
 	    order=workorder.search([('production_id','=',self.production_id.id),('next_order_id','=',self.order_id.id)])
-        self.production_id.write({'state':'in_production'})
         if order:
            batch=''
            for orde in order:
@@ -1728,7 +1727,6 @@ class MrpWorkcenterPructionline(models.Model):
                #record.write({'batch_ids':[(6,0, b_list)],'issue_bool':True})
                record.message_post(body=body)
                record.production_id.message_post(body=body)
-               record.production_id.write({'state:''in_production'})
    
     @api.multi
     def split_order(self):
