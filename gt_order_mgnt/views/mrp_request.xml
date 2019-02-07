@@ -529,10 +529,10 @@
                 <attribute name="invisible">1</attribute>
                  <!--button name="action_assign"  string="Reserve" type="object" class="oe_highlight" attrs="{'invisible':[('state','not in',('confirmed','picking_except'))]}"/-->
               </button>
-               <!--button name="force_production"   position="attributes">
+               <button name="force_production"   position="attributes">
                 <attribute name="invisible">1</attribute>
                
-              </button-->
+            </button>
               <button name="button_cancel" states="draft,ready,in_production" position="attributes">
                 <attribute name="class">oe_highlight</attribute>
               </button>
@@ -1080,6 +1080,8 @@
 		               <tree editable='bottom'>
 		                    <field name='name' required='1'/>
 		                    <field name='value' required='1' sum='total'/>
+                                    <field name='workcenter_id'
+                                        context="{'bom_true':True,'routing':parent.routing_id}"/>
 		               </tree>
 		           </field>
                    </page> 

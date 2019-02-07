@@ -187,7 +187,7 @@ class MrpProduction(models.Model):
                     #schedule_order=self.env.cr.fetchone()
                     body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
                     lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
-                        'qty':line.product_qty,'pending_qty':line.product_qty, 'rm_type':'stock'})) 
+                        'qty':line.required_qty,'pending_qty':line.required_qty, 'rm_type':'stock'})) 
                 location_dest_id=record.location_dest_id
 #                to send respective stock location in rm request loction
                 rm_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',location_dest_id.location_id.id)])
@@ -284,21 +284,31 @@ class MrpProductionProductLine(models.Model):
    def _get_rawMaterialQty(self):
 	for record in self:
 #            requested qty shud always remain same
-                div_var,no_of_one_time_wastage_ids,no_of_component_ids=0.0,0.0,0.0
+                div_var,no_of_one_time_wastage_ids,no_of_component_ids,product_ids,process_id=0.0,0.0,0.0,[],False
                 if record.production_id.bom_id.one_time_wastage_ids:
                     no_of_one_time_wastage_ids=sum(line.value for line in record.production_id.bom_id.one_time_wastage_ids)
-                print "record.production_id.bom_id.record.production_id.bom_id.",record.production_id.bom_id.code
+#                    if record.production_id.bom_id.one_time_wastage_ids[0].workcenter_id:
+#                        process_id=record.production_id.bom_id.one_time_wastage_ids[0].workcenter_id.id
+#                if process_id:
+                bom_line_prod_ids=[x.product_id.id for x in record.production_id.bom_id.bom_line_ids]
+#                    packging_line_prod_ids=[x.product_id.id for x in record.production_id.bom_id.bom_packging_line if x.workcenter_id.id==process_id]
+#                    product_ids=bom_line_prod_ids+packging_line_prod_ids
                 no_of_component_ids=len(record.production_id.bom_id.bom_line_ids.ids)
                 print "no_of_one_time_wastage_idsno_of_one_time_wastage_ids",no_of_one_time_wastage_ids,no_of_component_ids
                 div_var=float(no_of_one_time_wastage_ids)/float(no_of_component_ids)
-                print "div_vardiv_vardiv_var",div_var
-		record.required_qty=record.product_qty + div_var - record.extra_qty
+                print "div_vardiv_vardiv_var",div_var,product_ids
+#                if product_ids:
+                if record.product_id.id in bom_line_prod_ids:
+                    record.required_qty=record.product_qty + div_var - record.extra_qty
+
+                else:
+                    record.required_qty=record.product_qty -record.extra_qty
                 record.request_qty =record.required_qty    
                 received_qty=0.0
 		for picking in record.production_id.delivery_ids:
                     print "pickingpickingpicking",picking
                     if picking.state == 'done':
-                            record.production_id.write({'state':'ready'})
+                            record.production_id.write({'state':'in_production'})
                             for line in picking.pack_operation_product_ids:
                                     if line.product_id.id == record.product_id.id:
                                             received_qty += line.qty_done
