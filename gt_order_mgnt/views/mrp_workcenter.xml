@@ -734,7 +734,7 @@
                         <tree>
                           <field name='previous_batch_id'/>
                            <field name='batch_id' string='Current Batch No'/>
-                            <field name='product_qty' string="Produced Qty"/>
+                            <field name='produced_qty' string="Produced Qty"/>
                              <field name='uom_id' string='Unit'/>
                             <field name="create_uid" string='User Name'/>
                             <field name='remark'/>
