@@ -1036,9 +1036,9 @@
                 <xpath expr="//form/sheet" position="before">
                 <header>
                 <button type="object" name="send_for_approval" string="Send For Approval" class="btn-primary" attrs="{'invisible':[('state','not in',['draft'])]}"/>
-                <button type="object" name="send_approval_reminder" string="Send Approval Reminder" class="btn-primary" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
-                <button type="object" name="approve_bom" string="Approve BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app'])]}"/>
-                <button type="object" name="reject_bom" string="Reject BOM"  class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app','approve'])]}"/>
+                <button type="object" name="send_approval_reminder" string="Send Approval Reminder" class="btn-primary" attrs="{'invisible':[('state','not in',['sent_for_app','app_rem_sent'])]}"/>
+                <button type="object" name="approve_bom" string="Approve BOM" class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app','app_rem_sent'])]}"/>
+                <button type="object" name="reject_bom" string="Reject BOM"  class="btn-primary" groups="gt_order_mgnt.group_get_alert_bom_app_reject" attrs="{'invisible':[('state','not in',['sent_for_app','approve','app_rem_sent'])]}"/>
                 <button type="object" name="set_bom_to_draft" string="Set to Draft" class="btn-primary" attrs="{'invisible':[('state','not in',['reject'])]}"/>
                  <field name="state" widget="statusbar"/>
                 </header>
@@ -1092,7 +1092,7 @@
                <field name="product_id" position='replace'>
                	  <field name='product_id' attrs="{'readonly':[('state','not in',['draft'])]}" required='1' options="{'no_create': True, 'no_open': True}"/>
                	  <field name='general_remarks' attrs="{'readonly':[('state','not in',['draft'])]}"/>
-               	  <field name='remarks' attrs="{'readonly':[('state','not in',['sent_for_app'])],'invisible':[('remarks','=',False)]}"/>
+               	  <field name='remarks' attrs="{'readonly':[('state','not in',['sent_for_app','app_rem_sent'])],'invisible':[('remarks','=',False)]}"/>
                	  <field name='refuse_reason' attrs="{'readonly':[('refuse_reason','!=',False)],'invisible':[('refuse_reason','=',False)]}"/>
                </field>
                 <xpath expr="//notebook[2]/page[1]" position="attributes">
