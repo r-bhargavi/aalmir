@@ -492,14 +492,15 @@ class MrpWorkorderMachineProduce(models.Model):
             rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.production_id.id)])
             print "rm_idsrm_idsrm_ids",rm_ids
             if rm_ids:
-                pick_ids=self.env['stock.picking'].search([('material_request_id','=',rm_ids.id),('state','=','done')])
-                print "pick_idspick_idspick_ids",pick_ids
-                if pick_ids:
-                    for each in pick_ids:
-                        if each.store_ids:
-                            for each_store in each.store_ids:
-                                for each_batches in each_store.batches_ids:
-                                    batches.append(each_batches.batch_number.id)
+                for each_rm in rm_ids:
+                    pick_ids=self.env['stock.picking'].search([('material_request_id','=',each_rm.id),('state','=','done')])
+                    print "pick_idspick_idspick_ids",pick_ids
+                    if pick_ids:
+                        for each in pick_ids:
+                            if each.store_ids:
+                                for each_store in each.store_ids:
+                                    for each_batches in each_store.batches_ids:
+                                        batches.append(each_batches.batch_number.id)
             return {'domain': {'supplier_btc_no': [('id', 'in', batches)]}}
 
     

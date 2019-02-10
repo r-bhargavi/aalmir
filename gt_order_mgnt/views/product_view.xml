@@ -301,12 +301,12 @@
                           <group name='weight'>
 			    	
                           </group>
-                           <group string='Weight'   attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}">
-                                <label for="initial_weight" string="Product Weight"  attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}" /> 
-                		<div class="o_row" name="weight1" attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}">
+                           <group string='Weight'   attrs="{'invisible':[('matstrg','not in',('product','packaging','component'))]}">
+                                <label for="initial_weight" string="Product Weight"  attrs="{'invisible':[('matstrg','not in',('product','packaging','component'))]}" /> 
+                		<div class="o_row" name="weight1" attrs="{'invisible':[('matstrg','not in',('product','packaging','component'))]}">
                             		<field name="initial_weight" /><label string="Kg"/>
                         	</div>
-                                <label for="weight" string="Net Weight" invisible='1' attrs="{'invisible':[('matstrg','not in',('product','packaging'))]}"/>
+                                <label for="weight" string="Net Weight" invisible='1' attrs="{'invisible':[('matstrg','not in',('product','packaging','component'))]}"/>
                         	<div class="o_row" name="weight" invisible='1'>
                             		<field name="weight"/><label string="Kg"/>
                         	</div>

@@ -44,7 +44,7 @@
 		    <t t-name="production_request">
                         <div class="col-xs-6 o_kanban_primary_left">
                           <b>Production Requests</b>
-                          <div >
+                            <div >
                             	<a name="action_open_production" context="{'n_state': 'sales'}" type="object">
 			           Request from Sales-<span t-esc="mrp_detail.sales_request_count"/>                                
 					   </a>
@@ -57,7 +57,21 @@
 			   	<a name="action_open_production" context="{'n_state': 'raw_material'}" type="object">
 					   <span title="request Raw material Manufacturing Order"> Request Raw Material Mo -<span t-esc="mrp_detail.material_request_count"/>
 					   </span></a>
-                          </div>
+                            </div>  <br/>
+                            <div >     <b>BOM Requests</b>        
+                                           <a name="action_open_bomp" context="{'state': 'sent_for_app'}" type="object">
+					   <span title="BOM Pending Approvals"> BOM's Awaiting Approval - <span t-esc="mrp_detail.bom_request_count"/>
+					   </span></a>
+                                           <a name="action_open_bomp" context="{'state': 'bom_approved'}" type="object">
+					   <span title="BOM Pending Approvals"> Approved BOM's - <span t-esc="mrp_detail.bom_app_request_count"/>
+					   </span></a>
+                                           <a name="action_open_bomp" context="{'state': 'bom_rejected'}" type="object">
+					   <span title="BOM Pending Approvals"> Rejected BOM's - <span t-esc="mrp_detail.bom_rej_request_count"/>
+					   </span></a>
+                                           <a name="action_open_bomp" context="{'state': 'bom_draft'}" type="object">
+					   <span title="BOM Pending Approvals"> Draft BOM's - <span t-esc="mrp_detail.bom_draft_request_count"/>
+					   </span></a>
+                            </div>
                         </div>
                         <div class="col-xs-6 o_kanban_primary_right">
                             <b>Manufacture Order Details</b>

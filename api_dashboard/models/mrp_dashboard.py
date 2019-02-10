@@ -24,6 +24,7 @@ class CustomMrpDashboard(models.Model):
         purchase_order=self.env['purchase.order']
         mrp_workorder=self.env['mrp.production.workcenter.line']
         mrp_request=self.env['n.manufacturing.request']
+        bom_request=self.env['mrp.bom']
         picking_obj=self.env['stock.picking']
         location_obj=self.env['stock.location']
         
@@ -99,6 +100,10 @@ class CustomMrpDashboard(models.Model):
 	contract_request_count = len(mrp_request.search([('request_type', '=', 'contract'),('n_state','=','draft')]))
         stock_request_count = len(mrp_request.search([('request_type', '=', 'stock'),('n_state','=','draft')]))
         material_request_count = len(mrp_request.search([('request_type', '=', 'raw'),('n_state','=','draft')]))
+        bom_request_count = len(bom_request.search([('state','in',('sent_for_app','app_rem_sent'))]))
+        bom_app_request_count = len(bom_request.search([('state','=','approve')]))
+        bom_rej_request_count = len(bom_request.search([('state','=','reject')]))
+        bom_draft_request_count = len(bom_request.search([('state','=','draft')]))
         rm_virtual_available = picking_obj.search([('ntransfer_type', '=','rm_production'),('state','!=','done')])
         rm_virtual_done = picking_obj.search([('ntransfer_type', '=','rm_production'),('state','=','done')])
         
@@ -147,6 +152,10 @@ class CustomMrpDashboard(models.Model):
 		'total_purchase_done':pur_done,
 		'total_purchase_cancel':pur_cancel,
                 'sales_request_count':(sales_request_count),
+                'bom_request_count':(bom_request_count),
+                'bom_app_request_count':(bom_app_request_count),
+                'bom_rej_request_count':(bom_rej_request_count),
+                'bom_draft_request_count':(bom_draft_request_count),
                 'contract_request_count':(contract_request_count),
                 'stock_request_count':(stock_request_count),
                 'material_request_count':(material_request_count),
@@ -298,7 +307,14 @@ class CustomMrpDashboard(models.Model):
 	contract_request_count=len(self.env['n.manufacturing.request'].search([('request_type', '=', 'contract'),('n_state','=','draft')]))
         stock_request_count=len(self.env['n.manufacturing.request'].search([('request_type', '=', 'stock'),('n_state','=','draft')]))
         material_request_count=len(self.env['n.manufacturing.request'].search([('request_type', '=', 'raw'),('n_state','=','draft')]))
-        
+        bom_request_count=len(self.env['mrp.bom'].search([('state','in',('sent_for_app','app_rem_sent'))]))
+        bom_app_request_count=len(self.env['mrp.bom'].search([('state','=','approve')]))
+        bom_rej_request_count=len(self.env['mrp.bom'].search([('state','=','reject')]))
+        bom_draft_request_count=len(self.env['mrp.bom'].search([('state','=','draft')]))
+   
+    
+    
+    
     complete_mrp_count = fields.Integer(compute='_get_count')
     cancel_mrp_count = fields.Integer(compute='_get_count')
     hold_mrp_count = fields.Integer(compute='_get_count')
@@ -584,6 +600,48 @@ class CustomMrpDashboard(models.Model):
                 'target': 'current',
 		'domain':domain,
             }
+            
+            
+            # for opening records of BOMs pending approval
+
+    '''bom_request_count = fields.Integer(compute='_get_count')
+    bom_app_request_count = fields.Integer(compute='_get_count')
+    bom_rej_request_count = fields.Integer(compute='_get_count')
+    bom_draft_request_count = fields.Integer(compute='_get_count')'''
+    
+    @api.multi
+    def action_open_bomp(self):
+    	domain=[]
+    	name=""
+    	if self._context.get('state')=='sent_for_app':
+    		domain=[('state', 'in', ('sent_for_app','app_rem_sent'))]
+    		name="BOM Awaiting approval"
+        if self._context.get('state')=='bom_approved':
+                domain=[('state', '=', 'approve')]
+                name="Approved BOM's"
+        if self._context.get('state')=='bom_rejected':
+                domain=[('state', '=', 'reject')]
+                name="Rejected BOM's"
+        if self._context.get('state')=='bom_draft':
+                domain=[('state', '=', 'draft')]
+                name="Draft BOM's"
+                
+        tree_view = self.env.ref('mrp.mrp_bom_tree_view', False)
+	form_view = self.env.ref('mrp.mrp_bom_form_view', False)
+        if tree_view:
+            return {
+		'name':name,
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'tree',
+                'res_model': 'mrp.bom',
+		'views': [(tree_view.id, 'tree'), (form_view.id, 'form')],
+                'view_id': tree_view.id,
+                'target': 'current',
+		'domain':domain,
+            }
+            
+            
             
     @api.multi
     def action_create_transfer(self):
