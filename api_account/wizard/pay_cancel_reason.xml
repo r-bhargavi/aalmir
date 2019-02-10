@@ -9,7 +9,7 @@
                 <field name="description" string="Rejection reason"  required="1"/>
                 <field name="uploaded_document_cancel" widget="many2many_binary" string="Upload any supporting document"/>
                 <footer>
-                    <button string='Reject BOM' name="pay_refuse_reason" type="object" class="oe_highlight"/>
+                    <button string='Confirm' name="pay_refuse_reason" type="object" class="oe_highlight"/>
                    
                     <button string="Cancel" class="oe_highlight" special="cancel"/>
                 </footer>
