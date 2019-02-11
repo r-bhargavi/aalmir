@@ -217,6 +217,16 @@
     
      <menuitem action="rawmaterial_request_action" id="menu_raw_material_request" name="Raw Material Request"
             parent="stock.menu_stock_inventory_control" sequence="1"/>
+     <record model="ir.actions.act_window" id="rawmaterial_request_action_mo">
+        <field name="name">Raw Material Request</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.raw.material.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+     <menuitem action="rawmaterial_request_action_mo" id="menu_raw_material_request_mo" name="Raw Material Request"
+            parent="mrp.menu_mrp_manufacturing" sequence="1"/>
      <!-- end view for extra raw material request -->
      <!-- Wastage from mo request to supervissior view-->
      <record id="mrp_wastage_btach_tree" model="ir.ui.view">
