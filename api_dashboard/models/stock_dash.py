@@ -32,7 +32,7 @@ class CustomStockDashboard(models.Model):
             p_tree = self.env.ref('product.product_template_tree_view', False)
             p_form = self.env.ref('product.product_template_only_form_view', False)
             context=self._context.copy()
-            context.update({'msq':True,'group_by':'type'})
+            context.update({'msq':True,'group_by':'product_material_type'})
             if p_form:
                return {
 			'name':"Minimum Stock Product List",

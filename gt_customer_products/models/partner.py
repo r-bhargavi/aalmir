@@ -281,6 +281,8 @@ class CustomerProduct(models.Model):
     n_calculator_id = fields.Many2one('pricelist.calculater', string="Price Calculator") 
 
     qty_available = fields.Float(string="On Hand",related='product_id.qty_available')
+#    prod_count_var = fields.Char(string="On Hand",related='product_id.prod_count',store=True)
+#    mo_count_var = fields.Char(string="On Hand",related='product_id.mo_count')
     
     '''@api.onchange('avg_price', 'floor_price', 'lowest_price')
     def onchange_prices(self):
