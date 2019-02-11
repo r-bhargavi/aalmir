@@ -1010,14 +1010,14 @@
 						<field name="uom_name" readonly="1"/>
 						<field name="quantity" attrs="{'readonly':[('uom_name','=','Kg')],'required':[('uom_name','!=','Kg')]}"/>
 						<field name="percentage" attrs="{'readonly':[('uom_name','!=','Kg')],'required':[('uom_name','=','Kg')]}"/>
-						<field name="master_id" invisible=""/>
+						<field name="master_id" invisible="1"/>
 					</tree>
 					<form create='false' edit='false' delete='false'>
 						<field name="product_id" readonly="1"/>
 						<field name="uom_name" readonly="1"/>
 						<field name="quantity" attrs="{'required':[('uom_name','!=','Kg')],'readonly':[('uom_name','=','Kg')]}"/>
 						<field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
-						<field name="master_id" invisible=""/>
+						<field name="master_id" invisible="1"/>
 					</form>
 				</field>
 			</page>
@@ -1050,10 +1050,10 @@
                                     <field name="product_qty"/>
              </xpath>-->
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_uom']" position="after">
-               <field name="uom_name" invisible=""/>
-               <field name="product_uom" invisible=""/>
-               <field name="routing_id" invisible=""/>
-               <field name="bom_packaging_id" invisible=""/>
+               <field name="uom_name" invisible="1"/>
+               <field name="product_uom" invisible="1"/>
+               <field name="routing_id" invisible="1"/>
+               <field name="bom_packaging_id" invisible="1"/>
                <field name="percentage" attrs="{'required':[('uom_name','=','Kg')],'readonly':[('uom_name','!=','Kg')]}"/>
                <field name='workcenter_id' options="{'no_open':True,'no_create':True}" context="{'bom_true':True,'routing':parent.routing_id}"/>
               </xpath>
@@ -1107,46 +1107,46 @@
                   <attribute name="attrs">{'readonly':[('uom_name','=','Kg')]}</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='date_start']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='date_stop']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='property_ids']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_rounding']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_efficiency']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='attribute_value_ids']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='bom_line_ids']" position="attributes">
                   <attribute name="attrs">{'readonly':[('state','not in',['draft'])]}</attribute>
               </xpath>
                <xpath expr="//field[@name='type']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//field[@name='company_id']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
              <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='product_rounding']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='product_efficiency']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
                 <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='position']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
                <xpath expr="//separator[@groups='product.group_mrp_properties']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//page[@groups='base.group_no_one']/group/group/field[@name='property_ids']" position="attributes">
-                  <!--<attribute name="invisible">1</attribute>-->
+                  <attribute name="invisible">1</attribute>
               </xpath>
               <xpath expr="//div[@class='oe_chatter']/field[@name='message_follower_ids']" position="replace">
                         <!--button name="action_mail_sent" string="Send Mail" type="object" 

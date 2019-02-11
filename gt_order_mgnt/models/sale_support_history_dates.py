@@ -134,15 +134,14 @@ class MrpCompleteDate(models.Model):
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                             body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
-				<p> <strong> Manufacture completion Date Re-Scheduled </strong></p><br/>
-				<p>This is to inform you that below sale order completion date is updated.</p>
+				<p> <strong> Manufacturing completion Date for below sale order is updated by production.</strong></p><br/>
 					<p>Sale order No-: <b>%s</b> </p>
 					<p>Manufacturing Ref-: <b>%s</b> </p>
-		    			<p>Product:<b>%s has Re-Schedule 
-                                        <p>From Previous Completion Date:<b> %s</b> </p>
-                                        <p>To New production Completion date: <b>%s</b> </p>
+		    			<p>Product:<b>%s</b>
+                                        <p>Previous completion date:<b> %s</b> </p>
+                                        <p>Updated production completion date: <b>%s</b> </p>
                                         <p>By:<b> %s</b> </p>
-		    			<p>For reason:<b>%s</b> </p>
+		    			<p>Remarks:<b>%s</b> </p>
 				</p>
 				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',self.n_prevoiusdate1 or '',n_date, self.env.user.login or '',self.n_reason or '')
                             print "body_htmlbody_htmlbody_html",model_name,model_id
