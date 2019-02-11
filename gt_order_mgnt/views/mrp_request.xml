@@ -1189,12 +1189,15 @@
 		    	<tree editable="top">
               			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
                             	<field name="product_uom" options="{'no_open':True,'no_create':True}" />
-                            	<field name="product_qty" string="Qty Required"/>
+                                <field name="qty_per_packging" string="Qty per Packaging" required="1"/>
+
+                            	<field name="product_qty" string="Qty Required" readonly="1"/>
                                 <field name='workcenter_id' options="{'no_open':True,'no_create':True}" context="{'bom_true':True,'routing':parent.routing_id}"/>
                     	</tree>
 			<form create='false' edit='false' delete='false'>
-              			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
+                                <field name="qty_per_packging" options="{'no_open':True,'no_create':True}"/>
                             	<field name="product_uom" options="{'no_open':True,'no_create':True}"/>
+              			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
                             	<field name="product_qty"/>
                     	</form>
 	            </field>

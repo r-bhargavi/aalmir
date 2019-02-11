@@ -40,6 +40,7 @@ class ProductPricelist(models.Model):
 
     def _price_rule_get_multi_uom(self, cr, uid, pricelist, products_by_qty_by_partner, uom, context=None):
         _logger.info('_price_rule_get_multi_uom.........')
+        print "prcelist now--------------",pricelist
         context = context or {}
         date = context.get('date') and context['date'][0:10] or time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         products = map(lambda x: x[0], products_by_qty_by_partner)
@@ -67,7 +68,15 @@ class ProductPricelist(models.Model):
             prod_tmpl_ids = [product.product_tmpl_id.id for product in products]
 
         cust_p_obj = self.pool.get('customer.product')
-        cust_prod_ids = cust_p_obj.search(cr, uid, [('pricelist_id.customer','=', context.get('customer_id').id), ('product_id','=', context.get('product_id').id)])
+        if context.get('pricelist_id',False):
+            print "self-------12------------------",self
+            cust_prod_ids = cust_p_obj.search(cr, uid, [('pricelist_id','=', context.get('pricelist_id')),('pricelist_id.customer','=', context.get('customer_id').id), ('product_id','=', context.get('product_id').id)])
+        elif not context.get('pricelist_id',False) and context.get('line_id',False):
+            if context.get('line_id').pricelist_id:
+                cust_prod_ids = cust_p_obj.search(cr, uid, [('pricelist_id','=', context.get('line_id').pricelist_id.id),('pricelist_id.customer','=', context.get('customer_id').id), ('product_id','=', context.get('product_id').id)])
+        else:
+            cust_prod_ids = cust_p_obj.search(cr, uid, [('pricelist_id.customer','=', context.get('customer_id').id), ('product_id','=', context.get('product_id').id)])
+        print "cust_prod_idscust_prod_ids",cust_prod_ids
         if cust_prod_ids:
             cobj = cust_p_obj.browse(cr, uid, cust_prod_ids[0])
             item_ids = cobj.item_ids
@@ -99,14 +108,15 @@ class ProductPricelist(models.Model):
             price_uom_id = qty_uom_id
             flag_term=True
             _logger.info('Items in........{}'.format(items))
+            print "aedesfrefergrtg",context
             for rule1 in items:
                 if rule1.do_term.id == context.get('do_term'):
                     if qty_in_product_uom >= rule1.min_quantity and qty_in_product_uom <= rule1.qty:
                         flag_term=False
             if flag_term:
-                _logger.info('There no price for delivery term.........{}'.format(context.get('do_term')))
+                _logger.info('There is no price for delivery term.........{}'.format(context.get('do_term')))
                 dp_term_name=self.pool.get('stock.incoterms').browse(cr,uid,[context.get('do_term')]).name
-                raise UserError("There no price for product '{}' of Quantity {} against Delivery Term {} ".format(product.name,qty_in_product_uom,dp_term_name))
+                raise UserError("There is no price for product '{}' of Quantity {} against Delivery Term {} ".format(product.name,qty_in_product_uom,dp_term_name))
                 
             for rule in items:
                 if rule.do_term.id == context.get('do_term'):

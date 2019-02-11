@@ -2064,7 +2064,16 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
-    product_qty = fields.Float('Product Quantity', required=True, digits=dp.get_precision('BoM Line Qty Required'))
+    @api.multi
+    @api.depends('qty_per_packging')
+    def _compute_product_qty(self):
+        for record in self:
+            if record.qty_per_packging:
+                record.product_qty=1/record.qty_per_packging
+        
+    
+    product_qty = fields.Float('Product Quantity', required=True, digits=dp.get_precision('BoM Line Qty Required'),compute='_compute_product_qty')
+    qty_per_packging = fields.Float('Quantity per Packaging', digits=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')
     
@@ -2101,9 +2110,9 @@ class MrpBomMaster(models.Model):
     					
 				if uom_name.categ_id.cat_type not in p_type:
 					raise UserError(_('Please Select the raw material product of same product type '))
-					
+		print "qty now on create function mrp bom mastaer-----------",qty			
 		if qty!=0 and qty != 100.0:
-			raise UserError(_('Component Percentage Total Should be Equals to 100'))
+			raise UserError(_('Raw Materials/Components Composition Total Should be Equals to 100'))
 	else:
 		raise UserError(_('Please Enter products in Component '))
     	return super(MrpBomMaster,self).create(vals)
@@ -2112,55 +2121,81 @@ class MrpBomMaster(models.Model):
     def write(self,vals):
     	qty=0.0
 	id_list=[]
-    	if vals.get('master_line'):
-    		p_type=['all']
-    		for rec in self.master_line:
-    			p_type.append(rec.product_id.categ_id.cat_type)
-    		for line in vals.get('master_line'):
-    			if type(line[2]) == dict:
-    				product_id = self.env['product.product'].search([('id','=',line[2].get('product_id'))]) if line[2].get('product_id') else self.env['mrp.bom.master.line'].search([('id','=',line[1])]).product_id
+        if vals.get('master_line'):
+            for each in vals.get('master_line'):
+                print "each-----------------",each
+                if each[2] and each[2].get('percentage'):
+                    id_list.append(each[1])
+                    qty += each[2].get('percentage')
+            print "qtyqtyqtyqtyqty now-------",qty
+            if qty!=100.0:
+                for each_line in self.master_line:
+                    if each_line.id not in id_list and each_line.uom_name.upper()=='KG':
+                        qty += each_line.percentage
+#                                print "line---------------",line
+#                                dxfdsdff
+#	    			if type(line[2]) == dict:
+#	    				uom=line[2].get('uom_name')
+#                                        print "uomuomuomuom",uom
+#    			    		if uom and uom.upper()=='KG':
+#			    			if line[2].get('percentage')==0 or not line[2].get('percentage'):
+#	    			    			raise UserError(_('Please Enter Percentage of Material'))
+#	    					qty +=line[2].get('percentage')
+                    elif each_line.uom_name and each_line.uom_name.upper()=='PCS':
+                        if each_line.product_qty==0:
+                            raise UserError(_('Please Enter Quantity of Material'))
 
-		    		if product_id and product_id.uom_id.name.upper()=='KG':
-		    			if line[2].get('percentage')==0 or not line[2].get('percentage'):
-    			    			raise UserError(_('Please Enter Percentage Material'))
-    					qty +=line[2].get('percentage')
-				elif product_id and product_id.uom_id.name.upper()=='PCS':
-		    			if line[2].get('quantity')==0:
-    			    			raise UserError(_('Please Enter Quantity Material'))
-
-				elif product_id and product_id.uom_id.name.upper()=='KG' and not line[2].get('percentage'):
-		    			for rec in self.master_line:
-						if rec.id == line[1]:
-							qty += rec.percentage
-				elif line[2].get('percentage')==0 and line[1]:
-						raise UserError(_('Please Enter Percentage of Material'))
-				elif line[2].get('percentage') and line[1]:
-				    if product_id.uom_id.name.upper()=='KG':
-					qty += line[2].get('percentage')
-				elif line[2].get('quantity')==0 and line[1]:
-				    if product_id.uom_id.name.upper()=='PCS':
-				    	if line[2].get('quantity')==0:
-		    				raise UserError(_('Please Enter Percentage Material'))
-    				
-    				if len(p_type)==1:
-    					p_type.append(product_id.categ_id.cat_type)
-    				
-				if product_id.categ_id.cat_type not in p_type:
-					raise UserError(_('Please Select the raw material product of same product type '))
-
-			else:
-				for rec in self.master_line:
-				    if rec.uom_name.upper()=='KG':
-					if rec.id == line[1]:
-						id_list.append(rec.id)
-						qty += rec.percentage
-	if id_list:
-		for rec in self.master_line:
-		    if rec.uom_name.upper()=='KG':
-			if rec.id not in id_list:
-				qty += rec.percentage
+#			
+#    	if vals.get('master_line'):
+#    		p_type=['all']
+#    		for rec in self.master_line:
+#    			p_type.append(rec.product_id.categ_id.cat_type)
+#    		for line in vals.get('master_line'):
+#    			if type(line[2]) == dict:
+#    				product_id = self.env['product.product'].search([('id','=',line[2].get('product_id'))]) if line[2].get('product_id') else self.env['mrp.bom.master.line'].search([('id','=',line[1])]).product_id
+#
+#		    		if product_id and product_id.uom_id.name.upper()=='KG':
+#		    			if line[2].get('percentage')==0 or not line[2].get('percentage'):
+#    			    			raise UserError(_('Please Enter Percentage Material'))
+#    					qty +=line[2].get('percentage')
+#				elif product_id and product_id.uom_id.name.upper()=='PCS':
+#		    			if line[2].get('quantity')==0:
+#    			    			raise UserError(_('Please Enter Quantity Material'))
+#
+#				elif product_id and product_id.uom_id.name.upper()=='KG' and not line[2].get('percentage'):
+#		    			for rec in self.master_line:
+#						if rec.id == line[1]:
+#							qty += rec.percentage
+#				elif line[2].get('percentage')==0 and line[1]:
+#						raise UserError(_('Please Enter Percentage of Material'))
+#				elif line[2].get('percentage') and line[1]:
+#				    if product_id.uom_id.name.upper()=='KG':
+#					qty += line[2].get('percentage')
+#				elif line[2].get('quantity')==0 and line[1]:
+#				    if product_id.uom_id.name.upper()=='PCS':
+#				    	if line[2].get('quantity')==0:
+#		    				raise UserError(_('Please Enter Percentage Material'))
+#    				
+#    				if len(p_type)==1:
+#    					p_type.append(product_id.categ_id.cat_type)
+#    				
+#				if product_id.categ_id.cat_type not in p_type:
+#					raise UserError(_('Please Select the raw material product of same product type '))
+#
+#			else:
+#				for rec in self.master_line:
+#				    if rec.uom_name.upper()=='KG':
+#					if rec.id == line[1]:
+#						id_list.append(rec.id)
+#						qty += rec.percentage
+#	if id_list:
+#		for rec in self.master_line:
+#		    if rec.uom_name.upper()=='KG':
+#			if rec.id not in id_list:
+#				qty += rec.percentage
+        print "qty dyring write function master bom----------------",qty
 	if  qty >0 and qty != 100:
-		raise UserError(_('Component Percentage Total Should be Equals to 100'))
+		raise UserError(_('Raw Materials/Components Composition Total Should be Equals to 100'))
     	return super(MrpBomMaster,self).write(vals)
    
 class MrpBomMasterLine(models.Model):
