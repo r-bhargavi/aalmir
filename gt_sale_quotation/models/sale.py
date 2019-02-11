@@ -463,7 +463,7 @@ class SaleOrder(models.Model):
             
     				context = self._context.copy()
 				context.update({'customer_id': line.customer, 'product_id': line.product_id,
-						'do_term':order.incoterm.id})
+						'do_term':order.incoterm.id,'line_id':line})
 				result = self.pool['product.pricelist']._price_get_multi_line(self._cr, self._uid,
 						 order.pricelist_id, [(product,line.product_uom_qty,
 						 order.partner_id.id),], context=context)
@@ -582,7 +582,7 @@ class SaleOrder(models.Model):
 				    )
             
     				context = self._context.copy()
-				context.update({'customer_id': line.customer, 'product_id': line.product_id,'do_term':res.incoterm.id})
+				context.update({'customer_id': line.customer, 'product_id': line.product_id,'do_term':res.incoterm.id,'line_id':line})
 				result = self.pool['product.pricelist']._price_get_multi_line(self._cr, self._uid, res.pricelist_id, [(product,line.product_uom_qty, res.partner_id.id),], context=context)
 				if result:
 				   line.price_line_id = result.get(product.id)[1] or False
