@@ -60,7 +60,7 @@
 			<field name="n_status_rel" readonly="1" />
 			<field name="order_id" context="{'show_sale': True}" string="Sale Order" readonly="1"/>
 			<button name="open_sale_order" type="object" icon="gtk-jump-to" string="Sale Order" invisible="1"/>
-			<field name="date_order" readonly="1"/>
+			<!--<field name="date_order" readonly="1"/>-->
 			<field name="lpo_documents" readonly="1"/>
 		        <field name="lpo_number"  invisible="1"/>
 		        <field name="lpo_receipt_date"  invisible="1" readonly="1"/>

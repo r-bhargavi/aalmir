@@ -250,7 +250,7 @@ class CustomerProduct(models.Model):
     item_ids = fields.One2many('product.pricelist.item', 'cus_product_id','Priceline',copy=True)
     customer_id = fields.Many2one('res.partner', string="Customer")
     product_id = fields.Many2one('product.product', string='Product')
-    product_tmpl_id = fields.Many2one('product.template',string="Product")
+    product_tmpl_id = fields.Many2one('product.template',string="Product",related='product_id.product_tmpl_id',store=True)
     product_type = fields.Many2one('product.category',string="Product Category")
     uom_id = fields.Many2one('product.uom',related='product_id.uom_id', string="Unit", required=True)
     int_product_number = fields.Char(string='Internal Number')
