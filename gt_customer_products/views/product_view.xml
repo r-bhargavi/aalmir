@@ -163,6 +163,8 @@
 					
 					<!--CH_N019 start add fields to show film data-->
 					<field name="n_product_type" readonly="1"/>
+<!--					<field name="prod_count_var" readonly="1"/>
+					<field name="mo_count_var" readonly="1"/>-->
                                         <field name="n_calculator_id" attrs="{'invisible': [('n_product_type','!=', 'film')]}" readonly="1"/>
 					<!-- CH_N019 end -->
 

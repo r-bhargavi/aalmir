@@ -37,6 +37,8 @@
                       <field name="type" position='replace' />
                       <!--<field name="volume" position='replace' />-->
                       <field name="volume" position='replace'>
+                        <!--<field name="prod_count_var"/>-->
+                        <!--<field name="mo_count_var"/>-->
                         <field name="qty_reserved"/>
 
                            <field name="qty_available"/>

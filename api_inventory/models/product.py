@@ -41,10 +41,11 @@ class productTemplate(models.Model):
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
 	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count_mo')
-	mo_count_var = fields.Float('#Manufacturing',store=True,compute='_count_mo')
+	mo_count_var = fields.Float('#Manufacturing',store=True,compute='_count_mo_var')
         prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
+        prod_count_var = fields.Float('#Production Count',compute='_get_prod_orders_data_var',store=True)
         in_count = fields.Char('#Incoming Count',compute='_get_in_data')
-        prod_count_var = fields.Float('#Production Orders',store=True,compute='_get_prod_orders_count')
+        in_count_var = fields.Char('#Incoming Count',compute='_get_in_data_var')
 	bill_count = fields.Char('#Bills',compute='_get_bill_data')
 	bin_location_count = fields.Integer('#Bin Location',compute='_get_batches_data')
 	
@@ -95,18 +96,44 @@ class productTemplate(models.Model):
                         prod_count += each.n_order_qty
                 res.prod_count=str(prod_count)
 	@api.multi
+	def _get_prod_orders_data_var(self):
+            for res in self:
+                prod_count_now=0.0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+                product_id = [p.id for p in product_id]
+
+                prod_req_ids = self.env['n.manufacturing.request'].search([('n_product_id','in',product_id),('n_state','in',['new','draft'])])
+                print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
+                if prod_req_ids:
+                    for each in prod_req_ids:
+                        prod_count_now += each.n_order_qty
+                res.prod_count_var=prod_count_now
+	@api.multi
 	def _get_in_data(self):
             for res in self:
                 prod_count=0.0
                 product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
                 product_id = [p.id for p in product_id]
 
-                prod_req_ids = self.env['stock.move'].search([('product_id','in',product_id),('state','in',['assigned'])])
+                prod_req_ids = self.env['stock.move'].search([('picking_type.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
                     for each in prod_req_ids:
                         prod_count += each.product_uom_qty
                 res.in_count=str(prod_count)
+	@api.multi
+	def _get_in_data_var(self):
+            for res in self:
+                prod_count=0.0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+                product_id = [p.id for p in product_id]
+
+                prod_req_ids = self.env['stock.move'].search([('picking_type.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
+                print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
+                if prod_req_ids:
+                    for each in prod_req_ids:
+                        prod_count += each.product_uom_qty
+                res.in_count_var=prod_count
 	@api.multi
         @api.depends('prod_count')
 	def _get_prod_orders_count(self):
@@ -186,6 +213,20 @@ class productTemplate(models.Model):
                         print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty
             rec.mo_count=str(count)
             return res
+        @api.multi
+        def _mo_count_var(self):
+            Production = self.env['mrp.production']
+            for rec in self:
+                count=0
+                product_id = self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
+                mo_ids = Production.search([('product_id', '=', product_id.id),('state','not in',['done','cancel'])])
+                print "mo_idsmo_idsmo_idsmo_ids",mo_ids
+                if mo_ids:
+                    print "mo_idsmo_idsmo_ids",mo_ids
+                    for each_mo in mo_ids:
+                        count+=each_mo.product_qty-each_mo.n_produce_qty
+                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty
+            rec.mo_count_var=count
 
 	@api.multi
 	def open_prod_orders(self):
