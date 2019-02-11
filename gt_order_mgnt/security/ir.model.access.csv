@@ -290,6 +290,7 @@ sales_access_product_uom_type_purchase,product_uom_type_purchase,gt_customer_pro
 sales_access_product_uom_type_mrp,product_uom_type_mrp,gt_customer_products.model_product_uom_type,mrp.group_mrp_user,1,0,0,0
 ,,,,,,,
 access_ mrp_order_machine_produce_line,mrp_order_machine_produce_line,model_mrp_order_machine_produce_line,mrp.group_mrp_user,1,1,1,0
+access_ mrp_order_machine_produce_line_mgr,mrp_order_machine_produce_line_mgr,model_mrp_order_machine_produce_line,mrp.group_mrp_manager,1,1,1,1
 ,,,,,,,
 access_mrp_product_produce_line,mrp_product_produce_line,mrp.model_mrp_product_produce_line,mrp.group_mrp_manager,1,1,1,0
 access_mrp_product_produce_line_mo_user,mrp_product_produce_line_mo_user,mrp.model_mrp_product_produce_line,mrp.group_mrp_user,1,0,1,0

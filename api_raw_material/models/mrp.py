@@ -196,6 +196,7 @@ class MrpProduction(models.Model):
                             'product_id':record.product_id.id,'required_qty':record.product_qty,
                             'request_type':'normal',
                             'required_uom_id':record.product_uom.id,
+                            'expected_compl_date':record.n_request_date,
                             'request_line_ids':lst,
                             'source_location':rm_location.id if rm_location else False,
                             'request_date':record.date_planned}) 

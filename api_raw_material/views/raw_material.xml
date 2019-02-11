@@ -74,7 +74,8 @@
                   </group>
                   <group >
                       <field name='product_id' readonly="1" attrs="{'invisible':[('product_id','=',False)]}"  />
-                      <field name='request_date' readonly="1"/>
+                      <field name='request_date' string="Required Date" readonly="1"/>
+                      <field name='expected_compl_date' string="Expected Completion Date" readonly="1"/>
                       <field name='reason' attrs="{'invisible':[('request_type','=','normal')]}"/>
                       <field name='note' readonly="1" string="Production Remark"
                       			attrs="{'invisible':[('request_type','=','normal')]}"/>
@@ -101,7 +102,7 @@
 				  <button name="release_do" string="Release" type="object" attrs="{'invisible':['|',('reserve_status','not in ',('approve','reserve')),('reserve_qty','&lt;=',0.0)]}" class="btn-primary oe_edit_only"/>
 				  <field name='res_ids' invisible="1"/>
 				  <field name='reserve_status' invisible="1"/-->
-                                  <field name='required_date' attrs="{'readonly':[('rm_type','not in',('mo','po'))],'required':[('rm_type','in',('mo','po'))]}"/>
+                                  <!--<field name='required_date' attrs="{'readonly':[('rm_type','not in',('mo','po'))],'required':[('rm_type','in',('mo','po'))]}"/>-->
                                   <field name='rm_type' attrs="{'readonly':['|',('po_request_id','!=',False),('production_id','!=',False)]}"/>
                                   <button name='schedule_mo' type='object' string='Create MO/PO' class='oe_highlight oe_edit_only' attrs="{'invisible':[('rm_type','=','stock')]}"/>
                                     
