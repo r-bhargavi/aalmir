@@ -35,14 +35,17 @@
 		<field name="inherit_id" ref="product.product_template_tree_view"/>
 		<field name="arch" type="xml">
                       <field name="type" position='replace' />
+                      <field name="weight" position='replace' />
                       <!--<field name="volume" position='replace' />-->
                       <field name="volume" position='replace'>
+                      <!--<field name="weight" position='replace'/>-->
                         <!--<field name="prod_count_var"/>-->
                         <!--<field name="mo_count_var"/>-->
                         <field name="qty_reserved"/>
 
                            <field name="qty_available"/>
-                            <field name="virtual_available"/>
+
+                            <field name="virtual_available" invisible="1"/>
                         <field name="reordering_min_qty" string="Minimum Stock Qty" invisible="not context.get('msq')"/>
 <!--                        <field name="prod_count_var" string="Production Count"/>
                         <field name="mo_count_var" string="MO Count"/>-->
