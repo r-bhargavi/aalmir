@@ -156,7 +156,6 @@ class MrpCompleteDate(models.Model):
 					<p>Sale order No-: <b>%s</b> </p>
 					<p>Manufacturing Ref-: <b>%s</b> </p>
 		    			<p>Product:<b>%s</b>
-                                        <p>Product:<b>%s</b>
 		    			<p>Quantity:<b>%s %s</b>
                                         <p>Requested completion date: <b>%s</b> </p>
                                         <p>Previous completion date:<b> %s</b> </p>
