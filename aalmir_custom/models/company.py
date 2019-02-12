@@ -13,6 +13,10 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
+        prod_temps=self.env['product.template'].search([])
+        for each_temp in prod_temps:
+            each_temp.n_open_pricelist()
+        return True
 #        rm_req=self.env['mrp.raw.material.request'].search([])
 #        for each_rmr in rm_req:
 #            each_rmr.expected_compl_date=each_rmr.production_id.n_request_date

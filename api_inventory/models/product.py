@@ -44,6 +44,7 @@ class productTemplate(models.Model):
 	mo_count_var = fields.Float('#Manufacturing',store=True,compute='_count_mo_var')
         prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
         prod_count_var = fields.Float('#Production Count',compute='_get_prod_orders_data_var',store=True)
+        customer_name=fields.Char(string='Customer Name')
         in_count = fields.Char('#Incoming Count',compute='_get_in_data')
         in_count_var = fields.Char('#Incoming Count',compute='_get_in_data_var')
 	bill_count = fields.Char('#Bills',compute='_get_bill_data')

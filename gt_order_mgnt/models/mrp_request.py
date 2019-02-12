@@ -2065,6 +2065,13 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
+    @api.multi
+    @api.depends('product_qty')
+    def compute_qpp(self):
+        for rec in self:
+            if rec.product_qty:
+                rec.product_qty_qpp=rec.product_qty
+    
     @api.onchange('qty_per_packging')
     def onchange_bomPackging(self):
         print "sdfdsfsfsfdsfdsfsdf",self.qty_per_packging
@@ -2072,6 +2079,7 @@ class MrpBomLine(models.Model):
             self.product_qty=1/self.qty_per_packging
     
     product_qty = fields.Float('Product Quantity', required=True,digits=dp.get_precision('BoM Line Qty Required'))
+    product_qty_qpp = fields.Float('Qty Required',digits=dp.get_precision('BoM Line Qty Required'),compute='compute_qpp')
     qty_per_packging = fields.Float('Quantity per Packaging', digits=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')

@@ -323,6 +323,13 @@ class ProductTemplate(models.Model):
             produt_id=self.env['product.product'].search([('product_tmpl_id','=',rec.id)])
             cust_prod_ids = self.env['customer.product'].search([('product_id','in', [p_id.id for p_id in produt_id])])
             pids = [o.pricelist_id.id for o in cust_prod_ids if o.pricelist_id]
+            customer_name=''
+            cust_name_list=[]
+            for supp in cust_prod_ids:
+                if supp.pricelist_id.customer.name not in cust_name_list:
+                    cust_name_list.append(supp.pricelist_id.customer.name)
+                    customer_name+='%s %s'%(supp.pricelist_id.customer.name,"\n") 
+            self.customer_name=customer_name
         res = self.env['ir.actions.act_window'].for_xml_id('product', 'product_pricelist_action2')
         res['domain'] = [('id', 'in', pids)]
         return res    

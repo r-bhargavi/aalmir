@@ -31,6 +31,9 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_form_view" />
             <field name="arch" type="xml">
+                    <field name="type" position="after">
+                        <field name="customer_name"/>
+                    </field>
 
                  <div name="button_box" position="inside">
                     <button class="oe_stat_button" type="object" name="open_inventory_location" icon="fa-object-group" groups="stock.group_stock_user">
@@ -70,6 +73,7 @@
                         <field name="prod_count_var"/>
                         <field name="mo_count_var"/>
                         <field name="in_count_var"/>
+                        <field name="customer_name"/>
                       </field>
                 </field>
         </record>
