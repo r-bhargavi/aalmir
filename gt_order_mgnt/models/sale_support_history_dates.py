@@ -133,7 +133,7 @@ class MrpCompleteDate(models.Model):
                             n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
 			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
                             if not self.n_prevoiusdate1:
-                                subject="API-ERP Manufacturing Alert : %s production is scheduled"%(self.product_id.name)
+                                subject="API-ERP Manufacturing Alert : %s production is scheduled"%str(self.env[model_name].browse(model_id).product_id.name)
                                 body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
 				<p> <strong> This is to inform you that new manufacuring order is scheduled as per below details.</strong></p><br/>
@@ -149,14 +149,13 @@ class MrpCompleteDate(models.Model):
 				</p>
 				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
                             else:
-                                subject="API-ERP Manufacturing Alert : %s production completion date changed"%(self.product_id.name)
+                                subject="API-ERP Manufacturing Alert : %s production completion date changed"%str(self.env[model_name].browse(model_id).product_id.name)
                                 body_html = """<div> 
                                 <p>Dear Sir/Madam,<br/>
 				<p> <strong> Manufacturing completion Date for below sale order is changed by production.</strong></p><br/>
 					<p>Sale order No-: <b>%s</b> </p>
 					<p>Manufacturing Ref-: <b>%s</b> </p>
 		    			<p>Product:<b>%s</b>
-                                        <p>Product:<b>%s</b>
 		    			<p>Quantity:<b>%s %s</b>
                                         <p>Requested completion date: <b>%s</b> </p>
                                         <p>Previous completion date:<b> %s</b> </p>
