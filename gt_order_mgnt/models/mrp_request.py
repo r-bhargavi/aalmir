@@ -1586,8 +1586,9 @@ class MrpBom(models.Model):
             #uom=uom_id.id if uom_id  else self.product_uom.id
             for rec in self.master_id.master_line:
             	qty = rec.quantity if rec.quantity else (rec.percentage*self.product_qty/100) if self.product_qty else 1
-            	line_dict.append((0,0,{'product_id':rec.product_id,'percentage':rec.percentage,
-			'product_qty':qty,'product_efficiency':1}))
+                
+                line_dict.append((0,0,{'product_id':rec.product_id,'percentage':rec.percentage,
+                        'product_qty':qty,'product_efficiency':1}))
             self.bom_line_ids=line_dict
             
 #            point1 in bom changes
@@ -2064,15 +2065,13 @@ class WastageType(models.Model):
 class MrpBomLine(models.Model):
     _inherit = "mrp.bom.line"
     
-    @api.multi
-    @api.depends('qty_per_packging')
-    def _compute_product_qty(self):
-        for record in self:
-            if record.qty_per_packging:
-                record.product_qty=1/record.qty_per_packging
-        
+    @api.onchange('qty_per_packging')
+    def onchange_bomPackging(self):
+        print "sdfdsfsfsfdsfdsfsdf",self.qty_per_packging
+        if self.qty_per_packging:
+            self.product_qty=1/self.qty_per_packging
     
-    product_qty = fields.Float('Product Quantity', required=True, digits=dp.get_precision('BoM Line Qty Required'),compute='_compute_product_qty')
+    product_qty = fields.Float('Product Quantity', required=True,digits=dp.get_precision('BoM Line Qty Required'))
     qty_per_packging = fields.Float('Quantity per Packaging', digits=dp.get_precision('BoM Line Qty Required'))
     bom_id = fields.Many2one('mrp.bom', 'Parent BoM', ondelete='cascade', select=True, required=False)
     product_uom =fields.Many2one('product.uom','Unit',readonly=True,related='product_id.uom_id')
