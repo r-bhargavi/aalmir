@@ -115,7 +115,7 @@ class productTemplate(models.Model):
                 product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
                 product_id = [p.id for p in product_id]
 
-                prod_req_ids = self.env['stock.move'].search([('picking_type.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
+                prod_req_ids = self.env['stock.move'].search([('picking_type_id.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
                     for each in prod_req_ids:
@@ -128,7 +128,7 @@ class productTemplate(models.Model):
                 product_id = self.env['product.product'].search([('product_tmpl_id','=',res.id)])
                 product_id = [p.id for p in product_id]
 
-                prod_req_ids = self.env['stock.move'].search([('picking_type.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
+                prod_req_ids = self.env['stock.move'].search([('picking_type_id.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
                     for each in prod_req_ids:
