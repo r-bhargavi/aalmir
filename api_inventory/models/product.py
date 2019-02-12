@@ -41,9 +41,9 @@ class productTemplate(models.Model):
 	batches_count = fields.Char('#Batches',compute='_get_batches_data')
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
 	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count_mo')
-	mo_count_var = fields.Float('#Manufacturing',store=True,compute='_count_mo_var')
+	mo_count_var = fields.Float('#Manufacturing',compute='_count_mo_var')
         prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
-        prod_count_var = fields.Float('#Production Count',compute='_get_prod_orders_data_var',store=True)
+        prod_count_var = fields.Float('#Production Count',compute='_get_prod_orders_data_var')
         customer_name=fields.Char(string='Customer Name')
         in_count = fields.Char('#Incoming Count',compute='_get_in_data')
         in_count_var = fields.Char('#Incoming Count',compute='_get_in_data_var')
@@ -215,7 +215,7 @@ class productTemplate(models.Model):
             rec.mo_count=str(count)
             return res
         @api.multi
-        def _mo_count_var(self):
+        def _count_mo_var(self):
             Production = self.env['mrp.production']
             for rec in self:
                 count=0
