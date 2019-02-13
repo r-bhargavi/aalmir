@@ -433,7 +433,8 @@ class StockStoreLocationWizard(models.TransientModel):
 				
 			store_history=[]
                         if rec.picking.material_request_id:
-                            rec.picking.material_request_id.production_id.write({'state':'ready'})
+                            if rec.picking.material_request_id.production_id.state!='in_production':
+                                rec.picking.material_request_id.production_id.write({'state':'ready'})
 #            to link backorder of rm request to mo prodiction
 			# call method in module directory(stock_picking.py)
 			if rec.dispatch_doc:
@@ -449,7 +450,8 @@ class StockStoreLocationWizard(models.TransientModel):
 				elif rec.picking.picking_type_code=='internal':
                                         if 'MO' in rec.picking.origin if rec.picking.origin else '':
                                             if rec.picking.material_request_id:
-                                                rec.picking.material_request_id.production_id.write({'state':'ready'})
+                                                if rec.picking.material_request_id.production_id.state!='in_production':
+                                                    rec.picking.material_request_id.production_id.write({'state':'ready'})
 					if rec.picking.location_dest_id.actual_location and rec.picking.location_id.actual_location:
 						new_company_id = rec.picking.location_dest_id.company_id.id
 						line.master_batches.write({'store_id':rec.store_dest_id.id,

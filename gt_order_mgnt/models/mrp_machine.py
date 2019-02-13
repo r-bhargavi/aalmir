@@ -1840,6 +1840,23 @@ class MrpWorkcenterPructionline(models.Model):
                     'context': context,
              }
              
+#    @api.multi       
+#    def action_done(self):
+#        """ Sets state to done, writes finish date and calculates delay.
+#        @return: True
+        #"""
+#        for rec in self:
+#            delay = 0.0
+#            date_now = time.strftime('%Y-%m-%d %H:%M:%S')
+#
+#            date_start = datetime.strptime(rec.date_start,'%Y-%m-%d %H:%M:%S')
+#            date_finished = datetime.strptime(date_now,'%Y-%m-%d %H:%M:%S')
+#            delay += (date_finished-date_start).days * 24
+#            delay += (date_finished-date_start).seconds / float(60*60)
+#
+#            rec.write({'state':'done', 'date_finished': date_now,'delay':delay}, context=context)
+##        self.modify_production_order_state(cr,uid,ids,'done')
+#        return True
     @api.multi
     def action_start_working(self):
         res=super(MrpWorkcenterPructionline,self).action_start_working()
@@ -1909,8 +1926,8 @@ class MrpWorkcenterPructionline(models.Model):
         body +='<ul><li> Time          : '+str(datetime.now() + timedelta(hours=4))+'</li></ul>' 
         self.message_post(body=body)
         self.production_id.message_post(body=body)
-        res=super(MrpWorkcenterPructionline,self).action_done()
-        return res
+#        res=super(MrpWorkcenterPructionline,self).action_done()
+        return True
 
     @api.multi
     def machine_maintenance(self):
@@ -2311,7 +2328,7 @@ class MrpWorkcenterPructionline(models.Model):
         	if self._context.get('ready'):
 #                    need to uncomment while gng live for bom
                         if res.production_id.state not in ('ready','in_production'):
-                            raise UserError(_('Cannot  Work Order as MO is not in Ready to produce or Production state!!'))
+                            raise UserError(_('Cannot Lock Work Order as MO is not in Ready to produce or Production state!!'))
 
 #                        if not res.machine:
 #		          raise UserError(_('Please Select Machine Before Lock Work order..'))

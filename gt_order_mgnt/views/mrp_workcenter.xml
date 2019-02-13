@@ -636,23 +636,23 @@
                       
                    </group>
                        
-<!--                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
+                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                         <button name="select_all" string="All" icon='fa-check'  type="object"  
-                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />-->
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                         <button name="print_batch_data" string="Print" icon='fa-print'  type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                  <group>
                      <field name='batch_ids' nolabel='1' 
                            attrs="{'invisible':[('batch_ids','=',[])]}" readonly='1'>
                         <tree editable='bottom'>
-                          <field name='print_bool' invisible='1'/>
-<!--                           <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
-                               class="oe_highlight" attrs="{'invisible':[('print_bool','=',True)]}" />-->
+                          <field name='print_bool' invisible='0'/>
+                           <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
+                               class="oe_highlight" attrs="{'invisible':[('print_bool','=',True)]}" />
                            <button name="check_print" string="Select" icon='fa-check-circle-o' type="object"  
                                class="oe_highlight" invisible="1"/>
-<!--                           <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
-                               class="oe_highlight"  attrs="{'invisible':[('print_bool','=',False)]}"/>-->
+                           <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
+                               class="oe_highlight"  attrs="{'invisible':[('print_bool','=',False)]}"/>
                            <button name="uncheck_print" string="Not Select" icon='fa-times-circle-o' type="object"  
                                class="oe_highlight"  invisible="1"/>
                            <!--field name='create_date' string='Created Date'/-->

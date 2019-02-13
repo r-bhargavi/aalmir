@@ -309,21 +309,31 @@ class MrpProductionProductLine(models.Model):
 		for picking in record.production_id.delivery_ids:
                     print "pickingpickingpicking",picking
                     if picking.state == 'done':
-                            record.production_id.write({'state':'in_production'})
+#                            record.production_id.write({'state':'ready'})
                             for line in picking.pack_operation_product_ids:
                                     if line.product_id.id == record.product_id.id:
                                             received_qty += line.qty_done
 		record.receive_qty=received_qty
 		record.remain_received = round(record.required_qty - received_qty,2)
 		consumed_qty =0.00
+                
 		for line in record.production_id.workcenter_lines:
-			for raw in line.raw_materials_id:
-				if raw.product_id.id == record.product_id.id:
+                    for raw in line.raw_materials_id:
+                            if raw.product_id.id == record.product_id.id:
 
-					consumed_qty += raw.consumed_qty
+                                    consumed_qty += raw.consumed_qty
 		record.consumed_qty = consumed_qty
 		record.remain_consumed =round( received_qty - consumed_qty,2)
-		
+#                wo_ids=self.env['mrp.production.workcenter.line'].search([('production_id','=',record.production_id.id)])
+#                print "wo_idswo_ids",wo_ids,record.production_id
+#                if wo_ids:
+#                    if any(wo.state == 'startworking' for wo in wo_ids):
+#                        print "xfgfxgdfgdfg"
+#                        self._cr.execute('UPDATE mrp_production '\
+#                       'SET state=%s '\
+#                       'WHERE id = %s', ('in_production', record.production_id.id))
+##                        record.production_id.write({'state':'in_production'})
+#		
 class MrpWorkorderBatchNo(models.Model):
     _inherit='mrp.order.batch.number'
 

@@ -119,8 +119,8 @@ class productTemplate(models.Model):
                 prod_req_ids = self.env['stock.move'].search([('picking_type_id.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
-                    for each in prod_req_ids:
                         prod_count += each.product_uom_qty
+                            
                 res.in_count=str(prod_count)
 	@api.multi
 	def _get_in_data_var(self):

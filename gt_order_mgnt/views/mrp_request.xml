@@ -640,10 +640,17 @@
                <field name='partner_id' attrs="{'readonly': ['|',('state','!=','draft'),('request_line', '!=',False)]}" />
             </field>
 	   <field name="date_planned" position="before">
-	         <label for='n_produce_qty' string="Quantity Produced" 
+	         <label for='n_produce_qty' string="Quantity Transferred" 
                   attrs="{'invisible':[('state','not in',('ready','cancel','done','in_production'))]}"/>
 		     <div attrs="{'invisible':[('state','not in',('ready','cancel','done','in_production'))]}">
 		        <field name="n_produce_qty" class="oe_inline" nolabel="1" />
+			 <field name="produce_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
+		     </div>
+                     
+                     <label for='n_produce_qty_now' string="Quantity Produced" 
+                  attrs="{'invisible':[('state','not in',('ready','cancel','done','in_production'))]}"/>
+		     <div attrs="{'invisible':[('state','not in',('ready','cancel','done','in_production'))]}">
+		        <field name="n_produce_qty_now" class="oe_inline" nolabel="1" />
 			 <field name="produce_uom_id"  class="oe_inline" nolabel="1" readonly="1"/>
 		     </div>
 		<field name="n_client_date"  readonly="1" attrs="{'readonly': [('request_line','!=',False)]}"/>

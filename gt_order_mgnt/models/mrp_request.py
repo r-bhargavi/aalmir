@@ -135,6 +135,19 @@ class MrpProduction(models.Model):
 		            qty +=line.total_qty
 		rec.n_produce_qty = qty
                 rec.produce_uom_id=rec.product_uom.id
+    @api.multi 
+    @api.depends('workcenter_lines')
+    def _n_get_produced_qty_now(self):
+	for rec in self:
+		qty=0.0
+		if rec.workcenter_lines:
+			for line in rec.workcenter_lines:
+                            wo_id=self.env['mrp.production.workcenter.line'].search([('name','=',line.name)])
+                            if wo_id.order_last==True:
+                                for each_line in wo_id.batch_ids:
+                                    qty +=each_line.product_qty
+		rec.n_produce_qty_now = qty
+                rec.produce_uom_id=rec.product_uom.id
 
     @api.multi
     def _get_scrap_qty(self):
@@ -206,6 +219,7 @@ class MrpProduction(models.Model):
     n_po =fields.Many2one('purchase.order' ,string="PO order")
     n_request_qty = fields.Float('Quantity Requested',help='Quantity Requested by Sale Support',related='request_line.n_order_qty')
     n_produce_qty = fields.Float('Quantity Transferred',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty')
+    n_produce_qty_now = fields.Float('Quantity Produced',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty_now')
     produce_uom_id=fields.Many2one('product.uom', compute='_n_get_produced_qty')
     n_note = fields.Text('Instruction In PR',help='Instruction Given by Sale Support for Manufacture of this product',related='request_line.n_Note')
     n_approved_qty = fields.Float('Quantity Approved',help='Quantity Approved by Quality Check',compute='_get_approved_qty')
