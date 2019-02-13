@@ -54,11 +54,13 @@ class MrpCompleteDate(models.Model):
                             each_mo.write({'date_expected':self.n_nextdate})
                     if rm_ids:
                         for each in rm_ids:
+                            
                             pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id)])
                             if pick_ids:
                                 for each_pick in pick_ids:
                                     each_pick.write({'min_date':self.n_nextdate})
-                            each.write({'expected_compl_date':self.n_nextdate})
+                            if each.state=='draft':
+                                each.write({'expected_compl_date':self.n_nextdate})
 
                     self.n_name= self.n_mo.name
                     self.env['mrp.production'].sudo().browse(self.n_mo.id).write({'n_request_bool':True,'n_request_date':self.n_nextdate,'n_request_date_bool1':True,'n_request_date_bool':False})

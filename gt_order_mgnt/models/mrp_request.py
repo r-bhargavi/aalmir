@@ -271,7 +271,8 @@ class MrpProduction(models.Model):
                         if pick_ids:
                             for each_pick in pick_ids:
                                 each_pick.write({'min_date':record.date_planned})
-                        each.write({'expected_compl_date':record.date_planned})
+                        if each.state=='draft':
+                            each.write({'expected_compl_date':record.date_planned})
 
 
     @api.multi
