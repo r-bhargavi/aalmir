@@ -860,23 +860,35 @@
 			<group name="n_data" col="4">
 			   <group col="2">
                                 <field name="name" string="Production Request No." readonly="1"/>
-				<field name="n_product_id" readonly="1"/>
+				<!--<field name="n_product_id" readonly="1"/>-->
+				<field name="n_product_id" readonly="0"/>
 				<label for="n_order_qty"/>
 				<div>
-					<field name="n_order_qty" class="oe_inline" readonly="1"/>
-					<field name="n_unit" readonly="1"/>
+					<!--<field name="n_order_qty" class="oe_inline" readonly="1"/>-->
+					<field name="n_order_qty" class="oe_inline" readonly="0"/>
+					<!--<field name="n_unit" readonly="1"/>-->
+					<field name="n_unit" readonly="0"/>
 				</div>
-				<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="1" />
-                                <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>
-                                <field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Customer.'/>
-				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>
-		            	<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>
+				<!--<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="1" />-->
+				<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="0" />
+                                <!--<field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>-->
+                                <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="0" string='Sale Order No.'/>
+                                <!--<field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Customer.'/>-->
+                                <field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="0" string='Customer.'/>
+				<!--<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>-->
+				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="0"/>
+		            	<!--<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>-->
+		            	<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="0"/>
 		           </group>
 		           <group col="2">
-		           	<field name="n_category" options="{'no_open':True}" readonly="1"/>
-		                <field name="n_packaging" readonly="1" options="{'no_open':True}"/>
-		                <field name="n_delivery_date" readonly="1"/>
-                                <field name='request_type' readonly="1"/>
+		           	<!--<field name="n_category" options="{'no_open':True}" readonly="1"/>-->
+		           	<field name="n_category" options="{'no_open':True}" readonly="0"/>
+		                <!--<field name="n_packaging" readonly="1" options="{'no_open':True}"/>-->
+		                <field name="n_packaging" readonly="0" options="{'no_open':True}"/>
+		                <!--<field name="n_delivery_date" readonly="1"/>-->
+		                <field name="n_delivery_date" readonly="0"/>
+                                <!--<field name='request_type' readonly="1"/>-->
+                                <field name='request_type' readonly="0"/>
 				<field name="remain_bool" invisible="1"/>
 				<field name="n_default_code" invisible="1"/>
 			   </group >
@@ -886,44 +898,68 @@
 				<group>
 					<label for="n_Note"/>
 					<div>
-					<field name="n_Note" readonly="1"/>
+					<!--<field name="n_Note" readonly="1"/>-->
+					<field name="n_Note" readonly="0"/>
 					</div>
-					<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="1"/>
+					<!--<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="1"/>-->
+					<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="0"/>
 				</group>
 			     </page>
 			     <page name="transfer_info" string="Transfer Details" attrs="{'invisible':[('transfer_ids','=',[])]}" >
-				<field name='transfer_ids'  readonly="1">
+				<!--<field name='transfer_ids'  readonly="1">-->
+				<field name='transfer_ids'  readonly="0">
 					<tree>
-						<field name="picking_id" readonly="1"/>
-						<field name="product_id" readonly="1"/>
-						<field name="product_qty" readonly="1" />
-						<field name="product_uom" readonly="1" options="{'no_open':True}"/>
-						<field name="date" readonly="1"/>
-						<field name="state" readonly="1"/>
+						<!--<field name="picking_id" readonly="1"/>-->
+						<field name="picking_id" readonly="0"/>
+						<!--<field name="product_id" readonly="1"/>-->
+						<field name="product_id" readonly="0"/>
+						<!--<field name="product_qty" readonly="1" />-->
+						<field name="product_qty" readonly="0" />
+						<!--<field name="product_uom" readonly="1" options="{'no_open':True}"/>-->
+						<field name="product_uom" readonly="0" options="{'no_open':True}"/>
+						<!--<field name="date" readonly="1"/>-->
+						<field name="date" readonly="0"/>
+						<!--<field name="state" readonly="1"/>-->
+						<field name="state" readonly="0"/>
 					</tree>
 				</field>
 			     </page>
 			     <page name="batches_info" string="Batches Info" attrs="{'invisible':[('batches_ids','=',[])]}" >
-				<field name='batches_ids'  readonly="1">
-					<tree limit="10" string="New Batches" readonly="1">
-						<field name="product_id" readonly="1"/>
-						<field name="name" string="Number" readonly="1"/>
-						<field name="lot_id" readonly="1"/>
+				<!--<field name='batches_ids'  readonly="1">-->
+				<field name='batches_ids'  readonly="0">
+					<!--<tree limit="10" string="New Batches" readonly="1">-->
+					<tree limit="10" string="New Batches" readonly="0">
+						<!--<field name="product_id" readonly="1"/>-->
+						<field name="product_id" readonly="0"/>
+						<!--<field name="name" string="Number" readonly="1"/>-->
+						<field name="name" string="Number" readonly="0"/>
+						<!--<field name="lot_id" readonly="1"/>-->
+						<field name="lot_id" readonly="0"/>
 						<field name="product_qty" string="Quantity" />
-						<field name="uom_id" readonly="1" options="{'no_open':True,}"/>
-						<field name="state" readonly="1"/>
+						<!--<field name="uom_id" readonly="1" options="{'no_open':True,}"/>-->
+						<field name="uom_id" readonly="0" options="{'no_open':True,}"/>
+						<!--<field name="state" readonly="1"/>-->
+						<field name="state" readonly="0"/>
 					</tree>
 					<form readonly="1">
 	 				 	<group col="4">
-							<field name="product_id" readonly="1"/>
-							<field name="name" string="Number" readonly="1"/>
-							<field name="lot_id" readonly="1"/>
+							<!--<field name="product_id" readonly="1"/>-->
+							<field name="product_id" readonly="0"/>
+							<!--<field name="name" string="Number" readonly="1"/>-->
+							<field name="name" string="Number" readonly="0"/>
+							<!--<field name="lot_id" readonly="1"/>-->
+							<field name="lot_id" readonly="0"/>
 							<field name="convert_product_qty" string="Quantity"/>
-							<field name="uom_id" readonly="1" options="{'no_open':True}"/>
-							<field name="produce_qty_date" string="date" readonly="1"/>
-							<field name="user_id" readonly="1" options="{'no_open':True}"/>
-							<field name="employee_name" readonly="1"/>
-							<field name="state" readonly="1"/>
+							<!--<field name="uom_id" readonly="1" options="{'no_open':True}"/>-->
+							<field name="uom_id" readonly="0" options="{'no_open':True}"/>
+							<!--<field name="produce_qty_date" string="date" readonly="1"/>-->
+							<field name="produce_qty_date" string="date" readonly="0"/>
+							<!--<field name="user_id" readonly="1" options="{'no_open':True}"/>-->
+							<field name="user_id" readonly="0" options="{'no_open':True}"/>
+							<!--<field name="employee_name" readonly="1"/>-->
+							<field name="employee_name" readonly="0"/>
+							<!--<field name="state" readonly="1"/>-->
+							<field name="state" readonly="0"/>
 						</group>
 					</form>
 				</field>
