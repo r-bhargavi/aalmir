@@ -10,6 +10,8 @@
              <field name='name'/>
              <field name='production_id' readonly="1" string="Manufacturing No."/>
              <field name='product_id' readonly="1"/>
+             <field name='request_date' readonly="1"/>
+             <field name='expected_compl_date' readonly="1"/>
              <field name="wastage_qty"/>
              <field name="required_qty"/>
              <field name="required_uom_id" string="Unit"/>
@@ -35,8 +37,8 @@
                      		attrs="{'invisible':['|',('request_type','=','extra'),('state','!=','draft')]}"/>
                     <button name="reject_rm_request" groups="gt_order_mgnt.send_rm_extra_request" type="object" string="Reject Extra RM" class="oe_edit_only oe_highlight"
                      		attrs="{'invisible':['|',('request_type','=','normal'),('state','!=','draft')]}"/>
-		    <button type="object" string="Cancel" class="oe_edit_only oe_highlight" name='cancel_state'
-                      		attrs="{'invisible':[('state','in',('reject','cancel'))]}"/>
+<!--		    <button type="object" string="Cancel" class="oe_edit_only oe_highlight" name='cancel_state'
+                      		attrs="{'invisible':[('state','in',('reject','cancel','approve'))]}"/>-->
                     <field name="state" widget="statusbar" statusbar_visible="draft,approve,reject,cancel"/>
               </header>
               <sheet>
@@ -214,6 +216,8 @@
         <field name="res_model">mrp.raw.material.request</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'group_by':'state'}</field>
+
     </record>
     
      <menuitem action="rawmaterial_request_action" id="menu_raw_material_request" name="Raw Material Request"
@@ -224,6 +228,8 @@
         <field name="res_model">mrp.raw.material.request</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'group_by':'state'}</field>
+
     </record>
     
      <menuitem action="rawmaterial_request_action_mo" id="menu_raw_material_request_mo" name="Raw Material Request"

@@ -809,7 +809,7 @@
         <field name="model">n.manufacturing.request</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-            <tree string="Reserve" create="false">
+            <tree string="Reserve">
 		<field name="name"/>
 		<field name="n_sale_line" groups="gt_order_mgnt.group_sale_support" readonly="1" string="Sale Order"/>
                 <field name="contract_id" readonly="1" groups="gt_order_mgnt.group_sale_support"/>
@@ -839,11 +839,11 @@
         <field name="arch" type="xml">
             <form string="production_request">
 		<header>
-			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary" />
-			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder" attrs="{'invisible':[('bom_reminder_visible','=',False)]}"/>
-			<button name="send_reminder_to_create_mo" type="object"  string="Send Reminder MO" attrs="{'invisible':[('mo_reminder_visible','=',False)]}"/>
-			<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>
-			<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to Cancel Production Request?" class="btn-primary"/>
+			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft'),('n_state','!=','new')]}" class="btn-primary" />
+			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder" attrs="{'invisible':[('n_state','!=','draft')]}"/>
+			<button name="send_reminder_to_create_mo" type="object"  string="Send Reminder MO" attrs="{'invisible':[('n_state','!=','draft')]}"/>
+			<!--<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>-->
+			<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft'),('n_state','!=','new')]}" confirm="Are you sure want to Cancel Production Request?" class="btn-primary"/>
 			<!--<button name="create_production_transfer" type="object" string="Transfer Production"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary"/>-->
 			<field name="n_state" widget="statusbar" statusbar_visible="new,purchase,manufacture,done"/>
 		</header>
@@ -861,20 +861,20 @@
 			   <group col="2">
                                 <field name="name" string="Production Request No." readonly="1"/>
 				<!--<field name="n_product_id" readonly="1"/>-->
-				<field name="n_product_id" readonly="0"/>
-				<label for="n_order_qty"/>
+				<field name="n_product_id" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
+				<label for="n_order_qty" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 				<div>
 					<!--<field name="n_order_qty" class="oe_inline" readonly="1"/>-->
-					<field name="n_order_qty" class="oe_inline" readonly="0"/>
+					<field name="n_order_qty" class="oe_inline" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 					<!--<field name="n_unit" readonly="1"/>-->
-					<field name="n_unit" readonly="0"/>
+					<field name="n_unit" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 				</div>
 				<!--<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="1" />-->
 				<field name="n_mo_number" attrs="{'invisible':[('n_mo_number','=',False)]}" readonly="0" />
                                 <!--<field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>-->
-                                <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="0" string='Sale Order No.'/>
+                                <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)],'readonly':[('n_state','not in',['new'])]}" readonly="0" string='Sale Order No.'/>
                                 <!--<field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Customer.'/>-->
-                                <field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="0" string='Customer.'/>
+                                <field name="n_partner_id" attrs="{'readonly':[('n_state','not in',['new'])]}" readonly="0" string='Customer.'/>
 				<!--<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>-->
 				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="0"/>
 		            	<!--<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>-->
@@ -882,13 +882,13 @@
 		           </group>
 		           <group col="2">
 		           	<!--<field name="n_category" options="{'no_open':True}" readonly="1"/>-->
-		           	<field name="n_category" options="{'no_open':True}" readonly="0"/>
+		           	<field name="n_category" options="{'no_open':True}" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 		                <!--<field name="n_packaging" readonly="1" options="{'no_open':True}"/>-->
-		                <field name="n_packaging" readonly="0" options="{'no_open':True}"/>
+		                <field name="n_packaging" options="{'no_open':True}" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 		                <!--<field name="n_delivery_date" readonly="1"/>-->
-		                <field name="n_delivery_date" readonly="0"/>
+		                <field name="n_delivery_date" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
                                 <!--<field name='request_type' readonly="1"/>-->
-                                <field name='request_type' readonly="0"/>
+                                <field name='request_type' attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 				<field name="remain_bool" invisible="1"/>
 				<field name="n_default_code" invisible="1"/>
 			   </group >
@@ -899,7 +899,7 @@
 					<label for="n_Note"/>
 					<div>
 					<!--<field name="n_Note" readonly="1"/>-->
-					<field name="n_Note" readonly="0"/>
+					<field name="n_Note" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 					</div>
 					<!--<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="1"/>-->
 					<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="0"/>

@@ -119,7 +119,9 @@ class productTemplate(models.Model):
                 prod_req_ids = self.env['stock.move'].search([('picking_type_id.code','=','incoming'),('product_id','in',product_id),('state','in',['assigned'])])
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
-                        prod_count += each.product_uom_qty                        
+                    for each in prod_req_ids:
+                        prod_count += each.product_uom_qty
+
                 res.in_count=str(prod_count)
 	@api.multi
 	def _get_in_data_var(self):
@@ -211,7 +213,7 @@ class productTemplate(models.Model):
                     for each_mo in mo_ids:
                         count+=each_mo.product_qty-each_mo.n_produce_qty_now
                         print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty_now
-            rec.mo_count=str(count)
+                    rec.mo_count=str(count)
             return res
         @api.multi
         def _count_mo_var(self):
@@ -226,7 +228,7 @@ class productTemplate(models.Model):
                     for each_mo in mo_ids:
                         count+=each_mo.product_qty-each_mo.n_produce_qty_now
                         print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty_now
-            rec.mo_count_var=count
+                    rec.mo_count_var=count
 
 	@api.multi
 	def open_prod_orders(self):
