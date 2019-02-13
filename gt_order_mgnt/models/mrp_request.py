@@ -255,6 +255,26 @@ class MrpProduction(models.Model):
     product_cat_type=fields.Selection([('all','Both'),('film','Films and Bags'),('injection','Injection')],string='Product Category', compute='cate_type')
     
     @api.multi
+    @api.onchange('date_planned')
+    def check_date_planned(self):
+        for record in self:
+            if record.date_planned:
+                mo_name=self.env['stock.move'].search([('origin','ilike',record.name)])
+                rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',record.id)])
+                print "mo_namemo_name",mo_name
+                if mo_name:
+                    for each_mo in mo_name:
+                        each_mo.write({'date_expected':record.date_planned})
+                if rm_ids:
+                    for each in rm_ids:
+                        pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id)])
+                        if pick_ids:
+                            for each_pick in pick_ids:
+                                each_pick.write({'min_date':record.date_planned})
+                        each.write({'expected_compl_date':record.date_planned})
+
+
+    @api.multi
     def cancel_mrp(self):
 	mo_form = self.env.ref('gt_order_mgnt.n_production_request_cancel_form', False)
         if mo_form:

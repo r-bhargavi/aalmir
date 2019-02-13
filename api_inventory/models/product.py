@@ -210,8 +210,8 @@ class productTemplate(models.Model):
                 if mo_ids:
                     print "mo_idsmo_idsmo_ids",mo_ids
                     for each_mo in mo_ids:
-                        count+=each_mo.product_qty-each_mo.n_produce_qty
-                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty
+                        count+=each_mo.product_qty-each_mo.n_produce_qty_now
+                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty_now
             rec.mo_count=str(count)
             return res
         @api.multi
@@ -225,8 +225,8 @@ class productTemplate(models.Model):
                 if mo_ids:
                     print "mo_idsmo_idsmo_ids",mo_ids
                     for each_mo in mo_ids:
-                        count+=each_mo.product_qty-each_mo.n_produce_qty
-                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty
+                        count+=each_mo.product_qty-each_mo.n_produce_qty_now
+                        print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty_now
             rec.mo_count_var=count
 
 	@api.multi
@@ -450,7 +450,7 @@ class productProduct(models.Model):
                 print "mo_idsmo_idsmo_idsmo_ids",mo_ids
                 if mo_ids:
                     for each_mo in mo_ids:
-                        count+=each_mo.n_request_qty-each_mo.n_produce_qty
+                        count+=each_mo.n_request_qty-each_mo.n_produce_qty_now
             product_id.mo_count=str(count)
             return res
 

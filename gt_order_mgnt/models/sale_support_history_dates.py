@@ -45,9 +45,24 @@ class MrpCompleteDate(models.Model):
 	def save(self):
 		self.n_status = 'request'
 		if self.n_mo:
-			self.n_name= self.n_mo.name
-			self.env['mrp.production'].sudo().browse(self.n_mo.id).write({'n_request_bool':True,'n_request_date':self.n_nextdate,'n_request_date_bool1':True,'n_request_date_bool':False})
-			self.env['mrp.production'].sudo().browse(self.n_mo.id).message_post(body='New Change Date -: '+str(self.n_nextdate if self.n_nextdate else self.mo_schedule_date)
+                    print "self.n_mo.nameself.n_mo.nameself.n_mo.name",self.n_mo.name
+                    mo_name=self.env['stock.move'].search([('origin','ilike',self.n_mo.name)])
+                    rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.n_mo.id)])
+                    print "mo_namemo_name",mo_name
+                    if mo_name:
+                        for each_mo in mo_name:
+                            each_mo.write({'date_expected':self.n_nextdate})
+                    if rm_ids:
+                        for each in rm_ids:
+                            pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id)])
+                            if pick_ids:
+                                for each_pick in pick_ids:
+                                    each_pick.write({'min_date':self.n_nextdate})
+                            each.write({'expected_compl_date':self.n_nextdate})
+
+                    self.n_name= self.n_mo.name
+                    self.env['mrp.production'].sudo().browse(self.n_mo.id).write({'n_request_bool':True,'n_request_date':self.n_nextdate,'n_request_date_bool1':True,'n_request_date_bool':False})
+                    self.env['mrp.production'].sudo().browse(self.n_mo.id).message_post(body='New Change Date -: '+str(self.n_nextdate if self.n_nextdate else self.mo_schedule_date)
  +"\n By Reason:"+' '+str(self.n_reason)) 
                 if self.mo_schedule_date:
                    self.n_mo.date_planned=self.mo_schedule_date

@@ -201,7 +201,8 @@
         <field name="arch" type="xml">
            <field name="product_qty" position="after">
 		    <field name="n_request_qty" invisible="not context.get('show_qty')"/>
-		    <field name="n_produce_qty" invisible="not context.get('show_qty')"/>
+		    <field name="n_produce_qty" string="Qty Transferred"/>
+		    <field name="n_produce_qty_now" string="Qty Produced" invisible="not context.get('show_qty')"/>
             </field>
           
            <field name="date_planned" position="replace">
@@ -321,6 +322,9 @@
               <field name='allow_reorder' position='attributes'>
                   <attribute name='invisible'>1</attribute>
               </field>
+<!--              <xpath expr="//field[@name='date_planned']" position="attributes">
+                <attribute name='readonly'>[('n_request_date','!=',False)]</attribute>
+             </xpath>-->
               <xpath expr="//page[5]/group" position='after'> 
                <notebook>
                   <page string='Lot Details' attrs="{'invisible':[('lot_ids','=',[])]}" name='lot'>
