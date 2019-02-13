@@ -780,7 +780,7 @@
         <field name="model">n.manufacturing.request</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-            <tree string="Reserve" create="false">
+            <tree string="Reserve">
                <field name="name"/>
 		<field name="n_sale_line" readonly="1" groups="gt_order_mgnt.group_sale_support" string="Sale Order"/>
                 <field name="n_sale_order_line"  invisible="1"/> 
