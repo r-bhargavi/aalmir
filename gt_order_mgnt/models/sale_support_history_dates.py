@@ -173,6 +173,8 @@ class MrpCompleteDate(models.Model):
 					<p>Sale order No-: <b>%s</b> </p>
 					<p>Manufacturing Ref-: <b>%s</b> </p>
 		    			<p>Product:<b>%s</b>
+                                        <p>Customer name:<b>%s</b>
+                                        <p>Production request number:<b>%s</b>
 		    			<p>Quantity:<b>%s %s</b>
                                         <p>Requested completion date: <b>%s</b> </p>
                                         <p>Previous completion date:<b> %s</b> </p>
@@ -181,7 +183,7 @@ class MrpCompleteDate(models.Model):
                                         <p>By:<b> %s</b> </p>
 		    			<p>Remarks:<b>%s</b> </p>
 				</p>
-				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',self.n_prevoiusdate1 or 'No Previous Date',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
+				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',str(self.env[model_name].browse(model_id).partner_id) or '',str(self.env[model_name].browse(model_id).request_line) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',self.n_prevoiusdate1 or 'No Previous Date',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
                            
                             print "body_htmlbody_htmlbody_html",model_name,model_id
 
