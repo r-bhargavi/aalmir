@@ -189,7 +189,6 @@
             <field name="res_model">n.manufacturing.request</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
-            <field name="context">{'group_by':['n_state']}</field>
         </record>
         <record model="ir.actions.act_window" id="action_input_moves">
         <field name="name">Daily Injection production Received</field>
