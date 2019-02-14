@@ -382,6 +382,7 @@ class StockPicking(models.Model):
      dispatch_doc_name = fields.Char(string='Doc Name',copy=False)
 
      delivery_date=fields.Datetime('Delivery Date',copy=False)
+     expected_comple_date=fields.Datetime('Expected Completion Date',copy=False)
      delivery_doc = fields.Many2many('ir.attachment','delivery_attachment_rel','delivery_doc','id','Delivered Documents',copy=False)
      delivery_doc_name = fields.Char(string='Doc Name',copy=False)
      

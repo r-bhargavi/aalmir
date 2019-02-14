@@ -134,6 +134,7 @@ class MrpRawmaterial(models.Model):
 			if picking:
 				picking.material_request_id=rec.id
 				picking.min_date=rec.request_date
+				picking.expected_comple_date=rec.expected_compl_date
                                 picking.origin=rec.production_id.name
 				picking.ntransfer_type ='rm_virtual'
 				rec.picking_ids = [(4,picking.id)]
@@ -147,6 +148,7 @@ class MrpRawmaterial(models.Model):
 			if picking1:
 				picking1.material_request_id=rec.id
                                 picking1.min_date=rec.request_date
+				picking.expected_comple_date=rec.expected_compl_date
 
 				picking1.production_id=rec.production_id.id
 				picking1.origin=rec.name

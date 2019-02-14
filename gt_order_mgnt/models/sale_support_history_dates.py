@@ -13,8 +13,8 @@ class MrpCompleteDate(models.Model):
 	_order = "id desc"
 
 	n_line_id = fields.Many2one('sale.order.line','sale order')
-	n_prevoiusdate = fields.Date(string='Prevoius Date')
-	n_prevoiusdate1 = fields.Date(string='Prevoius Date')		#CH_N050 for reference
+	n_prevoiusdate = fields.Date(string='Previous Date')
+	n_prevoiusdate1 = fields.Date(string='Previous Date')		#CH_N050 for reference
 	n_nextdate = fields.Datetime(string='Next Date')
 	n_status  = state = fields.Selection([('draft','Draft'),('request','Pending'),('done','Approved'),('reject','Reject')],'Status',default='draft')
 	n_user_id = fields.Many2one('res.users','Aproved By')
@@ -45,22 +45,33 @@ class MrpCompleteDate(models.Model):
 	def save(self):
 		self.n_status = 'request'
 		if self.n_mo:
-                    print "self.n_mo.nameself.n_mo.nameself.n_mo.name",self.n_mo.name
-                    mo_name=self.env['stock.move'].search([('origin','ilike',self.n_mo.name)])
-                    rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.n_mo.id)])
-                    print "mo_namemo_name",mo_name
-                    if mo_name:
-                        for each_mo in mo_name:
-                            each_mo.write({'date_expected':self.n_nextdate})
-                    if rm_ids:
-                        for each in rm_ids:
-                            
-                            pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id)])
-                            if pick_ids:
-                                for each_pick in pick_ids:
-                                    each_pick.write({'min_date':self.n_nextdate})
-                            if each.state=='draft':
-                                each.write({'expected_compl_date':self.n_nextdate})
+                    if self.mo_schedule_date:
+                        self.n_mo.check_date_planned(self.mo_schedule_date)
+                    if self.n_nextdate and self.mo_schedule_date:
+                        if self.n_nextdate<self.mo_schedule_date:
+                            raise UserError(_('Completion Date Cannot be less then Scheduled Date'))
+                        if self.mo_schedule_date<datetime.strftime(datetime.today().date(),'%Y-%m-%d 00:00:00'):
+                            raise UserError(_('Schedule Date Cannot be less then Today Date'))
+
+                    if self.n_nextdate:
+                        if self.n_mo.request_line:
+                            self.n_mo.request_line.new_date_bool=True
+                        print "self.n_mo.nameself.n_mo.nameself.n_mo.name",self.n_mo.name
+                        mo_name=self.env['stock.move'].search([('origin','ilike',self.n_mo.name),('state','!=','done')])
+                        rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.n_mo.id)])
+                        print "mo_namemo_name",mo_name
+                        if mo_name:
+                            for each_mo in mo_name:
+                                each_mo.write({'date_expected':self.n_nextdate})
+                        if rm_ids:
+                            for each in rm_ids:
+
+                                pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id),('state','!=','done')])
+                                if pick_ids:
+                                    for each_pick in pick_ids:
+                                        each_pick.write({'expected_comple_date':self.n_nextdate})
+                                if each.state=='draft':
+                                    each.write({'expected_compl_date':self.n_nextdate})
 
                     self.n_name= self.n_mo.name
                     self.env['mrp.production'].sudo().browse(self.n_mo.id).write({'n_request_bool':True,'n_request_date':self.n_nextdate,'n_request_date_bool1':True,'n_request_date_bool':False})
@@ -92,104 +103,114 @@ class MrpCompleteDate(models.Model):
 				po_id.min_date=self.n_nextdate
 	  #CH_N051>>>>>
 		recipient_partners = str(self.n_line_id.order_id.user_id.login)
-		if self.n_line_id:
-			temp_id=''
-			if self.n_po:
-				temp_id = self.env.ref('gt_order_mgnt.template_change_date_purchase')
-				if self.n_po.production_ids:
-					self.n_po.production_ids.n_purchase_date=self.n_nextdate
-					self.n_po.production_ids.n_po=self.n_po.id
-					self.n_po.production_ids.n_purchase_bool=True  ##write for approvaL of new date
-                                        body='<span style="color:red;font-size:14px;">Purchase Order  '+str(self.n_po.name)+' Date Change -:</span>\n<li> Old Date:' +str(self.n_prevoiusdate1 and self.n_prevoiusdate1 or '') + '\tNew Date:'+str(self.n_nextdate) +' </li> <li>\nReason:' + str(self.n_reason)+'</li>'
-                                        self.n_po.production_ids.message_post(body)
-                                        
-					group=[]
-					if self.n_po.production_ids.request_line.n_category.cat_type=='film':
-						group = self.env['res.groups'].search([('name', '=', 'group_film_product')])
-					if self.n_po.production_ids.request_line.n_category.cat_type=='injection':
-						group = self.env['res.groups'].search([('name', '=', 'group_injection_product')])
-					for recipient in group.users:
-		    				recipient_partners += ","+str(recipient.login)
-				else:
-					search_id=self.env['sale.order.line.status'].search([('n_string','=','date_request')],limit=1) ## add status
-					if search_id:
-						self.n_line_id.n_status_rel=[(4,search_id.id)]
-					group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
-					for recipient in group.users:
-		    				recipient_partners += ","+str(recipient.login)
-					self.n_line_id.new_date_bool=True  ##write for approvaL of new date
-				#self.n_po.message_post(body='<span style="color:red;font-size:14px;">Purchase Order Change Date Request-:</span>\n '+ 'New Date:'+str(self.n_nextdate))
+#		if self.n_line_id:
+                temp_id=''
+                if self.n_po:
+                        temp_id = self.env.ref('gt_order_mgnt.template_change_date_purchase')
+                        if self.n_po.production_ids:
+                                self.n_po.production_ids.n_purchase_date=self.n_nextdate
+                                self.n_po.production_ids.n_po=self.n_po.id
+                                self.n_po.production_ids.n_purchase_bool=True  ##write for approvaL of new date
+                                body='<span style="color:red;font-size:14px;">Purchase Order  '+str(self.n_po.name)+' Date Change -:</span>\n<li> Old Date:' +str(self.n_prevoiusdate1 and self.n_prevoiusdate1 or '') + '\tNew Date:'+str(self.n_nextdate) +' </li> <li>\nReason:' + str(self.n_reason)+'</li>'
+                                self.n_po.production_ids.message_post(body)
 
-			elif self.n_mo:
-				temp_id = self.env.ref('gt_order_mgnt.template_change_date_mrp')
-				search_id=self.env['sale.order.line.status'].search([('n_string','=','date_request')],limit=1)
-				if search_id:
-						self.n_line_id.n_status_rel=[(4,search_id.id)]
-				self.n_line_id.new_date_bool=True  ##write for approvaL of new date
-			
-			if temp_id:
-                            recipient_partners=[]
-                            user_obj = self.env['res.users'].browse(self.env.uid)
-                            group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
-                            for recipient in group.users:
-                                if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
-                                     recipient_partners.append(recipient.login)
-                            recipient_partners.append(self.n_line_id.order_id.user_id.login)
-                            recipient_partners = ",".join(recipient_partners)
-                            print "recipient_partnersrecipient_partners",recipient_partners
-			    model_id= self.n_mo.id if self.n_mo else self.n_po.id
-			    model_name = 'mrp.production' if self.n_mo else 'purchase.order'
-			    name_str = 'Purchase Date Re-Scheduled' if self.n_po else 'Manufacture Date Re-Scheduled'
-			    base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-			    query = {'db': self._cr.dbname}
-			    fragment = {
-				'model': model_name,
-				'view_type': 'form',
-				'id': model_id,
-			    }
-                            n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-			    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-                            if not self.n_prevoiusdate1:
-                                subject="API-ERP Manufacturing Alert : %s production is scheduled"%str(self.env[model_name].browse(model_id).product_id.name)
-                                body_html = """<div> 
-                                <p>Dear Sir/Madam,<br/>
-				<p> <strong> This is to inform you that new manufacuring order is scheduled as per below details.</strong></p><br/>
-					<p>Sale order No-: <b>%s</b> </p>
-					<p>Manufacturing Ref-: <b>%s</b> </p>
-		    			<p>Product:<b>%s</b>
-		    			<p>Quantity:<b>%s %s</b>
-                                        <p>Requested completion date: <b>%s</b> </p>
-                                        <p>New production completion date: <b>%s</b> </p>
-                                        <p>Production starting date: <b>%s</b> </p>
-                                        <p>By:<b> %s</b> </p>
-		    			<p>Remarks:<b>%s</b> </p>
-				</p>
-				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
-                            else:
-                                subject="API-ERP Manufacturing Alert : %s production completion date changed"%str(self.env[model_name].browse(model_id).product_id.name)
-                                body_html = """<div> 
-                                <p>Dear Sir/Madam,<br/>
-				<p> <strong> Manufacturing completion Date for below sale order is changed by production.</strong></p><br/>
-					<p>Sale order No-: <b>%s</b> </p>
-					<p>Manufacturing Ref-: <b>%s</b> </p>
-		    			<p>Product:<b>%s</b>
-                                        <p>Customer name:<b>%s</b>
-                                        <p>Production request number:<b>%s</b>
-		    			<p>Quantity:<b>%s %s</b>
-                                        <p>Requested completion date: <b>%s</b> </p>
-                                        <p>Previous completion date:<b> %s</b> </p>
-                                        <p>New production completion date: <b>%s</b> </p>
-                                        <p>Production starting date: <b>%s</b> </p>
-                                        <p>By:<b> %s</b> </p>
-		    			<p>Remarks:<b>%s</b> </p>
-				</p>
-				</div>"""%(str(self.n_line_id.order_id.name) or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name) or ''+str(self.n_line_id.product_id.default_code) or '',str(self.env[model_name].browse(model_id).partner_id) or '',str(self.env[model_name].browse(model_id).request_line) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',self.n_prevoiusdate1 or 'No Previous Date',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
-                           
-                            print "body_htmlbody_htmlbody_html",model_name,model_id
+                                group=[]
+                                if self.n_po.production_ids.request_line.n_category.cat_type=='film':
+                                        group = self.env['res.groups'].search([('name', '=', 'group_film_product')])
+                                if self.n_po.production_ids.request_line.n_category.cat_type=='injection':
+                                        group = self.env['res.groups'].search([('name', '=', 'group_injection_product')])
+                                for recipient in group.users:
+                                        recipient_partners += ","+str(recipient.login)
+                        else:
+                                search_id=self.env['sale.order.line.status'].search([('n_string','=','date_request')],limit=1) ## add status
+                                if search_id:
+                                    if self.n_line_id:
+                                        self.n_line_id.n_status_rel=[(4,search_id.id)]
+                                group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
+                                for recipient in group.users:
+                                        recipient_partners += ","+str(recipient.login)
+                                if self.n_line_id:
 
-			    body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, model_name,model_id, context=self._context)
-			    temp_id.write({'subject':subject,'body_html': body_html, 'email_to' : recipient_partners, 'email_from': self.env.user.login})
-			    temp_id.send_mail(model_id)
+                                    self.n_line_id.new_date_bool=True  ##write for approvaL of new date
+                        #self.n_po.message_post(body='<span style="color:red;font-size:14px;">Purchase Order Change Date Request-:</span>\n '+ 'New Date:'+str(self.n_nextdate))
+
+                elif self.n_mo:
+                        temp_id = self.env.ref('gt_order_mgnt.template_change_date_mrp')
+                        search_id=self.env['sale.order.line.status'].search([('n_string','=','date_request')],limit=1)
+                        if search_id:
+                            if self.n_line_id:
+                                    self.n_line_id.n_status_rel=[(4,search_id.id)]
+                        if self.n_line_id:
+                            self.n_line_id.new_date_bool=True  ##write for approvaL of new date
+
+                if temp_id:
+                    recipient_partners=[]
+                    user_obj = self.env['res.users'].browse(self.env.uid)
+                    group = self.env['res.groups'].search([('name', '=', 'Sales Support Email')])
+                    for recipient in group.users:
+                        if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
+                             recipient_partners.append(recipient.login)
+                    if self.n_line_id:
+                        recipient_partners.append(self.n_line_id.order_id.user_id.login)
+                    recipient_partners = ",".join(recipient_partners)
+                    print "recipient_partnersrecipient_partners",recipient_partners
+                    model_id= self.n_mo.id if self.n_mo else self.n_po.id
+                    model_name = 'mrp.production' if self.n_mo else 'purchase.order'
+                    name_str = 'Purchase Date Re-Scheduled' if self.n_po else 'Manufacture Date Re-Scheduled'
+                    base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                    query = {'db': self._cr.dbname}
+                    fragment = {
+                        'model': model_name,
+                        'view_type': 'form',
+                        'id': model_id,
+                    }
+                    n_date=''
+                    if self.n_nextdate:
+                        n_date=datetime.strftime(datetime.strptime(self.n_nextdate,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+                    if not self.n_prevoiusdate1:
+                        subject="API-ERP Manufacturing Alert : %s production is scheduled"%str(self.env[model_name].browse(model_id).product_id.name)
+                        body_html = """<div> 
+                        <p>Dear Sir/Madam,<br/>
+                        <p> <strong> This is to inform you that new manufacuring order is scheduled as per below details.</strong></p><br/>
+                                <p>Sale order No-: <b>%s</b> </p>
+                                <p>Manufacturing Ref-: <b>%s</b> </p>
+                                <p>Product:<b>%s</b>
+                                <p>Customer name:<b>%s</b>
+                                <p>Production request number:<b>%s</b>
+                                <p>Quantity:<b>%s %s</b>
+                                <p>Requested completion date: <b>%s</b> </p>
+                                <p>New production completion date: <b>%s</b> </p>
+                                <p>Production starting date: <b>%s</b> </p>
+                                <p>By:<b> %s</b> </p>
+                                <p>Remarks:<b>%s</b> </p>
+                        </p>
+                        </div>"""%(str(self.n_line_id.order_id.name if self.n_line_id else '') or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name if self.n_line_id else '') or ''+str(self.n_line_id.product_id.default_code if self.n_line_id else '') or str(self.env[model_name].browse(model_id).product_id.default_code) or '',str(self.env[model_name].browse(model_id).partner_id.name) or '',str(self.env[model_name].browse(model_id).request_line.name) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
+                    else:
+                        subject="API-ERP Manufacturing Alert : %s production completion date changed"%str(self.env[model_name].browse(model_id).product_id.name)
+                        body_html = """<div> 
+                        <p>Dear Sir/Madam,<br/>
+                        <p> <strong> Manufacturing completion Date for below sale order is changed by production.</strong></p><br/>
+                                <p>Sale order No-: <b>%s</b> </p>
+                                <p>Manufacturing Ref-: <b>%s</b> </p>
+                                <p>Product:<b>%s</b>
+                                <p>Customer name:<b>%s</b>
+                                <p>Production request number:<b>%s</b>
+                                <p>Quantity:<b>%s %s</b>
+                                <p>Requested completion date: <b>%s</b> </p>
+                                <p>Previous completion date:<b> %s</b> </p>
+                                <p>New production completion date: <b>%s</b> </p>
+                                <p>Production starting date: <b>%s</b> </p>
+                                <p>By:<b> %s</b> </p>
+                                <p>Remarks:<b>%s</b> </p>
+                        </p>
+                        </div>"""%(str(self.n_line_id.order_id.name if self.n_line_id else '') or '',str(self.env[model_name].browse(model_id).name) or '',str(self.n_line_id.product_id.name if self.n_line_id else '') or str(self.env[model_name].browse(model_id).product_id.default_code) or ''+str(self.n_line_id.product_id.default_code if self.n_line_id else '') or '',str(self.env[model_name].browse(model_id).partner_id.name) or '',str(self.env[model_name].browse(model_id).request_line.name) or '',str(self.env[model_name].browse(model_id).product_qty) or '',str(self.env[model_name].browse(model_id).product_uom.name) or '',str(self.env[model_name].browse(model_id).n_client_date) or '',self.n_prevoiusdate1 or 'No Previous Date',n_date,str(self.env[model_name].browse(model_id).date_planned) or '' ,self.env.user.name or '',self.n_reason or '')
+
+                    print "body_htmlbody_htmlbody_html",model_name,model_id
+
+                    body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, model_name,model_id, context=self._context)
+                    temp_id.write({'subject':subject,'body_html': body_html, 'email_to' : recipient_partners, 'email_from': self.env.user.login})
+                    temp_id.send_mail(model_id)
 		return {'type':'ir.actions.act_window_close'}
 
 #CH_N043
@@ -260,8 +281,8 @@ class ScheduleDeliveryDateHtory(models.Model):
 	_order = "id desc"
 
 	n_line_id = fields.Many2one('sale.order.line','sale order')
-	n_prevoiusdate = fields.Datetime(string='Prevoius Date')
-	n_prevoiusdate1 = fields.Datetime(string='Prevoius Date')		#CH_N055 for reference
+	n_prevoiusdate = fields.Datetime(string='Previous Date')
+	n_prevoiusdate1 = fields.Datetime(string='Previous Date')		#CH_N055 for reference
 	n_nextdate = fields.Datetime(string='Next Schedule Date')
 	n_status  = fields.Selection([('scheduled','Scheduled'),('validate','Validate'),('schedule_dispatch','Scheduled Dispatch'),('dispatch','Dispatch')],'Status')
 	state = fields.Selection([('draft','Draft'),('done','Done')],'State',default='draft')

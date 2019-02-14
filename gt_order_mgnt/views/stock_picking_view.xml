@@ -158,6 +158,7 @@
 	<!--#CH_N079 make fields readonly -->
     		<field name="origin" position="replace">
 		 <field name="origin" attrs="{'readonly':[('state', '!=','draft')]}"/>
+		 <field name="expected_comple_date" attrs="{'invisible':[('expected_comple_date', '=',False)]}"/>
               </field>
             	<field name="move_type" position="attributes">
 			<attribute name="attrs">{'readonly':[('state', 'in',
@@ -604,7 +605,7 @@
      </record>
 	  
      <menuitem action="action_raw_matrial_request" id="menu_raw_material" name="Approved Raw Material"
-            parent="stock.menu_stock_inventory_control" sequence="3"/>
+            parent="stock.menu_stock_inventory_control" sequence="4"/>
     </data>
 </openerp>
 

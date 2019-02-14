@@ -120,9 +120,17 @@ class productTemplate(models.Model):
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
                     for each in prod_req_ids:
-                        prod_count += each.product_uom_qty
+                        if each.product_uom.id!=res.uom_id.id:
+                            if res.uom_id.name=='Kg' and each.product_uom.name=='MT':
+                                print "condition matched---------------------"
+                                prod_count+=each.product_uom_qty*1000
+                            else:
+                                prod_count += each.product_uom_qty
+                        else:
+                                
+                            prod_count += each.product_uom_qty
 
-                res.in_count=str(prod_count)
+                    res.in_count=str(prod_count)
 	@api.multi
 	def _get_in_data_var(self):
             for res in self:
@@ -134,8 +142,16 @@ class productTemplate(models.Model):
                 print "prod_req_idsprod_req_idsprod_req_ids",prod_req_ids
                 if prod_req_ids:
                     for each in prod_req_ids:
-                        prod_count += each.product_uom_qty
-                res.in_count_var=prod_count
+                        if each.product_uom.id!=res.uom_id.id:
+                            if res.uom_id.name=='Kg' and each.product_uom.name=='MT':
+                                print "condition matched---------------------"
+                                prod_count+=each.product_uom_qty*1000
+                            else:
+                                prod_count += each.product_uom_qty
+                        else:
+
+                            prod_count += each.product_uom_qty
+                    res.in_count_var=prod_count
 	@api.multi
         @api.depends('prod_count')
 	def _get_prod_orders_count(self):

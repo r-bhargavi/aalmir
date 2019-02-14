@@ -322,9 +322,9 @@
               <field name='allow_reorder' position='attributes'>
                   <attribute name='invisible'>1</attribute>
               </field>
-<!--              <xpath expr="//field[@name='date_planned']" position="attributes">
-                <attribute name='readonly'>[('n_request_date','!=',False)]</attribute>
-             </xpath>-->
+              <xpath expr="//field[@name='date_planned']" position="attributes">
+                <attribute name='readonly'>1</attribute>
+             </xpath>
               <xpath expr="//page[5]/group" position='after'> 
                <notebook>
                   <page string='Lot Details' attrs="{'invisible':[('lot_ids','=',[])]}" name='lot'>
@@ -563,7 +563,7 @@
 		 <attribute name="attrs">{'readonly':[('state', '!=','draft')]}</attribute>
 	  </field>
           <field name="bom_id" position="replace">
-               <field name="bom_id" required="1" 
+               <field name="bom_id" required="0" 
 		domain="['|',('product_id','=',product_id),'&amp;', ('product_tmpl_id.product_variant_ids','=',product_id), ('product_id','=',False),('state','=','approve')]"
              	context="{'default_product_id': product_id, 'default_product_tmpl_id': product_tmpl_id}" on_change="bom_id_change(bom_id)" />
           </field>
@@ -611,7 +611,7 @@
                  <button type='object' name='mrp_hold' string='Unhold MO' 
                     class="oe_highlight" context="{'active':True}"
                     attrs="{'invisible': ['|',('hold_order','=','active'),('state','in',('cancel','done'))]}"/>
-                 <button name="schedule_date" string="Update Completion Date" type="object"  attrs="{'invisible': ['|',('n_request_bool','=',True),('state','in',('cancel','done'))]}" help="click to send manufacture completion date to Sales Support"  class="btn-primary" />
+                 <button name="schedule_date" string="Schedule Date" type="object"  attrs="{'invisible': ['|',('n_request_bool','=',True),('state','in',('cancel','done'))]}" help="click to send manufacture completion date to Sales Support"  class="btn-primary" />
              </button> 
 	    <field name="date_planned" position="after">
                  <!--field name='dup_date_planned'/-->
@@ -794,6 +794,8 @@
                 <field name="n_order_qty" readonly="1"/>
 		 <field name="n_unit" readonly="1"/>
                 <field name="n_mo_number" invisible="1" readonly="1" />
+                <button name="manu_date_history" icon="fa-history" string="History" type="object" attrs="{'invisible':[('n_mo_number', '=', False)]}"/>
+
 		<field name="n_po_number" invisible="1" readonly="1" string="Purchase Requisition" />
 		<field name="n_Note" readonly="1"/>
 		<field name="n_state" groups="gt_order_mgnt.group_sale_support"/>
@@ -815,17 +817,23 @@
                 <field name="contract_id" readonly="1" groups="gt_order_mgnt.group_sale_support"/>
 		<field name="create_uid" strign="Create By" groups="gt_order_mgnt.group_sale_support"/>
 		<field name="create_date" strign="Create On" widget="date" groups="gt_order_mgnt.group_sale_support"/>
-                <field name="n_delivery_date" readonly="1"/>
+                <field name="n_delivery_date" string="Requested Completion Date" readonly="1"/>
                 <field name="n_product_id" readonly="1"/>
 		<button name="show_product" options="{'no_create': True}" type="object" icon="gtk-jump-to" groups="mrp.group_mrp_user"/>
-		<field name="n_product_desc" readonly="1" groups="mrp.group_mrp_user"/> 
-		<field name="n_default_code" readonly="1" groups="mrp.group_mrp_user"/>
+		<!--<field name="n_product_desc" readonly="1" groups="mrp.group_mrp_user"/>--> 
+		<!--<field name="n_default_code" readonly="1" groups="mrp.group_mrp_user"/>-->
+		<field name="new_date_bool" readonly="1" string="Rescheduled"/>
+		<field name="n_request_date" readonly="1" string="Expected Completion Date"/>
+		<field name="date_planned" readonly="1" string="MO Staring Date"/>
+		<field name="n_produce_qty" readonly="1" string="MO Qty Transferred"/>
+		<field name="n_produce_qty_now" readonly="1" string="MO Qty Produced"/>
+		<field name="new_date_bool" readonly="1" string="Rescheduled"/>
                 <field name="n_order_qty" readonly="1"/>
 		<field name="n_unit" readonly="1"/>
 		<field name="n_Note" readonly="1"/>
-		<field name="cancel_reason" readonly="1"/>
+		<!--<field name="cancel_reason" readonly="1"/>-->
 		<field name="n_mo_number" readonly="1" groups="mrp.group_mrp_user"/>
-		<field name="n_po_number" readonly="1" string="Purchase Requisition" groups="mrp.group_mrp_user"/>
+		<!--<field name="n_po_number" readonly="1" string="Purchase Requisition" groups="mrp.group_mrp_user"/>-->
 		<field name="n_state" readonly="1" groups="mrp.group_mrp_user"/>
 		<button name="check_cancel" string="Check Request" type="object" icon="gtk-apply" attrs="{'invisible':[('n_state','!=','cancel')]}" groups="gt_order_mgnt.group_sale_support" />
             </tree>
@@ -839,13 +847,15 @@
         <field name="arch" type="xml">
             <form string="production_request">
 		<header>
-			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','!=','draft'),('n_state','!=','new')]}" class="btn-primary" />
+			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','not in',['draft'])]}" class="btn-primary" />
+			<button name="send_request_production" type="object"  string="Send To Production"  attrs="{'invisible':[('n_state','not in',['new'])]}" class="btn-primary" />
+			<button name="acknowledge_approved" type="object"  string="Acknowledge Approval"  attrs="{'invisible':[('new_date_bool','=',False)]}" class="btn-primary" />
 			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder" attrs="{'invisible':[('n_state','!=','draft')]}"/>
 			<button name="send_reminder_to_create_mo" type="object"  string="Send Reminder MO" attrs="{'invisible':[('n_state','!=','draft')]}"/>
 			<!--<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>-->
 			<button name="cancel_pr" type="object"  string="cancel" attrs="{'invisible':[('n_state','!=','draft'),('n_state','!=','new')]}" confirm="Are you sure want to Cancel Production Request?" class="btn-primary"/>
 			<!--<button name="create_production_transfer" type="object" string="Transfer Production"  attrs="{'invisible':[('n_state','!=','draft')]}" class="btn-primary"/>-->
-			<field name="n_state" widget="statusbar" statusbar_visible="new,purchase,manufacture,done"/>
+			<field name="n_state" widget="statusbar" statusbar_visible="new,mo_created,manufacture,done"/>
 		</header>
 		<sheet>
 			<field name="n_sale_line" invisible="1"/>
@@ -874,7 +884,7 @@
                                 <!--<field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Sale Order No.'/>-->
                                 <field name="n_sale_line" attrs="{'invisible':[('n_sale_line','=',False)],'readonly':[('n_state','not in',['new'])]}" readonly="0" string='Sale Order No.'/>
                                 <!--<field name="n_partner_id" attrs="{'invisible':[('n_sale_line','=',False)]}" readonly="1" string='Customer.'/>-->
-                                <field name="n_partner_id" attrs="{'readonly':[('n_state','not in',['new'])]}" readonly="0" string='Customer.'/>
+                                <field name="n_partner_id"  string='Customer.'/>
 				<!--<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="1"/>-->
 				<field name="n_po_number" attrs="{'invisible':[('n_po_number','=',False)]}" string="Purchase Requisition" readonly="0"/>
 		            	<!--<field name="remaining_contract_qty" attrs="{'invisible':[('contract_id','=',False)]}" readonly="1"/>-->
@@ -884,7 +894,7 @@
 		           	<!--<field name="n_category" options="{'no_open':True}" readonly="1"/>-->
 		           	<field name="n_category" options="{'no_open':True}" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
 		                <!--<field name="n_packaging" readonly="1" options="{'no_open':True}"/>-->
-		                <field name="n_packaging" options="{'no_open':True}" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
+		                <field name="n_packaging" options="{'no_open':True}" attrs="{'readonly':[('n_state','not in',['new'])]}" domain="[('pkgtype','=','primary'),('product_tmpl_id.product_variant_ids','in',(n_product_id))]"/>
 		                <!--<field name="n_delivery_date" readonly="1"/>-->
 		                <field name="n_delivery_date" attrs="{'readonly':[('n_state','not in',['new'])]}"/>
                                 <!--<field name='request_type' readonly="1"/>-->
@@ -903,6 +913,15 @@
 					</div>
 					<!--<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="1"/>-->
 					<field name="cancel_reason" attrs="{'invisible':[('cancel_reason','=',False)]}" readonly="0"/>
+				</group>
+			     </page>
+			     <page name="mo_details" string="MO Details" >
+				<group>
+					<field name="date_planned" readonly="1"/>
+					<field name="n_request_date" readonly="1"/>
+					<field name="new_date_bool" invisible="1"/>
+					<field name="n_produce_qty" readonly="1"/>
+					<field name="n_produce_qty_now" readonly="1"/>
 				</group>
 			     </page>
 			     <page name="transfer_info" string="Transfer Details" attrs="{'invisible':[('transfer_ids','=',[])]}" >
@@ -1000,7 +1019,7 @@
         <field name="res_model">n.manufacturing.request</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('n_state', '=', 'draft')]</field>
+        <field name="domain">[('n_state', 'in', ['draft'])]</field>
     </record>
    <record id="action_partner_tree_view2" model="ir.actions.act_window.view">
             <field eval="1" name="sequence"/>

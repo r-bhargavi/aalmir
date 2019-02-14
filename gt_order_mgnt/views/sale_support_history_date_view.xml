@@ -40,8 +40,8 @@
 			<group col="4">
 				<field name="n_prevoiusdate" invisible="1"/>
 				<field name="n_prevoiusdate1" attrs="{'invisible':[('n_prevoiusdate1','=',False)]}" readonly="1"/>
-				<field name="n_nextdate" attrs="{'invisible':[('n_mo','=',False)]}" string="Complete Date"/>
-                                <field name='mo_schedule_date'  invisible="not context.get('mo_state')"/>
+				<field name="n_nextdate" attrs="{'invisible':[('n_mo','=',False)],'required':[('n_prevoiusdate1','=',False)]}" string="Complete Date"/>
+                                <field name='mo_schedule_date' attrs="{'required':[('n_prevoiusdate1','=',False)]}" />
 				<field name="n_status" invisible="1"/>
 				<field name="n_mo" invisible="1"/>
 				<field name="n_po" invisible="1"/>
