@@ -1861,6 +1861,11 @@ class MrpWorkcenterPructionline(models.Model):
     def action_start_working(self):
         res=super(MrpWorkcenterPructionline,self).action_start_working()
         for rec in self:
+            if rec.production_id.state not in ('ready'):
+                raise UserError(_('Cannot Start Work Order as MO is not in Ready to produce!!'))
+            rec.production_id.state='in_production'
+            if rec.production_id.request_line:
+                rec.production_id.request_line.n_state='manufacture'
             rec.production_id.state='in_production'
         return res
              
@@ -2327,8 +2332,8 @@ class MrpWorkcenterPructionline(models.Model):
         for res in self:
         	if self._context.get('ready'):
 #                    need to uncomment while gng live for bom
-                        if res.production_id.state not in ('ready','in_production'):
-                            raise UserError(_('Cannot Lock Work Order as MO is not in Ready to produce or Production state!!'))
+#                        if res.production_id.state not in ('ready','in_production'):
+#                            raise UserError(_('Cannot Lock Work Order as MO is not in Ready to produce or Production state!!'))
 
 #                        if not res.machine:
 #		          raise UserError(_('Please Select Machine Before Lock Work order..'))
@@ -2416,7 +2421,7 @@ class MrpWorkcenterPructionline(models.Model):
         for line in self:
             order_tree = self.env.ref('mrp_operations.mrp_production_workcenter_tree_view_inherit', False)
             order_form = self.env.ref('mrp_operations.mrp_production_workcenter_form_view_inherit', False)
-            line.production_id.write({'state':'in_production'})
+#            line.production_id.write({'state':'in_production'})
             if order_form:
                 return {
                     'name':'Work Orders',

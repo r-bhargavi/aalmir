@@ -246,7 +246,7 @@ class MrpProduction(models.Model):
     parent_id=fields.Many2one('mrp.production','Parent Manufactruing No.')
     #sub_production_ids=fields.One2many('mrp.production','parent_id',string='Sub MO Details')
     #requisition_ids=fields.One2many('purchase.requisition','m_production_id',string='PRQ Details')
-    date_planned = fields.Datetime('Schedule Starting Date', readonly=False, states={'draft': [('readonly', False)]}, required=True, copy=True,default='') #default='',compute='dateplanned')
+    date_planned = fields.Datetime('Schedule Starting Date', states={'draft': [('readonly', False)]}, required=False, copy=True,default='') #default='',compute='dateplanned')
     hold_order=fields.Selection([('active','Active'),('hold','Hold')],default='active', string='Order Status')
     total_shfit_required=fields.Float('Total Shift Required', compute='shiftcal')
     total_shfit_completed=fields.Float('Total Shift Completed',compute='shiftcal')
@@ -255,24 +255,24 @@ class MrpProduction(models.Model):
     product_cat_type=fields.Selection([('all','Both'),('film','Films and Bags'),('injection','Injection')],string='Product Category', compute='cate_type')
     
     @api.multi
-    @api.onchange('date_planned')
-    def check_date_planned(self):
+    def check_date_planned(self,date_planned):
         for record in self:
-            if record.date_planned:
-                mo_name=self.env['stock.move'].search([('origin','ilike',record.name)])
+            if date_planned:
+#                mo_name=self.env['stock.move'].search([('origin','ilike',record.name)])
                 rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',record.id)])
-                print "mo_namemo_name",mo_name
-                if mo_name:
-                    for each_mo in mo_name:
-                        each_mo.write({'date_expected':record.date_planned})
+                print "rm_idsrm_idsrm_ids",rm_ids.state
+#                print "mo_namemo_name",mo_name
+#                if mo_name:
+#                    for each_mo in mo_name:
+#                        each_mo.write({'date_expected':record.date_planned})
                 if rm_ids:
                     for each in rm_ids:
-                        pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id)])
+                        pick_ids=self.env['stock.picking'].search([('material_request_id','=',each.id),('state','!=','done')])
                         if pick_ids:
                             for each_pick in pick_ids:
-                                each_pick.write({'min_date':record.date_planned})
+                                each_pick.write({'min_date':date_planned})
                         if each.state=='draft':
-                            each.write({'expected_compl_date':record.date_planned})
+                            each.write({'request_date':date_planned})
 
 
     @api.multi
@@ -574,7 +574,7 @@ class MrpProduction(models.Model):
 			status_list.append((3,new_id.id))
 		self.env['sale.order.line'].sudo().browse(mo_id.sale_line.id).write({'mo_id': mo_id.id,'n_status_rel':status_list})
 	if mo_id.request_line:
-		self.env['n.manufacturing.request'].sudo().browse(mo_id.request_line.id).write({'n_state':'manufacture','n_mo_number':mo_id.id})
+		self.env['n.manufacturing.request'].sudo().browse(mo_id.request_line.id).write({'n_state':'mo_created','n_mo_number':mo_id.id})
 	return mo_id
 
     @api.multi
@@ -692,21 +692,30 @@ class MrpProduction(models.Model):
     @api.multi
     def action_confirm(self):
 	for rec in self:
-#            if rec.bom_id.state!='approve':
-#                raise UserError("BoM for the Product Selected in MO is yet not approved!")
+                if not rec.bom_id:
+                   raise UserError("BoM for the Product is not defined!!")
 #                move_ids,location_id,location_dest_id=[],[],[]
                 if not rec.product_id.product_tmpl_id.initial_weight:
                    raise UserError("Please Fill the Product Initial Weight")
+                if not rec.n_request_date:
+                   raise UserError("Please Fill the Completion Date")
+                if not rec.date_planned:
+                   raise UserError("Please Fill the Schedule Date")
 		if not rec.n_request_date and rec.request_line and rec.request_line.request_type != 'stock' and not rec.contract_id:
 			raise UserError("Please Update Manufacturing Complete Date")
 			
 		if rec.location_dest_id.quality_ck_loc and not rec.product_id.check_quality:
     			raise UserError("Product is not under quality check control. Please Select different Finished Location")
+                if rec.request_line:
+                    rec.request_line.n_state='scheduled'
                 res=super(MrpProduction,self).action_confirm()
                 print "re--------------------------------",res
 #                for each_move in rec.move_created_ids:
 #                    location_id.append(each_move.location_id.id)
 #                    location_dest_id.append(each_move.location_dest_id.id)
+                for move_line in rec.move_created_ids:
+                    if rec.n_request_date:
+                        move_line.date_expected=rec.n_request_date
                 product_lst=[]
                 if rec.product_id.product_tmpl_id.discription_line:
                    for line in rec.product_id.product_tmpl_id.discription_line:
@@ -942,6 +951,7 @@ class n_manufacturing_request(models.Model):
     @api.model
     def create(self, vals):
     	category=self.env['product.category'].search([('id','=',vals.get('n_category'))])
+#    	if category.cat_type == 'film':
     	if category.cat_type == 'film':
         	vals['name'] = self.env['ir.sequence'].next_by_code('film.production.request') or 'New'
 	elif category.cat_type == 'injection':
@@ -965,7 +975,8 @@ class n_manufacturing_request(models.Model):
 
     name=fields.Char('Production Request No.')
     n_sale_line = fields.Many2one('sale.order', 'Sale Line')
-    n_partner_id = fields.Many2one(related='n_sale_line.partner_id', string="Customer")
+#    n_partner_id = fields.Many2one(related='n_sale_line.partner_id', string="Customer")
+    n_partner_id = fields.Many2one("res.partner",string="Customer")
     n_sale_order_line = fields.Many2one('sale.order.line', 'Sale Order Line')
     n_delivery_date = fields.Datetime('Requested Date')
     n_order_qty = fields.Float('Order Qty',track_visibility='always')
@@ -977,7 +988,8 @@ class n_manufacturing_request(models.Model):
     n_state = fields.Selection([ ('new','New'),('draft', 'Draft'),
 				('purchase', 'Purchase'),
 				('scheduled', 'Scheduled'),
-				('manufacture', 'In-Produciton'),
+                                ('mo_created', 'MO created'),
+				('manufacture', 'In-Produciton'),				
 				('done', 'Done'),
 				('cancel', 'Cancelled'), ], 'Status', readonly=True, 
 				copy=False, default='new',track_visibility='always',
@@ -987,10 +999,16 @@ class n_manufacturing_request(models.Model):
     n_Note = fields.Text(string="Note",track_visibility='always')
     n_product_desc = fields.Char(compute =get_desc, string="Product Description",track_visibility='always')
     n_mo_number = fields.Many2one("mrp.production","MO Number")
+    date_planned = fields.Datetime(related='n_mo_number.date_planned') #default='',compute='dateplanned')
+    n_request_date = fields.Datetime(related='n_mo_number.n_request_date',string="Expected Completion Date") #default='',compute='dateplanned')
+
+    n_produce_qty = fields.Float(related='n_mo_number.n_produce_qty',string="Qty Transferred")
+    n_produce_qty_now = fields.Float(related='n_mo_number.n_produce_qty_now',string="Qty Produced")
     n_po_number	= fields.Many2one("purchase.requisition","TE Number")
 
     #CH_N045 add>>
     n_exist_pr = fields.Boolean(string='Exist', default=False)
+    new_date_bool = fields.Boolean(string='New Date Bool', default=False)
     reminder_sent = fields.Boolean(string='Reminder sent', default=False)
     reminder_mo_sent = fields.Boolean(string='Reminder MO sent', default=False)
     bom_reminder_visible = fields.Boolean(string='BoM reminder', compute='_compute_bom_reminder_visibility')
@@ -1008,7 +1026,7 @@ class n_manufacturing_request(models.Model):
     cancel_reason=fields.Text('Reason For Cancel',track_visibility='always')
     
     request_type=fields.Selection([('stock','From Stock'),('sale','Sale Support'),
-    				   ('raw','Raw Materail'),('contract','Contract')],string="Requested From")
+    				   ('raw','Raw Materail'),('contract','Contract')],string="Requested From",default='sale')
     
     transfer_ids = fields.Many2many('stock.move','production_request_move_rel',
     					'transfer_id','move_id' ,string="Transfers",copy=False)
@@ -1031,6 +1049,13 @@ class n_manufacturing_request(models.Model):
                   record.remain_bool=True
                else:
                   record.remain_bool=False
+    @api.multi
+    @api.onchange('n_product_id')
+    def check_product(self):
+        for record in self:
+            if record.n_product_id:
+                record.n_unit=record.n_product_id.uom_id.id
+                record.n_category=record.n_product_id.categ_id.id
                   
     @api.multi
     def contract_save(self):
@@ -1066,6 +1091,7 @@ class n_manufacturing_request(models.Model):
 		
 	self.n_state='draft'
 	self.request_type='sale'
+        self.n_partner_id=self.n_sale_line.partner_id.id
 	search_id=self.env['sale.order.line.status'].search([('n_string','=','production_request')],limit=1) ## add status
 	if search_id:
 		status_list.append((4,search_id.id))
@@ -1328,21 +1354,54 @@ class n_manufacturing_request(models.Model):
                 temp_id.send_mail(self.n_sale_line.id)
                 self.write({'reminder_sent':True})
         return True
+    
+    @api.multi
+    def manu_order_history(self):
+	order_form = self.env.ref('gt_order_mgnt.mrp_production_form_view_aalmir_ext', False)
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.production',
+	    'domain':[('request_line','=',self.id)],
+            'views': [(order_form.id, 'tree')],
+            'view_id': order_form.id,
+            'target': 'new',
+        }
+    @api.multi
+    def acknowledge_approved(self):
+        for rec in self:
+            if rec.n_sale_order_line:
+                rec.n_sale_order_line.approve_producton_date()
+
+            else:
+                if rec.n_mo_number:
+                    rec.n_mo_number.n_request_date_bool1=False
+                    rec.n_mo_number.n_request_date_bool=True
+                    rec.n_mo_number.message_post(body='<span style="color:green;font-size:14px;">New Date Approved By Sale support -:</span>\n '+
+                                    'New Date:'+str(rec.n_mo_number.n_request_date) +'\t')
+            rec.new_date_bool=False
+            
+    @api.multi
+    def send_request_production(self):
+        self.write({'n_state':'draft'})
     @api.multi
     def create_manufacturing_order(self):
 
 	context = self._context.copy()
         context.update({'request_id':self.id, 'default_contract_id':self.contract_id.id})
+        if self.n_partner_id:
+            context.update({'default_partner_id':self.n_partner_id.id})
         mo_form = self.env.ref('mrp.mrp_production_form_view', False)
         print "Self>dfsfsdfsdfdsf",context
         bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
-        if any(bom.state == 'approve' for bom in bom_id):
-            print "nothing to be done---------------------"
-        else:
-            raise UserError('You are not allowed to create MO request as the BoM is still not approved')
-
-        if not bom_id:
-            raise UserError('You are not allowed to create MO request as the BoM is still not issued for Product')
+#        if any(bom.state == 'approve' for bom in bom_id):
+#            print "nothing to be done---------------------"
+#        else:
+#            raise UserError('You are not allowed to create MO request as the BoM is still not approved')
+#
+#        if not bom_id:
+#            raise UserError('You are not allowed to create MO request as the BoM is still not issued for Product')
         if mo_form:
                 return {
                     'type': 'ir.actions.act_window',
