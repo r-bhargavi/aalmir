@@ -819,7 +819,7 @@
 		<field name="create_date" strign="Create On" widget="date" groups="gt_order_mgnt.group_sale_support"/>
                 <field name="n_delivery_date" string="Requested Completion Date" readonly="1"/>
                 <field name="n_product_id" readonly="1"/>
-		<button name="show_product" options="{'no_create': True}" type="object" icon="gtk-jump-to" groups="mrp.group_mrp_user"/>
+		<!--<button name="show_product" options="{'no_create': True}" type="object" icon="gtk-jump-to" groups="mrp.group_mrp_user"/>-->
 		<!--<field name="n_product_desc" readonly="1" groups="mrp.group_mrp_user"/>--> 
 		<!--<field name="n_default_code" readonly="1" groups="mrp.group_mrp_user"/>-->
 		<field name="new_date_bool" readonly="1" string="Rescheduled"/>
@@ -827,7 +827,6 @@
 		<field name="date_planned" readonly="1" string="MO Staring Date"/>
 		<field name="n_produce_qty" readonly="1" string="MO Qty Transferred"/>
 		<field name="n_produce_qty_now" readonly="1" string="MO Qty Produced"/>
-		<field name="new_date_bool" readonly="1" string="Rescheduled"/>
                 <field name="n_order_qty" readonly="1"/>
 		<field name="n_unit" readonly="1"/>
 		<field name="n_Note" readonly="1"/>
