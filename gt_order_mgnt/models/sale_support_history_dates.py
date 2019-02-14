@@ -14,7 +14,7 @@ class MrpCompleteDate(models.Model):
 
 	n_line_id = fields.Many2one('sale.order.line','sale order')
 	n_prevoiusdate = fields.Date(string='Previous Date')
-	n_prevoiusdate1 = fields.Date(string='Previous Date')		#CH_N050 for reference
+	n_prevoiusdate1 = fields.Date(string='Previous Completion Date')		#CH_N050 for reference
 	n_nextdate = fields.Datetime(string='Next Date')
 	n_status  = state = fields.Selection([('draft','Draft'),('request','Pending'),('done','Approved'),('reject','Reject')],'Status',default='draft')
 	n_user_id = fields.Many2one('res.users','Aproved By')
@@ -22,7 +22,7 @@ class MrpCompleteDate(models.Model):
 	n_mo =fields.Many2one('mrp.production','Manufacture Order')
 	n_po =fields.Many2one('purchase.order','Purchase Order')
         n_name = fields.Text("Name")
-        mo_schedule_date=fields.Datetime(string='Work Orders Schedule Date')
+        mo_schedule_date=fields.Datetime(string='MO Scheduled Starting Date')
         wo_schedule_planned=fields.Datetime(string='Schedule Date')
         wo_schedule_planned_end=fields.Datetime(string='End Date')
         work_order_id=fields.Many2one('mrp.production.workcenter.line','Work Order No.')
