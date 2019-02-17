@@ -50,8 +50,8 @@ class MrpCompleteDate(models.Model):
                     if self.n_nextdate and self.mo_schedule_date:
                         if self.n_nextdate<self.mo_schedule_date:
                             raise UserError(_('Completion Date Cannot be less then Scheduled Date'))
-                        if self.mo_schedule_date<datetime.strftime(datetime.today().date(),'%Y-%m-%d 00:00:00'):
-                            raise UserError(_('Schedule Date Cannot be less then Today Date'))
+#                        if self.mo_schedule_date<datetime.strftime(datetime.today().date(),'%Y-%m-%d 00:00:00'):
+#                            raise UserError(_('Schedule Date Cannot be less then Today Date'))
 
                     if self.n_nextdate:
                         if self.n_mo.request_line:

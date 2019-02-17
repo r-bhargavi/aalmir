@@ -1565,9 +1565,9 @@ class MrpWorkcenterPructionline(models.Model):
 				error_string="Workorder {} does not have any Sequence, Set Sequence for   scheduling".format(res.id)
     	    if vals.get('date_planned'):
         	new_date=datetime.strptime(vals.get('date_planned'),'%Y-%m-%d %H:%M:%S')
-        	if datetime.now() > new_date:
-        		error_string="You can not Schedule Workorder in less than current time."
-        		raise
+#        	if datetime.now() > new_date:
+#        		error_string="You can not Schedule Workorder in less than current time."
+#        		raise
         
     	    if  vals.get('capacity_type') and vals.get('machine'): 
     	    	m_type=self.env['machinery.capacity.type'].search([('id','=',vals.get('capacity_type'))])
