@@ -9,6 +9,7 @@
             <tree string="Raw Material Request">
              <field name='name'/>
              <field name='production_id' readonly="1" string="Manufacturing No."/>
+             <field name='partner_id' readonly="1" string="Customer"/>
              <field name='product_id' readonly="1"/>
              <field name='request_date' readonly="1"/>
              <field name='expected_compl_date' readonly="1"/>

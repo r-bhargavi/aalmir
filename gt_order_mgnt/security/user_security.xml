@@ -28,6 +28,12 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to get mails of raw material approval request</field>
     </record>
+     <record id="send_mo_close_mail" model="res.groups">
+        <field name="name">MO Closing Receiving</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to get mails of mo closing</field>
+    </record>
      <record id="send_rm_extra_request" model="res.groups">
         <field name="name">RM Extra Request Approve/Reject</field>
         <field name="category_id" ref="base.module_category_usability"/>

@@ -288,7 +288,7 @@
 		            </field>
                      </page>
                      <page string="Raw Material Requests" attrs="{'invisible':[('material_request_id','=',[])]}">
-                            <field name='wastage_batch_ids' readonly='1'>
+<!--                            <field name='wastage_batch_ids' readonly='1'>
                                <tree>
                                   <field name='name'/>
                                   <field name='product_qty'/>
@@ -307,7 +307,7 @@
                                    <field name='wastage_product'/>
                                  </group>
                                </form>
-                            </field>
+                            </field>-->
 		            <field name='material_request_id' readonly="1" attrs="{'invisible':[('material_request_id','=',[])]}">
 		                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state not in ('cancel', 'done','delivered')">
 				    <field name="name"/>

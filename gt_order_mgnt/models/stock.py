@@ -1366,6 +1366,10 @@ class stockQuant(models.Model):
     	
     @api.model
     def create(self,vals):
+        print "vals- from quat-------------",vals,self._context
+        if self._context.get('active_model')=='mrp.production':
+            obj = self.env['mrp.production'].browse(self._context.get('active_id'))
+#            vals.update({'packaging_type_id':obj.n_packaging.id})
     	res = super(stockQuant, self).create(vals)
     	print "quant..Create..",vals,res
         return res
