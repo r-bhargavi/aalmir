@@ -5,7 +5,7 @@
 	<record id="email_template_MRP_complete" model="mail.template">
             <field name="name">Quantity Manufacture/Purchased</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP MRP Alert :Quantity Manufacture/Purchased</field>
+            <field name="subject">API-MRP Production Alert: ${(object.request_line.name)}, ${(object.product_id.name)} For ${(object.partner_id.name or 'Customer')} is produced. </field>
             <field name="model_id" ref="sale.model_sale_order_line"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">
@@ -81,7 +81,7 @@
              <record id="email_template_partial_production" model="mail.template">
 		    <field name="name">Production/Manufacturing Order is completed.</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">${(object.request_line.name)}, For ${(object.partner_id.name or 'Customer')} is completed. ${(object.product_id.name)}</field>
+		    <field name="subject">API-MRP Alert: ${(object.request_line.name)}, For ${(object.partner_id.name or 'Customer')} is completed. ${(object.product_id.name)}</field>
 		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
 		    <field name="auto_delete" eval="False"/>
 		    <field name="body_html">
