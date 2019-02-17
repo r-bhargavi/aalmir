@@ -4,6 +4,8 @@ from openerp import models, fields, api,_
 import time
 import datetime
 from datetime import datetime
+from openerp import models, fields, api, exceptions, _
+
 from datetime import datetime, date, time, timedelta
 from urlparse import urljoin
 from urllib import urlencode
@@ -1090,7 +1092,8 @@ class MrpWorkorderBatchNo(models.Model):
                        'default_remark':self.remark,
                        'default_wastage_reason':self.reason,
                        'default_supplier_batch_no':self.supplier_batch_no,
-                       'default_produced_qty':self.product_qty,
+#                       'default_produced_qty':self.product_qty,
+                       'default_produced_qty':self.req_product_qty,
                      'default_product_qty':(self.req_product_qty - self.product_qty) if self.req_product_qty > self.product_qty else 0.0,'default_uom_id':self.uom_id.id if self.uom_id else self.order_id.wk_required_uom.id,'default_user_id':self.order_id.user_ids.ids,
                       'default_previous_order_ids':[(6,0,ids_cus)],
                         'supplier_batch':True if self.order_id.process_type == 'raw' else False,
@@ -1565,9 +1568,9 @@ class MrpWorkcenterPructionline(models.Model):
 				error_string="Workorder {} does not have any Sequence, Set Sequence for   scheduling".format(res.id)
     	    if vals.get('date_planned'):
         	new_date=datetime.strptime(vals.get('date_planned'),'%Y-%m-%d %H:%M:%S')
-        	if datetime.now() > new_date:
-        		error_string="You can not Schedule Workorder in less than current time."
-        		raise
+#        	if datetime.now() > new_date:
+#        		error_string="You can not Schedule Workorder in less than current time."
+#        		raise
         
     	    if  vals.get('capacity_type') and vals.get('machine'): 
     	    	m_type=self.env['machinery.capacity.type'].search([('id','=',vals.get('capacity_type'))])
@@ -2441,6 +2444,13 @@ class MrpWorkcenterPructionline(models.Model):
     @api.multi
     def extra_batchnumber(self):
         for record in self:
+            if record.extra_batch>=record.req_product_qty-len(self.batch_ids):
+                warning_mess = {
+                        'title': _('Extra Batches!'),
+                        'message' : _("You are issuing more then required batches") 
+                    }
+           	return {'warning': warning_mess}
+#                raise exceptions.Warning(_("You are issuing more then required batches"))
             if not record.extra_batch:
                raise UserError(_("Please Fill the Extra Batch No. for Batch Numbers Issue....."))
             else:

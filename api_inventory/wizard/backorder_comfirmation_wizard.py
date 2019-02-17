@@ -58,8 +58,10 @@ class stock_immediate_transfer(models.TransientModel):
 				elif not self.pick_id.purchase_id:
 					raise UserError("Done Quantity Should be less than or equal to Product Quantity")
 			operation_qty = operation.qty_done if operation.qty_done else operation.product_qty
+                        print "operation_qtyoperation_qty",operation_qty,math.ceil(operation_qty/operation.packaging_id.qty)
 			product_data.append((0,0,{'product_id':operation.product_id.id,
 						'qty_done':operation_qty,
+                                                'max_batches':math.ceil(operation_qty/operation.packaging_id.qty),
 						'qty_unit':operation.product_uom_id.id}))
 		
 		wizard_id=self.env['stock.store.location.wizard'].search([('picking','=',self.pick_id.id)])
@@ -133,7 +135,7 @@ class stock_immediate_transfer(models.TransientModel):
 			'res_id':res_id.id,
 		    }
 		    
-	else:	
+	else:
                 print "finally it wrn t to else part---------------------"
 		# If still in draft => confirm and assign
 		if self.pick_id.state == 'draft':
@@ -434,6 +436,7 @@ class stock_backorder_confirmation(models.TransientModel):
                                         lots += (batch.lot_id.id,)
                                 pckg_qty -= 1
                                 btch += 1
+                                print "len(batches)len(batches)",len(batches),res.pallet_no
                                 if pckg_qty <= 0 or btch == res.pack_qty:
                                         data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
                                         'max_qty':res.pallet_no if res.secondary_pack else 1,
@@ -450,21 +453,59 @@ class stock_backorder_confirmation(models.TransientModel):
                 # Quantity Comes from Manufacturing process
                 elif mrp_id:
                         lots,batches=[],[]
+#                        batches_ids=()
+#                        operation = operation_obj.search([('product_id','=',res.product_id.id),
+#                                                          ('picking_id','in',n_picking._ids)])
+#                        for op in operation:
+#                                batches_ids += (op.batch_number._ids)
+#                                if not op.batch_number:
+#                                        batches_ids += (op.produce_batches._ids)
+                        max_pallet=res.total_pallet_qty
+                        print "max_palletmax_pallet",max_pallet
                         bacthes_ids=batches_obj.search([('production_id','=',mrp_id.id),('product_id','=',res.product_id.id),
                                                         ('logistic_state','=','ready'),
                                                         ('store_id','=',False),('product_qty','>',0),
                                                         ('id','not in',tuple(completed_ids))])
+                                                        
+                        max_pallet=res.total_pallet_qty
                         for batch in bacthes_ids:
-                                batches.append(batch.id)
-                                completed_ids.append(batch.id)
-                                lots.append(batch.lot_id.id)
-                                btch +=1
-#                                to allot batches to picking of mrp from input to stock location if picking not in done
-                        data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
-                                'max_qty':res.pallet_no if res.secondary_pack else 1,
-                                'batch_qty':len(batches),
-                                'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
-                                'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
+                                batches += (batch.id,)
+                                if batch.lot_id.id not in lots:
+                                        lots += (batch.lot_id.id,)
+                                pckg_qty -= 1
+                                btch += 1
+                                print "len(batches)len(batches)",len(batches),res.pallet_no
+                                if pckg_qty <= 0 or btch == res.pack_qty:
+                                        data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
+                                        'max_qty':res.pallet_no if res.secondary_pack else 1,
+                                        'batch_qty':len(batches),
+                                        'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
+                                        'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
+                                        next=next[:4]+str(int(next[4:])+1).zfill(5)
+                                        pckg_qty=res.pallet_no if res.secondary_pack else 1
+                                        lots,batches=(),()
+                                        max_pallet -= 1
+                                if max_pallet <=0:
+                                        break
+
+#                        for batch in bacthes_ids:
+#                                batches.append(batch.id)
+#                                completed_ids.append(batch.id)
+#                                lots.append(batch.lot_id.id)
+#                                btch +=1
+#                                pckg_qty -= 1
+##                                to allot batches to picking of mrp from input to stock location if picking not in done
+#                        data.append((0,0,{'product_id':res.product_id.id,'master_batch':next,
+#                                'max_qty':res.pallet_no if res.secondary_pack else 1,
+#                                'batch_qty':len(batches),
+#                                'packaging':res.packaging_id.id,'sec_packaging':res.secondary_pack.id,
+#                                'lot_ids':[(6,0,lots)],'batch_ids':[(6,0,batches)]}))
+#                        next=next[:4]+str(int(next[4:])+1).zfill(5)
+#                        pckg_qty=res.pallet_no if res.secondary_pack else 1
+#                        lots,batches=(),()
+#                        max_pallet -= 1
+#                        if max_pallet <=0:
+#                                break
 
                         if btch >= pckg_qty:
                                 break

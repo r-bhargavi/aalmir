@@ -336,6 +336,16 @@ class MrpProductionProductLine(models.Model):
 #		
 class MrpWorkorderBatchNo(models.Model):
     _inherit='mrp.order.batch.number'
+    
+    @api.multi	
+    def unlink(self):
+    	for res in self:
+		if res.batch_tfred==True:
+                    raise UserError("Batch Cannot be deleted as it is already Transferred!" )
+		if res.product_qty>0.0:
+                    raise UserError("Batch Cannot be deleted as qty is already produced!" )
+    	return super(MrpWorkorderBatchNo,self).unlink()
+    
 
     wastage_bool=fields.Boolean('Wastage Bool',default=False)
     request_state=fields.Selection([('draft','Draft'),('requested','Approved'),('cancel','Cancelled'),('done','Done')], 

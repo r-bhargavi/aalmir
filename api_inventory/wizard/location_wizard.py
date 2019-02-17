@@ -719,6 +719,7 @@ class StockStoreLocationWizardLine(models.TransientModel):
     @api.onchange('batch_ids','master_batches')
     def _get_batch_qty(self):
     	for res in self:
+                print "xdfdgdfgdfgdfg",res,len(res.batch_ids),res.max_qty
     		if len(res.batch_ids) > res.max_qty:
     			raise UserError("Your Master Batches Quantity Is Full, You can Not add more batches")
     		qty=0.0

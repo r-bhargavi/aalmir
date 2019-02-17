@@ -10,6 +10,20 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_grind_int_number" model="ir.sequence">
+            <field name="name">Grinding Product Number</field>
+            <field name="code">grinding.product.number</field>
+            <field name="prefix">GRND</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_scrap_int_number" model="ir.sequence">
+            <field name="name">Scrap Product Number</field>
+            <field name="code">scrp.product.number</field>
+            <field name="prefix">SCRAP</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
 
     </data>
 </openerp>

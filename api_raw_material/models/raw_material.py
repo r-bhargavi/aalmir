@@ -45,6 +45,7 @@ class MrpRawmaterial(models.Model):
    			   
    wastage_qty=fields.Float('Wastage Qty')
    request_date=fields.Datetime('Requested Date')
+   partner_id=fields.Many2one(related='production_id.partner_id',store=True)
    expected_compl_date=fields.Datetime('Expected Completion Date')
    wastage_allow=fields.Float('Wastage Allowed')
    required_qty=fields.Float('Required Qty')

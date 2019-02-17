@@ -169,6 +169,25 @@ class ProductProduct(models.Model):
 			    else:
 				error_string='Please select Category Film/Injection'
 				raise
+                            
+                        elif product_tmpl_id.product_material_type.string =='scrap':
+                            v=False
+			    while (1):
+				v= seq_obj.next_by_code('scrp.product.number')
+				find_rec=product_obj.search([('default_code','=',v)])
+				if not find_rec:
+					break
+			    if v:
+			    	vals.update({'default_code' :v})
+                        elif product_tmpl_id.product_material_type.string =='grinding':
+                            v=False
+			    while (1):
+				v= seq_obj.next_by_code('grinding.product.number')
+				find_rec=product_obj.search([('default_code','=',v)])
+				if not find_rec:
+					break
+			    if v:
+			    	vals.update({'default_code' :v})
 			#generate default code for Packaging
 			elif product_tmpl_id.product_material_type.string=='packaging':
 			    v=False

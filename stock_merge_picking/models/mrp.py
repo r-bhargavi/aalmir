@@ -190,9 +190,12 @@ class MrpProductProduce(models.Model):
            self.env['stock.move'].create({'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
            pick_exist.action_confirm()
            pick_exist.action_assign()
+        if obj.move_created_ids:
+            obj.move_created_ids[0].write({'date_expected':obj.n_request_date})
         for batch_line in self.batch_ids:
             op_id=pick_exist.pack_operation_product_ids
             op_id.write({'batch_number':[(4, batch_line.id)]})
+#            op_id.write({'batch_number':[(6,0,batch_line.id)]})
             batch_line.write({'lot_id':self.lot_id.id,'production_id':obj.id,'logistic_state':'ready','batch_tfred':True})
         body='<b>Produced Qty In Production:</b>'
         body +='<ul><li> Production No.   : '+str(obj.name) +'</li></ul>'
@@ -213,7 +216,7 @@ class MrpProductProduce(models.Model):
     def api_do_produce(self):
     	for record in self:
 		res=super(MrpProductProduce,self).do_produce()
-		production_id =self.env['mrp.production'].search([('id','=',self._context.get('active_id'))])
+#		production_id =self.env['mrp.production'].search([('id','=',self._context.get('active_id'))])
                 if self.lot_id and not self.lot_id.production_id:
 		   self.lot_id.production_id=production_id.id
 		if self.lot_id:
@@ -332,8 +335,18 @@ class MrpProductProduce(models.Model):
                                     body_html +="<p><b>Return Raw Material Internal Transfer No.:"+str(return_picking.name)+"</b></p>"
                                 
 				body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.production',production_id.id, context=self._context)
-				n_emails=str(production_id.user_id.login)
-				temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(production_id.user_id.login)})
+                                group = self.env['res.groups'].search([('name', '=', 'MO Closing Receiving')])
+                                print "groupgroupgroupgroup",group
+                                if group:
+                                    user_ids = self.env['res.users'].sudo().search([('groups_id', 'in', [group.id])])
+                                    print "user_idsuser_ids",user_ids
+                                    email_to = ''.join([user.partner_id.email + ',' for user in user_ids])
+                                    email_to = email_to[:-1]
+                                    print "email_toemail_to",email_to
+                                else:
+                                    email_to=str(production_id.user_id.login)
+#				n_emails=str(production_id.user_id.login)
+				temp_id.write({'body_html': body_html, 'email_to' : email_to, 'email_from': str(production_id.user_id.login)})
 				temp_id.send_mail(production_id.id)
 	return True
 
