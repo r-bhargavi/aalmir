@@ -607,10 +607,17 @@ class MrpProduction(models.Model):
 				url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
 
 				body_html = """<div>
-	    <p> <strong>Product Requset is Complete </strong></p><br/>
-	    <p>Dear Sir/Madam,<br/>
-		Your sale order No-:<b> %s </b> product_no-:'%s ' (%s) Qty are produce on Date :<b>%s \n</b> and Move to Quality Checking/Warehouse
-. \n Production Status :- %s \n Requested Quantity :- %s  \n Total Produce Quantity :- %s \n </p>
+	    <p> <strong>Production Update </strong></p><br/>
+	    <p>Dear User,<br/>
+            The production is updated as per below details:<br/>
+            		<b>Sale Order No-:</b>  %s <br/>
+                        <b>Product Name-:</b>  %s <br/>
+                        <b>Produced Qty:</b>  %s <br/>
+                        <b>Produced Date:</b>%s <br/>
+                        <b>Moved to Quality Checking / Warehouse<br/>
+                        <b>Production Status:</b> %s <br/>
+                        <b>Requested Quantity:</b>  %s  <br/>
+                        <b>Total Produced Qty Till Now:</b>  %s </p>
 	    </div>"""%(self.sale_id.name or '',self.sale_line.product_id.name or '' +self.sale_line.product_id.default_code or '',str(production_qty),str(date.today()),str(rec.state),str(rec.n_request_qty),str(p_qty))
 
 				body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order.line',self.sale_line.id, context=self._context)

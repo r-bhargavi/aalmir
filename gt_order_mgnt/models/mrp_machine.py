@@ -1063,6 +1063,7 @@ class MrpWorkorderBatchNo(models.Model):
            else:
               ids_cus = [] 
         batches=[]
+        print "self.employee_idsself.employee_ids",self,self.order_id.employee_ids
         if self.production_id:
             rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',self.production_id.id)])
             print "rm_idsrm_idsrm_ids",rm_ids
@@ -1076,9 +1077,9 @@ class MrpWorkorderBatchNo(models.Model):
                                 for each_store in each.store_ids:
                                     for each_batches in each_store.batches_ids:
                                         batches.append(each_batches.batch_number.id)
-        if self.employee_ids:
+        if self.order_id.employee_ids:
             context.update({
-            'default_employee_ids':[(6,0,self.employee_ids.ids)],
+            'default_employee_ids':[(6,0,[self.order_id.employee_ids[0].id])],
             })
         if batches:
             context.update({'default_supplier_btc_no':[(6,0,[batches[0]])],})
@@ -1861,7 +1862,7 @@ class MrpWorkcenterPructionline(models.Model):
     def action_start_working(self):
         res=super(MrpWorkcenterPructionline,self).action_start_working()
         for rec in self:
-            if rec.production_id.state not in ('ready'):
+            if rec.production_id.state not in ('ready','in_production'):
                 raise UserError(_('Cannot Start Work Order as MO is not in Ready to produce!!'))
             rec.production_id.state='in_production'
             if rec.production_id.request_line:
