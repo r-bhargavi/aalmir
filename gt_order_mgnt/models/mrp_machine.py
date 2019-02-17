@@ -1861,7 +1861,7 @@ class MrpWorkcenterPructionline(models.Model):
     def action_start_working(self):
         res=super(MrpWorkcenterPructionline,self).action_start_working()
         for rec in self:
-            if rec.production_id.state not in ('ready'):
+            if rec.production_id.state not in ('ready','in_production'):
                 raise UserError(_('Cannot Start Work Order as MO is not in Ready to produce!!'))
             rec.production_id.state='in_production'
             if rec.production_id.request_line:

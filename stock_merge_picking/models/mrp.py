@@ -266,19 +266,20 @@ class MrpProductProduce(models.Model):
 				url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
 				text_link = _("""<a href="%s">%s</a> """) % (url,production_id.name)
 				body_html = """<div> 
-			<p><b>Dear: %s,</b><br/>
-		         <b>Production Number :</b>%s ,<br/>
-                         <b>Customer Name :</b>%s ,<br/>
-                         <b>Product Name :</b>[%s]%s ,<br/>
-		          <b>  Quantity Scheduled : %s %s ,Quantity Produced: %s %s,</b><br/>
-		          <b>  Completed By : %s ,Completed Date : %s ,</b><br/>
-		         
-		             
-			</p>
-		          <p> <b>  Reason : </b>%s ,<br/></p>
+			<p><b>Dear: User,</b><br/>
+                        <b>Production Request Number :</b>%s <br/>
+		         <b>Manufacturing Number :</b>%s <br/>
+                         <b>Customer Name :</b>%s <br/>
+                         <b>Product Name :</b>[%s]%s <br/>
+		          <b>  Quantity Scheduled :</b> %s %s<br/> 
+                          <b>  Quantity Produced:</b> %s %s<br/>
+		          <b>  Completed By :</b> %s<br/>
+                          <b>  Completed Date : %s </b><br/>        
+		        </p>
+		          <p> <b>  Remarks : </b>%s <br/></p>
 		         <h3 style='margin-left:200px;color:blue'>Manufacturing WorkOrders Details:</h3>
 		        
-			</div>"""%(production_id.user_id.name, text_link or '', 
+			</div>"""%(production_id.request_line.name, text_link or '',
                        production_id.partner_id.name, production_id.product_id.default_code,
                        production_id.product_id.name,
                        production_id.product_qty,production_id.product_uom.name,
@@ -325,7 +326,7 @@ class MrpProductProduce(models.Model):
                                     return_picking.unlink()
                                 else:
                                     return_picking.action_confirm()
-                                    body_html +="<h3 style='margin-left:200px;color:blue'>Production Manager Raw Material Details :</h3>"
+                                    body_html +="<h3 style='margin-left:200px;color:blue'>Remaining Raw Material As Per Production </h3>"
                                     body_html +="<table class='table' style='width:100%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th>Remaining qty</th></tr>"
                                     body_html +=body_rm
                                     body_html +="<p><b>Return Raw Material Internal Transfer No.:"+str(return_picking.name)+"</b></p>"

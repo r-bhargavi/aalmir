@@ -220,34 +220,35 @@
 
     </record>
     <record model="ir.actions.act_window" id="inventory_input_moves_action_stock">
-        <field name="name">Inventory Input Moves</field>
+        <field name="name">Daily Production Completed</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">stock.move</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'group_by':['state','date:day','product_id']}</field>
-        <field name="domain">[('state','=','done'),('location_dest_id.location_id.name','ilike','DXB'),('location_dest_id.name','ilike','Input')]</field>
+        <field name="context">{'group_by':['state','date:day']}</field>
+        <field name="domain">[('state','=','done'),('location_id','=',7),('location_dest_id','=',37)]</field>
 
 
     </record>
     <record model="ir.actions.act_window" id="inventory_input_moves_action_stock_not_done">
-        <field name="name">Expected Inventory Input</field>
+        <field name="name">Expected Production Completion</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">stock.move</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'group_by':['state','date_expected:day','product_id']}</field>
-        <field name="domain">[('state','!=','done'),('location_dest_id.location_id.name','ilike','DXB'),('location_dest_id.name','ilike','Input')]</field>
+        <field name="context">{'group_by':['state','date_expected:day']}</field>
+        <field name="domain">[('state','!=','done'),('location_id','=',7),('location_dest_id','=',37)]</field>
 
 
     </record>
-    
+        
+     <menuitem id="menu_inv_production" name="Production" parent="stock.menu_stock_root" sequence="4" />
      <menuitem action="rawmaterial_request_action" id="menu_raw_material_request" name="Raw Material Request"
-            parent="stock.menu_stock_inventory_control" sequence="1"/>
-     <menuitem action="inventory_input_moves_action_stock" id="menu_input_moves_stock" name="Daily DXB Production"
-            parent="stock.menu_stock_inventory_control" sequence="2"/>
-     <menuitem action="inventory_input_moves_action_stock_not_done" id="menu_input_moves_stock_not_done" name="Expected DXB Production"
-            parent="stock.menu_stock_inventory_control" sequence="3"/>
+            parent="menu_inv_production" sequence="1"/>
+     <menuitem action="inventory_input_moves_action_stock" id="menu_input_moves_stock" name="FG Daily Received DXB"
+            parent="menu_inv_production" sequence="2"/>
+     <menuitem action="inventory_input_moves_action_stock_not_done" id="menu_input_moves_stock_not_done" name="FG Expected Receivings DXB"
+            parent="menu_inv_production" sequence="3"/>
      <record model="ir.actions.act_window" id="rawmaterial_request_action_mo">
         <field name="name">Raw Material Request</field>
         <field name="type">ir.actions.act_window</field>
@@ -291,16 +292,13 @@
 
                  <field name="domain">[('material_request_id','!=',False)]</field> 
      </record>
-	  
-     <menuitem action="action_raw_matrial_request_mo_approved" id="menu_mo_rmr" name="Approved Raw Material"
-            parent="mrp.menu_mrp_manufacturing" sequence="2"/>
+            <menuitem id="menu_rmr_production" name="Raw Materials" parent="mrp.menu_mrp_manufacturing" sequence="4" />
+     <menuitem action="action_raw_matrial_request_mo_approved" id="menu_mo_rmr" name="Approved Raw Materials" parent="menu_rmr_production" sequence="2"/>    
+     <menuitem action="rawmaterial_request_action_mo" id="menu_raw_material_request_mo" name="Raw Materials Requested" parent="menu_rmr_production" sequence="1"/>
     
-     <menuitem action="rawmaterial_request_action_mo" id="menu_raw_material_request_mo" name="Raw Material Request"
-            parent="mrp.menu_mrp_manufacturing" sequence="1"/>
-     <menuitem action="inventory_moves_input_action_mo" id="menu_inventory_moves_input_mo" name="Daily DXB Production"
-            parent="mrp.menu_mrp_manufacturing" sequence="3"/>
-     <menuitem action="inventory_moves_input_action_mo_not_done" id="menu_inventory_moves_input_mo_not_done" name="Expected DXB Production"
-            parent="mrp.menu_mrp_manufacturing" sequence="4"/>
+            <menuitem id="menu_mo_production" name="Production Transfers" parent="mrp.menu_mrp_manufacturing" sequence="4" />
+     <menuitem action="inventory_moves_input_action_mo" id="menu_inventory_moves_input_mo" name="FG Daily Transferred DXB" parent="menu_mo_production" sequence="3"/>
+     <menuitem action="inventory_moves_input_action_mo_not_done" id="menu_inventory_moves_input_mo_not_done" name="FG Expected Transfers DXB" parent="menu_mo_production" sequence="4"/>
      <!-- end view for extra raw material request -->
      <!-- Wastage from mo request to supervissior view-->
      <record id="mrp_wastage_btach_tree" model="ir.ui.view">
