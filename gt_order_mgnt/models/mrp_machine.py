@@ -1935,8 +1935,8 @@ class MrpWorkcenterPructionline(models.Model):
         body +='<ul><li> Time          : '+str(datetime.now() + timedelta(hours=4))+'</li></ul>' 
         self.message_post(body=body)
         self.production_id.message_post(body=body)
-#        res=super(MrpWorkcenterPructionline,self).action_done()
-        return True
+        res=super(MrpWorkcenterPructionline,self).action_done()
+        return res
 
     @api.multi
     def machine_maintenance(self):
