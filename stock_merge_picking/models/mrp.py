@@ -216,8 +216,9 @@ class MrpProductProduce(models.Model):
     def api_do_produce(self):
     	for record in self:
 		res=super(MrpProductProduce,self).do_produce()
-#		production_id =self.env['mrp.production'].search([('id','=',self._context.get('active_id'))])
-                if self.lot_id and not self.lot_id.production_id:
+		production_id =self.env['mrp.production'].search([('id','=',self._context.get('active_id'))])
+                print "production_idproduction_idproduction_id",production_id
+                if self.lot_id and not self.lot_id.production_id and production_id:
 		   self.lot_id.production_id=production_id.id
 		if self.lot_id:
                    self.lot_id.total_qty =self.product_qty
@@ -276,18 +277,28 @@ class MrpProductProduce(models.Model):
                          <b>Product Name :</b>[%s]%s <br/>
 		          <b>  Quantity Scheduled :</b> %s %s<br/> 
                           <b>  Quantity Produced:</b> %s %s<br/>
+                          <b>  Packaging:</b> %s <br/>
 		          <b>  Completed By :</b> %s<br/>
-                          <b>  Completed Date : %s </b><br/>        
+                          <b>  Requested Completion Date :</b> %s <br/>
+                          <b>  Expected Completion Date Date :</b> %s <br/>
+                          <b>  Completed Date :</b> %s <br/>
+                          <b>  Wastage Allowed :</b> %s %s <br/> 
+                          <b>  Wastage Produced :</b> %s %s<br/> 
 		        </p>
 		          <p> <b>  Remarks : </b>%s <br/></p>
-		         <h3 style='margin-left:200px;color:blue'>Manufacturing WorkOrders Details:</h3>
+		         <h3 style='margin-left:200px;color:blue'>Manufacturing WorkOrders Details</h3>
 		        
-			</div>"""%(production_id.request_line.name, text_link or '',
+			</div>"""%(production_id.request_line.name if production_id.request_line else '', text_link or '',
                        production_id.partner_id.name, production_id.product_id.default_code,
                        production_id.product_id.name,
                        production_id.product_qty,production_id.product_uom.name,
                        production_id.n_produce_qty,production_id.produce_uom_id.name, 
-                       self.env.user.name , str(date.today()) ,self.reason)
+                       production_id.n_packaging.name,
+                       self.env.user.name , production_id.n_client_date,
+                       production_id.n_request_date,str(date.today()), 
+                       production_id.wastage_allow or '0',production_id.allow_wastage_uom_id.name or 'Kg',
+                       production_id.total_wastage_qty or '0',production_id.allow_wastage_uom_id.name or 'Kg',
+                       self.reason)
                                 body_html +="<table class='table' style='width:100%; height: 50%;font-family:arial; text-align:left;'><tr><th>WorkOrder Name </th><th>Machine Name</th><th>Required qty</th><th>Produced qty</th><th>Wastage qty</th></tr>" 
                                 for order in production_id.workcenter_lines:
                                     body_html +="<tr><td>%s</td><td>%s</td><td>%s %s</td><td>%s %s</td><td>%s %s</td></tr>"%(str(order.name),str(order.machine.name), str(round(order.wk_required_qty,2)),str(order.wk_required_uom.name),str(round(order.total_product_qty if order.total_product_qty else 0.0,2)),str(order.total_uom_id.name if order.total_uom_id else ''), str(round(order.total_wastage_qty if order.total_wastage_qty else 0.0, 2)),str(order.wastage_uom_id.name if order.wastage_uom_id else ''))  
@@ -332,7 +343,7 @@ class MrpProductProduce(models.Model):
                                     body_html +="<h3 style='margin-left:200px;color:blue'>Remaining Raw Material As Per Production </h3>"
                                     body_html +="<table class='table' style='width:100%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th>Remaining qty</th></tr>"
                                     body_html +=body_rm
-                                    body_html +="<p><b>Return Raw Material Internal Transfer No.:"+str(return_picking.name)+"</b></p>"
+                                    body_html +="<p><b>Return Raw Material Internal Transfer No:"+str(return_picking.name)+"</b></p>"
                                 
 				body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.production',production_id.id, context=self._context)
                                 group = self.env['res.groups'].search([('name', '=', 'MO Closing Receiving')])

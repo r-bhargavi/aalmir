@@ -691,6 +691,9 @@
                        <div>
                          <!--<field name='extra_batch' attrs="{'invisible':[('issue_bool','=',False)], 'readonly':[('extra_bool','=',True)]}" class='oe_inline'/>-->
                          <field name='extra_batch' class='oe_inline'/>
+                         <field name='warning_mess' invisible="1"/>
+                         <h4  attrs="{'invisible':[('warning_mess','=',False)]}" style="color:red;" 
+                               >You are trying to issue more then required batches. </h4>
 <!--                         <button type='object' name='extra_batchnumber'  string='Issue' 
                          attrs="{'invisible':['|',('issue_bool','=',False),('extra_bool','=',True)]}" class='oe_inline oe_highlight' />-->
                          <button type='object' name='extra_batchnumber'  string='Issue' 
