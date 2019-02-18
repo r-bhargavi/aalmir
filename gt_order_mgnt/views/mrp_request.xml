@@ -202,7 +202,7 @@
            <field name="product_qty" position="after">
 		    <field name="n_request_qty" invisible="not context.get('show_qty')"/>
 		    <field name="n_produce_qty" string="Qty Transferred"/>
-		    <field name="n_produce_qty_now" string="Qty Produced" invisible="not context.get('show_qty')"/>
+		    <field name="n_produce_qty_now" string="Qty Produced"/>
             </field>
           
            <field name="date_planned" position="replace">
@@ -220,9 +220,9 @@
             <!--field name="product_uom" position="after">
               <field name="wastage_allow" string='Wastage(Kg)'/> COMENTED due to move in new module
             </field-->
-            <field name="product_qty" position="after">
+<!--            <field name="product_qty" position="after">
                <field name="n_produce_qty" string='Produced Qty'/>
-            </field>
+            </field>-->
             <field name="name" position='attributes'>
                   <attribute name='string'>MO Name</attribute>
             </field>
