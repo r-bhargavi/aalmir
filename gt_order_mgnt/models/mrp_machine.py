@@ -1600,6 +1600,13 @@ class MrpWorkcenterPructionline(models.Model):
 	       order_ids=self.search(cr,uid,[('production_id','=', context.get('production'))])
                args.extend([('id','in',order_ids)])
         return super(MrpWorkcenterPructionline,self).name_search(cr, uid, name, args, operator=operator, context=context, limit=limit)
+    @api.multi
+    @api.depends('extra_batch')
+    def extra_batch_compute(self):
+        for record in self:
+            if record.extra_batch and record.req_product_qty:
+                if record.extra_batch>=record.req_product_qty-len(self.batch_ids):
+                        record.warning_mess = True
 
     @api.multi
     @api.onchange('machine', 'capacity_type')
@@ -1935,8 +1942,8 @@ class MrpWorkcenterPructionline(models.Model):
         body +='<ul><li> Time          : '+str(datetime.now() + timedelta(hours=4))+'</li></ul>' 
         self.message_post(body=body)
         self.production_id.message_post(body=body)
-#        res=super(MrpWorkcenterPructionline,self).action_done()
-        return True
+        res=super(MrpWorkcenterPructionline,self).action_done()
+        return res
 
     @api.multi
     def machine_maintenance(self):
@@ -2059,6 +2066,7 @@ class MrpWorkcenterPructionline(models.Model):
 
     duration=fields.Float('Duration')
     m_change=fields.Boolean('Machine Change', deafult=False)
+    warning_mess=fields.Boolean('Warning', compute='extra_batch_compute')
     working_machine = fields.Many2one('machinery', string='Change Machine', )
     
     maintenance_id=fields.Many2one('machine.maintenance', string='Maintenance Request No.')
@@ -2444,13 +2452,6 @@ class MrpWorkcenterPructionline(models.Model):
     @api.multi
     def extra_batchnumber(self):
         for record in self:
-            if record.extra_batch>=record.req_product_qty-len(self.batch_ids):
-                warning_mess = {
-                        'title': _('Extra Batches!'),
-                        'message' : _("You are issuing more then required batches") 
-                    }
-           	return {'warning': warning_mess}
-#                raise exceptions.Warning(_("You are issuing more then required batches"))
             if not record.extra_batch:
                raise UserError(_("Please Fill the Extra Batch No. for Batch Numbers Issue....."))
             else:

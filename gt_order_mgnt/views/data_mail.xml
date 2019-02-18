@@ -5,7 +5,7 @@
 	<record id="email_template_MRP_complete" model="mail.template">
             <field name="name">Quantity Manufacture/Purchased</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-MRP Production Alert: ${(object.request_line.name)}, ${(object.product_id.name)} For ${(object.partner_id.name or 'Customer')} is produced. </field>
+            <field name="subject">API-MRP Production Alert: ${(object.name)}, ${(object.product_id.name)} For ${(object.order_id.partner_id.name or 'Customer')} is produced. </field>
             <field name="model_id" ref="sale.model_sale_order_line"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">
@@ -40,7 +40,7 @@
 	<record id="email_template_producton_req_again" model="mail.template">
             <field name="name">Production Requested</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP MRP Alert :Production Requested again</field>
+            <field name="subject">API-MRP Alert :Production Requested again</field>
             <field name="model_id" ref="gt_order_mgnt.model_sale_order"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">
@@ -51,7 +51,7 @@
 	<record id="email_template_for_bom_approval" model="mail.template">
             <field name="name">BOM Approval Requested</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP MRP Alert BOM Requested for Approval</field>
+            <field name="subject">API-MRP Alert BOM Requested for Approval</field>
             <field name="model_id" ref="gt_order_mgnt.model_mrp_bom"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">
@@ -81,7 +81,7 @@
              <record id="email_template_partial_production" model="mail.template">
 		    <field name="name">Production/Manufacturing Order is completed.</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-MRP Alert: ${(object.request_line.name)}, For ${(object.partner_id.name or 'Customer')} is completed. ${(object.product_id.name)}</field>
+		    <field name="subject">API-MRP Alert: ${(object.name)}, For ${(object.partner_id.name or 'Customer')} is completed. ${(object.product_id.name)}</field>
 		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
 		    <field name="auto_delete" eval="False"/>
 		    <field name="body_html">
@@ -95,7 +95,7 @@
             <record id="email_template_hold_mo" model="mail.template">
 		    <field name="name">Hold Manufacturing Order.</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP MRP Alert :Hold Manufacturing Order</field>
+		    <field name="subject">API-MRP Alert :Hold Manufacturing Order</field>
 		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
 		    <field name="auto_delete" eval="False"/>
 		    <field name="body_html">
@@ -106,7 +106,7 @@
           <record id="email_template_active_mo" model="mail.template">
 		    <field name="name">Active Hold Manufacturing Order.</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">API-ERP MRP Alert :Active hold Manufacturing Order</field>
+		    <field name="subject">API-MRP Alert :Active hold Manufacturing Order</field>
 		    <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
 		    <field name="auto_delete" eval="False"/>
 		    <field name="body_html">
