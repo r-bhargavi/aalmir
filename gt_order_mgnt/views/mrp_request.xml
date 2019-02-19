@@ -848,7 +848,7 @@
 		<header>
 			<button name="create_manufacturing_order" type="object"  string="Manufacturing Order"  attrs="{'invisible':[('n_state','not in',['draft'])]}" class="btn-primary" />
 			<button name="send_request_production" type="object"  string="Send To Production"  attrs="{'invisible':[('n_state','not in',['new'])]}" class="btn-primary" />
-			<button name="acknowledge_approved" type="object"  string="Acknowledge Approval"  attrs="{'invisible':[('new_date_bool','=',False)]}" class="btn-primary" />
+			<button name="acknowledge_approved" type="object"  string="Acknowledge Production Date Change"  attrs="{'invisible':[('new_date_bool','=',False)]}" class="btn-primary" />
 			<button name="send_reminder_bom" type="object"  string="Send BOM Reminder" attrs="{'invisible':[('n_state','!=','draft')]}"/>
 			<button name="send_reminder_to_create_mo" type="object"  string="Send Reminder MO" attrs="{'invisible':[('n_state','!=','draft')]}"/>
 			<!--<button name="%(gt_order_mgnt.production_detail_action)d" type="action"  string="Purchase Request" attrs="{'invisible':[('n_state','!=','draft')]}" confirm="Are you sure want to create purchase requisition for product?" class="btn-primary"/>-->

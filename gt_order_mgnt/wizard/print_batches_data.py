@@ -73,3 +73,15 @@ class PrintBatchesData(models.TransientModel):
             if line.print_bool==True:
                 res=self.env['report'].get_action(self, 'gt_order_mgnt.report_workorder_batch_number_barcode')
         return res
+    @api.multi
+    def print_small_batches(self):
+        res=[]
+        for each in self.wo_id.batch_ids:
+            if each.id not in self.batch_ids.ids:
+                each.write({'print_bool':False})
+        for line in self.batch_ids:
+            line.print_bool=True
+
+            if line.print_bool==True:
+                res=self.env['report'].get_action(self, 'gt_order_mgnt.report_workorder_batch_number_small')
+        return res
