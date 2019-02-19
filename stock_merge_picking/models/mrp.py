@@ -238,7 +238,7 @@ class MrpProductProduce(models.Model):
                 for batch_line in self.batch_ids:
                    op_id=pick_exist.pack_operation_product_ids
                    op_id.write({'batch_number':[(4, batch_line.id)]})
-                   batch_line.write({'lot_id':self.lot_id.id,'production_id':production_id.id,'logistic_state':'ready'})
+                   batch_line.write({'lot_id':self.lot_id.id,'production_id':production_id.id,'logistic_state':'ready','batch_tfred':True})
 	        production_id.state='done'
 		if production_id.state == 'done' and production_id.remain_wastage_qty:
                    raise UserError("Wastage Qty remaining in manufacturing order.") 
@@ -254,6 +254,16 @@ class MrpProductProduce(models.Model):
 		new_id=self.env['sale.order.line.status'].search([('n_string','=','manufacture')],limit=1)  #remove status
 		if new_id:
 			self.env['sale.order.line'].sudo().browse(production_id.sale_line.id).write({'n_status_rel':[(3,new_id.id)]})
+#                        find all wo related to production and delete all batches which are not all produced while closing MO
+                wo_ids=self.env['mrp.production.workcenter.line'].search([('production_id','=',production_id.id)])
+                print "wo_idswo_ids",wo_ids
+                if wo_ids:
+                    batch_ids=self.env['mrp.order.batch.number'].search([('production_id','=',production_id.id),('order_id','in',wo_ids.ids),('convert_product_qty','=',0.0)])
+                    print "batch_idsbatch_ids",batch_ids
+                    if batch_ids:
+                        for each_batch in batch_ids:
+                            each_batch.unlink()
+                        
 		if record.complete_produce:  
                    for order in production_id.workcenter_lines:
                        order.state ='done'

@@ -26,9 +26,10 @@
                 <footer>
                     <button string='Print Detailed' name="print_detailed_batches" type="object" class="oe_highlight"/>
                     <button string='Print Normal' name="print_normal_batches" type="object" class="oe_highlight"/>
+                    <button string='Print Small' name="print_small_batches" type="object" class="oe_highlight"/>
                     <!--<button string='Select/Unselect All' name="select_unselect_all" type="object" class="oe_highlight"/>-->
                     or
-                    <button string="Cancel" class="oe_link" special="cancel"/>
+                    <button string="Cancel" class="oe_highlight" special="cancel"/>
                 </footer>
            </form>
         </field>

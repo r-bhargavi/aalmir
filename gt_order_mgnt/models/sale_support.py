@@ -694,10 +694,13 @@ class SaleOrderLine(models.Model):
 		rec.n_status='done'
 		rec.n_user_id=self.env.uid	#update aproved user
 		if rec.n_mo:
+                
 			rec.n_mo.n_request_date_bool1=False
 			rec.n_mo.n_request_date_bool=True
                         rec.n_mo.message_post(body='<span style="color:green;font-size:14px;">New Date Approved By Sale support -:</span>\n '+
                                         'New Date:'+str(rec.n_nextdate) +'\t'+ 'Old Date:' +str(rec.n_prevoiusdate1))
+                        if rec.n_mo.request_line:
+                            rec.n_mo.request_line.new_date_bool=False
 		if rec.n_po:
 			rec.n_po.n_request_date_bool1=False
 			rec.n_po.n_request_date_bool=True

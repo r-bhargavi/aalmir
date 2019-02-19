@@ -44,6 +44,15 @@
             name="gt_order_mgnt.report_workorder_batch_number_barcode" 
             menu="False"        
             paperformat="api_inventory.paperformat_api_barcode"/>
+       <report 
+            id="report_workorder_batch_no_barcode_small"
+            string="Small Batch"
+            model="print.batches.data" 
+            report_type="qweb-pdf"
+            file="gt_order_mgnt.report_workorder_batch_number_small" 
+            name="gt_order_mgnt.report_workorder_batch_number_small" 
+            menu="False"        
+            paperformat="api_inventory.paperformat_api_barcode_small"/>
 
         <report 
             id="report_batch_no_barcode"
