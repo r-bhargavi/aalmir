@@ -1605,7 +1605,7 @@ class MrpWorkcenterPructionline(models.Model):
     def extra_batch_compute(self):
         for record in self:
             if record.extra_batch and record.req_product_qty:
-                if record.extra_batch>=record.req_product_qty-len(self.batch_ids):
+                if record.extra_batch>=record.req_product_qty-len(record.batch_ids):
                         record.warning_mess = True
 
     @api.multi
