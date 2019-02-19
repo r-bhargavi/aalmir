@@ -675,8 +675,8 @@
                            <button name="change_produceqty" string="Edit" type="object"  
                            class="oe_highlight"   context="{'more':True}"
                             attrs="{'invisible':[('product_qty','=',0)]}"/>
-                           <button name="unlink" string="Delete" type="object"  
-                           class="oe_highlight"
+                           <button name="unlink" string="Delete" type="object" icon="fa-recycle"
+                           
                             attrs="{'invisible':[('product_qty','!=',0)]}"/>
 <!--                          <button name="print_batch_barcode" string="Print" type="object"  
                            class="oe_highlight"  icon='fa-print'/> -->
