@@ -2176,6 +2176,9 @@ class MrpWorkcenterPructionline(models.Model):
     				'Previous status', readonly=True,help="this field is used for maintaining previous status before hold")
     employee_ids=fields.Many2many('hr.employee', string='Operators')
     cutting_pac_qty=fields.Char(compute='cutting_pack')
+    production_state=fields.Selection(
+            [('draft', 'New'), ('cancel', 'Cancelled'), ('confirmed', 'Awaiting Raw Materials'),('requestrm', 'Raw Materials Requested'),('rmr', 'Raw Materials Rejected'), ('ready', 'Ready to Produce'), ('in_production', 'Production Started'), ('done', 'Done')],
+            string='Production Status',related='production_id.state',store=True, readonly=True)
   
     @api.multi
     @api.depends('req_uom_id')
@@ -2399,6 +2402,7 @@ class MrpWorkcenterPructionline(models.Model):
                      qty=record.qty
                   else:
                      qty=record.wk_required_qty 
+                     print "qtyqtyqty",qty
                else:
                    qty=record.wk_required_qty 
                record.req_product_qty= math.ceil(qty /record.each_batch_qty)

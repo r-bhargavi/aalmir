@@ -1071,7 +1071,7 @@
 			<page string="Components">
 				<field name="master_line">
 					<tree editable="bottom">
-						<field name="product_id" domain="[('product_material_type.string', 'in',('raw','component'))]" options="{'no_open':True,'no_create':True}"/>
+						<field name="product_id" domain="[('product_material_type.string', 'in',('raw','component','grinding'))]" options="{'no_open':True,'no_create':True}"/>
 						<field name="uom_name" readonly="1"/>
 						<field name="quantity" attrs="{'readonly':[('uom_name','=','Kg')],'required':[('uom_name','!=','Kg')]}"/>
 						<field name="percentage" attrs="{'readonly':[('uom_name','!=','Kg')],'required':[('uom_name','=','Kg')]}"/>

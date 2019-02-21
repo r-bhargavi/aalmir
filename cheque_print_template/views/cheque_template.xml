@@ -18,14 +18,14 @@
                                         <span style="font-size:1.5em; " class="account_pay_layout" t-field="o.cheque_date" t-field-options="{&quot;format&quot;: &quot;dd-MM-yyyy&quot;}"/> </td>
                             </tr>
                             <tr>
-                                <td colspan="3" style="padding-left:0px; padding-top:110px;">
+                                <td colspan="3" style="padding-left:0px; padding-top:105px;">
                                     <t t-if="o.journal_id.account_pay_cheque==True">
                                      <span style="font-size:1.5em;" t-field="o.partner_id.name"/></t>  </td>
                             </tr>
                             <tr>
-                                <td colspan="2" style="padding-left:0px; padding-top:30px; line-height:4em;">
+                                <td colspan="2" style="padding-left:0px; padding-top:20px; line-height:4em;">
                                      <span style="font-size:1.5em;" t-field="o.check_amount_in_words"/>                                  </td>
-                                <td rowspan="2" style="padding-left:110px; padding-top:70px;">
+                                <td rowspan="2" style="padding-left:110px; padding-top:60px;">
                                     <strong>**</strong><span style="font-size:1.5em;" t-field="o.amount"/><strong>** </strong>                                </td>
                             </tr>
                             <tr>

@@ -51,7 +51,7 @@
 	<record id="email_template_for_bom_approval" model="mail.template">
             <field name="name">BOM Approval Requested</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-MRP Alert BOM Requested for Approval</field>
+            <field name="subject">API-MRP Alert: BOM Requested for Approval</field>
             <field name="model_id" ref="gt_order_mgnt.model_mrp_bom"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">
@@ -119,7 +119,7 @@
         <record id="template_change_date_mrp" model="mail.template">
             <field name="name">Schedule Date Change MRP</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-ERP Manufacturing Alert : ${(object.product_id.name)} production completion date updated</field>
+            <field name="subject">API-MRP Manufacturing Alert : ${(object.product_id.name)} production completion date updated</field>
             <!--<field name="email_to">${object.team_id.user_id.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>-->
             <field name="model_id" ref="gt_order_mgnt.model_mrp_production"/>
@@ -464,7 +464,7 @@
         <record id="email_template_for_rm_request" model="mail.template">
 		    <field name="name">RM Request</field>
 		    <field name="email_from">${(user.email or '')|safe}</field>
-		    <field name="subject">New RM Request for ${object.name} is created</field>
+		    <field name="subject">API-MRP RM Request: ${object.name} is created</field>
 		    <!--<field name="email_to">${object.user_id.email|safe}</field>-->
 		    <!--<field name="lang">${object.partner_id.lang}</field>-->
 		     <field name="model_id" ref="api_raw_material.model_mrp_raw_material_request"/>
