@@ -42,6 +42,7 @@
         'wizard/order_split_machine_change_view.xml',
         'wizard/reject_bill_reason.xml',
         'wizard/print_batches_data.xml',
+        'wizard/bulk_issue_batches_view.xml',
         'wizard/order_confirm_wizard_view.xml',
         'wizard/request_payment_term_wizard_view.xml',
         'wizard/order_confirm_by_sales_support_wizard_view.xml',

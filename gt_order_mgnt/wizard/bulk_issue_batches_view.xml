@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bulk_issue_batches_form_view" model="ir.ui.view">
+        <field name="name">issue.bulk.batches.form.view</field>
+        <field name="model">issue.bulk.batches</field>
+        <field name="arch" type="xml">
+            <form string="Issue Bulk Batches">
+                <group>
+                    <field name='previous_batch_id' options="{'no_create': True}" 
+                     domain="[('remain_used_qty','!=',0)]"
+                     attrs="{'invisible': [('previous_order_ids','=',[])], 'required':[('previous_order_ids','!=',[])]}"
+                 context="{'prev':True, 'previous_order_ids':previous_order_ids}" />
+                    <field name='previous_order_ids' widget="many2many_tags"/>
+                    <field name='employee_ids'  widget="many2many_tags" required="1"/>
+                    <field name='supplier_btc_no' widget='many2many_tags'
+                         options="{'no_create': True, 'no_open': True}"
+                         
+                       />
+                    <field name='produce_qty' required="1"/>
+                    
+
+                </group>
+                     <group>
+                     <field name='batch_ids' nolabel='1' 
+                           >
+                        <tree editable='bottom'>
+                          <field name='print_bool' invisible="1"/>
+                           <field name='name' string='Current Batch No.' readonly='1'/>      
+                           <field name='req_product_qty' sum='total' readonly='1'/>
+                           <field name='product_qty' readonly='1' string="Produced Qty" sum='total'/>
+                           <field name='transferred_qty'  string="Transferred Qty" readonly='1'/>
+                           <field name='wastage_qty' sum='total' readonly='1'/>
+                           <field name='uom_id' readonly='1'/>
+                           <field name='employee_name' readonly='1'/>
+                           <field name='equal_qty' invisible='1'/>
+                           <field name='supplier_batch_no' readonly='1'/>
+                        </tree>
+                     </field>
+                    </group>
+                <field name="wo_id" invisible="1"/>
+                <footer>
+                    <button string='Bulk Issue' name="issue_bulk_batches" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_highlight" special="cancel"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="issue_bulk_batches_form_view_action" model="ir.actions.act_window">
+        <field name="name">Issue Bulk Batches</field>
+        <field name="res_model">issue.bulk.batches</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="bulk_issue_batches_form_view"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

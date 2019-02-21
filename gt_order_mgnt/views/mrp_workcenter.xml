@@ -636,11 +636,13 @@
                       
                    </group>
                        
-                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
-                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
-                        <button name="select_all" string="All" icon='fa-check'  type="object"  
+<!--                        <button name="print_batch_barcode" string="All" icon='fa-print' type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />-->
+                        <button name="select_all" string="Select/Unselect All" icon='fa-check'  type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                         <button name="print_batch_data" string="Print" icon='fa-print'  type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
+                        <button name="issue_bulk_batch" string="Issue Bulk Batches" icon='fa-check'  type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                  <group>
                      <field name='batch_ids' nolabel='1' 
@@ -661,7 +663,7 @@
                            <field name='req_product_qty' sum='total'/>
                            <field name='product_qty' readonly='1' string="Produced Qty" sum='total'/>
                            <field name='transferred_qty'  string="Transferred Qty"/>
-                           <field name='wastage_qty' sum='total'/>
+                           <field name='wastage_qty'/>
                            <field name='uom_id'/>
                            <!--field name='user_id'/-->
                            <field name='employee_name'/>

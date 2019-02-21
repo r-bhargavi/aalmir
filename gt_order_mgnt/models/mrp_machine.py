@@ -754,7 +754,8 @@ class MrpWorkorderMachineProduce(models.Model):
 #                                       'remain_used_qty':record.batch_id.remain_used_qty +(record.product_qty),
                                        'remain_used_qty':record.batch_id.remain_used_qty +(record.produced_qty),
                                        'supplier_batch_no':supp_name,
-                                      'wastage_qty':record.batch_id.wastage_qty + record.wastage_qty,
+#                                      'wastage_qty':record.batch_id.wastage_qty + record.wastage_qty,
+                                      'wastage_qty':record.wastage_qty,
                                       'prev_batch_id':record.previous_batch_id.id})
                if record.document:
                    record.batch_id.write({                                      
@@ -2025,6 +2026,19 @@ class MrpWorkcenterPructionline(models.Model):
                 'view_id': form_id.id,
                 'target': 'new',
 #                'res_id':rec.picking_id.id,
+            }
+    @api.multi
+    def issue_bulk_batch(self):
+        form_id = self.env.ref('gt_order_mgnt.bulk_issue_batches_form_view')
+        return {
+                'name' :'Issue Bulk Batches',
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'issue.bulk.batches',
+                'views': [(form_id.id, 'form')],
+                'view_id': form_id.id,
+                'target': 'new',
             }
   
     @api.multi

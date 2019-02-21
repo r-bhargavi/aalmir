@@ -568,10 +568,10 @@
               <xpath expr="//tree" position='attributes'>
                   <attribute name='default_order'>min_date desc</attribute>
               </xpath>
-              <xpath expr="//field[@name='create_date']" position='attributes'>
+<!--              <xpath expr="//field[@name='create_date']" position='attributes'>
                 <attribute name="invisible">1</attribute>
 
-              </xpath>
+              </xpath>-->
               <xpath expr="//tree" position='attributes'>
                 <attribute name="decoration-danger">state not in ('cancel', 'done','delivered') and min_date &lt; current_date</attribute>
 
