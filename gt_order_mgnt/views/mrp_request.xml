@@ -1252,7 +1252,7 @@
               	    <separator string="Packaging Materials"/> 
 		    <field name="bom_packging_line" position="attributes" attrs="{'readonly':[('state','not in',['draft'])]}">
 		    	<tree editable="top">
-              			<field name="product_id" domain="[('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
+              			<field name="product_id" domain="['|',('product_tmpl_id.can_bom_prod', '=',True),('product_material_type.string', '=','packaging')]" options="{'no_open':True,'no_create':True}"/>
                             	<field name="product_uom" options="{'no_open':True,'no_create':True}" />
                                 <field name="qty_per_packging" string="Qty per Packaging" required="1"/>
 

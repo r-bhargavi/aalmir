@@ -92,6 +92,7 @@
 			<field name="n_tolerance" string="Tolerance (+/-)" fg_color="red:n_exceed_tolerance==True;" readonly="1"/>
 			<field name="n_client_date" readonly="1"/>
 			<field name="n_manu_date" readonly="1"/>
+			<field name="n_date_change_req" readonly="1"/>
 			<button name="approve_producton_date" type="object"  string="Approve"  icon="gtk-apply" attrs="{'invisible':[('new_date_bool', '=',False)]}"/>
 			<button name="manu_date_history" icon="fa-history" string="History" type="object" attrs="{'invisible':[('date_ids', '=', [])]}"/>
 			<field name="n_schdule_date" fg_color="green:n_delivery == 'today';orange:n_delivery =='week';blue:n_delivery =='2week';red:n_delivery == 'dated';" readonly="1"/>

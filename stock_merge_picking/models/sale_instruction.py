@@ -108,7 +108,8 @@ class ProcessInstructionLine(models.Model):
 	    if args[0]:
 		if args[0][2] and  type(args[0][2]) is list:
 	            pr_id=self.env['process.instruction'].search([('id','in',args[0][2])])
-		    args.append(('product_id','in',(pr_id.product_id.id,False)))
+                    for each_pr in pr_id:
+                        args.append(('product_id','in',(each_pr.product_id.id,False)))
 	    
 		    if args[0][0] == 'process_rec_id':
 			args.append(('create_uid','!=',self.env.user.id))
@@ -117,7 +118,8 @@ class ProcessInstructionLine(models.Model):
 			args.append(('create_uid','=',self.env.user.id))
 
 		    if args[0][0] == 'process_id':
-			args.remove(('product_id','in',(pr_id.product_id.id,False)))
+                        for each_pro in pr_id:
+                            args.remove(('product_id','in',(each_pro.product_id.id,False)))
 			args.append(('create_uid','=',self.env.user.id))
 	    return super(ProcessInstructionLine, self).search(args=args,
                                           offset=offset,

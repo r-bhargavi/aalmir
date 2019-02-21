@@ -193,7 +193,8 @@ class CustomSalesDashboard(models.Model):
     	sale_ids=[]
 	new_id=self.env['process.instruction'].search([('id','>',0)])
 	if new_id:
-		for rec in new_id.all_messages_line:
+            for each_new in new_id:
+		for rec in each_new.all_messages_line:
 			if self.env.user.id != rec.create_uid.id:
 				rec_user=[]		# to store send users
 				for n_usr in rec.send_user_id:

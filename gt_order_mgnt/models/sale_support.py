@@ -274,6 +274,13 @@ class SaleOrderLine(models.Model):
 
 #CH_N038 start add fields functions.>>
     @api.multi
+    def _get_no_date_change_request(self):
+        for rec in self:
+            complete_date_ids=self.env['mrp.complete.date'].search([('n_line_id','=',rec.id),('n_status','!=','draft')])
+            if complete_date_ids:
+                rec.n_date_change_req=len(complete_date_ids)
+            
+    @api.multi
     def _get_tolerance(self):
         for line in self:
             n_tolerance= line.product_id.n_production_tolerance
@@ -463,6 +470,7 @@ class SaleOrderLine(models.Model):
 
     new_date_bool = fields.Boolean("New Productoin date", default=False)
     n_exceed_tolerance = fields.Boolean("Exceed Tolerance", default=False, compute='_get_tolerance')
+    n_date_change_req = fields.Integer("No.Of Date Change Requests", default=False, compute='_get_no_date_change_request')
 
     date_ids = fields.One2many('mrp.complete.date', 'n_line_id', 'DATE history')
     n_qty_delivered = fields.Float('delivered qty',compute='_get_delivery_qty')

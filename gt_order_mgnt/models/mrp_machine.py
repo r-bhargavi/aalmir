@@ -1064,6 +1064,7 @@ class MrpWorkorderBatchNo(models.Model):
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
+        print "ids- cus----------------------",ids_cus
         batches=[]
         print "self.employee_idsself.employee_ids",self,self.order_id.employee_ids
         if self.production_id:

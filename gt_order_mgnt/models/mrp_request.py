@@ -994,17 +994,17 @@ class n_manufacturing_request(models.Model):
 							
     n_state = fields.Selection([ ('new','New'),('draft', 'Draft'),
 #				('purchase', 'Purchase'),
-				('scheduled', 'Scheduled'),
                                 ('mo_created', 'MO created'),
+				('scheduled', 'Scheduled'),                                
 				('manufacture', 'In-Production'),				
 				('done', 'Done'),
 				('cancel', 'Cancelled'), ], 'Status', readonly=True, 
 				copy=False, default='new',track_visibility='always',
-			help="'New': Production request created but not sent to production\n\
-                            'Draft': Production request sent to production\n\
-                            'MO Created': Manufacturing order created but production not confirmed\n\
-                            'Scheduled': MO created, scheduled and confirmed for raw material request\n\
-                            'In-Production': Production started for this request\n")
+			help="'New': Production request created but not sent to production\n	\
+			     'Draft': Production request sent to production\n \
+                             'MO Created': Manufacturing order created but production not confirmed\n \
+                             'Scheduled': MO created, scheduled and confirmed for raw material requests\n \
+                             'In-Production': Production started for this request\n")
     #CH_N038 add >>	
     n_Note = fields.Text(string="Note",track_visibility='always')
     n_product_desc = fields.Char(compute =get_desc, string="Product Description",track_visibility='always')
@@ -1752,7 +1752,6 @@ class MrpBom(models.Model):
                              send_user_name=recipient.name
 
                 send_user = ",".join(recipient_partners)
-                new_subject='API-MRP BOM Approval Alert: BoM Approval Requested for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
                 body_html = """<div> 
                         <p>Dear User,<br/>
                         <p>Kindly Approve BOM at your earliest so that MO can be planned and started.</p><br/>
@@ -1801,7 +1800,7 @@ class MrpBom(models.Model):
                              send_user_name=recipient.name
 
                 send_user = ",".join(recipient_partners)
-                new_subject='API-MRP BOM Approval Reminder Alert: BoM Approval Reminder for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
+                new_subject='API-MRP BOM Alert: BoM Approval Requested for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)
                 body_html = """<div> 
                         <p>Dear User,<br/>
                         <p>Kindly Approve BOM at your earliest so that MO can be planned and started.</p><br/>
@@ -2495,10 +2494,11 @@ class MrpPrdocutionHold(models.Model):
 			</p>
 			</div>"""%(rec.production_id.user_id.name, text_link or '',rec.production_id.partner_id.name,
 		            rec.production_id.product_id.name,rec.production_id.product_qty,rec.production_id.product_uom.name, rec.production_id.n_produce_qty,rec.production_id.produce_uom_id.name, rec.reason, date.today(), self.env.user.name, 
-rec.reminder_date, event_link or '')
+                  rec.reminder_date, event_link or '')
 	          body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'mrp.production',rec.production_id.id, context=self._context)
 	          n_emails=str(rec.production_id.user_id.login)
 	          temp_id.write({'body_html': body_html, 'email_to' : n_emails, 'email_from': str(rec.production_id.user_id.login)})
 	          temp_id.send_mail(rec.production_id.id)
 	          
 
+#                new_subject='API-MRP BOM Alert: BoM Approval Reminder for %s.'%str('['+self.product_id.default_code+']'+' '+self.product_id.name)

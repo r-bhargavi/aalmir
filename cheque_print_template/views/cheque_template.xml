@@ -24,12 +24,15 @@
                             </tr>
                             <tr>
                                 <td colspan="2" style="padding-left:0px; padding-top:20px; line-height:4em;">
-                                     <span style="font-size:1.5em;" t-field="o.check_amount_in_words"/>                                  </td>
+                                     <span style="font-size:1.5em;" t-field="o.check_amount_in_words"/>                                  
+                                </td>
                                 <td rowspan="2" style="padding-left:110px; padding-top:60px;">
-                                    <strong>**</strong><span style="font-size:1.5em;" t-field="o.amount"/><strong>** </strong>                                </td>
+                                    <strong>**</strong><span  style="font-size:1.5em;" t-field="o.amount"/><strong>** </strong>                                
+                                </td>
                             </tr>
                             <tr>
-                                <td height="30px" colspan="2" class="text-right" style="padding-right:60px;padding-top:20px;">                                </td>
+                                <td height="30px" colspan="2" class="text-right" style="padding-right:60px;padding-top:20px;">                                
+                                </td>
                             </tr>
                             <!--<tr >-->
                                 <!--<td>-->
