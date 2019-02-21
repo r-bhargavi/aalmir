@@ -633,6 +633,7 @@ class StockMove(models.Model):
 				   			'description':'UnReserved for order {} in Operation {}'.format(
 				   				res.picking_id.sale_id.name,res.picking_id.name)})]})
 					reserve_qty += batch.product_qty
+                                print "reserve_qtyreserve_qty",reserve_qty
 
 				sale_line_vals={'res_ids':[(0,0,{'product_id':res.product_id.id,
 								'n_reserve_Type':'do','res_qty':reserve_qty,
@@ -645,7 +646,8 @@ class StockMove(models.Model):
 							('force_reserve','warehouse'))])
 				if new_id:
 					n_status_rel.extend([(3,i.id) for i in new_id])
-				
+				print "reserve_qtyreserve_qtyreserve_qty",reserve_qty
+                                dsfdf
 				sale_line_vals.update({'reserved_qty':res.n_sale_line_id.reserved_qty-reserve_qty,
 						'n_status_rel':n_status_rel})
 				res.n_sale_line_id.write(sale_line_vals)

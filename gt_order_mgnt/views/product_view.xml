@@ -265,8 +265,7 @@
 		  <field name="uom_id" position="replace">
 		  	<field name="internal_name" />
 		  	<field name="n_product_type" readonly="1" attrs="{'invisible':[('purchase_ok','!=',True),('sale_ok','!=',True)]}"/>
-<!--		  	<field name="prod_count_var"/>
-		  	<field name="mo_count_var"/>-->
+		  	<!--<field name="mo_count_var"/>-->
                         <label for="n_calculator_id" string="Product Descriptions" attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}"/>
                     	<div attrs="{'invisible': ['|',('matstrg','not in',('product','packaging','component')),('hide_calculator','=',False)]}">
                         	<field name="n_calculator_id" readonly="1"  nolabel="1" class="oe_inline"/>

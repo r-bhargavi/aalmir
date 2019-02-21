@@ -68,6 +68,7 @@
 				<field name="store_id" readonly="1"/>
 				<field name="user_id" string="Supervisor Name" readonly="1" options="{'no_create': True, 'no_open': True}"/>
 				<field name="employee_name" readonly="1" groups="mrp.group_mrp_user"/>
+				<field name="supplier_batch_no" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="remark" readonly="1" groups="mrp.group_mrp_user"/>
 				<field name="reason" groups="mrp.group_mrp_user"/>
 

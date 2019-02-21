@@ -42,6 +42,8 @@ class productTemplate(models.Model):
 	expenses_count = fields.Char('#Expenses',compute='_get_expense_data')
 	mo_count = fields.Char('#Manufacturing',compute='_bom_orders_count_mo')
 	mo_count_var = fields.Float('#Manufacturing',compute='_count_mo_var')
+        can_bom_prod = fields.Boolean(string="Can Be Used in BoM Production",default=False)
+
         prod_count = fields.Char('#Production Orders',compute='_get_prod_orders_data')
         prod_count_var = fields.Float('#Production Count',compute='_get_prod_orders_data_var')
         customer_name=fields.Char(string='Customer Name')

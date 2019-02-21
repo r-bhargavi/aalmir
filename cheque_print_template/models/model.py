@@ -33,6 +33,7 @@ class BankChequeDetials(models.Model):
     @api.multi
     def action_cheque_print(self):
         self.ensure_one()
+        self._onchange_amount()
         return self.env['report'].get_action(self, 'cheque_print_template.report_cheque_print_template')
 
 
