@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from openerp import api, fields, models
+from openerp.exceptions import UserError, ValidationError
+
 
 
 class IssueBulkBatches(models.TransientModel):
@@ -22,7 +24,9 @@ class IssueBulkBatches(models.TransientModel):
     def batch_ids_onchange(self):
         for record in self:
             if record.wo_id:
-                return {'domain': {'batch_ids': [('id', 'in', (record.wo_id.batch_ids.ids))]}}
+                batch_ids=self.env['mrp.order.batch.number'].search([('convert_product_qty','=',0.0),('order_id','=',record.wo_id.id),('production_id','=',record.wo_id.production_id.id)])
+                if batch_ids:
+                    return {'domain': {'batch_ids': [('id', 'in', (batch_ids.ids))]}}
 
 
 
@@ -52,11 +56,11 @@ class IssueBulkBatches(models.TransientModel):
             rec.update({'default_supplier_btc_no':[(6,0,[batches])],})
         ids_cus = [] 
         if wo_line_id.batch_no_ids_prev:
-           for batch in self.order_id.batch_no_ids_prev:
+           for batch in self.wo_id.batch_no_ids_prev:
                ids_cus.append(batch.order_id.id)
         else:
            if wo_line_id.parent_id:
-              for batch in self.order_id.parent_id.batch_no_ids_prev:
+              for batch in self.wo_id.parent_id.batch_no_ids_prev:
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
@@ -84,6 +88,9 @@ class IssueBulkBatches(models.TransientModel):
 
     @api.multi
     def issue_bulk_batches(self):
+        if not self.batch_ids:
+            raise UserError(_("There are no Batches to issue!"))
+
         res=[]
         print "len----------------",self.batch_ids.ids
         for each in self.batch_ids:
