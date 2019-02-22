@@ -285,6 +285,10 @@
 						<span t-esc="n_status.date_request"/> </a>
 					</a>
 					<a class="o_project_kanban_box" name="" type="action">
+		                           <a name="action_stateopen_no_change" context="{'n_state':'date_request_change'}" type="object">No of Date Change Request -
+						<span t-esc="n_status.date_change_req"/> </a>
+					</a>
+					<a class="o_project_kanban_box" name="" type="action">
 		                           <a name="action_openpr" context="{'n_state':'pr_request'}" type="object">Cancelled PR -
 						<span t-esc="n_status.cancel_pr_request"/> </a>
 					</a>

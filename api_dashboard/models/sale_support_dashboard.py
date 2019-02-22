@@ -9,6 +9,29 @@ import json
 
 class CustomSalesDashboard(models.Model):
     _name = "custom.sales.dashboard"
+    
+    @api.multi
+    def action_stateopen_no_change(self):
+	domain=[]
+	_name=''
+        if self._context.get('n_state') == 'date_request_change':
+		domain=[('new_date_bool', '=',True)]
+		_name='No of Date Change Request'
+
+	rq_tree = self.env.ref('gt_order_mgnt.n_production_request_tree_history', False)
+        rq_form =self.env.ref('gt_order_mgnt.mrp_production_request_form',False)
+        if rq_tree:
+            return {
+		'name':_name,
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'tree',
+                'res_model':'n.manufacturing.request',
+		'views': [(rq_tree.id, 'tree'),(rq_form.id, 'form')],
+                'view_id': rq_tree.id,
+                'target': 'current',
+		'domain':domain,
+            }
  
     @api.one
     def _get_count(self):
@@ -141,6 +164,7 @@ class CustomSalesDashboard(models.Model):
 	paid_qty=self.env['sale.order.line'].search([('product_id.name','not in',('Advance Payment','Deposit Product')),('order_id.state','=','sale'),('state','!=','done'),('n_status_rel', 'in',[ids16.id])])
 
 	cancel_pr = self.env['n.manufacturing.request'].search([('n_state','=','cancel'),('check_bool','=',False)])
+	no_f_dc_req = self.env['n.manufacturing.request'].search([('new_date_bool','=',True)])
 	#new_rm_request=self.env['mrp.raw.material.request'].search([('state','=','draft'),('request_type','=','normal')])
         #extra_rm_request=self.env['mrp.raw.material.request'].search([('state','=','draft'),('request_type','=','extra')])
         #transfer_orders=self.env['stock.picking'].search([('state','=','confirmed'),('production_id','!=',False)])
@@ -179,6 +203,7 @@ class CustomSalesDashboard(models.Model):
                 #'transfer':len(transfer_orders),
 		'extra_qty':len(ext_qty),
 		'cancel_pr_request':len(cancel_pr),
+		'date_change_req':len(no_f_dc_req),
 		'instrct':instrct,
 		}
     @api.one

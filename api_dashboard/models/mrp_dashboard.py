@@ -199,6 +199,7 @@ class CustomMrpDashboard(models.Model):
                 'target': 'current',
 		'domain':domain,
             }
+
     '''@api.one
     def _get_count(self):
         days= datetime.today().day

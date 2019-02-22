@@ -124,7 +124,7 @@ class MrpRawmaterial(models.Model):
                         if any(line.pick_qty == 0.0 for line in rec.request_line_ids):
                             raise UserError(_("You cannot pick 0 qty for raw materials!!!"))
 			for line in rec.request_line_ids:
-				move_ids = self.env['stock.move'].create({ 'date':rec.request_date,
+				move_ids = self.env['stock.move'].create({ 'date':rec.request_date,'origin':rec.name,
 						  'product_id':line.product_id.id,'product_uom_qty':line.pick_qty,
 						  'product_uom':line.uom_id.id, 'picking_type_id':picking_type1.id,  
 						  'location_dest_id':picking_type1.default_location_dest_id.id,
