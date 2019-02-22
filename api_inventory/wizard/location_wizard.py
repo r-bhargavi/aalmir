@@ -302,7 +302,7 @@ class StockStoreLocationWizard(models.TransientModel):
    				'quantity':qty,'unit_id':line.qty_unit.id,'batch_number':res.id,
    				'lot_number':res.lot_id.id}))
 			res.write({'logistic_state':'transit_in',
-				   'master_id':matser_batch_id.id,'store_id':self.locations.id,
+				   'master_id':matser_batch_id.id,'store_id':self.locations.id,'picking_id':self.picking.id,
 				   'batch_history':[(0,0,{'operation':'logistics',
 				   	'description':'Received by Logistics({}) using Master-Batch {}'.format(self.picking.name,matser_batch_id.name)})]})
 		print "......................",self.locations,self.locations.product_type
