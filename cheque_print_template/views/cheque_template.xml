@@ -27,7 +27,7 @@
                                      <span style="font-size:1.5em;" t-field="o.check_amount_in_words"/>                                  
                                 </td>
                                 <td rowspan="2" style="padding-left:110px; padding-top:60px;">
-                                    <strong>**</strong><span  style="font-size:1.5em;" t-field="o.amount"/><strong>** </strong>                                
+                                    <strong>**</strong><span  style="font-size:1.5em;" t-esc="'%.2f'% o.amount"/><strong>** </strong>                               
                                 </td>
                             </tr>
                             <tr>
