@@ -52,11 +52,11 @@ class IssueBulkBatches(models.TransientModel):
             rec.update({'default_supplier_btc_no':[(6,0,[batches])],})
         ids_cus = [] 
         if wo_line_id.batch_no_ids_prev:
-           for batch in self.order_id.batch_no_ids_prev:
+           for batch in self.wo_id.batch_no_ids_prev:
                ids_cus.append(batch.order_id.id)
         else:
            if wo_line_id.parent_id:
-              for batch in self.order_id.parent_id.batch_no_ids_prev:
+              for batch in self.wo_id.parent_id.batch_no_ids_prev:
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
