@@ -20,6 +20,7 @@ access_stock_warehouse_orderpoint_group_user,stock.warehouse.orderpoint.group.us
 access_stock_store_master_batch_group_user,stock.store.master.batch.group.user,api_inventory.model_stock_store_master_batch,account.group_account_user,1,1,1,1
 access_mrp_order_batch_number_group_user,mrp.order.batch.number.group.user,gt_order_mgnt.model_mrp_order_batch_number,account.group_account_user,1,1,1,1
 access_mrp_order_batch_number_group_mrp_manager,mrp.order.batch.number.group.mrp.manager,gt_order_mgnt.model_mrp_order_batch_number,mrp.group_mrp_manager,1,1,1,1
+access_mrp_order_batch_number_group_mrp_user,mrp.order.batch.number.group.mrp.user,gt_order_mgnt.model_mrp_order_batch_number,mrp.group_mrp_user,1,1,1,0
 access_n_warehouse_placed_product_group_user,n.warehouse.placed.product.group.user,api_inventory.model_n_warehouse_placed_product,account.group_account_user,1,1,1,1
 access_store_multi_product_data_group_user,store.multi.product.data.group.user,api_inventory.model_store_multi_product_data,account.group_account_user,1,1,1,1
 access_product_price_history_group_user,product.price.history.group.user,product.model_product_price_history,account.group_account_user,1,1,1,1
