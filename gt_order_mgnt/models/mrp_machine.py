@@ -2071,6 +2071,7 @@ class MrpWorkcenterPructionline(models.Model):
             else:
                record.first_order=False
     
+    
     date_planned_end=fields.Datetime(compute='endtime')
     user_ids=fields.Many2many('res.users', string='Assign To')
     total_product_qty=fields.Float('Total Produced Qty', compute='total_producedqty')
@@ -2161,6 +2162,7 @@ class MrpWorkcenterPructionline(models.Model):
     machine_show=fields.Boolean(default=False)
     hold_order=fields.Selection([('active','Active'),('hold','Hold')],default='active', string='Order Status')
     order_last=fields.Boolean('Last Order', default=False)
+    first_order=fields.Boolean('First Work Order', default=False,compute='compute_first_wo',store=True)
     partner_id=fields.Many2one('res.partner', 'Customer Name', related='production_id.partner_id')
     wk_planned_status=fields.Selection([('unplanned','Unplanned'),('partial','Partial planned'),
                                      ('fully','Fully Planned'),('maintenace','Machine Maintenance'),

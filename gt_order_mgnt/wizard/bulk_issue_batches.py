@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp import api, fields, models
+from openerp import api, fields, models, _
 from openerp.exceptions import UserError, ValidationError
 
 
@@ -13,6 +13,7 @@ class IssueBulkBatches(models.TransientModel):
     
     batch_ids=fields.Many2many('mrp.order.batch.number',string='Batch No.') 
     wo_id=fields.Many2one('mrp.production.workcenter.line',string='WO ID') 
+    first_order=fields.Boolean(related='wo_id.first_order',store=True,string='First Wo') 
     previous_batch_id=fields.Many2one('mrp.order.batch.number',string='Previous Batch No.')
     previous_order_ids=fields.Many2many('mrp.production.workcenter.line', string='Previous Work Order No.')
     employee_ids=fields.Many2many('hr.employee', string='Operators Name')
@@ -51,6 +52,8 @@ class IssueBulkBatches(models.TransientModel):
                                                 batches.append(each_batches.batch_number.id)
                 if batch_ids:
                     return {'domain': {'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', (batch_ids.ids))],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
+                else:
+                    return {'domain': {'batch_ids': [('id', 'in', False)]}}
 
 
 
@@ -97,17 +100,6 @@ class IssueBulkBatches(models.TransientModel):
 
 	return rec
     @api.multi
-    
-    def select_unselect_all(self):
-        for record in self:
-            if record.batch_ids:
-                if any(batch.print_bool == True for batch in record.batch_ids):
-                    for rec in record.batch_ids:
-                      rec.print_bool=False
-                else:
-                    for rec in record.batch_ids:
-                        rec.print_bool=True
-        return {"type": "ir.actions.do_nothing",}
 
 
     @api.multi
@@ -116,6 +108,8 @@ class IssueBulkBatches(models.TransientModel):
             raise UserError(_("There are no Batches to issue!"))
         if self.produce_qty==0.0:
             raise UserError(_("Please Input Proper Qty to Produce!"))
+        if self.produce_qty>self.batch_ids[0].req_product_qty:
+            raise UserError(_("Produce Qty cannot be greater then Required Qty of Batch!!"))
 
         res=[]
         print "len----------------",self.batch_ids.ids
