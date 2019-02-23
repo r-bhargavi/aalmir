@@ -10,10 +10,13 @@
                      domain="[('remain_used_qty','!=',0)]"
                      attrs="{'invisible': [('previous_order_ids','=',[])], 'required':[('previous_order_ids','!=',[])]}"
                  context="{'prev':True, 'previous_order_ids':previous_order_ids}" />
+                    <field name='first_order' invisible="1"/>
+
                     <field name='previous_order_ids' widget="many2many_tags" readonly="1"/>
                     <field name='employee_ids'  widget="many2many_tags" required="1"/>
                     <field name='supplier_btc_no' widget='many2many_tags'
                          options="{'no_create': True, 'no_open': True}"
+                         attrs="{'invisible': [('first_order','=',False)]}"
                          
                        />
                     <field name='produce_qty' required="1"/>

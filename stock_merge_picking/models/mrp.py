@@ -228,7 +228,7 @@ class MrpProductProduce(models.Model):
                    stck_location=self.env['stock.location'].search([('actual_location','=',True),('location_id','=',production_id.location_dest_id.location_id.id)])
                    pick_exist=self.env['stock.picking'].search([('origin','=',production_id.name),('location_id','=',production_id.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','!=','done')])
                    print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
-                   if not pick_exist:
+                   if not pick_exist and self.product_qty>0.0:
                       pick_exist=self.env['stock.picking'].create({'origin':production_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
                       print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
                    self.env['stock.move'].create({'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
