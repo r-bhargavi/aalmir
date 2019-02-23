@@ -642,8 +642,8 @@
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
                         <button name="print_batch_data" string="Print" icon='fa-print'  type="object"  
                            attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
-                        <button name="issue_bulk_batch" string="Issue Bulk Batches" icon='fa-check'  type="object"  
-                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />
+<!--                        <button name="issue_bulk_batch" string="Issue Bulk Batches" icon='fa-check'  type="object"  
+                           attrs="{'invisible':[('batch_ids','=',[])]}" class="oe_highlight" />-->
                  <group>
                      <field name='batch_ids' nolabel='1' 
                            attrs="{'invisible':[('batch_ids','=',[])]}" readonly='1'>
