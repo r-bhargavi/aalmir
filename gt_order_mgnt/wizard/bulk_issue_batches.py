@@ -25,8 +25,32 @@ class IssueBulkBatches(models.TransientModel):
         for record in self:
             if record.wo_id:
                 batch_ids=self.env['mrp.order.batch.number'].search([('convert_product_qty','=',0.0),('order_id','=',record.wo_id.id),('production_id','=',record.wo_id.production_id.id)])
+                ids_cus = [] 
+                if record.wo_id.batch_no_ids_prev:
+                   for batch in record.wo_id.batch_no_ids_prev:
+                       ids_cus.append(batch.order_id.id)
+                else:
+                   if record.wo_id.parent_id:
+                      for batch in record.wo_id.parent_id.batch_no_ids_prev:
+                          ids_cus.append(batch.order_id.id)
+                   else:
+                      ids_cus = [] 
+                batches=[]
+                if record.wo_id.production_id:
+                    rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',record.wo_id.production_id.id)])
+                    print "rm_idsrm_idsrm_ids",rm_ids
+                    if rm_ids:
+                        for each_rm in rm_ids:
+                            pick_ids=self.env['stock.picking'].search([('material_request_id','=',each_rm.id),('state','=','done')])
+                            print "pick_idspick_idspick_ids",pick_ids
+                            if pick_ids:
+                                for each in pick_ids:
+                                    if each.store_ids:
+                                        for each_store in each.store_ids:
+                                            for each_batches in each_store.batches_ids:
+                                                batches.append(each_batches.batch_number.id)
                 if batch_ids:
-                    return {'domain': {'batch_ids': [('id', 'in', (batch_ids.ids))]}}
+                    return {'domain': {'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', (batch_ids.ids))],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
 
 
 
@@ -53,7 +77,7 @@ class IssueBulkBatches(models.TransientModel):
                                     for each_batches in each_store.batches_ids:
                                         batches.append(each_batches.batch_number.id)
         if batches:
-            rec.update({'default_supplier_btc_no':[(6,0,[batches])],})
+            rec.update({'default_supplier_btc_no':[(6,0,[batches])]})
         ids_cus = [] 
         if wo_line_id.batch_no_ids_prev:
            for batch in self.wo_id.batch_no_ids_prev:
@@ -83,13 +107,15 @@ class IssueBulkBatches(models.TransientModel):
                 else:
                     for rec in record.batch_ids:
                         rec.print_bool=True
-        return {  "type": "ir.actions.do_nothing",}
+        return {"type": "ir.actions.do_nothing",}
 
 
     @api.multi
     def issue_bulk_batches(self):
         if not self.batch_ids:
             raise UserError(_("There are no Batches to issue!"))
+        if self.produce_qty==0.0:
+            raise UserError(_("Please Input Proper Qty to Produce!"))
 
         res=[]
         print "len----------------",self.batch_ids.ids
