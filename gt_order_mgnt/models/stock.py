@@ -1248,7 +1248,8 @@ class StockPackOperation(models.Model):
      		if rec.picking_id.state not in ('transit','done','delivered','cancel'):
      			if rec.packaging_id:
      				qty = rec.qty_done if rec.qty_done else rec.product_qty
-				rec.pack_qty=math.ceil(qty/rec.packaging_id.qty)
+                                if rec.packaging_id.qty>0.0:
+                                    rec.pack_qty=math.ceil(qty/rec.packaging_id.qty)
 		
      @api.multi
      @api.depends('pack_qty','secondary_pack')

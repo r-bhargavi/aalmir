@@ -18,6 +18,7 @@ access_hr_expense_group_user,hr.expense.group.user,hr_expense.model_hr_expense,a
 access_product_product_group_user,product.product.group.user,product.model_product_product,account.group_account_user,1,1,1,1
 access_stock_warehouse_orderpoint_group_user,stock.warehouse.orderpoint.group.user,stock.model_stock_warehouse_orderpoint,account.group_account_user,1,1,1,1
 access_stock_store_master_batch_group_user,stock.store.master.batch.group.user,api_inventory.model_stock_store_master_batch,account.group_account_user,1,1,1,1
+access_stock_store_master_batch_group_stck_mgr,stock.store.master.batch.group.stck.mgr,api_inventory.model_stock_store_master_batch,stock.group_stock_manager,1,1,1,1
 access_mrp_order_batch_number_group_user,mrp.order.batch.number.group.user,gt_order_mgnt.model_mrp_order_batch_number,account.group_account_user,1,1,1,1
 access_mrp_order_batch_number_group_mrp_manager,mrp.order.batch.number.group.mrp.manager,gt_order_mgnt.model_mrp_order_batch_number,mrp.group_mrp_manager,1,1,1,1
 access_mrp_order_batch_number_group_mrp_user,mrp.order.batch.number.group.mrp.user,gt_order_mgnt.model_mrp_order_batch_number,mrp.group_mrp_user,1,1,1,0
