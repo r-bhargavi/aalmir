@@ -968,7 +968,9 @@ class n_manufacturing_request(models.Model):
 		
         result = super(n_manufacturing_request, self).create(vals)
 #        if result.n_sale_order_line and result.n_order_qty > result.n_sale_order_line.pending_qty:
-#		raise UserError(_('Your order more than pending quantity'))
+#		raise UserError(_('Your order more than pending quantity')
+        if not vals.get('n_sale_line',False):
+            result.n_save()
         return result
 
     @api.multi
@@ -1113,69 +1115,73 @@ class n_manufacturing_request(models.Model):
 		self.n_sale_order_line.pending_qty -= self.n_order_qty
 		self.n_packaging = self.n_sale_order_line.product_packaging.id if self.n_sale_order_line.product_packaging else self.env['product.packaging'].search([('product_tmpl_id','=',self.n_product_id.product_tmpl_id.id),('pkgtype','=','primary')],limit=1).id
 	#CH_N054 <<<<<<<<<<<<<<
-		user_obj = self.env['res.users'].browse(self.env.uid)
-		temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
-	    	if temp_id:
-                        base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-                        query = {'db': self._cr.dbname}
-                        fragment = {
-                                  'model': 'n.manufacturing.request',
-                                  'view_type': 'form',
-                                  'id': self.id,
-                                 }
-                        url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-                        print "urlurl",url
-                        text_link = _("""<a href="%s">%s</a> """) % (url,self.name)
-	    		group,send_user_name=False,''
-	    		recipient_partners=[]
-    			if self.n_category.cat_type=='film':
-	    			group = self.env['res.groups'].search([('name', 'in', ('Film manager','Get BoM Alert'))])
-    			elif self.n_category.cat_type=='injection':
-	    			group = self.env['res.groups'].search([('name', 'in', ('Injection manager','Get BoM Alert'))])
-                        print "groupgroupgroupgroupgroupgroup",group
-		       	for groups in group:
-                            for recipient in groups.users:
-                                if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
-                                     recipient_partners.append(recipient.login)
-                                     send_user_name=recipient.name
-                        recipient_partners.append(self.n_sale_order_line.order_id.user_id.login)
-		       	send_user = ",".join(recipient_partners)
-		        product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
-                        bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
-                        if not bom_id:
-                            new_subject='API-ERP Production Alert:BoM required,New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
-                        else:
-                            new_subject='API-ERP Production Alert:New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
-                        print "new_subjectnew_subject",new_subject
-                        n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
-                        if not self.n_Note:
-                            note=''
-                        else:
-                            note=self.n_Note
-			body_html = """<div> 
-                                <strong><p>Dear User,<br/>
-				<p>New production request is raised as per below details</strong></p><br/>
-				
-					<p>Request Number : <b>%s</b> </p>
-		    			<p>Product:<b>%s</b> </p>
-		    			<p>Instructions from Sale Support:<b>%s</b> </p>
-		    			<p>Requested completion date: <b>%s</b> </p>
-		    			<p>Sales Order Number:<b>%s</b> </p>
-		    			<p>Customer Name:<b>%s</b> </p>
-		    			<p>Sales Person:<b>%s</b> </p>
-		    			<p>Quantity :<b>%s</b> \t%s </p>
-		    			<p>Packaging :<b>%s</b> </p>
-				</p>
-				</div>"""%(str(text_link),product_data,note,str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
-			body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
-                        print "body_htmlbody_htmlbody_html",body_html
-                        if bom_id:
-                            body_html +="<table class='table' style='font-family:arial; text-align:left;'><tr><th>BoM Name </th></tr>" 
-                            for line in bom_id:
-                                #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
-                                #self.env.cr.execute(term_qry)
-                                #schedule_order=self.env.cr.fetchone()
-                                body_html +="<tr><td>%s</td></tr>"%(str(line.code)) 
+        user_obj = self.env['res.users'].browse(self.env.uid)
+        temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
+        if temp_id:
+                base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                query = {'db': self._cr.dbname}
+                fragment = {
+                          'model': 'n.manufacturing.request',
+                          'view_type': 'form',
+                          'id': self.id,
+                         }
+                url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+                print "urlurl",url
+                text_link = _("""<a href="%s">%s</a> """) % (url,self.name)
+                group,send_user_name=False,''
+                recipient_partners=[]
+                if self.n_category.cat_type=='film':
+                        group = self.env['res.groups'].search([('name', 'in', ('Film manager','Get BoM Alert'))])
+                elif self.n_category.cat_type=='injection':
+                        group = self.env['res.groups'].search([('name', 'in', ('Injection manager','Get BoM Alert'))])
+                print "groupgroupgroupgroupgroupgroup",group
+                for groups in group:
+                    for recipient in groups.users:
+                        if recipient.login not in recipient_partners and str(recipient.login) != str(user_obj.partner_id.email):
+                             recipient_partners.append(recipient.login)
+                             send_user_name=recipient.name
+                if self.n_sale_order_line:
+                    recipient_partners.append(self.n_sale_order_line.order_id.user_id.login)
+                send_user = ",".join(recipient_partners)
+                product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
+                bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
+                if not bom_id:
+                    new_subject='API-ERP Production Alert:BoM required,New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
+                else:
+                    new_subject='API-ERP Production Alert:New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
+                print "new_subjectnew_subject",new_subject
+                if self.n_delivery_date:
+                    n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                else:
+                    n_date=''
+                if not self.n_Note:
+                    note=''
+                else:
+                    note=self.n_Note
+                body_html = """<div> 
+                        <strong><p>Dear User,<br/>
+                        <p>New production request is raised as per below details</strong></p><br/>
+
+                                <p>Request Number : <b>%s</b> </p>
+                                <p>Product:<b>%s</b> </p>
+                                <p>Instructions from Sale Support:<b>%s</b> </p>
+                                <p>Requested completion date: <b>%s</b> </p>
+                                <p>Sales Order Number:<b>%s</b> </p>
+                                <p>Customer Name:<b>%s</b> </p>
+                                <p>Sales Person:<b>%s</b> </p>
+                                <p>Quantity :<b>%s</b> \t%s </p>
+                                <p>Packaging :<b>%s</b> </p>
+                        </p>
+                        </div>"""%(str(text_link),product_data,note,str(n_date),str(self.n_sale_order_line.order_id.name) if self.n_sale_order_line else '',str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name) if self.n_sale_order_line else str(self.n_partner_id.name) if self.n_partner_id else '',str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
+                body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
+                print "body_htmlbody_htmlbody_html",body_html
+                if bom_id:
+                    body_html +="<table class='table' style='font-family:arial; text-align:left;'><tr><th>BoM Name </th></tr>" 
+                    for line in bom_id:
+                        #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
+                            #self.env.cr.execute(term_qry)
+                            #schedule_order=self.env.cr.fetchone()
+                        body_html +="<tr><td>%s</td></tr>"%(str(line.code)) 
 #                            base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 #                            query = {'db': self._cr.dbname}
 #                            fragment = {
@@ -1187,16 +1193,16 @@ class n_manufacturing_request(models.Model):
 #                            print "urlurl",url
 #                            text_link = _("""<a href="%s">%s</a> """) % (url,"VIEW REQUEST")
 #                            body_html +='<li> <b>RM Request :</b> '+str(text_link) +'</li>'
-                            body_html +="</table>"
-                        else:
-                            body_html+= """<div> 
+                    body_html +="</table>"
+                else:
+                    body_html+= """<div> 
 
-				<p style="color:red"> <strong>No BOM created till now, BOM required.</strong></p><br/>
-				</div>"""
-			temp_id.write({'body_html': body_html,'subject':new_subject,
-					'email_to' : send_user, 'email_from': user_obj.partner_id.email})
-                        print "send_usersend_user",send_user,body_html
-			temp_id.send_mail(self.n_sale_line.id)
+                        <p style="color:red"> <strong>No BOM created till now, BOM required.</strong></p><br/>
+                        </div>"""
+                temp_id.write({'body_html': body_html,'subject':new_subject,
+                                'email_to' : send_user, 'email_from': user_obj.partner_id.email})
+                print "send_usersend_user",send_user,body_html
+                temp_id.send_mail(self.n_sale_line.id if self.n_sale_line else False)
 			
 #		if self.n_exist_pr:
 #		    temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
@@ -1338,7 +1344,10 @@ class n_manufacturing_request(models.Model):
                 send_user = ",".join(recipient_partners)
                 product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
                 new_subject='API-ERP BOM Alert: Production stopped for %s as BOM not available.'%str('['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
-                n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                if self.n_delivery_date:
+                    n_date=datetime.strftime(datetime.strptime(self.n_delivery_date,tools.DEFAULT_SERVER_DATETIME_FORMAT).date(), '%Y-%m-%d')           
+                else:
+                    n_date=''
                 body_html = """<div> 
                         <p>Dear User,<br/>
                         <p>This is to inform you that manufacturing supervisor tried to create Manufacturing order for below request but was not successful as there is no BOM defined for %s</p>
@@ -1354,14 +1363,14 @@ class n_manufacturing_request(models.Model):
 		    			<p>Packaging :<b>%s</b></p>
 				</p>
 				</div>"""%('['+str(self.n_product_id.default_code)+']'+' '+str(self.n_product_id.name),str(text_link),'['+str(self.n_product_id.default_code)+']'+' '+str(self.n_product_id.name),str(self.n_Note) or '',str(n_date),str(self.n_sale_order_line.order_id.name),str(self.n_sale_order_line.order_id.partner_id.name),str(self.n_sale_order_line.order_id.user_id.name),str(self.n_order_qty),str(self.n_unit.name),str(self.n_packaging.name))
-                body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id, context=self._context)
+                body_html = self.pool['mail.template'].render_template(self._cr, self._uid, body_html, 'sale.order',self.n_sale_line.id if self.n_sale_line else False, context=self._context)
                 print "body_htmlbody_htmlbody_html",body_html
                 temp_id.write({'body_html': body_html,'subject':new_subject,
                                 'email_to' : send_user, 'email_from': user_obj.partner_id.email})
                 print "send_usersend_user",send_user,body_html
 #                self.message_post(body=body_html)
 
-                temp_id.send_mail(self.n_sale_line.id)
+                temp_id.send_mail(self.n_sale_line.id if self.n_sale_line else False)
                 self.write({'reminder_sent':True})
         return True
     
