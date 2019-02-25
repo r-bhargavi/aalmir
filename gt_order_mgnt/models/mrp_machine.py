@@ -637,12 +637,12 @@ class MrpWorkorderMachineProduce(models.Model):
                else:
 		    wastage_qty=record.wastage_qty
 #               if record.order_id.wk_required_qty < (wastage_qty + record.product_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty):
-               print "record.order_id.wk_required_qtyrecord.order_id.wk_required_qty",record.order_id.wk_required_qty,wastage_qty + record.produced_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty
 #               if record.order_id.wk_required_qty < (wastage_qty + record.produced_qty + record.order_id.total_product_qty +record.order_id.total_wastage_qty):
                if record.req_product_qty < record.produced_qty:
                   record.warning_bool=True
                else:
                   record.warning_bool=False
+            print "recordrecordrecordrecord",record
             if record.order_id.raw_materials_id:
                 '''for raw in record.order_id.raw_materials_id:
                    qty_one=(raw.qty/record.order_id.wk_required_qty)
@@ -1088,7 +1088,10 @@ class MrpWorkorderBatchNo(models.Model):
         if batches:
             context.update({'default_supplier_btc_no':[(6,0,[batches[0]])],})
         machine_produce_id=self.env['mrp.order.machine.produce'].search([('batch_id','=',self.id),('order_id','=',self.order_id.id)])
-	context.update({'default_order_id':self.order_id.id, 'default_machine':self.machine.id,
+        print "self.order_idself.order_idself.order_id",self.order_id
+	context.update({
+                        'default_order_id':self.order_id.id, 
+                        'default_machine':self.machine.id,
                          'default_previous_order_id':self.order_id.batch_no_ids_prev[0].order_id.id if self.order_id.batch_no_ids_prev else '',
                        'default_batch_id':self.id,
                        'default_remark':self.remark,
@@ -1135,6 +1138,7 @@ class MrpWorkorderBatchNo(models.Model):
         res_id=False
         if machine_produce_id:
             res_id=machine_produce_id[0].id
+        print "context before opening pop up---------------",context
         if mo_form:
                 return {
                     'name':'Produced Qty in Batch',
