@@ -91,6 +91,7 @@ class IssueBulkBatches(models.TransientModel):
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
+        print "ids_cusids_cusids_cus",ids_cus
         if wo_line_id.batch_ids:
 #            rec.update({'batch_ids' :((6, 0, tuple([v.id for v in wo_line_id.batch_ids])),),'wo_id':wo_line_id.id})
             rec.update({'wo_id':wo_line_id.id,'default_previous_order_ids':[(6,0,ids_cus)],

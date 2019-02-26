@@ -615,13 +615,15 @@ class MrpWorkorderMachineProduce(models.Model):
     @api.depends('produced_qty','wastage_qty')
     def checkproduced_qty(self):
         for record in self:
+            print"sdfsdfsdfsdfsdf",self._context
+            wo_id=self.env['mrp.production.workcenter.line'].browse(self._context.get('default_order_id',False))
             wastage_qty=0.0
             if record.wastage_qty:
                if record.uom_id.id !=record.wastage_uom.id:
                   if record.uom_id.name =='Pcs':
                       wastage_qty=math.ceil(record.wastage_qty/record.product_id.weight) if record.wastage_qty else 0.0
                   if record.uom_id.name =='m':
-                     qty_m=(record.order_id.wk_required_qty/record.order_id.qty)
+                     qty_m=(wo_id.wk_required_qty/record.order_id.qty)
                      wastage_qty=qty_m * record.wastage_qty
                else:
                      wastage_qty=record.wastage_qty
@@ -643,7 +645,7 @@ class MrpWorkorderMachineProduce(models.Model):
                else:
                   record.warning_bool=False
             print "recordrecordrecordrecord",record
-            if record.order_id.raw_materials_id:
+            if wo_id.raw_materials_id:
                 '''for raw in record.order_id.raw_materials_id:
                    qty_one=(raw.qty/record.order_id.wk_required_qty)
                    total =round(qty_one * record.product_qty,2)
@@ -655,7 +657,7 @@ class MrpWorkorderMachineProduce(models.Model):
                 for bom_ln in record.production_id.bom_id.bom_packging_line:
                     rm_append.append((bom_ln.id))
                 for bom in self.env['mrp.bom.line'].browse(rm_append):
-                    if bom.workcenter_id.id == record.order_id.workcenter_id.id:
+                    if bom.workcenter_id.id == wo_id.workcenter_id.id:
                        for product in record.production_id.product_lines:
                            if product.product_id.id == bom.product_id.id:
                               one_qty=0.0
