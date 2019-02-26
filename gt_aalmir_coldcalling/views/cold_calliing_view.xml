@@ -27,7 +27,7 @@
                     <field name="mobile" widget="phone" options="{'dial_button_invisible': True}" />
                     <field name="email_from"/>
                     <field name="stage_2" readonly="1"/>
-                    <field name="user_id" />
+                    <field name="user_id"  options="{'no_create': True}" domain="[('salesperson_bool','=',True)]"/>
 		    <field name="history_recent" readonly="1" />
                     <field name="id" invisible="1"/>
                     <button name="get_contact" string="Contact" type="object" class="oe_highlight" attrs="{'invisible' : [('stage_2','not in',['contacted', 'not_contacted'])] }" icon="fa-phone"/>

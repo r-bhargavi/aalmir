@@ -260,9 +260,9 @@ class ProductProduct(models.Model):
 			    v=False
                             v= seq_obj.next_by_code('expense.internal.number')
                             vals.update({'default_code' :v,'asset_code':''})
-			else:
-				error_string='Material Type of Product is not Found'
-				raise
+#			else:
+#				error_string='Material Type of Product is not Found'
+#				raise
 				
 		elif vals.get('product_material_type') and not vals.get('default_code'):
 			material=self.env['product.material.type'].search([('id','=',vals.get('product_material_type'))])
