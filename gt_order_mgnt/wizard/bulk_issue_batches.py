@@ -15,6 +15,8 @@ class IssueBulkBatches(models.TransientModel):
     wo_id=fields.Many2one('mrp.production.workcenter.line',string='WO ID') 
     first_order=fields.Boolean(related='wo_id.first_order',store=True,string='First Wo') 
     previous_batch_id=fields.Many2one('mrp.order.batch.number',string='Previous Batch No.')
+    previous_order_id=fields.Many2one('mrp.production.workcenter.line', string='Previous Work Order No.')
+
     previous_order_ids=fields.Many2many('mrp.production.workcenter.line', string='Previous Work Order No.')
     employee_ids=fields.Many2many('hr.employee', string='Operators Name')
     supplier_btc_no=fields.Many2many('mrp.order.batch.number', string='Supplier Batch Number')
@@ -80,26 +82,26 @@ class IssueBulkBatches(models.TransientModel):
                                     for each_batches in each_store.batches_ids:
                                         batches.append(each_batches.batch_number.id)
         if batches:
-            rec.update({'default_supplier_btc_no':[(6,0,[batches])]})
+            rec.update({'supplier_btc_no':[(6,0,batches)]})
         ids_cus = [] 
         if wo_line_id.batch_no_ids_prev:
-           for batch in self.wo_id.batch_no_ids_prev:
+           for batch in wo_line_id.batch_no_ids_prev[0]:
                ids_cus.append(batch.order_id.id)
         else:
            if wo_line_id.parent_id:
-              for batch in self.wo_id.parent_id.batch_no_ids_prev:
+              for batch in wo_line_id.parent_id.batch_no_ids_prev[0]:
                   ids_cus.append(batch.order_id.id)
            else:
               ids_cus = [] 
-        if wo_line_id.batch_ids:
+        print "ids_cusids_cusids_cusids_cus",ids_cus
+#        if wo_line_id.batch_ids:
 #            rec.update({'batch_ids' :((6, 0, tuple([v.id for v in wo_line_id.batch_ids])),),'wo_id':wo_line_id.id})
-            rec.update({'wo_id':wo_line_id.id,'default_previous_order_ids':[(6,0,ids_cus)],
-            'default_previous_order_id':wo_line_id.batch_no_ids_prev[0].order_id.id if wo_line_id.batch_no_ids_prev else '',
+        rec.update({'wo_id':wo_line_id.id,'previous_order_ids':[(6,0,ids_cus)],
+        'previous_order_id':wo_line_id.batch_no_ids_prev[0].order_id.id if wo_line_id.batch_no_ids_prev else '',
 
-            })
-
+        })
+        print "rec--------------------------",rec
 	return rec
-    @api.multi
 
 
     @api.multi
