@@ -29,6 +29,7 @@ class IssueBulkBatches(models.TransientModel):
             if record.wo_id:
                 batch_ids=self.env['mrp.order.batch.number'].search([('convert_product_qty','=',0.0),('order_id','=',record.wo_id.id),('production_id','=',record.wo_id.production_id.id)])
                 ids_cus = [] 
+                prev_batch = [] 
                 if record.wo_id.batch_no_ids_prev:
                    for batch in record.wo_id.batch_no_ids_prev:
                        ids_cus.append(batch.order_id.id)
@@ -38,6 +39,10 @@ class IssueBulkBatches(models.TransientModel):
                           ids_cus.append(batch.order_id.id)
                    else:
                       ids_cus = [] 
+                if record.wo_id.batch_no_ids_prev:
+                    for each_rec in record.wo_id.batch_no_ids_prev:
+                        if each_rec.remain_used_qty!=0.0:
+                            prev_batch.append(each_rec.id)
                 batches=[]
                 if record.wo_id.production_id:
                     rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',record.wo_id.production_id.id)])
@@ -53,9 +58,9 @@ class IssueBulkBatches(models.TransientModel):
                                             for each_batches in each_store.batches_ids:
                                                 batches.append(each_batches.batch_number.id)
                 if batch_ids:
-                    return {'domain': {'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', (batch_ids.ids))],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
+                    return {'domain': {'previous_batch_id':[('id', 'in', prev_batch)],'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', (batch_ids.ids))],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
                 else:
-                    return {'domain': {'batch_ids': [('id', 'in', False)]}}
+                    return  {'domain': {'previous_batch_id':[('id', 'in', prev_batch)],'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', False)],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
 
 
 
@@ -67,22 +72,22 @@ class IssueBulkBatches(models.TransientModel):
         active_ids = context.get('active_ids', [])
         wo_line_id = self.env['mrp.production.workcenter.line'].browse(active_ids)
         print "wo_line_idwo_line_idwo_line_id",wo_line_id
-        batches=[]
-        if wo_line_id.production_id:
-            rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',wo_line_id.production_id.id)])
-            print "rm_idsrm_idsrm_ids",rm_ids
-            if rm_ids:
-                for each_rm in rm_ids:
-                    pick_ids=self.env['stock.picking'].search([('material_request_id','=',each_rm.id),('state','=','done')])
-                    print "pick_idspick_idspick_ids",pick_ids
-                    if pick_ids:
-                        for each in pick_ids:
-                            if each.store_ids:
-                                for each_store in each.store_ids:
-                                    for each_batches in each_store.batches_ids:
-                                        batches.append(each_batches.batch_number.id)
-        if batches:
-            rec.update({'supplier_btc_no':[(6,0,batches)]})
+#        batches=[]
+#        if wo_line_id.production_id:
+#            rm_ids=self.env['mrp.raw.material.request'].search([('production_id','=',wo_line_id.production_id.id)])
+#            print "rm_idsrm_idsrm_ids",rm_ids
+#            if rm_ids:
+#                for each_rm in rm_ids:
+#                    pick_ids=self.env['stock.picking'].search([('material_request_id','=',each_rm.id),('state','=','done')])
+#                    print "pick_idspick_idspick_ids",pick_ids
+#                    if pick_ids:
+#                        for each in pick_ids:
+#                            if each.store_ids:
+#                                for each_store in each.store_ids:
+#                                    for each_batches in each_store.batches_ids:
+#                                        batches.append(each_batches.batch_number.id)
+#        if batches:
+#            rec.update({'supplier_btc_no':[(6,0,batches)]})
         ids_cus = [] 
         if wo_line_id.batch_no_ids_prev:
            for batch in wo_line_id.batch_no_ids_prev[0]:
@@ -97,6 +102,13 @@ class IssueBulkBatches(models.TransientModel):
             rec.update({
             'employee_ids':[(6,0,[wo_line_id.employee_ids[0].id])],
             })
+        if wo_line_id.batch_no_ids_prev:
+            for each_rec in wo_line_id.batch_no_ids_prev:
+                if each_rec.remain_used_qty!=0.0:
+                    prev_batch_id=each_rec.id
+        rec.update({
+            'previous_batch_id':prev_batch_id if prev_batch_id else False
+            })       
         print "ids_cusids_cusids_cus",ids_cus
         if wo_line_id.batch_ids:
 #            rec.update({'batch_ids' :((6, 0, tuple([v.id for v in wo_line_id.batch_ids])),),'wo_id':wo_line_id.id})
