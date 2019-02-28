@@ -55,7 +55,7 @@ class IssueBulkBatches(models.TransientModel):
                 if batch_ids:
                     return {'domain': {'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', (batch_ids.ids))],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
                 else:
-                    return {'domain': {'batch_ids': [('id', 'in', False)]}}
+                    return {'domain': {'previous_order_id':record.wo_id.batch_no_ids_prev[0].order_id.id if record.wo_id.batch_no_ids_prev else '','previous_order_ids':[('id', 'in', ids_cus)],'supplier_btc_no': [('id', 'in', batches)],'batch_ids': [('id', 'in', False)],'employee_ids':[('id', 'in', (record.wo_id.employee_ids.ids))]}}
 
 
 
