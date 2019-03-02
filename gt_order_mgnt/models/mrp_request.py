@@ -969,8 +969,8 @@ class n_manufacturing_request(models.Model):
         result = super(n_manufacturing_request, self).create(vals)
 #        if result.n_sale_order_line and result.n_order_qty > result.n_sale_order_line.pending_qty:
 #		raise UserError(_('Your order more than pending quantity')
-        if not vals.get('n_sale_line',False):
-            result.with_context(not_from_dashboard=True).n_save()
+#        if not vals.get('n_sale_line',False):
+#            result.with_context(not_from_dashboard=True).n_save()
         return result
 
     @api.multi
@@ -1102,8 +1102,6 @@ class n_manufacturing_request(models.Model):
 #		raise UserError(_('Your order more than pending quantity')) 
 		
 	self.n_state='draft'
-        if self._context.get('not_from_dashboard',False):
-            self.n_state='new'
 
 	self.request_type='sale'
         self.n_partner_id=self.n_sale_line.partner_id.id
@@ -1411,7 +1409,9 @@ class n_manufacturing_request(models.Model):
             
     @api.multi
     def send_request_production(self):
-        self.write({'n_state':'draft'})
+        self.n_save()
+
+#        self.write({'n_state':'draft'})
     @api.multi
     def create_manufacturing_order(self):
 
