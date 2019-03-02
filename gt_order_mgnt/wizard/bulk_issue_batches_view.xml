@@ -1,25 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="assign_batch_no_form_view" model="ir.ui.view">
+        <field name="name">assign.batch.no.form.view</field>
+        <field name="model">assign.batch.no</field>
+        <field name="arch" type="xml">
+            <form string="Issue Bulk Batches">
+                <group>
+                    <field name='supplier_btc_no' widget='many2many_tags'
+                         options="{'no_create': True, 'no_open': True}"
+                       />
+
+                </group>
+                <footer>
+                    <button string='Assign Batches' name="assign_batches_now" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_highlight" special="cancel"/>
+                </footer>
+           </form>
+        </field>
+    </record>
+
+    <record id="assign_batch_form_view_action" model="ir.actions.act_window">
+        <field name="name">Assign Batches</field>
+        <field name="res_model">assign.batch.no</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="assign_batch_no_form_view"/>
+        <field name="target">new</field>
+    </record>
     <record id="bulk_issue_batches_form_view" model="ir.ui.view">
         <field name="name">issue.bulk.batches.form.view</field>
         <field name="model">issue.bulk.batches</field>
         <field name="arch" type="xml">
             <form string="Issue Bulk Batches">
                 <group>
+                    <field name='previous_order_ids' widget="many2many_tags" readonly="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+
                     <field name='previous_batch_id' options="{'no_create': True}" 
                      domain="[('remain_used_qty','!=',0)]"
-                     attrs="{'invisible': [('previous_order_ids','=',[])], 'required':[('previous_order_ids','!=',[])]}"
-                 context="{'prev':True, 'previous_order_ids':previous_order_ids}" readonly="1"/>
+                     attrs="{'invisible': [('previous_order_ids','=',[])]}"
+                 context="{'prev':True, 'previous_order_ids':previous_order_ids}" readonly="0"/>
                     <field name='first_order' invisible="1"/>
 
-                    <field name='previous_order_ids' widget="many2many_tags" readonly="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
-                    <field name='previous_order_id'  readonly="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                    <!--<field name='previous_order_id'  readonly="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>-->
                     <field name='employee_ids'  widget="many2many_tags" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
-                    <field name='supplier_btc_no' widget='many2many_tags'
+<!--                    <field name='supplier_btc_no' widget='many2many_tags'
                          options="{'no_create': True, 'no_open': True}"
                          attrs="{'invisible': [('first_order','=',False)]}" 
-                         
-                       />
+                       />-->
                     <field name='produce_qty' required="1"/>
                     
 
@@ -44,6 +72,7 @@
                 <field name="wo_id" invisible="1"/>
                 <footer>
                     <button string='Bulk Issue' name="issue_bulk_batches" type="object" class="oe_highlight"/>
+                    <button string='Assign Supplier Batch No' name="assign_batch_no" attrs="{'invisible': [('first_order','=',False)]}" type="object" class="oe_highlight"/>
                     or
                     <button string="Cancel" class="oe_highlight" special="cancel"/>
                 </footer>

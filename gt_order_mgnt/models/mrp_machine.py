@@ -742,6 +742,7 @@ class MrpWorkorderMachineProduce(models.Model):
                    name +='%s %s'%(emp.name,"\n")
                supp_name=''
                if record.supplier_btc_no and record.first_order==True:
+                   
                   for supp in record.supplier_btc_no:
                      supp_name +='%s %s'%(supp.name,"\n") 
 #               record.batch_id.write({'product_qty':record.batch_id.product_qty + record.product_qty,
