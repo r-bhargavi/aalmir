@@ -71,15 +71,17 @@ class HrExpense(models.Model):
 
     @api.onchange('partner_id_preferred','employee_id')
     def _onchange_partner_emp(self):
-        if self.partner_id_preferred:
+        if self.expense_type and self.expense_type=='other_expense':
             bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.partner_id_preferred.id),('active_account','=',True)])
             if len(bank_id)==1:
                 self.bank_id=bank_id.id
             return {'domain': {'bank_id': [('partner_id', '=', self.partner_id_preferred.id)]}}
 
-        elif self.employee_id:
+        elif self.expense_type and self.expense_type=='emp_expense':
             self.partner_id_preferred=self.employee_id.address_home_id.id
+            print "self.partner_id_preferredself.partner_id_preferred",self.partner_id_preferred
             bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.employee_id.address_home_id.id),('active_account','=',True)])
+            print "bank_idbank_idbank_id",bank_id
             if len(bank_id)==1:
                 self.bank_id=bank_id.id
             return {'domain': {'bank_id': [('partner_id', '=', self.employee_id.address_home_id.id)]}}
@@ -420,7 +422,7 @@ class HrExpense(models.Model):
             self.product_uom_id= self.product_id.uom_id.id
             self.type_product= self.product_id.type_product
         return result
-    
+#    
     
 class BankChequeDetailsExpense(models.Model):
     '''to store cheque details against bank'''
