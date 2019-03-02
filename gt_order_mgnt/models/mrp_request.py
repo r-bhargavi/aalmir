@@ -970,7 +970,7 @@ class n_manufacturing_request(models.Model):
 #        if result.n_sale_order_line and result.n_order_qty > result.n_sale_order_line.pending_qty:
 #		raise UserError(_('Your order more than pending quantity')
         if not vals.get('n_sale_line',False):
-            result.n_save()
+            result.with_context(not_from_dashboard=True).n_save()
         return result
 
     @api.multi
@@ -1102,6 +1102,9 @@ class n_manufacturing_request(models.Model):
 #		raise UserError(_('Your order more than pending quantity')) 
 		
 	self.n_state='draft'
+        if self._context.get('not_from_dashboard',False):
+            self.n_state='new'
+
 	self.request_type='sale'
         self.n_partner_id=self.n_sale_line.partner_id.id
 	search_id=self.env['sale.order.line.status'].search([('n_string','=','production_request')],limit=1) ## add status
@@ -1143,7 +1146,7 @@ class n_manufacturing_request(models.Model):
                 if self.n_sale_order_line:
                     recipient_partners.append(self.n_sale_order_line.order_id.user_id.login)
                 send_user = ",".join(recipient_partners)
-                product_data = ''.join(['[',str(self.n_product_id.default_code),']',self.n_product_id.name])
+                product_data = ''.join(['[',str(self.n_product_id.default_code if self.n_product_id.default_code else ''),']',self.n_product_id.name])
                 bom_id=self.env['mrp.bom'].search([('product_id','=',self.n_product_id.id)])
                 if not bom_id:
                     new_subject='API-ERP Production Alert:BoM required,New request %s received for %s'%(str(self.name),'['+self.n_product_id.default_code+']'+' '+self.n_product_id.name)
