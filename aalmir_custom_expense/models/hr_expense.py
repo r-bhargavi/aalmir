@@ -82,7 +82,7 @@ class HrExpense(models.Model):
             print "self.partner_id_preferredself.partner_id_preferred",self.partner_id_preferred
             bank_id=self.env['res.partner.bank'].search([('partner_id','=',self.employee_id.address_home_id.id),('active_account','=',True)])
             print "bank_idbank_idbank_id",bank_id
-            if len(bank_id)==1:
+            if bank_id and len(bank_id)==1:
                 self.bank_id=bank_id.id
             return {'domain': {'bank_id': [('partner_id', '=', self.employee_id.address_home_id.id)]}}
 
