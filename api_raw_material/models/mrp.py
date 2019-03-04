@@ -188,7 +188,7 @@ class MrpProduction(models.Model):
                     body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
                     lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
                         'qty':line.required_qty,'pending_qty':line.required_qty, 'rm_type':'stock','required_date':record.date_planned,
-                        'expected_compl_date':record.n_request_date,
+                        'expected_compl_date':record.n_request_date,'production_id':record.id,
                         })) 
                 location_dest_id=record.location_dest_id
 #                to send respective stock location in rm request loction
