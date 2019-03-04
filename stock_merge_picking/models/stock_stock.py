@@ -45,9 +45,11 @@ class stock_picking(osv.osv):
                 'backorder_id': picking.id,
             })
             backorder = self.browse(cr, uid, backorder_id, context=context)
+            print "backorderbackorder",backorder
 #            to link the bo to the mo
             if backorder.material_request_id:
                 backorder.material_request_id.production_id.delivery_ids= [(4,backorder.id)]	
+                backorder.write({'expected_comple_date':picking.expected_comple_date})
             self.message_post(cr, uid, picking.id, body=_("Back order <em>%s</em> <b>created</b>.") % (backorder.name), context=context)
             move_obj = self.pool.get("stock.move")
             move_obj.write(cr, uid, backorder_move_ids, {'picking_id': backorder_id}, context=context)
