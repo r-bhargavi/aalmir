@@ -121,6 +121,7 @@ class ResPartnerCredit(models.Model):
                    uninvoice_amt -=total_inv
             
             invoice1=self.env['account.invoice'].search([('sale_id', '=', record.sale_id.id),('state','in',('open','paid'))])
+            print "recordrecordrecord----------------",record,record.sale_id
             order_amt = record.sale_id.n_quotation_currency_id.compute(record.sale_id.amount_total,record.sale_id.report_currency_id)
 	#CH_N103 ADD currecny converter >>>
             for ln in invoice1:

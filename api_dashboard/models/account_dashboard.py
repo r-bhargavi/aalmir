@@ -270,7 +270,11 @@ class account_journal(models.Model):
 	credt_req=0
 	credt = self.env['res.partner.credit'].search([('state','=','request')])
 	if credt:
-                credt_req = len(credt)
+                partner_list=[]
+                for each in credt:
+                    if each.partner_id.id not in partner_list:
+                        partner_list.append(each.partner_id.id)
+                credt_req = len(partner_list)
         pending_rqst=self.env['purchase.order'].search([('state','=','awaiting')])
         lst_rqst=[]
         for pend in pending_rqst:
@@ -438,6 +442,7 @@ class account_journal(models.Model):
 	   for rec in self.env['res.partner.credit'].search([('state', '=','request')]):
 		list_ids.append(rec.partner_id.id)
            domain=[('id','in',list_ids)]
+           print "domaindomaindomain",domain,list_ids
 	   tree_id=self.env.ref('gt_order_mgnt.customer_credit_tree_ac').id #customer_credit_tree').id
 	   form_id=self.env.ref('gt_order_mgnt.customer_credit_form_ac').id #customer_credit_form').id
            model='res.partner'
