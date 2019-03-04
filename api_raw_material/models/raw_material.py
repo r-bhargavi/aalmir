@@ -316,6 +316,7 @@ class MrpRawmaterialLine(models.Model):
 	pro_request_id=fields.Many2one('n.manufacturing.request', string='Production No.')
 	production_id=fields.Many2one('mrp.production', string='Manufacturing No.')
 	requisition_id=fields.Many2one('purchase.requisition',string='PRQ No.')
+	pr_id=fields.Many2one('n.manufacturing.request',string='PR No.',related='production_id.request_line',store=True)
 	po_request_id=fields.Many2one('stock.purchase.request',string='Purchase Request No.')
 	required_date=fields.Datetime('Required Date')
 	expected_compl_date=fields.Datetime('Expected Completion Date')

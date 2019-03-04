@@ -22,6 +22,27 @@
         </field>
      </record>
      
+     <record id="mrp_production_rawmaterial_line_request_tree" model="ir.ui.view">
+        <field name="name">mrp.raw.material.request.line.tree</field>
+        <field name="model">mrp.raw.material.request.line</field>
+        <field name="arch" type="xml">
+            <tree string="Raw Material Request Lines" options="{'no_create': True, 'no_open': True}">
+             <field name="product_id" readonly="1"/>
+            <field name='qty' readonly="1"/>
+            <field name='pick_qty' required="1" readonly="1"/>
+            <field name='required_date' readonly="1"/>
+            <field name='expected_compl_date' readonly="1"/>
+            <field name='extra_qty' readonly="1"/>
+            <field name='total_available_qty' readonly="1"/>
+            <field name='available_qty' readonly="1"/>
+            <field name='uom_id' readonly="1"/>
+           <field name='production_id' readonly="1" attrs="{'invisible':[('production_id','=',False)]}"/>
+            <field name='pr_id' readonly="1" string="Prod.Request No."/>
+
+          </tree>
+        </field>
+     </record>
+     
      <record id="mrp_production_rawmaterial_request_form" model="ir.ui.view">
         <field name="name">Raw Material Request Form</field>
         <field name="model">mrp.raw.material.request</field>
@@ -112,6 +133,7 @@
                                   <button name='schedule_mo' type='object' string='Create MO/PO' class='oe_highlight oe_edit_only' attrs="{'invisible':[('rm_type','=','stock')]}"/>
                                     
                                  <field name='production_id' attrs="{'invisible':[('production_id','=',False)]}"/>
+                                    <field name='pr_id' readonly="1" string="Prod.Request No."/>
                                  <field name='po_request_id' attrs="{'invisible':[('po_request_id','=',False)]}"/>
 		                 <!--button name='back_schedule' type='object' string='Back' class='oe_highlight'
                                     attrs="{'invisible':[('po_request_id','=',False),('production_id','=',False)]}"/-->
@@ -295,7 +317,17 @@
 
                  <field name="domain">[('material_request_id','!=',False)]</field> 
      </record>
-            <menuitem id="menu_rmr_production" name="Raw Materials" parent="mrp.menu_mrp_manufacturing" sequence="4" />
+    <record model="ir.actions.act_window" id="action_raw_matrial_request_lines">
+		<field name="name">Raw Material Lines</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">mrp.raw.material.request.line</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree</field>
+		 <field name="view_id" ref="api_raw_material.mrp_production_rawmaterial_line_request_tree"/>
+                <field name="context">{'group_by':'product_id'}</field>
+     </record>
+    <menuitem id="menu_rmr_production" name="Raw Materials" parent="mrp.menu_mrp_manufacturing" sequence="4" />
+     <menuitem action="action_raw_matrial_request_lines" id="menu_mo_rmr_lines" name="Raw Material Lines" parent="menu_rmr_production" sequence="3"/>    
      <menuitem action="action_raw_matrial_request_mo_approved" id="menu_mo_rmr" name="Approved Raw Materials" parent="menu_rmr_production" sequence="2"/>    
      <menuitem action="rawmaterial_request_action_mo" id="menu_raw_material_request_mo" name="Raw Materials Requested" parent="menu_rmr_production" sequence="1"/>
     
