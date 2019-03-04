@@ -318,6 +318,7 @@ class MrpRawmaterialLine(models.Model):
 	requisition_id=fields.Many2one('purchase.requisition',string='PRQ No.')
 	po_request_id=fields.Many2one('stock.purchase.request',string='Purchase Request No.')
 	required_date=fields.Datetime('Required Date')
+	expected_compl_date=fields.Datetime('Expected Completion Date')
 	total_available_qty = fields.Float('Total Stock',digits_compute=dp.get_precision('Stock qty'),related='product_id.qty_available')
 	available_qty = fields.Float('Available Qty',digits_compute=dp.get_precision('Stock qty'),compute='get_available_qty')
 
