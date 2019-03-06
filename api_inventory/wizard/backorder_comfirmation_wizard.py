@@ -156,6 +156,9 @@ class stock_backorder_confirmation(models.TransientModel):
     
     @api.multi
     def process(self):
+        if 'MO/' in self.pick_id.name:
+            raise UserError("Cannot Create BackOrder for Finished Goods of MO.Please Input full Qty in Operations in Picking!!")
+
         self.ensure_one()
         ##from INput_location >> Stock(Transit IN)
         if self.pick_id.picking_type_code =='internal' and self.pick_id.location_id.pre_ck and self.pick_id.location_dest_id.actual_location:

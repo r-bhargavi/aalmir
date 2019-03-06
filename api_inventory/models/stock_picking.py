@@ -398,11 +398,15 @@ class stockPicking(models.Model):
 		  When quantity move form INput to Stock Location.'''
 	    	for res in self:
 	    		try:
+                            for check in res.pack_operation_product_ids:
+                                if 'MO/' in check.picking_id.name and check.qty_done>0.0:
+                                    raise UserError("If you want to process full qty please process it using Validate Button.Keep the Operation Qty Done as 0")
     			    if res.location_id.usage in ('inventory','production') or res.picking_type_code =='incoming':
     			    	if not res.pack_operation_product_ids:
 		    			raise ValueError("Please Make some Operations.")
     			    	
 				for rec in res.pack_operation_product_ids:
+
 					if rec.product_id.type != 'product':
 						# to Create Batches for only Stockable Product
 						continue
