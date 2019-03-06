@@ -604,7 +604,7 @@
                  <field name="domain">[('material_request_id','!=',False)]</field> 
      </record>
      
-     <record model="ir.actions.act_window" id="action_raw_matrial_request_line_pick">
+<!--     <record model="ir.actions.act_window" id="action_raw_matrial_request_line_pick">
 		<field name="name">Raw Material Lines</field>
 		<field name="type">ir.actions.act_window</field>
 		<field name="res_model">mrp.raw.material.request.line</field>
@@ -612,11 +612,11 @@
 		<field name="view_mode">tree</field>
 		 <field name="view_id" ref="api_raw_material.mrp_production_rawmaterial_line_request_tree"/>
                 <field name="context">{'group_by':'product_id'}</field>
-     </record>
+     </record>-->
 	  
      <menuitem action="action_raw_matrial_request" id="menu_raw_material" name="Approved Raw Material"
             parent="stock.menu_stock_inventory_control" sequence="4"/>
-          <menuitem action="action_raw_matrial_request_line_pick" id="menu_mo_rmr_line_pick" name="Raw Material Request Line" parent="stock.menu_stock_inventory_control" sequence="5"/>    
+          <!--<menuitem action="action_raw_matrial_request_line_pick" id="menu_mo_rmr_line_pick" name="Raw Material Request Line" parent="stock.menu_stock_inventory_control" sequence="5"/>-->    
 
     </data>
 </openerp>
