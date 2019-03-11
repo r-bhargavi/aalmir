@@ -26,6 +26,8 @@ class accountPayment(models.Model):
 
     expense_pay = fields.Boolean('Expense Pay')
     expense_id = fields.Many2one('hr.expense', 'Expense')
+    expense_payment_rel = fields.Many2many('hr.expense','pay_exp_rel','exp_id','pay_id','Expenses',copy=False,track_visibility='always')
+
     
     
     @api.onchange('partner_type')

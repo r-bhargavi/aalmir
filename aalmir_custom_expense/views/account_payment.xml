@@ -9,6 +9,7 @@
 		<field name="arch" type="xml">
 			 <field name="communication" position="after">
                               <field name="expense_pay"  readonly="1" invisible="1"/>
+                              <field name="expense_payment_rel"  readonly="1" attrs="{'invisible':[('expense_payment_rel','=',False)]}"/>
                               <field name="expense_id"  readonly="1" attrs="{'invisible':[('expense_pay','=',False)]}"/>
 		         </field>
                 </field>

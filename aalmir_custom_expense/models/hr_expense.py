@@ -48,6 +48,8 @@ class HrExpense(models.Model):
 				    
     cheque_details = fields.One2many('bank.cheque.details.expense','expense_id','Cheque Details')
     approval_by = fields.Many2one('res.users', 'Approval Req. By',copy=False)
+
+    expense_details = fields.One2many('payment.expense.line','expense_id',copy=False)
     approved_by = fields.Many2one('res.users', 'Approved By',copy=False)
     requested_by = fields.Many2one('hr.employee', 'Requested By',copy=False)
     user_id = fields.Many2one('res.users', 'User')
@@ -61,6 +63,16 @@ class HrExpense(models.Model):
     uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',copy=False,track_visibility='always')
     internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
+    tot_amount_if_other_expense=fields.Float('Total Amount', compute='amount_other_expense_if_any')
+
+
+    @api.multi
+    @api.depends('expense_details')
+    def amount_other_expense_if_any(self):
+        for record in self:
+            if record.expense_details:
+                for each_exp in record.expense_details:
+                    record.tot_amount_if_other_expense+=each_exp.amount
     
     @api.onchange('payment_method')
     def pay_method_onchange(self):
@@ -226,6 +238,63 @@ class HrExpense(models.Model):
             'product_uom_id': line.get('uom_id'),
             'analytic_account_id': line.get('analytic_account_id'),
         }
+        
+        
+        
+    @api.multi
+    def _move_line_get(self):
+        account_move = []
+        for expense in self:
+            if expense.product_id:
+                account = expense.product_id.product_tmpl_id._get_product_accounts()['expense']
+                if not account:
+                    raise UserError(_("No Expense account found for the product %s (or for it's category), please configure one.") % (expense.product_id.name))
+            else:
+                account = self.env['ir.property'].with_context(force_company=expense.company_id.id).get('property_account_expense_categ_id', 'product.category')
+                if not account:
+                    raise UserError(_('Please configure Default Expense account for Product expense: `property_account_expense_categ_id`.'))
+            amt=0.0
+            unit_amount_each,unit_amount_total=0.0,0.0
+            if expense.expense_details:
+                for each_exp in expense.expense_details:
+                    unit_amount_each+=each_exp.expense_id_other.unit_amount
+                unit_amount_total=unit_amount_each+expense.unit_amount
+            else:
+                unit_amount_total=expense.unit_amount
+            if expense.expense_details:
+                amt=expense.tot_amount_if_other_expense+expense.total_amount
+            else:
+                amt=expense.total_amount
+                
+            print "amtamtamtamtamtamt",amt,unit_amount_total
+            move_line = {
+                    'type': 'src',
+                    'name': expense.name.split('\n')[0][:64],
+                    'price_unit': unit_amount_total,
+                    'quantity': expense.quantity,
+                    'price': amt,
+                    'account_id': account.id,
+                    'product_id': expense.product_id.id,
+                    'uom_id': expense.product_uom_id.id,
+                    'analytic_account_id': expense.analytic_account_id.id,
+                }
+            account_move.append(move_line)
+            
+            # Calculate tax lines and adjust base line
+            taxes = expense.tax_ids.compute_all(unit_amount_total, expense.currency_id, expense.quantity, expense.product_id)
+            account_move[-1]['price'] = taxes['total_excluded']
+            account_move[-1]['tax_ids'] = [(6, 0, expense.tax_ids.ids)]
+            for tax in taxes['taxes']:
+                account_move.append({
+                    'type': 'tax',
+                    'name': tax['name'],
+                    'price_unit': tax['amount'],
+                    'quantity': 1,
+                    'price': tax['amount'],
+                    'account_id': tax['account_id'] or move_line['account_id'],
+                    'tax_line_id': tax['id'],
+                })
+        return account_move
 
     @api.multi
     def action_move_create(self):
@@ -330,11 +399,18 @@ class HrExpense(models.Model):
                     expense.paid_expenses()
             move.post()
         print "expenkdskjdsnhkjfhdskjfjkednf",expense.uploaded_document
+        amt=0.0
+        if expense.expense_details:
+            amt=expense.total_amount+expense.tot_amount_if_other_expense
+        else:
+            amt=expense.total_amount
+            
+        print "amtamtamtamtamt",amt
         pay_dict={'payment_type': 'outbound',
         'payment_method_id': self.env.ref('account.account_payment_method_manual_out').id,
         'payment_method': self.payment_method,
         'partner_type': 'supplier',
-        'amount': expense.total_amount,
+        'amount': amt,
         'expense_pay':True,
         'expense_id':expense.id,
         'currency_id': expense.currency_id.id,
@@ -343,6 +419,8 @@ class HrExpense(models.Model):
         'communication': expense.communication,
         'internal_note': expense.internal_note,
         }
+        if expense.expense_details:
+            pay_dict.update({'expense_payment_rel':[(4, [x.expense_id_other.id for x in expense.expense_details])]})
         if expense.cheque_status:
             if expense.cheque_status=='cleared':
                 expense.chq_s_us='signed'
@@ -401,6 +479,10 @@ class HrExpense(models.Model):
         move_line_id=self.env['account.move.line'].search([('payment_id','=',payment.id)])
         move_pay=move_line_id[0].move_id
         expense.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
+        if expense.expense_details:
+            for each in expense.expense_details:
+                each.expense_id_other.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
+                each.expense_id_other.paid_expenses()
         expense.paid_expenses()
 
         return True
@@ -443,3 +525,16 @@ class BankChequeDetailsExpense(models.Model):
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status',copy=False)
     
     		   			   			
+class PaymentExpenseDetails(models.Model):
+    '''to store cheque details against bank'''
+    _name = "payment.expense.line"
+    
+    expense_id_other = fields.Many2one('hr.expense','Expense')
+    expense_id = fields.Many2one('hr.expense','Expense')
+    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
+    
+    		   			   			
+    @api.onchange('expense_id_other')
+    def expense_id_onchange(self):
+    	if self.expense_id_other:
+            self.amount=self.expense_id_other.total_amount

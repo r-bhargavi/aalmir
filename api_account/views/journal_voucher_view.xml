@@ -22,7 +22,11 @@
             <field name="arch" type="xml">
             <form string='Journal Voucher'>
 		<header>
-			<button type="object" string="Post" class="oe_highlight" name="post_voucher" states="draft"/>
+			<button type="object" string="Submit Voucher" class="oe_highlight" name="submit_voucher" states="draft"/>
+			<button type="object" string="Approval Reminder" class="oe_highlight" name="submit_voucher" attrs="{'invisible':['|',('state','not in',['submitted','resent_for_approval']),('sent_mail','=',False)]}" states="submitted"/>
+			<button type="object" string="Approve Voucher" class="oe_highlight" name="approve_voucher" states="submitted,resent_for_approval"/>
+			<button type="object" string="Reject Voucher" class="oe_highlight" name="reject_voucher" states="submitted,resent_for_approval"/>
+			<button type="object" string="Post" class="oe_highlight" name="post_voucher" states="approved"/>
 			<button type="object" string="Cancel" class="oe_highlight" name="cancel" states="posted"/>
 			<field name="state" widget="statusbar"/>
 		</header>
@@ -31,6 +35,7 @@
                          <div class="oe_title">
 		                <h1>
 		                    <field name="name" readonly="1"/>
+		                    <field name="sent_mail" readonly="1" invisible="0"/>
 		                </h1>
 		          </div>
 		         <group col="4">
@@ -42,6 +47,7 @@
                                   attrs="{'readonly':[('state','=','posted')]}"/>
                              <field name='move_id' readonly='1' attrs="{'invisible':[('move_id','=',False)]}"/>
                             <field name="uploaded_doc" widget="many2many_binary"/>
+                            <field name='refuse_reason' attrs="{'invisible':[('refuse_reason','=',False)]}"/>
 
                              <field name='currency_id' options="{'no_create': True, 'no_open': True}"
                                   attrs="{'invisible':[('state','!=','posted')],'readonly':[('state','=','posted')]}"/>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+	<!--#Template for complete Voucher Process-->
+	<record id="email_template_for_voucher_approval" model="mail.template">
+            <field name="name">Voucher Approval</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
+            <field name="subject">API-MRP Voucher Approval Request Alert: ${(object.name)} is requested. </field>
+            <field name="model_id" ref="api_account.model_journal_voucher"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html">
+                <![CDATA[
+            ]]>
+            </field>
+        </record>
+  
+            </data>
+</openerp>

@@ -39,6 +39,71 @@ import openerp.addons.decimal_precision as dp
 class JournalVoucher(models.Model):
 	_name='journal.voucher'
 	_inherit = ['mail.thread']
+        
+        
+        @api.multi
+        def approve_voucher(self):
+            self.write({'state':'approved'})
+            
+        @api.multi
+        def reject_voucher(self):
+            cofirm_form = self.env.ref('api_account.pay_cancel_wizard_view_form', False)
+            if cofirm_form:
+                return {
+                            'name':'Cancel Wizard',
+                            'type': 'ir.actions.act_window',
+                            'view_type': 'form',
+                            'view_mode': 'form',
+                            'res_model': 'cancel.pay.reason.wizard',
+                            'views': [(cofirm_form.id, 'form')],
+                            'view_id': cofirm_form.id,
+                            'target': 'new'
+                        }
+#            self.write({'state':'reject'})
+            
+            
+        @api.multi
+        def submit_voucher(self):
+            for record in self:
+                temp_id = self.env.ref('api_account.email_template_for_voucher_approval')
+                if temp_id:
+                    recipient_partners=''
+                    group = self.env['res.groups'].search([('name', '=', 'Approve Voucher')])
+                    for recipient in group.users:
+                        recipient_partners += ","+str(recipient.login)
+                    base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+                    query = {'db': self._cr.dbname}
+                    fragment = {
+                              'model': 'jounal.voucher',
+                              'view_type': 'form',
+                              'id': record.id,
+                             }
+                    url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+                    print "urlurl",url
+                    text_link = _("""<a href="%s">%s</a> """) % (url,"VOUCHER")
+                    print "text_linktext_linktext_link",text_link
+                    body ='You have been requested for approval for the attached voucher. ' 
+                    body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+                    body +='<li> <b>Voucher date :</b>'+str(record.date) +'</li>'
+                    body +='<li> <b>Note :</b> '+str(record.note) +'</li>'
+                    record.state='submitted'
+                    if self.sent_mail==True:
+                        body ='This is reminder for approval for the attached voucher. ' 
+                        body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+                        body ='This is to just inform you that you have been marked as a person who has to approve the attached voucher. ' 
+
+                        body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+                        body +='<li> <b>Voucher date :</b>'+str(record.date) +'</li>'
+                        body +='<li> <b>Note :</b> '+str(record.note) +'</li>'
+                        record.state='resent_for_approval'
+                    temp_id.write({'body_html': body, 'email_to':recipient_partners,
+                                      'email_from':record.env.user.login})
+                    values = temp_id.generate_email(record.id)
+                    mail_mail_obj = self.env['mail.mail']
+                    msg_id = mail_mail_obj.create(values) 
+                    record.sent_mail=True
+                    msg_id.send()	       
+
 
 	@api.model
 	def default_currency(self):
@@ -60,9 +125,11 @@ class JournalVoucher(models.Model):
 	voucher_line=fields.One2many('journal.voucher.line','voucher_id')
 	multi_voucher_line=fields.One2many('journal.voucher.line','voucher_id')
 	note=fields.Text('Narration')
-	state=fields.Selection([('draft','Unposted'),('posted','Posted')], default='draft', string='Status',copy=False,)
+	refuse_reason=fields.Text('Refuse Reason',track_visibility='onchange')
+	state=fields.Selection([('draft','Unposted'),('submitted','Submitted For Approval'),('resent_for_approval','Resent For Approval'),('approved','Approved'),('reject','Rejected'),('posted','Posted')], default='draft', string='Status',copy=False,)
 	amount=fields.Float('Amount',compute="get_amount_total")
 	multi=fields.Boolean('Is Multi Partner',default=False,help="To Create Entry for Multiple partners")
+	sent_mail=fields.Boolean('Mail Sent',default=False,help="To indicate the first mail for approval voucher is being sent")
 	
 	@api.model
 	def get_amount_total(self):
