@@ -13,9 +13,22 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-        prod_temps=self.env['product.template'].search([])
-        for each_temp in prod_temps:
-            each_temp.n_open_pricelist()
+        mo_orders=self.env['mrp.production'].search([])
+        pick_ids_list=[]
+        for each_mo in mo_orders:
+            if each_mo.location_dest_id.id==37:
+                picks=self.env['stock.picking'].search([('origin','=',each_mo.name)])
+                if picks:
+                    for each_pick in picks:
+                        if 'VFRM' in each_pick.name:
+                            pick_ids_list.append(each_pick.id)
+                        elif 'RFRM' in each_pick.name:
+                            pick_ids_list.append(each_pick.id)
+        print "pick_ids_listpick_ids_listpick_ids_listpick_ids_list",pick_ids_list,len(pick_ids_list)
+        
+#        prod_temps=self.env['product.template'].search([])
+#        for each_temp in prod_temps:
+#            each_temp.n_open_pricelist()
         return True
 #        rm_req=self.env['mrp.raw.material.request'].search([])
 #        for each_rmr in rm_req:
