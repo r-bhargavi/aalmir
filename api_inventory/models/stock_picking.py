@@ -27,6 +27,7 @@ def subset_sum_batches(batches, target):
 				return partial
 				
 			flag=False
+                        qty_sum=0.0
 			ntarget = target - partial_sum
 			if all([ q.convert_product_qty > ntarget for q in batches[i+1:]]):
 				continue

@@ -1117,7 +1117,12 @@ class n_manufacturing_request(models.Model):
 		self.n_packaging = self.n_sale_order_line.product_packaging.id if self.n_sale_order_line.product_packaging else self.env['product.packaging'].search([('product_tmpl_id','=',self.n_product_id.product_tmpl_id.id),('pkgtype','=','primary')],limit=1).id
 	#CH_N054 <<<<<<<<<<<<<<
         user_obj = self.env['res.users'].browse(self.env.uid)
-        temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
+        if self.n_sale_order_line:
+            
+            temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')
+        else:
+            temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again_new')
+            
         if temp_id:
                 base_url = self.env['ir.config_parameter'].get_param('web.base.url')
                 query = {'db': self._cr.dbname}
@@ -1200,10 +1205,12 @@ class n_manufacturing_request(models.Model):
 
                         <p style="color:red"> <strong>No BOM created till now, BOM required.</strong></p><br/>
                         </div>"""
+                print "user_objuser_obj",user_obj.partner_id,send_user
+                print "dsfdsfsf",temp_id
                 temp_id.write({'body_html': body_html,'subject':new_subject,
                                 'email_to' : send_user, 'email_from': user_obj.partner_id.email})
-                print "send_usersend_user",send_user,body_html
-                temp_id.send_mail(self.n_sale_line.id if self.n_sale_line else False)
+                print "send_usersend_user",send_user,body_html,self.id
+                temp_id.send_mail(self.n_sale_line.id if self.n_sale_line else self.id)
 			
 #		if self.n_exist_pr:
 #		    temp_id = self.env.ref('gt_order_mgnt.email_template_producton_req_again')

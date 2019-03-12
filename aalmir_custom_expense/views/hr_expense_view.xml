@@ -150,6 +150,7 @@
                 
                 <field name="name" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="context">{'active_id': active_id}</attribute>
 
                 </field>
                 <field name="analytic_account_id" position="attributes">
@@ -247,7 +248,7 @@
                                         <tree editable="top">
                                                 <field name="expense_id" invisible="1"/>
                                                 <field name="expense_id_other" domain="[('state','=','approve')]"/>
-                                                <field name="amount" required="1" />
+                                                <field name="amount" required="1"/>
                                         </tree>
                                 </field>
                             </page>

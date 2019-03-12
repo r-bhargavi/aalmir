@@ -9,9 +9,14 @@
 		<field name="arch" type="xml">
 			 <field name="communication" position="after">
                               <field name="expense_pay"  readonly="1" invisible="1"/>
-                              <field name="expense_payment_rel"  readonly="1" attrs="{'invisible':[('expense_payment_rel','=',False)]}"/>
+                              <field name="expense_payment_rel" string="Linked Expenses" widget="many2many_tags"  readonly="1" attrs="{'invisible':[('expense_payment_rel','=',False)]}"/>
                               <field name="expense_id"  readonly="1" attrs="{'invisible':[('expense_pay','=',False)]}"/>
 		         </field>
+                    <div name="button_box" position="inside"> 
+		   	<button class="oe_stat_button" name="open_expenses" type="object" icon="fa-chain" attrs="{'invisible':[('expense_count','=',0.0)]}">
+                        <field string="Expenses" name="expense_count" widget="statinfo"/>
+                    </button>
+		   </div>
                 </field>
 	</record>
         

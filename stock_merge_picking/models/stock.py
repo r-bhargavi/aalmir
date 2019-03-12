@@ -554,7 +554,7 @@ class StockMove(models.Model):
 			   			'description':'Reserved for order {} in Operation {}'.format(
 			   				res.picking_id.sale_id.name,res.picking_id.name)})]})
 					if res_btch_qty<0:
-						err
+						print "batch qty is less then 000000"
 
 				if res.n_sale_line_id and result_batches:
 					new_add_qty=sum([ i.convert_product_qty for i in result_batches])

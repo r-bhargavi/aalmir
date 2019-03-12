@@ -481,7 +481,7 @@ class HrExpense(models.Model):
         expense.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
         if expense.expense_details:
             for each in expense.expense_details:
-                each.expense_id_other.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
+                each.expense_id_other.write({'uploaded_document':expense.uploaded_document if expense.uploaded_document else False,'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today(),'communication':expense.communication,'internal_note':expense.internal_note,'account_move_id':expense.account_move_id.id,'bank_journal_id_expense':expense.bank_journal_id_expense.id})
                 each.expense_id_other.paid_expenses()
         expense.paid_expenses()
 
@@ -537,4 +537,13 @@ class PaymentExpenseDetails(models.Model):
     @api.onchange('expense_id_other')
     def expense_id_onchange(self):
     	if self.expense_id_other:
+            if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
+                self.expense_id_other=False
+                return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
             self.amount=self.expense_id_other.total_amount
+
+    @api.onchange('amount')
+    def amount_onchange(self):
+    	if self.amount and self.amount!=self.expense_id_other.total_amount:
+            self.amount=self.expense_id_other.total_amount
+            return {'warning': {'title': "Invalid", 'message': "You cannot change approved the expense amount!!!"}}
