@@ -954,7 +954,19 @@ class n_manufacturing_request(models.Model):
     #@api.model
     #def _needaction_domain_get(self):
     #	return [('n_state', '=', 'draft')]
-
+    @api.multi
+    def manu_date_history(self):
+	order_form = self.env.ref('gt_order_mgnt.manufacturing_date_history_view', False)
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'mrp.complete.date',
+	    'domain':[('n_mo.request_line.id','=',self.id),('n_status','!=','draft')],
+            'views': [(order_form.id, 'tree')],
+            'view_id': order_form.id,
+            'target': 'new',
+        }
     @api.model
     def create(self, vals):
     	category=self.env['product.category'].search([('id','=',vals.get('n_category'))])

@@ -794,7 +794,6 @@
                 <field name="n_order_qty" readonly="1"/>
 		 <field name="n_unit" readonly="1"/>
                 <field name="n_mo_number" invisible="1" readonly="1" />
-                <button name="manu_date_history" icon="fa-history" string="History" type="object" attrs="{'invisible':[('n_mo_number', '=', False)]}"/>
 
 		<field name="n_po_number" invisible="1" readonly="1" string="Purchase Requisition" />
 		<field name="n_Note" readonly="1"/>
@@ -832,6 +831,8 @@
 		<field name="n_Note" readonly="1"/>
 		<!--<field name="cancel_reason" readonly="1"/>-->
 		<field name="n_mo_number" readonly="1" groups="mrp.group_mrp_user"/>
+                <button name="manu_date_history" icon="fa-history" string="History" type="object" attrs="{'invisible':[('n_mo_number', '=', False)]}"/>
+
 		<!--<field name="n_po_number" readonly="1" string="Purchase Requisition" groups="mrp.group_mrp_user"/>-->
 		<field name="n_state" readonly="1" groups="mrp.group_mrp_user"/>
 		<button name="check_cancel" string="Check Request" type="object" icon="gtk-apply" attrs="{'invisible':[('n_state','!=','cancel')]}" groups="gt_order_mgnt.group_sale_support" />

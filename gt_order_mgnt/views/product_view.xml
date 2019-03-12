@@ -596,14 +596,18 @@
 		<field name="model">product.product</field>
 		<field name="inherit_id" ref="product.product_normal_form_view"/>
 		<field name="arch" type="xml">
-<!--                    <xpath expr="//div[@name='button_box']" position="inside">
-                    <button type="object"
+                    <xpath expr="//div[@name='button_box']" position="inside">
+                      <button class="oe_stat_button" name="action_view_mos" type="object"
+                        attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}" icon="fa-list-alt">
+                        <field string="Manufacturing" name="mo_count_var" widget="statinfo" />
+                    </button>
+<!--                    <button type="object"
                             name="action_open_scrap"
                             attrs="{'invisible':[('type', '!=', 'product')]}"
                             class="oe_stat_button" icon="fa-building-o">
                             <field name="qty_scrapped" widget="statinfo" string="Scrapped Qty"/>
-                        </button>
-                </xpath>-->
+                        </button>-->
+                </xpath>
 			<field name="default_code" position="replace"/>
     			<field name="barcode" position="replace"/>
    		</field>
