@@ -31,7 +31,23 @@ from urllib import urlencode
 class productProduct(models.Model):
     _inherit = 'product.product'
     
+    mo_count_var = fields.Float('#Manufacturing',compute='_count_mo_var')
+
     
+    @api.multi
+    def _count_mo_var(self):
+        Production = self.env['mrp.production']
+        for rec in self:
+            count=0
+            product_id = self.env['product.product'].search([('product_tmpl_id','=',rec.product_tmpl_id.id)])
+            mo_ids = Production.search([('product_id', '=', product_id.id),('state','not in',['done','cancel'])])
+            print "mo_idsmo_idsmo_idsmo_ids",mo_ids
+            if mo_ids:
+                print "mo_idsmo_idsmo_ids",mo_ids
+                for each_mo in mo_ids:
+                    count+=each_mo.product_qty-each_mo.n_produce_qty_now
+                    print "countcountcountcountcount",count,each_mo.n_request_qty-each_mo.n_produce_qty_now
+                    rec.mo_count_var=count
     @api.multi
     def create_Product_uom(self):
         for record in self:
@@ -166,10 +182,35 @@ class productProduct(models.Model):
     @api.multi
     def action_view_reserve(self):
         return self.product_tmpl_id.action_view_reserve()
+    
+    def _get_products(self, cr, uid, ids, context=None):
+        products = []
+        for prodtmpl in self.browse(cr, uid, ids, context=None):
+            products += [x.id for x in prodtmpl.product_variant_ids]
+        return products
+    @api.multi
+    def _get_act_window_dict(self,name):
+        context=self._context.copy()
 
+        mod_obj = self.pool.get('ir.model.data')
+        act_obj = self.pool.get('ir.actions.act_window')
+        result = mod_obj.xmlid_to_res_id(self._cr,self._uid, name, raise_if_not_found=True)
+        result = act_obj.read(self._cr, self._uid, [result], context=context)[0]
+        return result
     @api.multi
     def action_view_mos(self):
-        return self.product_tmpl_id.action_view_mos()
+        products = self._get_products()
+        result = self._get_act_window_dict('mrp.act_product_mrp_production')
+        if len(self) == 1 and len(products) == 1:
+            result['context'] = "{'default_product_id': " + str(products[0]) + ", 'search_default_product_id': " + str(products[0]) + "}"
+        else:
+            result['domain'] = "[('product_id','in',[" + ','.join(map(str, products)) + "])]"
+            result['context'] = "{}"
+        return result
+#    @api.multi
+#    def action_view_mos(self):
+#        
+#        return self.product_tmpl_id.action_view_mos()
 
     @api.multi
     def action_view_orderpoints(self):

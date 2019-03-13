@@ -31,6 +31,8 @@
     'depends': ['account','product','gt_order_mgnt','stock_merge_picking'],
     'data': [
                 'security/ir.model.access.csv',
+                'security/user_security.xml',
+                'data/data_mail.xml',
                 'views/account_invoice_view.xml',
                 'views/account_move.xml',
                 'views/bank_view.xml',

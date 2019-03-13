@@ -29,6 +29,9 @@ class PayCancelWizard(models.TransientModel):
         elif self._context.get('active_model',False)=='mrp.bom':
             bom_brw=self.env['mrp.bom'].browse(active_ids)
             bom_brw.write({'refuse_reason':self.description,'state':'reject'})
+        elif self._context.get('active_model',False)=='journal.voucher':
+            vou_brw=self.env['journal.voucher'].browse(active_ids)
+            vou_brw.write({'refuse_reason':self.description,'state':'reject'})
 
         elif self._context.get('active_model',False)=='hr.expense':
             exp_brw=self.env['hr.expense'].browse(active_ids)

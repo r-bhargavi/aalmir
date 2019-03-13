@@ -49,9 +49,9 @@
                     <button class="oe_stat_button" type="object" context="{'group_by':'state'}" name="open_expenses" icon="fa-database" >
                     	<field name="expenses_count" widget="statinfo"/>
                     </button>
-                    <button class="oe_stat_button" type="object" context="{'group_by':'n_state'}" name="open_prod_orders" icon="fa-database" >
+<!--                    <button class="oe_stat_button" type="object" context="{'group_by':'n_state'}" name="open_prod_orders" icon="fa-database" >
                     	<field name="prod_count" widget="statinfo"/>
-                    </button>
+                    </button>-->
                     <button class="oe_stat_button" type="object" context="{'group_by':'state'}" name="open_in_orders" icon="fa-database" >
                     	<field name="in_count" widget="statinfo"/>
                     </button>

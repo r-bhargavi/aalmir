@@ -214,7 +214,7 @@ class stock_picking(osv.osv):
     @api.cr_uid_ids_context
     def do_prepare_partial(self, cr, uid, picking_ids, context=None):
         context = context or {}
-        print "DDDDDDDDDDDd...,,,do_prepare_partial",
+        print "DDDDDDDDDDDd...,,,do_prepare_partial",context
         if context.get('sale_support'):
 		pack_operation_obj = self.pool.get('stock.pack.operation')
 

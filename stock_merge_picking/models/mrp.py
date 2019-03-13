@@ -187,7 +187,7 @@ class MrpProductProduce(models.Model):
               pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
               print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
            print "moves ino bj-------------------",obj.move_created_ids
-           self.env['stock.move'].create({'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+           self.env['stock.move'].create({'origin':obj.name,'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
            pick_exist.action_confirm()
            pick_exist.action_assign()
         if obj.move_created_ids:
@@ -231,7 +231,7 @@ class MrpProductProduce(models.Model):
                    if not pick_exist and self.product_qty>0.0:
                       pick_exist=self.env['stock.picking'].create({'origin':production_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
                       print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
-                   self.env['stock.move'].create({'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
+                   self.env['stock.move'].create({'origin':production_id.name,'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
                    pick_exist.action_confirm()
                    pick_exist.action_assign()
 
@@ -290,7 +290,7 @@ class MrpProductProduce(models.Model):
                           <b>  Packaging:</b> %s <br/>
 		          <b>  Completed By :</b> %s<br/>
                           <b>  Requested Completion Date :</b> %s <br/>
-                          <b>  Expected Completion Date Date :</b> %s <br/>
+                          <b>  Expected Completion Date :</b> %s <br/>
                           <b>  Completed Date :</b> %s <br/>
                           <b>  Wastage Allowed :</b> %s %s <br/> 
                           <b>  Wastage Produced :</b> %s %s<br/> 

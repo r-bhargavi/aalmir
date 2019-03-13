@@ -317,6 +317,9 @@ class AccountPaymentTermRequest(models.Model):
                 rec.n_payment_term.n_partner_id=[(6,0,ids)]
 
 	temp_id = self.env.ref('gt_order_mgnt.email_template_payment_term_accepted')
+        if self.purchase_id:
+            temp_id = self.env.ref('gt_order_mgnt.email_template_payment_term_accepted_po')
+
         if temp_id:
             user_obj = self.env['res.users'].browse(self.env.uid)
             base_url = self.env['ir.config_parameter'].get_param('web.base.url')

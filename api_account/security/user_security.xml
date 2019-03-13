@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    
+     <record id="voucher_approval_process" model="res.groups">
+        <field name="name">Approve Voucher</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to approve Voucher waiting for approval.</field>
+    </record>
+
+</openerp>
