@@ -49,7 +49,7 @@ class HrExpense(models.Model):
     cheque_details = fields.One2many('bank.cheque.details.expense','expense_id','Cheque Details')
     approval_by = fields.Many2one('res.users', 'Approval Req. By',copy=False)
 
-    expense_details = fields.One2many('payment.expense.line','expense_id',copy=False)
+#    expense_details = fields.One2many('payment.expense.line','expense_id',copy=False)
     approved_by = fields.Many2one('res.users', 'Approved By',copy=False)
     requested_by = fields.Many2one('hr.employee', 'Requested By',copy=False)
     user_id = fields.Many2one('res.users', 'User')
@@ -63,16 +63,16 @@ class HrExpense(models.Model):
     uploaded_document_tt = fields.Many2many('ir.attachment','bill_attachment_pay_rel','bill','pay_id','Upload TT Docs',copy=False,track_visibility='always')
     bank_id = fields.Many2one('res.partner.bank', 'Bank Name',copy=False,track_visibility='always')
     internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
-    tot_amount_if_other_expense=fields.Float('Total Amount', compute='amount_other_expense_if_any')
+#    tot_amount_if_other_expense=fields.Float('Total Amount', compute='amount_other_expense_if_any')
 
 
-    @api.multi
-    @api.depends('expense_details')
-    def amount_other_expense_if_any(self):
-        for record in self:
-            if record.expense_details:
-                for each_exp in record.expense_details:
-                    record.tot_amount_if_other_expense+=each_exp.amount
+#    @api.multi
+#    @api.depends('expense_details')
+#    def amount_other_expense_if_any(self):
+#        for record in self:
+#            if record.expense_details:
+#                for each_exp in record.expense_details:
+#                    record.tot_amount_if_other_expense+=each_exp.amount
     
     @api.onchange('payment_method')
     def pay_method_onchange(self):
@@ -255,16 +255,16 @@ class HrExpense(models.Model):
                     raise UserError(_('Please configure Default Expense account for Product expense: `property_account_expense_categ_id`.'))
             amt=0.0
             unit_amount_each,unit_amount_total=0.0,0.0
-            if expense.expense_details:
-                for each_exp in expense.expense_details:
-                    unit_amount_each+=each_exp.expense_id_other.unit_amount
-                unit_amount_total=unit_amount_each+expense.unit_amount
-            else:
-                unit_amount_total=expense.unit_amount
-            if expense.expense_details:
-                amt=expense.tot_amount_if_other_expense+expense.total_amount
-            else:
-                amt=expense.total_amount
+#            if expense.expense_details:
+#                for each_exp in expense.expense_details:
+#                    unit_amount_each+=each_exp.expense_id_other.unit_amount
+#                unit_amount_total=unit_amount_each+expense.unit_amount
+#            else:
+            unit_amount_total=expense.unit_amount
+#            if expense.expense_details:
+#                amt=expense.tot_amount_if_other_expense+expense.total_amount
+#            else:
+            amt=expense.total_amount
                 
             print "amtamtamtamtamtamt",amt,unit_amount_total
             move_line = {
@@ -400,10 +400,10 @@ class HrExpense(models.Model):
             move.post()
         print "expenkdskjdsnhkjfhdskjfjkednf",expense.uploaded_document
         amt=0.0
-        if expense.expense_details:
-            amt=expense.total_amount+expense.tot_amount_if_other_expense
-        else:
-            amt=expense.total_amount
+#        if expense.expense_details:
+#            amt=expense.total_amount+expense.tot_amount_if_other_expense
+#        else:
+        amt=expense.total_amount
             
         print "amtamtamtamtamt",amt
         pay_dict={'payment_type': 'outbound',
@@ -419,8 +419,8 @@ class HrExpense(models.Model):
         'communication': expense.communication,
         'internal_note': expense.internal_note,
         }
-        if expense.expense_details:
-            pay_dict.update({'expense_payment_rel':[(4, [x.expense_id_other.id for x in expense.expense_details])]})
+#        if expense.expense_details:
+#            pay_dict.update({'expense_payment_rel':[(4, [x.expense_id_other.id for x in expense.expense_details])]})
         if expense.cheque_status:
             if expense.cheque_status=='cleared':
                 expense.chq_s_us='signed'
@@ -479,10 +479,10 @@ class HrExpense(models.Model):
         move_line_id=self.env['account.move.line'].search([('payment_id','=',payment.id)])
         move_pay=move_line_id[0].move_id
         expense.write({'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today()})
-        if expense.expense_details:
-            for each in expense.expense_details:
-                each.expense_id_other.write({'uploaded_document':expense.uploaded_document if expense.uploaded_document else False,'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today(),'communication':expense.communication,'internal_note':expense.internal_note,'account_move_id':expense.account_move_id.id,'bank_journal_id_expense':expense.bank_journal_id_expense.id})
-                each.expense_id_other.paid_expenses()
+#        if expense.expense_details:
+#            for each in expense.expense_details:
+#                each.expense_id_other.write({'uploaded_document':expense.uploaded_document if expense.uploaded_document else False,'account_pay_id': move_pay.id,'payment_id':payment.id,'pay_date':date.today(),'communication':expense.communication,'internal_note':expense.internal_note,'account_move_id':expense.account_move_id.id,'bank_journal_id_expense':expense.bank_journal_id_expense.id})
+#                each.expense_id_other.paid_expenses()
         expense.paid_expenses()
 
         return True
@@ -524,26 +524,26 @@ class BankChequeDetailsExpense(models.Model):
     register_payment_id=fields.Many2one('account.register.payments')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status',copy=False)
     
-    		   			   			
-class PaymentExpenseDetails(models.Model):
-    '''to store cheque details against bank'''
-    _name = "payment.expense.line"
-    
-    expense_id_other = fields.Many2one('hr.expense','Expense')
-    expense_id = fields.Many2one('hr.expense','Expense')
-    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
-    
-    		   			   			
-    @api.onchange('expense_id_other')
-    def expense_id_onchange(self):
-    	if self.expense_id_other:
-            if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
-                self.expense_id_other=False
-                return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
-            self.amount=self.expense_id_other.total_amount
-
-    @api.onchange('amount')
-    def amount_onchange(self):
-    	if self.amount and self.amount!=self.expense_id_other.total_amount:
-            self.amount=self.expense_id_other.total_amount
-            return {'warning': {'title': "Invalid", 'message': "You cannot change approved the expense amount!!!"}}
+#    		   			   			
+#class PaymentExpenseDetails(models.Model):
+#    '''to store cheque details against bank'''
+#    _name = "payment.expense.line"
+#    
+#    expense_id_other = fields.Many2one('hr.expense','Expense')
+#    expense_id = fields.Many2one('hr.expense','Expense')
+#    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
+#    
+#    		   			   			
+#    @api.onchange('expense_id_other')
+#    def expense_id_onchange(self):
+#    	if self.expense_id_other:
+#            if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
+#                self.expense_id_other=False
+#                return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
+#            self.amount=self.expense_id_other.total_amount
+#
+#    @api.onchange('amount')
+#    def amount_onchange(self):
+#    	if self.amount and self.amount!=self.expense_id_other.total_amount:
+#            self.amount=self.expense_id_other.total_amount
+#            return {'warning': {'title': "Invalid", 'message': "You cannot change approved the expense amount!!!"}}
