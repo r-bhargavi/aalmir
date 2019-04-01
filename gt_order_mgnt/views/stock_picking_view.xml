@@ -150,6 +150,8 @@
                 	<button name="aalmir_picking_print" string="Download" type="object" class="oe_highlight"
 	 			groups="stock.group_stock_user, gt_order_mgnt.group_sale_support" 
 	 			/>
+                        <button name="acknowledge_receiving" attrs="{'invisible':['|',('ack_rec','=',True),('state','!=','done')]}" string="Acknowledged by Production" groups="gt_order_mgnt.group_injection_product,gt_order_mgnt.mrp_admin_bom" type="object" class="oe_highlight"/>
+
 			<!--button name="split_picking_data" string="Split &amp;Schedule Delivery" type="object"
  				class="oe_highlight" groups="gt_order_mgnt.group_sale_support" 
                    		attrs="{'invisible':['|','|',('picking_status','!=','draft'),
@@ -158,6 +160,7 @@
 	<!--#CH_N079 make fields readonly -->
     		<field name="origin" position="replace">
 		 <field name="origin" attrs="{'readonly':[('state', '!=','draft')]}"/>
+		 <field name="ack_rec" invisible="0"/>
 		 <field name="expected_comple_date" attrs="{'invisible':[('expected_comple_date', '=',False)]}"/>
               </field>
             	<field name="move_type" position="attributes">
@@ -585,6 +588,7 @@
 
               </xpath>-->
               <xpath expr="//field[@name='state']" position='before'>
+                <field name="ack_rec"/>                
                 <field name="create_date"/>                
                 <field name="min_date"/>
                 <field name="dispatch_date"/>              
