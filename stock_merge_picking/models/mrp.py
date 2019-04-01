@@ -240,8 +240,8 @@ class MrpProductProduce(models.Model):
                    op_id.write({'batch_number':[(4, batch_line.id)]})
                    batch_line.write({'lot_id':self.lot_id.id,'production_id':production_id.id,'logistic_state':'ready','batch_tfred':True})
 	        production_id.state='done'
-		if production_id.state == 'done' and production_id.remain_wastage_qty:
-                   raise UserError("Wastage Qty remaining in manufacturing order.") 
+#		if production_id.state == 'done' and production_id.remain_wastage_qty:
+#                   raise UserError("Wastage Qty remaining in manufacturing order.") 
 		for line in production_id.move_lines:
 			line.state='cancel'
 		for rec in production_id.move_created_ids:

@@ -82,7 +82,7 @@ class MrpProductionExtraRM(models.Model):
                       raise UserError(_('Please Select Scrap product in Manufacturing Product.')) 
                    else:
                       product_id=rec.production_id.product_id.scrap_product_id.id
-                batch=self.env['mrp.order.batch.number'].create({'name':str(record.used_type)+'-'+str(rec.production_id.name)+'-' +str(rec.production_id.product_id.default_code),
+                batch=self.env['mrp.order.batch.number'].sudo().create({'name':str(record.used_type)+'-'+str(rec.production_id.name)+'-' +str(rec.production_id.product_id.default_code),
 		                               'production_id':rec.production_id.id,
                                                 'uom_id':record.uom_id.id,
 		                                'product_qty':record.qty, 

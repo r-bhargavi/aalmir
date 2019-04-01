@@ -70,7 +70,7 @@ class stock_picking(osv.osv):
         @return: True
         """
         result= super(stock_picking,self).action_assign(cr, uid, ids,context=context)
-        pick_brw=self.pool.get('stock.picking').browse(cr,uid,ids[0])
+#        pick_brw=self.pool.get('stock.picking').browse(cr,uid,ids[0])
         #if any([ x.state in ('confirmed') for x in pick_brw.move_lines]):
             #raise UserError('Some Products are not available in mentioned source location')
         return result
