@@ -463,6 +463,7 @@ class StockPicking(models.Model):
      destination_report=fields.Char('Destination on Report', default='Destination')
      check_partner=fields.Boolean(default=True)
      invoice_done=fields.Boolean(default=False)
+     ack_rec=fields.Boolean(default=False,track_visibility='always')
 
      picking_status=fields.Selection([('draft','Draft'),('pick_list','In Picking'),
      					('r_t_dispatch','Ready To dispatch'),
@@ -1088,6 +1089,12 @@ class StockPicking(models.Model):
                         record.customer_invoice_pending_amt=inv.currency_id.compute((total),credit_currency_id)
             else:
                 record.customer_invoice_pending_amt=0.0           
+
+
+     @api.multi
+     def acknowledge_receiving(self):        
+        self.write({'ack_rec': True})
+
 
      @api.multi
      def aalmir_picking_print(self):
