@@ -241,7 +241,7 @@ class SaleOrderLine(models.Model):
 				rec.send_discount_mail()
 			product_qty = self.env['product.uom']._compute_qty_obj(rec.product_uom,rec.product_uom_qty, rec.product_id.uom_id)
             		pricelist_id = self.env['raw.material.pricelist'].search([('product_id', '=', rec.product_id.id)])
-            		if pricelist_id.msq > (pricelist_id.stock_qty-product_qty) and rec.state in ('draft','sent') :
+            		if not rec.buying_type=='book' and pricelist_id.msq > (pricelist_id.stock_qty-product_qty) and rec.state in ('draft','sent') :
             			raise UserError("This [%s]%s couldn't be sold as it's current stock is %.2f %s.\n After selling %.2f %s the remaining stock will be %.2f %s that is lower than MSQ of %.2f %s. You can maximum sell upto %.2f %s "%(rec.product_id.default_code,rec.product_id.name,pricelist_id.stock_qty, rec.product_uom.name,rec.product_uom_qty, rec.product_id.uom_id.name, pricelist_id.stock_qty-product_qty, rec.product_id.uom_id.name,pricelist_id.msq, rec.product_uom.name,pricelist_id.stock_qty-pricelist_id.msq, rec.product_uom.name))
 	return res
 
@@ -255,7 +255,7 @@ class SaleOrderLine(models.Model):
 			rec.send_discount_mail()
 		product_qty = self.env['product.uom']._compute_qty_obj(rec.product_uom,rec.product_uom_qty, rec.product_id.uom_id)
             	pricelist_id = self.env['raw.material.pricelist'].search([('product_id', '=', rec.product_id.id)])
-            	if pricelist_id.msq > (pricelist_id.stock_qty-product_qty) and rec.state in ('draft','sent') :
+            	if not rec.buying_type=='book' and  pricelist_id.msq > (pricelist_id.stock_qty-product_qty) and rec.state in ('draft','sent') :
             		raise UserError("This [%s]%s couldn't be sold as it's current stock is %.2f %s.\n After selling %.2f %s the remaining stock will be %.2f %s that is lower than MSQ of %.2f %s. You can maximum sell upto %.2f %s "%(rec.product_id.default_code,rec.product_id.name,pricelist_id.stock_qty, rec.product_uom.name,rec.product_uom_qty, rec.product_id.uom_id.name, pricelist_id.stock_qty-product_qty, rec.product_id.uom_id.name,pricelist_id.msq, rec.product_uom.name,pricelist_id.stock_qty-pricelist_id.msq, rec.product_uom.name))
                     
 	return rec
@@ -424,7 +424,7 @@ class SaleOrderLine(models.Model):
         if self.product_id.type == 'product' and self.order_id.is_reception:
             product_qty = self.env['product.uom']._compute_qty_obj(self.product_uom, self.product_uom_qty, self.product_id.uom_id)
             pricelist_id = self.env['raw.material.pricelist'].search([('product_id', '=', self.product_id.id)])
-            if pricelist_id.msq and pricelist_id.msq >= (pricelist_id.stock_qty-product_qty):
+            if not self.buying_type=='book' and pricelist_id.msq and pricelist_id.msq >= (pricelist_id.stock_qty-product_qty):
             	warning_mess = {
                         'title': _('Not enough inventory!'),
                         'message' : _("This [%s]%s couldn't be sold as it's current stock is %.2f %s.\n After selling %.2f %s the remaining stock will be %.2f %s that is lower than MSQ of %.2f %s. You can maximum sell upto %.2f %s ") % \
