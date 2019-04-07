@@ -56,6 +56,7 @@ class stockMasterBatch(models.Model):
         #                                added by bhargavi store true
 
         total_quantity = fields.Float('Total Quantity',compute='_get_batches_data',store=True)
+        total_quantity_dup = fields.Float('Total Quantity DUp')
         uom_id=fields.Many2one('product.uom',compute='_get_batches_data',store=True)
         #                                added by bhargavi
 

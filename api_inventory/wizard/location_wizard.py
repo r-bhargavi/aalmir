@@ -279,13 +279,43 @@ class StockStoreLocationWizard(models.TransientModel):
 			raise UserError("Product '{}' selected batches Quantity  {} is not equal to opeartion Quantity  {} ".format(product_id,batches_product[d],operation_product[d]))
 
     	for line in self.wizard_line:
-    	   mo_number=self.env['mrp.production'].search([('name','=',self.picking.origin)])
-    	   po_number=self.env['purchase.order'].search([('name','=',self.picking.origin)])
-    	   matser_batch_id=self.env['stock.store.master.batch'].create({
-						 'product_id':line.product_id.id,'packaging':line.packaging.id,
-						 'location_id':self.picking.location_dest_id.id,
-						 'store_id':self.locations.id,'logistic_state':'transit_in',
-						 'company_id':self.locations.company_id.id})
+#            if not line.product_id:
+#                    raise UserError("Please Select product")
+#            if not line.master_batch:
+#                    raise UserError("Master Batch Missing!!!")
+#
+#            bin_id=self.env['n.warehouse.placed.product'].search([('id','=',line.stock_location.id)])
+#            if not bin_id:
+#                    raise UserError("Bin-Location not found")
+#            elif bin_id.state =='full':
+#                    raise UserError("Bin-Location '{}' is fully accoupied".format(bin_id.name))
+#
+#            if  bin_id.product_type == 'single' and bin_id.product_id.id:
+#                    if bin_id.product_id.id != line.product_id.id:
+#                            raise UserError("Selected '{}' Bin in only for single product, You can't store different product in this Locaiton".format(bin_id.name))
+#
+#            mst_str=[]
+#            add_new_qty = 0
+#            for mst in line.master_batch:
+#                    add_new_qty += mst.total_quantity
+#                    if mst.store_id.id != line.stock_location.id:
+#                            raise UserError("Master Batch '{}' is not in current location '{}'".format(mst.name,line.stock_location.name))
+#                    mst_str.append(mst.name)
+#            mst_str = ",".join(mst_str)		
+#            bin_form = self.env.ref('api_inventory.transfer_bin_location_validate_wizard', False)
+#            context = self._context.copy()
+#            rec.add_qty = add_new_qty
+#            context.update({'default_product_id':rec.product_id.id,'default_master_batches':mst_str,
+#                            'default_t_qty':add_new_qty,'default_t_qty_unit':rec.add_unit.id,
+#                            'default_loc_bin_id':rec.stock_location.id,
+#                            'default_dest_bin_id':bin_id.id,'trsf_id':rec.id})
+#    	   mo_number=self.env['mrp.production'].search([('name','=',self.picking.origin)])
+#    	   po_number=self.env['purchase.order'].search([('name','=',self.picking.origin)])
+#    	   matser_batch_id=self.env['stock.store.master.batch'].create({
+#						 'product_id':line.product_id.id,'packaging':line.packaging.id,
+#						 'location_id':self.picking.location_dest_id.id,
+#						 'store_id':self.locations.id,'logistic_state':'transit_in',
+#						 'company_id':self.locations.company_id.id})
 	   batches_data=[]
     	   if line.batch_ids:
     	   	body=''
@@ -688,6 +718,7 @@ class StockStoreLocationWizardLine(models.TransientModel):
        1) use to select batches and transfer from produciton to input location."""
     
     _name = 'stock.store.location.wizard.line'
+    stock_location = fields.Many2one('n.warehouse.placed.product','Stock Location')
 
     select_store = fields.Boolean('Check')
     wizard_id = fields.Many2one('stock.store.location.wizard', string='Wizard')
@@ -715,6 +746,15 @@ class StockStoreLocationWizardLine(models.TransientModel):
     to_do_unit = fields.Many2one('product.uom','Unit')
     pack_id = fields.Many2one('stock.pack.operation','operation')
     
+#    @api.onchange('stock_location')
+#    def stock_location_onchange(self):
+#    	if self.stock_location:
+#            for each in self.wizard_id.wizard_line:
+#                if each.id!=self.id:
+#                    if each.stock_location.id==self.stock_location.id:
+#                        self.stock_location=False
+#                        return {'warning': {'title': "Invalid", 'message': "Cannot Take Same Rack Location to place Product!!"}}
+
     @api.multi
     @api.onchange('batch_ids','master_batches')
     def _get_batch_qty(self):

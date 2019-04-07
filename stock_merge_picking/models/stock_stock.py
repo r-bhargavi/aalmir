@@ -46,6 +46,7 @@ class stock_picking(osv.osv):
             })
             backorder = self.browse(cr, uid, backorder_id, context=context)
             print "backorderbackorder",backorder
+            picking.write({'next_bo':backorder.id})
 #            to link the bo to the mo
             if backorder.material_request_id:
                 backorder.material_request_id.production_id.delivery_ids= [(4,backorder.id)]	

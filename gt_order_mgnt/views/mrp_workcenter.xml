@@ -1199,7 +1199,7 @@
                            <field name='serial_no'/>
                             <field name='assets_no'/>
                                 <field name="machine_user_ids" widget="many2many_tags" string="Machine Users"
-                                   options="{'no_create': True, 'no_open': True}" required="1" 
+                                   options="{'no_create': True, 'no_open': True}" required="" 
                                    domain="[('employee_ids','!=',False)]"/>
                                <field name='employee_ids' widget="many2many_tags"/>
                           </group>
@@ -1403,6 +1403,9 @@
                                           <img src="/gt_order_mgnt/static/src/img/100%.gif" width='180px'/>
                                         </t>
                                         <t t-if="record.time_efficiency.value &lt; 0.90 and record.time_efficiency.value &gt; 0.80 ">
+                                          <img src="/gt_order_mgnt/static/src/img/80%.gif" width='180px'/>
+                                        </t>
+                                        <t t-if="record.time_efficiency.value &lt; 0.80 and record.time_efficiency.value &gt; 0.00 ">
                                           <img src="/gt_order_mgnt/static/src/img/80%.gif" width='180px'/>
                                         </t>
                                        <t t-if="record.time_efficiency.value &lt; 1 and record.time_efficiency.value &gt; 0.90 ">

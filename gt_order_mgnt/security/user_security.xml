@@ -13,6 +13,12 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to get mails of approved bills</field>
     </record>
+     <record id="maintatinence_alert_mail" model="res.groups">
+        <field name="name">Maintenance email alerts</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to get mails of maintainence alert</field>
+    </record>
      <record id="send_fund_tfr_request" model="res.groups">
         <field name="name">Transfer Request Approve</field>
         <field name="category_id" ref="base.module_category_usability"/>

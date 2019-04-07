@@ -15,6 +15,7 @@ access_approval_config_bill_account_user,approval.config.bill.account.user,model
 access_bank_cheque_details_account_user,bank.cheque.details.account.user,api_account.model_bank_cheque_details,account.group_account_user,1,1,1,0
 access_bank_cheque_details_group_user,bank.cheque.details.group.user,api_account.model_bank_cheque_details,base.group_user,1,1,1,0
 access_hr_expense_group_user,hr.expense.group.user,hr_expense.model_hr_expense,account.group_account_user,1,1,1,1
+access_aalmir_expense_group_account_user,aalmir_custom_expense.group.account.user,aalmir_custom_expense.model_payment_expense_line,account.group_account_user,1,1,1,1
 access_product_product_group_user,product.product.group.user,product.model_product_product,account.group_account_user,1,1,1,1
 access_stock_warehouse_orderpoint_group_user,stock.warehouse.orderpoint.group.user,stock.model_stock_warehouse_orderpoint,account.group_account_user,1,1,1,1
 access_stock_store_master_batch_group_user,stock.store.master.batch.group.user,api_inventory.model_stock_store_master_batch,account.group_account_user,1,1,1,1

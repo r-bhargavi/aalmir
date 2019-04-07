@@ -311,6 +311,7 @@ class MrpRawmaterialLine(models.Model):
 	extra_qty=fields.Float('Extra Qty',digits_compute=dp.get_precision('Stock qty'),compute='_compute_extra_qty')
 	pick_qty=fields.Float('Pick Qty',digits_compute=dp.get_precision('Stock qty'))
 	uom_id=fields.Many2one('product.uom', string="Unit")
+        shift_qty=fields.Float('Shift Qty')
 
 	rm_type=fields.Selection([('stock','Stock'),('mo','MO'),('po','PO')], default='stock')
 	pro_request_id=fields.Many2one('n.manufacturing.request', string='Production No.')

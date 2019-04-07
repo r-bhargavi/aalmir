@@ -143,9 +143,10 @@ class MrpProduction(models.Model):
 		if rec.workcenter_lines:
 			for line in rec.workcenter_lines:
                             wo_id=self.env['mrp.production.workcenter.line'].search([('name','=',line.name)])
-                            if wo_id.order_last==True:
-                                for each_line in wo_id.batch_ids:
-                                    qty +=each_line.product_qty
+                            for each_wo in wo_id:
+                                if each_wo.order_last==True:
+                                    for each_line in each_wo.batch_ids:
+                                        qty +=each_line.product_qty
 		rec.n_produce_qty_now = qty
                 rec.produce_uom_id=rec.product_uom.id
 
@@ -180,8 +181,9 @@ class MrpProduction(models.Model):
     @api.multi
     @api.depends('routing_id')
     def compute_routing(self):
-        if self.routing_id:
-            self.route_id=self.routing_id.id
+        for rec in self:
+            if rec.routing_id:
+                rec.route_id=rec.routing_id[0].id
     @api.multi
     @api.depends('workcenter_lines.date_planned','workcenter_lines.date_planned_end')
     def _get_completion_date(self):
@@ -222,6 +224,7 @@ class MrpProduction(models.Model):
     n_produce_qty_now = fields.Float('Quantity Produced',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty_now')
     produce_uom_id=fields.Many2one('product.uom', compute='_n_get_produced_qty')
     n_note = fields.Text('Instruction In PR',help='Instruction Given by Sale Support for Manufacture of this product',related='request_line.n_Note')
+    no_of_shifts = fields.Integer('No.Of Shifts')
     n_approved_qty = fields.Float('Quantity Approved',help='Quantity Approved by Quality Check',compute='_get_approved_qty')
 
     mo_scrap = fields.Float('Mo Scrap Quantity',compute='_get_scrap_qty')
@@ -325,7 +328,35 @@ class MrpProduction(models.Model):
                   record.planned_status='unplanned'
                if record.hold_order =='hold':
                   record.planned_status='hold'
-    
+                  
+                  
+    @api.multi
+    def update_shifts_temp(self):
+        for each in self.material_request_id:
+            for each_line in each.request_line_ids:
+                each_line.shift_qty=each_line.qty/self.no_of_shifts
+            body='<b>Shifts Updated</b>'
+            body +='<li> Shifts updated with :</b>'+str(self.no_of_shifts) +'</li>'       
+            self.message_post(body=body)
+        return True
+    @api.multi
+    def update_schedule_shifts_picking(self):
+        context = self._context.copy()
+#        context.update({'default_production_id':self.id})
+        hold_form = self.env.ref('api_raw_material.mrp_production_shifts_form', False)
+        print "hold_formhold_form",hold_form
+        if hold_form:
+                return {
+                    'name':'Update Picking order with shifts',
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'mrp.production.shifts.update',
+                    'views': [(hold_form.id, 'form')],
+                    'view_id': hold_form.id,
+                    'target': 'new',
+                    'context': context,
+             } 
     
     @api.multi
     def mrp_hold(self):
@@ -732,6 +763,8 @@ class MrpProduction(models.Model):
                 workorders=self.env['mrp.production.workcenter.line'].search([('production_id','=',rec.id)], order='sequence desc')
                 next_id=False
                 for orders in workorders:
+                        if orders.first_order==True:
+                            orders.production_id.no_of_shifts=orders.req_product_qty
                 	orders.next_order_id=next_id
                 	orders.n_packaging=orders.production_id.n_packaging.id if orders.production_id.n_packaging else False
                 	next_id=orders.id
@@ -2380,6 +2413,70 @@ class MrpWorkcentor(models.Model):
         
         return super(MrpWorkcentor,self).name_search(name, args, operator=operator,limit=limit)
 
+
+class MrpPrdocutionShiftsUpdate(models.Model):
+     _name='mrp.production.shifts.update'
+     
+     pick_ids=fields.One2many('raw.material.pick.ids','shift_id',
+                            string='RM Pick IDs') 
+     no_of_shifts=fields.Integer('No of Shifts')
+     schedule_date=fields.Datetime('Schedule Date')                   
+     first_request_time=fields.Datetime('First Request')                   
+     @api.model
+     def default_get(self,fields):
+        rec = super(MrpPrdocutionShiftsUpdate, self).default_get(fields)
+	obj = self.env['mrp.production'].browse(self._context.get('active_id'))
+        line_vals=[]
+	if obj.delivery_ids:
+            fif_hours_from_now = datetime.now() + timedelta(hours=15)
+            print "fif_hours_from_nowfif_hours_from_nowfif_hours_from_now",fif_hours_from_now
+            check=fif_hours_from_now.strftime("%Y-%m-%d %H:%M:%S")
+            for each_dl in obj.delivery_ids:
+                vals={}
+                if each_dl.state in ('partially_available','assigned','confirmed'):
+                    
+                    vals.update({'pick_id':each_dl.id})
+                    print "val------------------------",vals
+                    line_vals.append((0,0,vals))
+        rec.update({'pick_ids':line_vals,'schedule_date':check,'no_of_shifts':1,'first_request_time':check})
+        return rec
+    
+     @api.multi
+     def update_shifts(self):
+         if not self.pick_ids:
+            raise UserError(_("There is no pending RM Delivery for this Order!!"))
+         obj = self.env['mrp.production'].browse(self._context.get('active_id'))
+         if self.no_of_shifts>obj.no_of_shifts:
+            raise UserError(_("No.of Shifts selected cannot be greater then Production Shifts!!"))
+         if self.no_of_shifts<=0:
+            raise UserError(_("No.of Shifts cannot be less then or equal to 0!!"))
+
+         for each in self.pick_ids:
+            if self.schedule_date:
+                fif_hours_from_now = datetime.now() + timedelta(hours=15)
+                print "fif_hours_from_nowfif_hours_from_nowfif_hours_from_now",fif_hours_from_now
+                check=fif_hours_from_now.strftime("%Y-%m-%d %H:%M:%S")
+                if self.schedule_date<self.first_request_time:
+                    raise UserError(_("Shifts can be updated only after 15 hours from now!!"))
+
+                each.pick_id.write({'min_date':self.schedule_date})
+            if self.no_of_shifts:
+                each.pick_id.write({'no_of_shifts':self.no_of_shifts})
+            body='<b>Shifts Updated</b>'
+            body +='<li> For RM Transfer :</b>'+str(self.pick_ids[0].pick_id.name) +'</li>'
+            body +='<li> Scheduled For :</b>'+str(self.schedule_date) +'</li>'
+            body +='<li> Shifts updated with :</b>'+str(self.no_of_shifts) +'</li>'
+
+            each.pick_id.material_request_id.production_id.message_post(body=body)
+
+class RawMaterialPickIds(models.Model):
+    _name='raw.material.pick.ids' 
+     
+    shift_id=fields.Many2one('mrp.production.shifts.update', string='Manufacturing No.')  
+    pick_id=fields.Many2one('stock.picking', string='Picking No.')  
+    
+     
+     
 class MrpPrdocutionHold(models.Model):
      _name='mrp.production.hold'
      production_id=fields.Many2one('mrp.production', string='Manufacturing No.')  

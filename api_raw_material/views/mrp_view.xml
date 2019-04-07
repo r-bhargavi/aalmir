@@ -209,13 +209,45 @@
 				<attribute name="attrs">{'invisible':['|',('state','not in',('draft','pause')),('process_type','=','raw')]}</attribute>
 			</button>
 		</field>
-	</record>	
+	</record>
+        
+                
+            <record id="mrp_production_shifts_form" model="ir.ui.view">
+		<field name="name">mrp.production.shifts.form</field>
+		<field name="model">mrp.production.shifts.update</field>
+		<field name="arch" type="xml">
+		    <form string="Update Shifts in Picking">
+                        <group>
+                            <field name='no_of_shifts' required="1"/>
+                           <field name='schedule_date' string='Schedule Date' required="1"/>
+                           <field name='first_request_time' string='First Request' invisible="1"/>
+                        </group>
+                        
+		          <group colspan="4">
+                              <field name="pick_ids"  readonly='0' options="{'no_quick_create': True, 'no_create_edit' : True}">
+                        <tree editable='bottom' delete='false' create='false'>
+                           <field name='pick_id' readonly="1"/>
+                           <field name='shift_id' invisible="1" />
+                        </tree>
+                     </field>
+		         </group>
+		        
+		       <footer>
+		            <button type="object" string="Update Shift" class="oe_highlight" 
+		             name="update_shifts"/>
+		            <button type="object" string="Cancel" class="oe_highlight" name='cancel'
+		             special='cancel' />
+		       </footer>
+		    </form>
+		</field>
+	    </record>	
 
      <record id="mrp_production_form_view_aalmir_ext123" model="ir.ui.view">
         <field name="name">mrp.production.form</field>
         <field name="model">mrp.production</field>
         <field name="inherit_id" ref="mrp.mrp_production_form_view"></field>
         <field name="arch" type="xml">
+            
 
 <!--            <xpath expr="//field[@name='routing_id']" position="attributes">
                 <attribute name='readonly'>1</attribute>
@@ -274,7 +306,8 @@
                      </field>
                     <button name='RM_Request_Mo' type='object' string='RM Request' class='oe_highlight'
                   attrs="{'invisible':['|',('raw_request', '=',True),('state','not in',('confirmed','ready'))]}"/>
-                     
+                        <button type="object" string="Next Shift RM" class="oe_highlight" name='update_schedule_shifts_picking' attrs="{'invisible':['|',('state','=','done'),('delivery_ids','=',[])]}"/>
+
                     <notebook style='margin-top:20px'>
                        <page string="Raw Material Delivery's" attrs="{'invisible':[('delivery_ids','=',[])]}">
 		            <field name='delivery_ids' readonly="1" attrs="{'invisible':[('delivery_ids','=',[])]}">

@@ -42,8 +42,12 @@ class JournalVoucher(models.Model):
         
         
         @api.multi
+        def reset_to_draft(self):
+            self.write({'state':'draft'})
+        @api.multi
         def approve_voucher(self):
-            self.write({'state':'approved'})
+            self.post_voucher()
+#            self.write({'state':'approved'})
             
         @api.multi
         def reject_voucher(self):
@@ -65,6 +69,7 @@ class JournalVoucher(models.Model):
         @api.multi
         def submit_voucher(self):
             for record in self:
+                record.assert_balanced()
                 temp_id = self.env.ref('api_account.email_template_for_voucher_approval')
                 if temp_id:
                     recipient_partners=''
@@ -79,30 +84,34 @@ class JournalVoucher(models.Model):
                               'id': record.id,
                              }
                     url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
-                    print "urlurl",url
+
+#                    print "urlurl",url
                     text_link = _("""<a href="%s">%s</a> """) % (url,"VOUCHER")
-                    print "text_linktext_linktext_link",text_link
-                    body ='You have been requested for approval for the attached voucher. ' 
-                    body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
-                    body +='<li> <b>Voucher date :</b>'+str(record.date) +'</li>'
-                    body +='<li> <b>Note :</b> '+str(record.note) +'</li>'
-                    record.state='submitted'
-                    if self.sent_mail==True:
+#                    print "text_linktext_linktext_link",text_link
+#                    body ='You have been requested for approval for the attached voucher. ' 
+#                    body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+#                    body +='<li> <b>Voucher date :</b>'+str(record.date) +'</li>'
+#                    body +='<li> <b>Note :</b> '+str(record.note) +'</li>'
+                record.state='submitted'
+                
+                if self.sent_mail==True:
                         body ='This is reminder for approval for the attached voucher. ' 
-                        body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
                         body ='This is to just inform you that you have been marked as a person who has to approve the attached voucher. ' 
 
-                        body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+#                        body +='<li> <b>View Voucher :</b> '+str(text_link) +'</li>'
+                        body +='<li> <b>Voucher :</b> '+str(record.name) +'</li>'
                         body +='<li> <b>Voucher date :</b>'+str(record.date) +'</li>'
                         body +='<li> <b>Note :</b> '+str(record.note) +'</li>'
                         record.state='resent_for_approval'
-                    temp_id.write({'body_html': body, 'email_to':recipient_partners,
-                                      'email_from':record.env.user.login})
-                    values = temp_id.generate_email(record.id)
-                    mail_mail_obj = self.env['mail.mail']
-                    msg_id = mail_mail_obj.create(values) 
-                    record.sent_mail=True
-                    msg_id.send()	       
+                        temp_id.write({'body_html': body, 'email_to':recipient_partners,
+                                          'email_from':record.env.user.login})
+                        values = temp_id.generate_email(record.id)
+                        mail_mail_obj = self.env['mail.mail']
+                        msg_id = mail_mail_obj.create(values) 
+                        record.sent_mail=True
+                        print "text_linktext_linktext_link",text_link
+                        msg_id.send()	  
+                record.sent_mail=True
 
 
 	@api.model
@@ -124,10 +133,9 @@ class JournalVoucher(models.Model):
 	date=fields.Date('Date',default=fields.Date.context_today)    
 	voucher_line=fields.One2many('journal.voucher.line','voucher_id')
 	multi_voucher_line=fields.One2many('journal.voucher.line','voucher_id')
-	note=fields.Text('Narration')
+	note=fields.Text('Narration',track_visibility='always')
 	refuse_reason=fields.Text('Refuse Reason',track_visibility='onchange')
-#	state=fields.Selection([('draft','Unposted'),('submitted','Submitted For Approval'),('resent_for_approval','Resent For Approval'),('approved','Approved'),('reject','Rejected'),('posted','Posted')], default='draft', string='Status',copy=False,)
-	state=fields.Selection([('draft','Unposted'),('posted','Posted')], default='draft', string='Status',copy=False,)
+	state=fields.Selection([('draft','Unposted'),('submitted','Submitted For Approval'),('resent_for_approval','Resent For Approval'),('approved','Approved'),('reject','Rejected'),('posted','Posted')], default='draft', string='Status',copy=False,track_visibility='always')
 	amount=fields.Float('Amount',compute="get_amount_total")
 	multi=fields.Boolean('Is Multi Partner',default=False,help="To Create Entry for Multiple partners")
 	sent_mail=fields.Boolean('Mail Sent',default=False,help="To indicate the first mail for approval voucher is being sent")
@@ -153,8 +161,9 @@ class JournalVoucher(models.Model):
 	def _get_company_data(self):
 		#partner_id = self.env['res.partner'].search([('company_id','=',self.company_id.id)])
 		#journal = self.env['account.journal'].search([('company_id','=',self.company_id.id)])
-		return {'domain':{'journal_id':[('company_id','=',self.company_id.id)],
-				  'partner_id':[('company_id','=',self.company_id.id),('customer','=',False),('supplier','=',False)]}}
+#		return {'domain':{'journal_id':[('company_id','=',self.company_id.id)],
+#				  'partner_id':[('company_id','=',self.company_id.id),('customer','=',False),('supplier','=',False)]}}
+		return {'domain':{'journal_id':[('company_id','=',self.company_id.id)]}}
 		
 	@api.onchange('journal_id')
 	def _update_voucher_line(self):
@@ -233,6 +242,6 @@ class JournalVoucherLine(models.Model):
 	
 	@api.onchange('company_id')
 	def _get_company_data(self):
-		return {'domain':{'account_id':[('company_id','=',self.company_id.id)],
-				  'partner_id':[('company_id','=',self.company_id.id),('customer','=',False),('supplier','=',False)]}}
+            return {'domain':{'journal_id':[('company_id','=',self.company_id.id)]}}
+
 				  

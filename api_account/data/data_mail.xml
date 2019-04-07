@@ -5,7 +5,7 @@
 	<record id="email_template_for_voucher_approval" model="mail.template">
             <field name="name">Voucher Approval</field>
             <field name="email_from">${(user.email or '')|safe}</field>
-            <field name="subject">API-MRP Voucher Approval Request Alert: ${(object.name)} is requested. </field>
+            <field name="subject">API-ERP JV Approval Requested: ${(object.name)} is requested. </field>
             <field name="model_id" ref="api_account.model_journal_voucher"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html">

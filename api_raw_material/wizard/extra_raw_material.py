@@ -68,6 +68,7 @@ class MrpProductionExtraRM(models.Model):
    @api.multi
    def extra_rawmaterials(self):
        for rec in self:
+         print "use_rawuse_raw",self._context
          if self._context.get('use_raw'):
             print'TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
             for record in rec.used_raw_matrial_ids:
@@ -90,6 +91,7 @@ class MrpProductionExtraRM(models.Model):
                                                 #'wastage_allow':record.production_id.wastage_allow,
                                                # 'wastage_qty':rec.production_id.total_wastage_qty,
                                                 'used_type':record.used_type})
+                print "batch--------------------------",batch
             rec.production_id.requested_wastage_qty +=sum(line.qty for line in rec.used_raw_matrial_ids)
          
          else:

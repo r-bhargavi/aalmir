@@ -23,11 +23,13 @@
 		     <page string="Master Batch Details">
 		     	<group>
 		     	<field name="wizard_line" nolabel="1" context="{'group_by':'product_id'}">
-		        	<tree readonly="1" create="false" delete="false">
+		        	<!--<tree readonly="1" create="false" delete="false">-->
+		        	<tree delete="false">
 		        		<field name="product_id" />
 		        		<field name="master_batch" />
 		        		<field name="batch_ids" widget="many2many_tags" readonly="1" string="Child Batches" />
 	         			<field name="lot_ids" />
+	         			<field name="stock_location" required="1"/>
 		        		<field name="done_qty" string="Quantity" />
 		        		<field name="qty_unit" />
 				</tree>
@@ -37,6 +39,8 @@
 		        		<field name="master_batch" readonly="1"/>
 		        		<field name="lot_ids" widget="many2many_tags" 
 		        			options="{'no_create': True, 'no_open': True}" string='Transfer No.'/>
+                                        <field name="stock_location" required="1"/>
+
 	        			</group >
 	        			<group col="2">
 	        			<field name="batch_ids" widget="many2many_tags"  string="Child Batches"
@@ -108,15 +112,18 @@
                 	</group>
                     <group>
                         <field name="wizard_line"  nolabel="1" >
-                        	<tree create="false" >
+                        	<!--<tree create="false" >-->
+                        	<tree>
                         		<field name="product_id" readonly="1"/>
                         		<field name="master_batches" widget="many2many_tags" />
+                        		<!--<field name="stock_location"   domain="[('state','=','empty')]"/>-->
                         		<field name="to_do_qty" string="To Do" readonly="1" sum="total"/>
                         		<field name="pick_qty" string="Pick Quantity" readonly="1" sum="total"/>
                         		<field name="done_qty" string="Done" readonly="1" sum="total"/>
                         		<field name="to_do_unit" readonly="1"/>
                         	</tree>
-                        	<form create="false">
+                        	<!--<form create="false">-->
+                        	<form>
                         		<group col="4">
                         			<field name="product_id" readonly="1"/>
 						<label for="to_do_qty"/>
@@ -125,6 +132,7 @@
 		    				     <field name="to_do_unit" class="oe_inline" nolabel="1" readonly="1"/>
 			    			</div>
 			    			<field name="packaging" readonly="1"/>
+			    			<!--<field name="stock_location" readonly="0"/>-->
 					</group>
 				    	<group col="1">
 					    	<field name="master_batches" >

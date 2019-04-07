@@ -13,23 +13,56 @@ class resCompany(models.Model):
 	
     @api.multi
     def price_update_products(self):
-        mo_orders=self.env['mrp.production'].search([])
-        pick_ids_list=[]
-        for each_mo in mo_orders:
-            if each_mo.location_dest_id.id==37:
-                picks=self.env['stock.picking'].search([('origin','=',each_mo.name)])
-                if picks:
-                    for each_pick in picks:
-                        if 'VFRM' in each_pick.name:
-                            pick_ids_list.append(each_pick.id)
-                        elif 'RFRM' in each_pick.name:
-                            pick_ids_list.append(each_pick.id)
-        print "pick_ids_listpick_ids_listpick_ids_listpick_ids_list",pick_ids_list,len(pick_ids_list)
+        ssmb=self.env['stock.store.master.batch'].search([])
+        for each_ssmb in ssmb:
+            each_ssmb.total_quantity_dup=each_ssmb.total_quantity
+#        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].search([('n_location_view','!=',False),('state','!=','empty')])
+##        warehouse_place_product_ids=self.env['n.warehouse.placed.product'].search([('id','=',17)])
+#        
+#        if warehouse_place_product_ids:
+#            count=0
+#            for each_wh in warehouse_place_product_ids:
+#                if not each_wh.master_batches and not each_wh.store_batches_ids:
+#                    count+=1
+#                    print "warehouse_place_product_idswarehouse_place_product_ids",each_wh
+##            print "final count======================================",count
+#                    
+#                    each_wh.packages=0.0
+#                    each_wh.total_quantity=0.0
+#                    each_wh.pkg_unit=False
+#                    each_wh.pkg_capicity=0.0
+#                    each_wh.pkg_capicity_unit=False
+#                    each_wh.total_qty_unit=False
+#                    each_wh.product_id=False
+#                    each_wh.Packaging_type=False
+#                    each_wh.state='empty'
+
+#        moves_mo=self.env['stock.move'].search([('state','in',['done','cancel','confirmed']),('location_id','=',21),('location_dest_id','=',7)])
+#        print "moves_momoves_momoves_mo",moves_mo,len(moves_mo)
+#        move_list=[]
+#        for each in moves_mo:
+#            if 'MO' in each.origin:
+#                move_list.append(each.id)
+#                each.write({'state':'draft'})
+#                each.unlink()
+#        print "move_listmove_listmove_list",move_list,len(move_list)
+#        mo_orders=self.env['mrp.production'].search([])
+#        pick_ids_list=[]
+#        for each_mo in mo_orders:
+#            if each_mo.location_dest_id.id==37:
+#                picks=self.env['stock.picking'].search([('origin','=',each_mo.name)])
+#                if picks:
+#                    for each_pick in picks:
+#                        if 'VFRM' in each_pick.name:
+#                            pick_ids_list.append(each_pick.id)
+#                        elif 'RFRM' in each_pick.name:
+#                            pick_ids_list.append(each_pick.id)
+#        print "pick_ids_listpick_ids_listpick_ids_listpick_ids_list",pick_ids_list,len(pick_ids_list)
         
 #        prod_temps=self.env['product.template'].search([])
 #        for each_temp in prod_temps:
 #            each_temp.n_open_pricelist()
-        return True
+#            return True
 #        rm_req=self.env['mrp.raw.material.request'].search([])
 #        for each_rmr in rm_req:
 #            each_rmr.expected_compl_date=each_rmr.production_id.n_request_date
@@ -98,7 +131,7 @@ class resCompany(models.Model):
 #            if res.payment_method=='cheque':
 #                for each_cheque in res.cheque_details:
 #                    each_cheque._onchange_amount()
-#        return True
+        return True
 #        for res in pay_ids:
 #            if res.invoice_ids:
 #                for each_inv in res.invoice_ids:

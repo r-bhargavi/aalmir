@@ -524,26 +524,31 @@ class BankChequeDetailsExpense(models.Model):
     register_payment_id=fields.Many2one('account.register.payments')
     cheque_status=fields.Selection([('not_clear','Not Cleared'),('cleared','Cleared')],related="expense_id.cheque_status", string='Cheque Status',copy=False)
     
-#    		   			   			
-#class PaymentExpenseDetails(models.Model):
-#    '''to store cheque details against bank'''
-#    _name = "payment.expense.line"
-#    
-#    expense_id_other = fields.Many2one('hr.expense','Expense')
-#    expense_id = fields.Many2one('hr.expense','Expense')
-#    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
-#    
-#    		   			   			
-#    @api.onchange('expense_id_other')
-#    def expense_id_onchange(self):
-#    	if self.expense_id_other:
-#            if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
-#                self.expense_id_other=False
-#                return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
-#            self.amount=self.expense_id_other.total_amount
-#
-#    @api.onchange('amount')
-#    def amount_onchange(self):
-#    	if self.amount and self.amount!=self.expense_id_other.total_amount:
-#            self.amount=self.expense_id_other.total_amount
-#            return {'warning': {'title': "Invalid", 'message': "You cannot change approved the expense amount!!!"}}
+    		   			   			
+class PaymentExpenseDetails(models.Model):
+    '''to store cheque details against bank'''
+    _name = "payment.expense.line"
+    
+    expense_id_other = fields.Many2one('hr.expense','Expense')
+    expense_id = fields.Many2one('hr.expense','Expense')
+    amount = fields.Float('Amount',digits=dp.get_precision('Account'))
+    
+    		   			   			
+    @api.onchange('expense_id_other')
+    def expense_id_onchange(self):
+    	if self.expense_id_other:
+            if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
+                self.expense_id_other=False
+                return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
+            if self.expense_id_other.id!=self.expense_id.id:
+                self.expense_id_other=False
+                return {'warning': {'title': "Invalid", 'message': "You cannot select same expense to pay as the main expense is also same!!"}}
+            self.amount=self.expense_id_other.total_amount
+        return {'domain': {'expense_id_other': [('partner_id_preferred', '=', self.expense_id.partner_id_preferred.id)]}}
+
+
+    @api.onchange('amount')
+    def amount_onchange(self):
+    	if self.amount and self.amount!=self.expense_id_other.total_amount:
+            self.amount=self.expense_id_other.total_amount
+            return {'warning': {'title': "Invalid", 'message': "You cannot change approved the expense amount!!!"}}

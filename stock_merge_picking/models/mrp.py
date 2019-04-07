@@ -187,9 +187,12 @@ class MrpProductProduce(models.Model):
               pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
               print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
            print "moves ino bj-------------------",obj.move_created_ids
-           self.env['stock.move'].create({'origin':obj.name,'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
+           self.env['stock.move'].create({'product_packaging':obj.n_packaging.id,'product_id':obj.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':obj.product_id.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id})
            pick_exist.action_confirm()
            pick_exist.action_assign()
+        print "obj.move_created_idsobj.move_created_ids",obj.move_created_ids2
+        if obj.move_created_ids2:
+            obj.move_created_ids2[0].write({'product_packaging':obj.n_packaging.id})
         if obj.move_created_ids:
             obj.move_created_ids[0].write({'date_expected':obj.n_request_date})
         for batch_line in self.batch_ids:
@@ -231,7 +234,7 @@ class MrpProductProduce(models.Model):
                    if not pick_exist and self.product_qty>0.0:
                       pick_exist=self.env['stock.picking'].create({'origin':production_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
                       print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
-                   self.env['stock.move'].create({'origin':production_id.name,'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
+                   self.env['stock.move'].create({'product_packaging':production_id.n_packaging.id,'product_id':production_id.product_id.id,'product_uom_qty':self.product_qty,'picking_id':pick_exist.id,'picking_type_id':picking_type_2.id,'product_uom':self.product_uom_id.id,'name':production_id.product_id.name,'location_id':production_id.location_dest_id.id,'location_dest_id':stck_location.id})
                    pick_exist.action_confirm()
                    pick_exist.action_assign()
 

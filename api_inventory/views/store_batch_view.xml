@@ -138,7 +138,7 @@
 		<field name="res_model">mrp.order.batch.number</field>
 		<field name="view_type">form</field>
 		<field name="view_mode">tree,form</field>
-		<field name="domain">[("logistic_state","!=",'draft'),('produce_bool','=',True)]</field>
+		<field name="domain">[("logistic_state","!=",'draft')]</field>
 		<field name="search_view_id" ref="batche_details_filter_view"/>
 	</record>
 	
@@ -168,6 +168,7 @@
 				<field name="name" readonly="1"/>
 				<field name="product_id" readonly="1"/>
 				<field name="total_quantity" readonly="1"/>
+				<field name="total_quantity_dup" invisible="1"/>
 				<field name="store_id" readonly="1"/>
 				<field name="lot_id" readonly="1"/>
 				<field name="uom_id" readonly="1"/>
