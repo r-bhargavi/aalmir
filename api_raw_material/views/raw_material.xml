@@ -37,6 +37,7 @@
             <field name='available_qty' readonly="1"/>
             <field name='uom_id' readonly="1"/>
            <field name='production_id' readonly="1" attrs="{'invisible':[('production_id','=',False)]}"/>
+           <field name='material_request_id' readonly="1"/>
             <field name='pr_id' readonly="1" string="Prod.Request No."/>
 
           </tree>
@@ -110,13 +111,14 @@
                   
                 <notebook >
                      <page string='Raw Material Details'>
-                         <field name="request_line_ids" nolabel="1">
+                         <field name="request_line_ids" attrs="{'readonly':[('state','!=','draft')]}" nolabel="1">
 		                <tree editable="bottom"  >
 		                  <field name="product_id" readonly="1"/>
 		                  <field name='qty' readonly="1"/>
 		                  <field name='pick_qty' required="1"/>
-		                  <field name='required_date'/>
-		                  <field name='expected_compl_date'/>
+<!--		                  <field name='required_date'/>
+		                  <field name='expected_compl_date'/>-->
+		                  <field name='shift_qty' readonly="1" string="Each Shift Qty"/>
 		                  <field name='extra_qty'/>
 		                  <field name='total_available_qty' readonly="1"/>
                                   <field name='available_qty' readonly="1"/>
@@ -324,7 +326,7 @@
 		<field name="view_type">form</field>
 		<field name="view_mode">tree</field>
 		 <field name="view_id" ref="api_raw_material.mrp_production_rawmaterial_line_request_tree"/>
-                <field name="context">{'group_by':'product_id'}</field>
+                <field name="context">{'group_by':['product_id','expected_compl_date:day']}</field>
      </record>
      
       <record model="ir.actions.act_window" id="action_raw_matrial_request_line_pick">
@@ -334,7 +336,8 @@
 		<field name="view_type">form</field>
 		<field name="view_mode">tree</field>
 		 <field name="view_id" ref="api_raw_material.mrp_production_rawmaterial_line_request_tree"/>
-                <field name="context">{'group_by':'product_id'}</field>
+                <field name="context">{'group_by':['product_id','expected_compl_date:day']}</field>
+
      </record>
 	  
           <menuitem action="action_raw_matrial_request_line_pick" id="menu_mo_rmr_line_pick" name="Raw Material Request Line" parent="stock.menu_stock_inventory_control" sequence="5"/>    

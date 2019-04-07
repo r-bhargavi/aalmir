@@ -22,7 +22,7 @@
              	<attribute name="options">{'no_create': True, 'no_open': True}</attribute>
              </field>
              <field name="location_dest_id" position="after">
-                    <field name="pick_ref"/>
+                    <field name="pick_ref" attrs="{'invisible':[('pick_ref','=',False)]}"/>
              </field>
              
              <notebook position="inside">

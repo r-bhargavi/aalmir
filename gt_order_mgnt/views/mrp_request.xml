@@ -69,6 +69,7 @@
 		    </form>
 		</field>
 	    </record>
+          
     <!-- End Mrp Hold with Work Orders-->
      <!-- Start Mrp RM schedule form -->
          <!--record id="mrp_production_rm_schedule_form" model="ir.ui.view">
@@ -669,6 +670,15 @@
 	            
 		</div>
 		<field name="n_note" attrs="{'invisible':[('n_note','=',False)]}" readonly="1"/>
+		<!--<field name="no_of_shifts" attrs="{'readonly':[('state','not in',['draft','confirmed'])]}"  required="1"/>-->
+                <label for='no_of_shifts' string="Shifts" 
+                  />
+                <div>
+                 	<field name="no_of_shifts" readonly="0"  required="1"/>
+                <button type="object"  icon="STOCK_APPLY" class="oe_highlight" 
+		             name="update_shifts_temp"/>
+                 </div>
+		
 		<field name="n_approved_qty" readonly="1" attrs="{'invisible': [('n_approved_qty','=',0)]}"/>
               	<field name="uploaded_documents" widget="many2many_binary" readonly="1" attrs="{'invisible':[('uploaded_documents','=',[])]}"/>
              <div name="button_box" attrs="{'invisible':[('quality_scrap','=',0),('mo_scrap','=',0)]}" position="inside"> 

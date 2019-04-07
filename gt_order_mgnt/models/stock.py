@@ -383,6 +383,9 @@ class StockPicking(models.Model):
 
      delivery_date=fields.Datetime('Delivery Date',copy=False)
      expected_comple_date=fields.Datetime('Expected Completion Date',copy=False)
+     no_of_shifts=fields.Integer('No of Shifts',copy=False)
+     next_bo=fields.Many2one('stock.picking',string='Next BackOrder',copy=False)
+
      delivery_doc = fields.Many2many('ir.attachment','delivery_attachment_rel','delivery_doc','id','Delivered Documents',copy=False)
      delivery_doc_name = fields.Char(string='Doc Name',copy=False)
      
@@ -1094,8 +1097,50 @@ class StockPicking(models.Model):
      @api.multi
      def acknowledge_receiving(self):        
         self.write({'ack_rec': True})
-
-
+        
+     @api.onchange('no_of_shifts')
+     def _onchange_shifts(self):
+        shift_total=0.0
+        if self.no_of_shifts and self.material_request_id:
+            pick_ids=self.env['stock.picking'].search([('material_request_id','=',self.material_request_id.id),('no_of_shifts','>',0.0),('id','!=',self.id)])
+            if pick_ids:
+                
+                for each_pick in pick_ids:
+                    shift_total+=each_pick.no_of_shifts
+            else:
+                print "if self.no_of_shiftsif self.no_of_shifts",self.material_request_id.production_id.no_of_shifts,self.no_of_shifts
+                if self.no_of_shifts >self.material_request_id.production_id.no_of_shifts:
+                    raise UserError(_('Shifts Inputted exceed total no of shifts in Production it should be maximum %s')%(str(self.material_request_id.production_id.no_of_shifts)))
+        if shift_total>0:
+            if self.no_of_shifts >self.material_request_id.production_id.no_of_shifts-shift_total:
+                raise UserError(_('Shifts Inputted exceed total no of shifts in Production it should be maximum %s')%(str(self.material_request_id.production_id.no_of_shifts-shift_total)))
+        
+     @api.multi
+     def calculate_shift_qty(self):  
+        self._onchange_shifts()
+        shift_qty=0.0
+        shift_qty=0.0
+        if not self.material_request_id:
+            raise UserError('Cannot Calculate Shift Qty as the picking doesnt belong to RM Request!')
+        if self.state not in ('partially_available','assigned'):
+            raise UserError('Cannot Assign Shifts Qty as the Picking is not in Available State!!!')
+        if self.material_request_id:
+            mri=self.material_request_id
+            for each in self.pack_operation_product_ids:
+                rml_id=self.env['mrp.raw.material.request.line'].search([('material_request_id','=',mri.id),('product_id','=',each.product_id.id)])
+                if rml_id:
+                    shift_qty=rml_id.shift_qty*self.no_of_shifts
+                    if shift_qty>each.product_qty:
+                        each.write({'qty_done':each.product_qty})
+                    else:
+                        each.write({'qty_done':shift_qty})
+                    
+            body='<b>Done Qty on Operations Updated in Picking using Calculate Shifts</b>'
+            body +='<li> For RM Transfer :</b>'+str(self.name) +'</li>'
+            body +='<li> Scheduled For :</b>'+str(self.min_date) +'</li>'
+            body +='<li> Shifts updated with :</b>'+str(self.no_of_shifts) +'</li>'
+            self.message_post(body=body)
+                
      @api.multi
      def aalmir_picking_print(self):
         self.ensure_one()

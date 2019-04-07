@@ -46,7 +46,7 @@ class MachineMaintenance(models.Model):
             temp_id = self.env.ref('gt_order_mgnt.email_template_maintenance_department')
 	    if temp_id:
 	       recipient_partners=str(self.env.user.login)
-	       group = self.env['res.groups'].search([('name', '=', 'User'),('category_id.name','=','Manufacturing')])
+	       group = self.env['res.groups'].search([('name', '=', 'Maintenance email alerts')])
 	       for recipient in group.users:
 	    	   recipient_partners += ","+str(recipient.login)
 	       user_obj = self.env['res.users'].browse(self.env.uid)
@@ -113,7 +113,7 @@ class MachineMaintenance(models.Model):
 	   if temp_id:
 	       recipient_partners=str(self.env.user.login)
                recipient_partners1=''
-	       group = self.env['res.groups'].search([('name', '=', 'User'),('category_id.name','=','Manufacturing')])
+	       group = self.env['res.groups'].search([('name', '=', 'Maintenance email alerts')])
 	       for recipient in group.users:
 	    	   recipient_partners += ","+str(recipient.login)
                    recipient_partners1 += str(recipient.login)
@@ -163,7 +163,7 @@ class MachineMaintenance(models.Model):
 	    if temp_id:
 	       recipient_partners=str(self.env.user.login)
                rec=[]
-	       group = self.env['res.groups'].search([('name', '=', 'User'),('category_id.name','=','Manufacturing')])
+	       group = self.env['res.groups'].search([('name', '=', 'Maintenance email alerts')])
 	       for recipient in group.users:
 	    	   recipient_partners += ","+str(recipient.login)
                   
@@ -214,7 +214,7 @@ class MachineMaintenance(models.Model):
             temp_id = self.env.ref('gt_order_mgnt.email_template_maintenance_department')
 	    if temp_id:
 	       recipient_partners=str(self.env.user.login)
-	       group = self.env['res.groups'].search([('name', '=', 'User'),('category_id.name','=','Manufacturing')])
+	       group = self.env['res.groups'].search([('name', '=', 'Maintenance email alerts')])
 	       for recipient in group.users:
 	    	   recipient_partners += ","+str(recipient.login)
 	       user_obj = self.env['res.users'].browse(self.env.uid)
@@ -258,7 +258,7 @@ class MachineMaintenance(models.Model):
             temp_id = self.env.ref('gt_order_mgnt.email_template_maintenance_department')
 	    if temp_id:
 	       recipient_partners=str(self.env.user.login)
-	       group = self.env['res.groups'].search([('name', '=', 'User'),('category_id.name','=','Manufacturing')])
+	       group = self.env['res.groups'].search([('name', '=', 'Maintenance email alerts')])
 	       for recipient in group.users:
 	    	   recipient_partners += ","+str(recipient.login)
 	       user_obj = self.env['res.users'].browse(self.env.uid)
@@ -510,6 +510,7 @@ class MrpWorkorderMachineProduce(models.Model):
     def _check_txr(self):
         print "check ro--------------------------"
         for rec in self:
+            print "rec.batch_idrec.batch_id",rec.batch_id
             if rec.batch_id.batch_tfred==True:
                 print "yes matching----------------------"
                 rec.check_txr=True
@@ -645,7 +646,7 @@ class MrpWorkorderMachineProduce(models.Model):
                else:
                   record.warning_bool=False
             print "recordrecordrecordrecord",record
-            if wo_id.raw_materials_id:
+            if wo_id and wo_id.raw_materials_id:
                 '''for raw in record.order_id.raw_materials_id:
                    qty_one=(raw.qty/record.order_id.wk_required_qty)
                    total =round(qty_one * record.product_qty,2)
@@ -1111,6 +1112,14 @@ class MrpWorkorderBatchNo(models.Model):
             context.update({
             'default_document':[(6,0,self.document.ids)],
             })
+        prev_batch_id=False
+        if self.order_id.batch_no_ids_prev:
+            for each_rec in self.order_id.batch_no_ids_prev:
+                if each_rec.remain_used_qty!=0.0:
+                    prev_batch_id=each_rec.id
+        context.update({
+            'default_previous_batch_id':prev_batch_id if prev_batch_id else False
+            })   
 	raw_lst=[]
         for res in self:
 		if res.order_id.raw_materials_id:
@@ -1141,7 +1150,7 @@ class MrpWorkorderBatchNo(models.Model):
         res_id=False
         if machine_produce_id:
             res_id=machine_produce_id[0].id
-        print "context before opening pop up---------------",context
+        print "context before opening pop up---------------",context,machine_produce_id
         if mo_form:
                 return {
                     'name':'Produced Qty in Batch',
@@ -1887,6 +1896,10 @@ class MrpWorkcenterPructionline(models.Model):
             if rec.production_id.request_line:
                 rec.production_id.request_line.n_state='manufacture'
             rec.production_id.state='in_production'
+            if rec.machine:
+                  rec.machine.status = 'active'
+                  rec.machine.running_workorder_id=rec.id
+                  rec.machine.running_production_id=rec.production_id.id
         return res
              
     '''@api.multi
@@ -2369,6 +2382,8 @@ class MrpWorkcenterPructionline(models.Model):
     @api.multi
     def change_state(self):
         for res in self:
+                if res.first_order==True:
+                    res.production_id.no_of_shifts=res.req_product_qty
         	if self._context.get('ready'):
 #                    need to uncomment while gng live for bom
 #                        if res.production_id.state not in ('ready','in_production'):

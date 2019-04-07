@@ -145,7 +145,7 @@ class locationStockOperation(models.Model):
 	    		else:
 	    			rec.packaging_qty = str(rec.add_qty)+" "+str(rec.unit.name)
 	    	    elif rec.operation_type=='transfer':
-	    	     	cnt=qty=0
+	    	     	cnt,qty_tot=0,0.0
 	    	     	unit = rec.multi_product_id.Packaging_type.uom_id if rec.multi_product_id else rec.stock_location.Packaging_type.uom_id if rec.product_id else False
 	    	     	if unit and unit.product_type:
 	    	     		unit = unit.product_type.name 
@@ -153,12 +153,17 @@ class locationStockOperation(models.Model):
     	     			unit=unit.name
      			else :
      				unit=''
-    	     		for mst in rec.master_batches:
-    	     			cnt += len(mst.batch_id._ids)
-    	     			#for btch in res.batch_id:
-				qty +=  mst.total_quantity
-			if qty:
-				rec.add_qty=qty	
+                        if rec.master_batches:
+                            for mst in rec.master_batches:
+                                print "mstmst",mst
+                                cnt += len(mst.batch_id._ids)
+                                #for btch in res.batch_id:
+                                qty_tot +=  mst.total_quantity_dup
+                            print "qtyqty",qty_tot
+                            if qty_tot:
+                                    rec.add_qty=qty_tot	
+                        else:
+                            rec.add_qty=0.0    
 			rec.packaging_qty = str(cnt)+" "+str(unit) if cnt else None
 	    	    		
 	    			

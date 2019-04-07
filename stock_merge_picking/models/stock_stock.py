@@ -46,6 +46,7 @@ class stock_picking(osv.osv):
             })
             backorder = self.browse(cr, uid, backorder_id, context=context)
             print "backorderbackorder",backorder
+            picking.write({'next_bo':backorder.id})
 #            to link the bo to the mo
             if backorder.material_request_id:
                 backorder.material_request_id.production_id.delivery_ids= [(4,backorder.id)]	
@@ -70,9 +71,9 @@ class stock_picking(osv.osv):
         @return: True
         """
         result= super(stock_picking,self).action_assign(cr, uid, ids,context=context)
-        pick_brw=self.pool.get('stock.picking').browse(cr,uid,ids[0])
-        #if any([ x.state in ('confirmed') for x in pick_brw.move_lines]):
-            #raise UserError('Some Products are not available in mentioned source location')
+#        pick_brw=self.pool.get('stock.picking').browse(cr,uid,ids[0])
+#        if any([ x.state in ('confirmed') for x in pick_brw.move_lines]):
+#            raise UserError('Some Products are not available in mentioned source location')
         return result
 
 

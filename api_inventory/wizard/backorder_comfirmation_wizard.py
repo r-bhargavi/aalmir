@@ -25,7 +25,7 @@ class stock_immediate_transfer(models.TransientModel):
     	self.ensure_one()
     	#from INput_location >> Stock(Transit IN)
         if self.pick_id.material_request_id:
-            if self.pick_id.material_request_id.production_id.state!='in_production':
+            if self.pick_id.material_request_id.production_id.state not in ('in_production','done','cancel'):
                 self.pick_id.material_request_id.production_id.write({'state':'ready'})
 #            to link backorder of rm request to mo prodiction
         if self.pick_id.backorder_id and self.pick_id.backorder_id.material_request_id:

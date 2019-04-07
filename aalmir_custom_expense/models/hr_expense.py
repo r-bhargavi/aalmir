@@ -540,7 +540,12 @@ class PaymentExpenseDetails(models.Model):
             if self.expense_id_other.partner_id_preferred.id!=self.expense_id.partner_id_preferred.id:
                 self.expense_id_other=False
                 return {'warning': {'title': "Invalid", 'message': "You cannot merge expenses of two different partners!!"}}
+            if self.expense_id_other.id!=self.expense_id.id:
+                self.expense_id_other=False
+                return {'warning': {'title': "Invalid", 'message': "You cannot select same expense to pay as the main expense is also same!!"}}
             self.amount=self.expense_id_other.total_amount
+        return {'domain': {'expense_id_other': [('partner_id_preferred', '=', self.expense_id.partner_id_preferred.id)]}}
+
 
     @api.onchange('amount')
     def amount_onchange(self):

@@ -158,6 +158,9 @@ class MrpProduction(models.Model):
     @api.multi
     def RM_Request_Mo(self):
         for record in self:
+            if record.no_of_shifts==0.0:
+                raise UserError(_('Shifts on Manufacturing cannot be 0.Please add shifts!!')) 
+
             if record.product_lines:
                 email_to=''
                 temp_id = self.env.ref('gt_order_mgnt.email_template_for_rm_request')
@@ -187,7 +190,7 @@ class MrpProduction(models.Model):
                     #schedule_order=self.env.cr.fetchone()
                     body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
                     lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
-                        'qty':line.required_qty,'pending_qty':line.required_qty, 'rm_type':'stock','required_date':record.date_planned,
+                        'qty':line.required_qty,'shift_qty':line.required_qty/record.no_of_shifts,'pending_qty':line.required_qty, 'rm_type':'stock','required_date':record.date_planned,
                         'expected_compl_date':record.n_request_date,'production_id':record.id,
                         })) 
                 location_dest_id=record.location_dest_id

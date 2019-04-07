@@ -151,6 +151,7 @@
 	 			groups="stock.group_stock_user, gt_order_mgnt.group_sale_support" 
 	 			/>
                         <button name="acknowledge_receiving" attrs="{'invisible':['|',('ack_rec','=',True),('state','!=','done')]}" string="Acknowledged by Production" groups="gt_order_mgnt.group_injection_product,gt_order_mgnt.mrp_admin_bom" type="object" class="oe_highlight"/>
+                        <button name="calculate_shift_qty" attrs="{'invisible':[('state','not in',['partially_available','assigned'])]}" string="Calculate Shifts Qty"  type="object" class="oe_highlight"/>
 
 			<!--button name="split_picking_data" string="Split &amp;Schedule Delivery" type="object"
  				class="oe_highlight" groups="gt_order_mgnt.group_sale_support" 
@@ -160,12 +161,14 @@
 	<!--#CH_N079 make fields readonly -->
     		<field name="origin" position="replace">
 		 <field name="origin" attrs="{'readonly':[('state', '!=','draft')]}"/>
-		 <field name="ack_rec" invisible="0"/>
+		 <field name="ack_rec" string="Acknowledged by Production" readonly="1" attrs="{'invisible':[('picking_type_code', '=', 'internal'),('state', '!=','done')]}"/>
 		 <field name="expected_comple_date" attrs="{'invisible':[('expected_comple_date', '=',False)]}"/>
+		 <field name="no_of_shifts" attrs="{'invisible':['|',('state', '=','done'),('no_of_shifts', '=',0)]}"/>
+		 <field name="next_bo" readonly="1" attrs="{'invisible':[('next_bo', '=',False)]}"/>
               </field>
             	<field name="move_type" position="attributes">
 			<attribute name="attrs">{'readonly':[('state', 'in',
-					('done','cancel','transit','dispatch','delivered'))]}</attribute>
+					('done','cancel','transit','dispatch','delivered'))]}</attribute>d
 		</field>
             	<field name="picking_type_id" position="attributes">
 			<attribute name="attrs">{'readonly':[('state', '!=','draft')]}</attribute>

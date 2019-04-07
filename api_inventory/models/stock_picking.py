@@ -400,6 +400,9 @@ class stockPicking(models.Model):
 	    	for res in self:
 	    		try:
                             for check in res.pack_operation_product_ids:
+                                if check.qty_done>check.product_qty:
+                                    raise UserError("Qty Done cannot be greater then To Do!!")
+
                                 if 'MO/' in check.picking_id.name and check.qty_done>0.0:
                                     raise UserError("If you want to process full qty please process it using Validate Button.Keep the Operation Qty Done as 0")
     			    if res.location_id.usage in ('inventory','production') or res.picking_type_code =='incoming':

@@ -68,6 +68,7 @@ class MrpProductionExtraRM(models.Model):
    @api.multi
    def extra_rawmaterials(self):
        for rec in self:
+         print "use_rawuse_raw",self._context
          if self._context.get('use_raw'):
             print'TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
             for record in rec.used_raw_matrial_ids:
@@ -82,7 +83,7 @@ class MrpProductionExtraRM(models.Model):
                       raise UserError(_('Please Select Scrap product in Manufacturing Product.')) 
                    else:
                       product_id=rec.production_id.product_id.scrap_product_id.id
-                batch=self.env['mrp.order.batch.number'].create({'name':str(record.used_type)+'-'+str(rec.production_id.name)+'-' +str(rec.production_id.product_id.default_code),
+                batch=self.env['mrp.order.batch.number'].sudo().create({'name':str(record.used_type)+'-'+str(rec.production_id.name)+'-' +str(rec.production_id.product_id.default_code),
 		                               'production_id':rec.production_id.id,
                                                 'uom_id':record.uom_id.id,
 		                                'product_qty':record.qty, 
@@ -90,6 +91,7 @@ class MrpProductionExtraRM(models.Model):
                                                 #'wastage_allow':record.production_id.wastage_allow,
                                                # 'wastage_qty':rec.production_id.total_wastage_qty,
                                                 'used_type':record.used_type})
+                print "batch--------------------------",batch
             rec.production_id.requested_wastage_qty +=sum(line.qty for line in rec.used_raw_matrial_ids)
          
          else:
