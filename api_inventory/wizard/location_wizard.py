@@ -239,8 +239,7 @@ class StockStoreLocationWizard(models.TransientModel):
 			for operation in self.picking.pack_operation_product_ids:
 				operation.product_qty=operation.qty_done
 		 	self.picking.do_transfer()
-			
-    # click button in Master batch wizard when Picking is in Move to location
+                            # click button in Master batch wizard when Picking is in Move to location
     @api.multi	
     def generate_master_batch(self):
     	'''Function used to move Quantity from Input to STOCK(Transit-IN) Location.
@@ -279,66 +278,28 @@ class StockStoreLocationWizard(models.TransientModel):
 			raise UserError("Product '{}' selected batches Quantity  {} is not equal to opeartion Quantity  {} ".format(product_id,batches_product[d],operation_product[d]))
 
     	for line in self.wizard_line:
-#            if not line.product_id:
-#                    raise UserError("Please Select product")
-#            if not line.master_batch:
-#                    raise UserError("Master Batch Missing!!!")
-#
-#            bin_id=self.env['n.warehouse.placed.product'].search([('id','=',line.stock_location.id)])
-#            if not bin_id:
-#                    raise UserError("Bin-Location not found")
-#            elif bin_id.state =='full':
-#                    raise UserError("Bin-Location '{}' is fully accoupied".format(bin_id.name))
-#
-#            if  bin_id.product_type == 'single' and bin_id.product_id.id:
-#                    if bin_id.product_id.id != line.product_id.id:
-#                            raise UserError("Selected '{}' Bin in only for single product, You can't store different product in this Locaiton".format(bin_id.name))
-#
-#            mst_str=[]
-#            add_new_qty = 0
-#            for mst in line.master_batch:
-#                    add_new_qty += mst.total_quantity
-#                    if mst.store_id.id != line.stock_location.id:
-#                            raise UserError("Master Batch '{}' is not in current location '{}'".format(mst.name,line.stock_location.name))
-#                    mst_str.append(mst.name)
-#            mst_str = ",".join(mst_str)		
-#            bin_form = self.env.ref('api_inventory.transfer_bin_location_validate_wizard', False)
-#            context = self._context.copy()
-#            rec.add_qty = add_new_qty
-#            context.update({'default_product_id':rec.product_id.id,'default_master_batches':mst_str,
-#                            'default_t_qty':add_new_qty,'default_t_qty_unit':rec.add_unit.id,
-#                            'default_loc_bin_id':rec.stock_location.id,
-#                            'default_dest_bin_id':bin_id.id,'trsf_id':rec.id})
-#    	   mo_number=self.env['mrp.production'].search([('name','=',self.picking.origin)])
-#    	   po_number=self.env['purchase.order'].search([('name','=',self.picking.origin)])
-#    	   matser_batch_id=self.env['stock.store.master.batch'].create({
-#						 'product_id':line.product_id.id,'packaging':line.packaging.id,
-#						 'location_id':self.picking.location_dest_id.id,
-#						 'store_id':self.locations.id,'logistic_state':'transit_in',
-#						 'company_id':self.locations.company_id.id})
+    	   mo_number=self.env['mrp.production'].search([('name','=',self.picking.origin)])
+    	   po_number=self.env['purchase.order'].search([('name','=',self.picking.origin)])
+    	   matser_batch_id=self.env['stock.store.master.batch'].create({
+						 'product_id':line.product_id.id,'packaging':line.packaging.id,
+						 'location_id':self.picking.location_dest_id.id,
+						 'store_id':self.locations.id,'logistic_state':'transit_in',
+						 'company_id':self.locations.company_id.id})
 	   batches_data=[]
     	   if line.batch_ids:
     	   	body=''
     	   	total_qty = sum([res.convert_product_qty if res.convert_product_qty else res.product_qty for res in line.batch_ids ])
-                #                                added by bhargavi
-
-                matser_batch_id.total_quantity=total_qty
-                matser_batch_id.uom_id=res.uom_id.id
-                #                                added by bhargavi
-
     	   	for res in line.batch_ids:
     	   		qty=res.convert_product_qty if res.convert_product_qty else res.product_qty
     	   		batches_data.append((0,0,{'product_id':line.product_id.id,'store_id':self.locations.id,
    				'quantity':qty,'unit_id':line.qty_unit.id,'batch_number':res.id,
    				'lot_number':res.lot_id.id}))
 			res.write({'logistic_state':'transit_in',
-				   'master_id':matser_batch_id.id,'store_id':self.locations.id,'picking_id':self.picking.id,
+				   'master_id':matser_batch_id.id,'store_id':self.locations.id,
 				   'batch_history':[(0,0,{'operation':'logistics',
 				   	'description':'Received by Logistics({}) using Master-Batch {}'.format(self.picking.name,matser_batch_id.name)})]})
 		print "......................",self.locations,self.locations.product_type
-
 		if self.locations.product_type=='multi':
-                        print "self.locations,,,,,,,,,,,",self.locations
 			loc_id=self.locations
 			exist_pro = self.env['store.multi.product.data'].search([('product_id','=',line.product_id.id),
 							('Packaging_type','=',line.packaging.id),
@@ -436,7 +397,204 @@ class StockStoreLocationWizard(models.TransientModel):
 		    else:
 		        pack.unlink()
 		self.picking.do_transfer()
-
+			
+    # click button in Master batch wizard when Picking is in Move to location
+#    @api.multi	
+#    def generate_master_batch(self):
+#    	'''Function used to move Quantity from Input to STOCK(Transit-IN) Location.
+#    		and Generate Master Batches#'''
+#    	self.ensure_one()
+#    	if not self.wizard_line:
+#    		raise UserError("There is No Record to Process Please contact to administrator")
+#	
+#	batches_id=[]
+#	batches_product={}	#Get Batches Quantity of each Product
+#	for line in self.wizard_line:
+#		if line.batch_ids==[]:
+#   			raise UserError("Please add Batches in Master-Batch {}",format(line.master_batch))	
+#   		if len(line.batch_ids) != len(set(line.batch_ids)):
+#			raise UserError("In Master Batch '{}' some Child Batches are dupllicate",format(line.master_batch))
+#		if set(batches_id)&(set(line.batch_ids._ids)):
+#			btch_list=list(set(batches_id)&(set(line.batch_ids._ids)))
+#			mtch_ids=self.env['mrp.order.batch.number'].search([('id','in',btch_list)])
+#			mtch_str=",".join([ m.name for m in mtch_ids])
+#			raise UserError("{} Batches are in multiple Master-Batches".format(mtch_str))
+#		batches_id.extend(line.batch_ids._ids)
+#		batches_product[line.product_id.id] = batches_product[line.product_id.id] + line.done_qty if batches_product.get(line.product_id.id) else  line.done_qty
+#		
+#	operation_product={}	#Get Operation Quantity of each Product
+#	for operation in self.picking.pack_operation_product_ids:
+#		qty = operation.qty_done if operation.qty_done else operation.product_qty
+#   		operation_product[operation.product_id.id] = operation_product[operation.product_id.id] + qty if operation_product.get(operation.product_id.id) else  qty
+#    	
+#    	# check opearation quantity and batches quantity
+#	for d in operation_product:
+#		product_id = self.env['product.product'].search([('id','=',d)]).name
+#		if not batches_product.get(d,False):
+#			raise UserError("Product '{}' Not in Found batches Batches".format(product_id))
+#
+#		if operation_product[d] != batches_product[d]:
+#			raise UserError("Product '{}' selected batches Quantity  {} is not equal to opeartion Quantity  {} ".format(product_id,batches_product[d],operation_product[d]))
+#
+#    	for line in self.wizard_line:
+#            if not line.product_id:
+#                    raise UserError("Please Select product")
+#            if not line.master_batch:
+#                    raise UserError("Master Batch Missing!!!")
+#
+#            bin_id=self.env['n.warehouse.placed.product'].search([('id','=',self.locations.id)])
+#            if not bin_id:
+#                    raise UserError("Bin-Location not found")
+#            elif bin_id.state =='full':
+#                    raise UserError("Bin-Location '{}' is fully accoupied".format(bin_id.name))
+#
+#            if  bin_id.product_type == 'single' and bin_id.product_id.id:
+#                    if bin_id.product_id.id != line.product_id.id:
+#                            raise UserError("Selected '{}' Bin in only for single product, You can't store different product in this Locaiton".format(bin_id.name))
+#
+#            mst_str=[]
+#            add_new_qty = 0
+#            for mst in line.master_batch:
+#                    add_new_qty += mst.total_quantity
+#                    if mst.store_id.id != self.locations.id:
+#                            raise UserError("Master Batch '{}' is not in current location '{}'".format(mst.name,rec.locations.id.name))
+#                    mst_str.append(mst.name)
+#            mst_str = ",".join(mst_str)		
+#            bin_form = self.env.ref('api_inventory.transfer_bin_location_validate_wizard', False)
+#            context = self._context.copy()
+#            rec.add_qty = add_new_qty
+#            context.update({'default_product_id':rec.product_id.id,'default_master_batches':mst_str,
+#                            'default_t_qty':add_new_qty,'default_t_qty_unit':rec.add_unit.id,
+#                            'default_loc_bin_id':rec.stock_location.id,
+#                            'default_dest_bin_id':bin_id.id,'trsf_id':rec.id})
+#            mo_number=self.env['mrp.production'].search([('name','=',self.picking.origin)])
+#            po_number=self.env['purchase.order'].search([('name','=',self.picking.origin)])
+#            matser_batch_id=self.env['stock.store.master.batch'].create({
+#                                                  'product_id':line.product_id.id,'packaging':line.packaging.id,
+#                                                  'location_id':self.picking.location_dest_id.id,
+#                                                  'store_id':self.locations.id,'logistic_state':'transit_in',
+#                                                  'company_id':self.locations.company_id.id})
+#            batches_data=[]
+#            if line.batch_ids:
+#                body=''
+#    	   	total_qty = sum([res.convert_product_qty if res.convert_product_qty else res.product_qty for res in line.batch_ids ])
+#                #                                added by bhargavi
+#
+#                matser_batch_id.total_quantity=total_qty
+#                matser_batch_id.uom_id=res.uom_id.id
+#                #                                added by bhargavi
+#
+#    	   	for res in line.batch_ids:
+#    	   		qty=res.convert_product_qty if res.convert_product_qty else res.product_qty
+#    	   		batches_data.append((0,0,{'product_id':line.product_id.id,'store_id':self.locations.id,
+#   				'quantity':qty,'unit_id':line.qty_unit.id,'batch_number':res.id,
+#   				'lot_number':res.lot_id.id}))
+#			res.write({'logistic_state':'transit_in',
+#				   'master_id':matser_batch_id.id,'store_id':self.locations.id,'picking_id':self.picking.id,
+#				   'batch_history':[(0,0,{'operation':'logistics',
+#				   	'description':'Received by Logistics({}) using Master-Batch {}'.format(self.picking.name,matser_batch_id.name)})]})
+#		print "......................",self.locations,self.locations.product_type
+#
+#		if self.locations.product_type=='multi':
+#                        print "self.locations,,,,,,,,,,,",self.locations
+#			loc_id=self.locations
+#			exist_pro = self.env['store.multi.product.data'].search([('product_id','=',line.product_id.id),
+#							('Packaging_type','=',line.packaging.id),
+#							('store_id','=',loc_id.id)])
+#			if exist_pro:
+#				exist_pro.packages += len(line.batch_ids._ids)
+#				exist_pro.total_quantity += total_qty
+#				body+="<li>Packages added : "+str(len(line.batch_ids._ids))+" </li>"
+#				body+="<li>Quantity added : "+str(total_qty)+" </li>"
+#			else:	
+#				add_vals={'product_id':line.product_id.id}
+#				body+="<li>New Product add : "+str(line.product_id.name)+" </li>"
+#				if not line.sec_packaging:
+#					capacity=line.packaging.qty*loc_id.max_qty
+#					add_vals.update({'pkg_capicity':capacity})
+#					add_vals.update({'pkg_capicity_unit':line.packaging.unit_id.id})
+#					body+="<li>Packaging Capicity : "+str(capacity)+" "+str(line.packaging.unit_id.name)+" </li>"
+#					add_vals.update({'packages':len(line.batch_ids._ids)})
+#					add_vals.update({'pkg_unit':line.packaging.uom_id.id})
+#					
+#				elif line.packaging and line.sec_packaging:
+#					capacity=line.sec_packaging.qty*loc_id.max_qty
+#					add_vals.update({'pkg_capicity':capacity})
+#					add_vals.update({'pkg_capicity_unit':line.sec_packaging.unit_id.id})
+#					body+="<li>Packag Capicity : "+str(capacity)+" "+str(line.sec_packaging.unit_id.name)+" </li>"
+#					add_vals.update({'packages':len(line.batch_ids._ids)})
+#					add_vals.update({'pkg_unit':line.sec_packaging.unit_id.id})
+#				body+="<li>No of Packages : "+str(len(line.batch_ids._ids))+" "+str(line.sec_packaging.unit_id.name)+" </li>"
+#				add_vals.update({'total_quantity':total_qty})
+#				add_vals.update({'total_qty_unit':line.packaging.unit_id.id})
+#				body+="<li>Quantity Added : "+str(total_qty)+" "+str(line.packaging.unit_id.name)+" </li>"
+#				add_vals.update({'Packaging_type':line.packaging.id})
+#				body+="<li>Packaging : "+str(line.packaging.name)+" </li>"
+#				loc_id.multi_product_ids=[(0,0,add_vals)]
+#			loc_id.state='partial'
+#		else:
+#			raise UserError("Transfer error in generate master batch...")
+#			
+#		self.locations.message_post(body)
+#		operation_dsc = 'From Inventory Loss'
+#		if mo_number:
+#			operation_dsc = 'From Manufacturing {}'.format(mo_number)
+#		elif po_number:
+#			operation_dsc = 'From Purchasing {}'.format(po_number)
+#
+#		self.env['location.history'].create({'stock_location':self.locations.id,
+#							'product_id':line.product_id.id,
+#							'qty':total_qty,'n_type':'in',
+#							'operation_name':operation_dsc,
+#							'operation':'mo' if mo_number else 'po' if po_number else 'stk',
+#							})
+#							
+#		# create history in stock Picking
+#		store_data=self.env['picking.lot.store.location'].create({'picking_id':self.picking.id,
+#    							'master_id':matser_batch_id.id,'quantity':line.done_qty,
+#    							'unit_id':line.qty_unit.id,'store_id':self.locations.id,
+#    							'product_id':line.product_id.id,
+#    							'batches_ids':batches_data})
+#    							
+#    # call default backorder methods
+#    	if self.back_order_id:
+#		self.back_order_id._process(self.backorder)
+#		picking_obj=self.env['stock.picking']
+#    		if self.backorder:
+#    			pre_order_id= picking_obj.search([('name','=',self.picking.origin)])
+#    			backorder_id= picking_obj.search([('backorder_id','=',self.picking.id)])
+#    			if pre_order_id:
+#    				result1=[]
+#    				for move in pre_order_id.move_lines:
+#    					for back in backorder_id.move_lines:
+#    						if move.product_id.id ==back.product_id.id:
+#    							result1.append((0, 0, {'product_id': move.product_id.id,
+#    								 'quantity': back.product_qty, 'move_id': move.id}))
+#                		vals={'product_return_moves':result1,'location_id': pre_order_id.location_id.id}
+#                		return_id = self.env['stock.return.picking'].with_context({
+#                							'new_active_id':pre_order_id.id}).create(vals)
+#				return_data=return_id.create_returns()
+#				pick_id=picking_obj.search([('id','=',return_data.get('res_id'))])
+#				pick_id.name = pick_id.name.replace('/INT/','/RE-INT/')
+#				self.picking.message_post('Return for Rejected quantity <b>{}</b>'.format(pick_id.name))
+#				pick_id.message_post('Return form Order <b>{}</b>'.format(self.picking.name))
+#					    
+#	# call default Transfer methods	    
+#    	elif self.immediate_tra:
+#		# If still in draft => confirm and assign
+#		if self.picking.state == 'draft':
+#		    self.picking.action_confirm()
+#		    if self.picking.state != 'assigned':
+#		        self.picking.action_assign()
+#		        if self.picking.state != 'assigned':
+#		            raise UserError(_("Could not reserve all requested products. Please use the \'Mark as Todo\' button to handle the reservation manually."))
+#		for pack in self.picking.pack_operation_ids:
+#		    if pack.product_qty > 0:
+#		        pack.write({'qty_done': pack.product_qty})
+#		    else:
+#		        pack.unlink()
+#		self.picking.do_transfer()
+#
     # On Clicking dispatch process in Wizard of delivery order
     @api.multi
     def dispatch_process(self):
