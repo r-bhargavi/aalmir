@@ -150,6 +150,7 @@
                 	<button name="aalmir_picking_print" string="Download" type="object" class="oe_highlight"
 	 			groups="stock.group_stock_user, gt_order_mgnt.group_sale_support" 
 	 			/>
+                        <!--<button name="acknowledge_receiving" attrs="{'invisible':['|','|',('picking_type_id.id', 'not in',[7,8]),('ack_rec','=',True),('state','!=','done')]}" string="Acknowledged by Production" groups="gt_order_mgnt.group_injection_product,gt_order_mgnt.mrp_admin_bom" type="object" class="oe_highlight"/>-->
                         <button name="acknowledge_receiving" attrs="{'invisible':['|',('ack_rec','=',True),('state','!=','done')]}" string="Acknowledged by Production" groups="gt_order_mgnt.group_injection_product,gt_order_mgnt.mrp_admin_bom" type="object" class="oe_highlight"/>
                         <button name="calculate_shift_qty" attrs="{'invisible':[('state','not in',['partially_available','assigned'])]}" string="Calculate Shifts Qty"  type="object" class="oe_highlight"/>
 

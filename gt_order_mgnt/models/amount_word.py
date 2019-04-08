@@ -11,6 +11,9 @@ def _amount_total_text(self, cursor, user, ids, name, arg, context=None):
         if order.currency_id.name == 'AED':
             a = 'Dirham'
             b = 'Fils'
+        if order.currency_id.name == 'OMR':
+            a = 'Rial'
+            b = 'Baisa'
         if order.currency_id.name == 'USD':
             a = 'Dollar'
             b = 'cent'
@@ -27,6 +30,9 @@ def _amount_total_text_inv(self, cursor, user, ids, name, arg, context=None):
         if order.company_id.currency_id.name == 'AED':
             a = 'Dirham'
             b = 'Fils'
+        if order.currency_id.name == 'OMR':
+            a = 'Rial'
+            b = 'Baisa'
         if order.currency_id.name == 'USD':
             a = 'Dollar'
             b = 'cent'

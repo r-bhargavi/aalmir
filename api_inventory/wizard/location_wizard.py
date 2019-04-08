@@ -665,7 +665,7 @@ class StockStoreLocationWizard(models.TransientModel):
 				elif rec.picking.picking_type_code=='internal':
                                         if 'MO' in rec.picking.origin if rec.picking.origin else '':
                                             if rec.picking.material_request_id:
-                                                if rec.picking.material_request_id.production_id.state!='in_production':
+                                                if rec.picking.material_request_id.production_id.state not in ('in_production','done','cancel'):
                                                     rec.picking.material_request_id.production_id.write({'state':'ready'})
 					if rec.picking.location_dest_id.actual_location and rec.picking.location_id.actual_location:
 						new_company_id = rec.picking.location_dest_id.company_id.id
