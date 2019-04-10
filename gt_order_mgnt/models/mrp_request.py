@@ -2427,10 +2427,10 @@ class MrpPrdocutionShiftsUpdate(models.Model):
         rec = super(MrpPrdocutionShiftsUpdate, self).default_get(fields)
 	obj = self.env['mrp.production'].browse(self._context.get('active_id'))
         line_vals=[]
+        fif_hours_from_now = datetime.now() + timedelta(hours=15)
+        print "fif_hours_from_nowfif_hours_from_nowfif_hours_from_now",fif_hours_from_now
+        check=fif_hours_from_now.strftime("%Y-%m-%d %H:%M:%S")
 	if obj.delivery_ids:
-            fif_hours_from_now = datetime.now() + timedelta(hours=15)
-            print "fif_hours_from_nowfif_hours_from_nowfif_hours_from_now",fif_hours_from_now
-            check=fif_hours_from_now.strftime("%Y-%m-%d %H:%M:%S")
             for each_dl in obj.delivery_ids:
                 vals={}
                 if each_dl.state in ('partially_available','assigned','confirmed'):
