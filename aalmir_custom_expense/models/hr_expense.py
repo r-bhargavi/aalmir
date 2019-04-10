@@ -547,7 +547,7 @@ class HrExpense(models.Model):
         return True
     
     @api.multi
-    def approve_expenses(self):
+    def approve_expense_custom(self):
 
         self.write({'state': 'approve','approved_by':self._uid})
     

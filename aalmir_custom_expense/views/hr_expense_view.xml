@@ -275,10 +275,10 @@
                 </field>
                  <xpath expr="//button[@name='approve_expenses']" position="replace">
                     <!--<attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>-->
-                    <button type="object" name="approve_expenses" string="Approve" class="btn-primary"
-                            attrs="{'invisible':[('state','!=','submit'),('show_approve','=',False)]}"
+                    <button type="object" name="approve_expense_custom" string="Approve" class="btn-primary"
+                            attrs="{'invisible':['|',('state','!=','submit'),('show_approve','=',False)]}"
                  />                
-                    <button type="object" name="approve_expenses" string="Approve Admin" class="btn-primary"
+                    <button type="object" name="approve_expense_custom" string="Approve Admin" class="btn-primary"
                             attrs="{'invisible':[('state','!=','submit')]}" groups="base.group_no_one"
                  />                
                  </xpath>
