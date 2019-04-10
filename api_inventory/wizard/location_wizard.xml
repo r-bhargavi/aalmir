@@ -29,7 +29,7 @@
 		        		<field name="master_batch" />
 		        		<field name="batch_ids" widget="many2many_tags" readonly="1" string="Child Batches" />
 	         			<field name="lot_ids" />
-	         			<field name="stock_location" required="1"/>
+	         			<!--<field name="stock_location" required="1"/>-->
 		        		<field name="done_qty" string="Quantity" />
 		        		<field name="qty_unit" />
 				</tree>
@@ -39,7 +39,7 @@
 		        		<field name="master_batch" readonly="1"/>
 		        		<field name="lot_ids" widget="many2many_tags" 
 		        			options="{'no_create': True, 'no_open': True}" string='Transfer No.'/>
-                                        <field name="stock_location" required="1"/>
+                                        <!--<field name="stock_location" required="1"/>-->
 
 	        			</group >
 	        			<group col="2">
