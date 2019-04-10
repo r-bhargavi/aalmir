@@ -182,6 +182,8 @@
 
                 </field>
                 <field name="product_id" position="after">
+                    <field name="show_approve" invisible="1"/>
+                    <field name="type_product" required="1" readonly="1"/>
                     <field name="type_product" required="1" readonly="1"/>
                     <field name="cancel_reason" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
@@ -234,7 +236,7 @@
                                 <field name="doc_name" invisible="1"/>
                                 <!--making internal note mandatory-->
                                 <!--<field name="communication" required="1"/>-->
-                                <field name="communication"/>
+                                <field name="communication" required="1"/>
                                 <field name="internal_note"/>
                                 <field name="internal_request_tt" attrs="{'invisible':[('pay_p_up','!=','not_posted')]}"/>
                                 <field name="uploaded_document" colspan="2" filename="doc_name" 
@@ -271,12 +273,15 @@
                         <button name="print_payment_receipt" type="object" icon='fa-download' string="Download Receipt" class="btn-primary"  attrs = "{'invisible': [('account_pay_id', '=',False)]}"/>
                         <button name="cancel_expense" type="object" icon='fa-close' string="Cancel Expense" class="btn-primary"  attrs = "{'invisible': [('state', '!=','done')]}"/>
                 </field>
-                 <xpath expr="//button[@name='approve_expenses']" position="attributes">
-                    <attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>
-                </xpath>
-<!--                 <xpath expr="//button[@name='approve_expenses']" position="attributes">
-                        <attribute name='invisible'>[('approval_by','!=',user_id.id)]</attribute>
-                </xpath>-->
+                 <xpath expr="//button[@name='approve_expenses']" position="replace">
+                    <!--<attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>-->
+                    <button type="object" name="approve_expenses" string="Approve" class="btn-primary"
+                            attrs="{'invisible':[('state','!=','submit'),('show_approve','=',False)]}"
+                 />                
+                    <button type="object" name="approve_expenses" string="Approve Admin" class="btn-primary"
+                            attrs="{'invisible':[('state','!=','submit')]}" groups="base.group_no_one"
+                 />                
+                 </xpath>
                 <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" position="attributes">
                     <attribute name='groups'>aalmir_custom_expense.restricted_hr_expense_grant</attribute>
 
