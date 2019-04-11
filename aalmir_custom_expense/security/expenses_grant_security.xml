@@ -9,6 +9,12 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to approve expenses submitted.</field>
     </record>
+    <record id="restricted_hr_expense_grant_for_no_ac" model="res.groups">
+        <field name="name">Expenses Grant for no Approval Config</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">the user will have access to approve expenses submitted but there was no approval configuraton.</field>
+    </record>
 
 </data>
 

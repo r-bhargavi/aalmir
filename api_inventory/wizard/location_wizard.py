@@ -405,8 +405,7 @@ class StockStoreLocationWizard(models.TransientModel):
 		        pack.write({'qty_done': pack.product_qty})
 		    else:
 		        pack.unlink()
-		self.picking.do_transfer()
-#
+		self.picking.do_transfer()#
     # On Clicking dispatch process in Wizard of delivery order
     @api.multi
     def dispatch_process(self):

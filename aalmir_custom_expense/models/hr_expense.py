@@ -10,7 +10,8 @@ from dateutil.relativedelta import relativedelta
 
 class HrExpense(models.Model):
     _inherit = "hr.expense"
-    
+    show_approve=fields.Boolean('Show Approve', compute='compute_show_approve')
+
     cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
     uploaded_document_cancel = fields.Many2many('ir.attachment','cancel_attachment_exp_rel','cancel_att','exp_id','Upload Cancel Proof',copy=False,track_visibility='always')
     name = fields.Char(string='Expense Description', readonly=True)
@@ -65,7 +66,38 @@ class HrExpense(models.Model):
     internal_request_tt=fields.Text('Note',track_visibility='always',copy=False)
 #    tot_amount_if_other_expense=fields.Float('Total Amount', compute='amount_other_expense_if_any')
 
-
+    @api.multi
+    def compute_show_approve(self):
+        for record in self:
+            non_approval=self.env['approval.config'].search([('product_type','=',record.type_product.id)])
+            if non_approval:
+                user_ids=[]
+                for each_line in non_approval.approval_line:
+                    if non_approval.currency_id.id!=each_line.approve_id.currency_id.id:
+                        from_currency = non_approval.currency_id
+                        to_currency = each_line.approve_id.currency_id
+                        limit_amt = from_currency.compute(each_line.approve_amount_upto, to_currency, round=False)
+                    else:
+                        limit_amt=each_line.approve_amount_upto
+                    if limit_amt>record.total_amount:
+                        user_ids.append(each_line.approval_by.id)
+                if self.env.user.id in user_ids:
+                    record.show_approve=True
+                    break;
+                else:
+                    record.show_approve=False
+                    break;
+            else:
+                group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+                print "group_idgroup_id",group_id
+                users=self.env['res.groups'].search([('id', '=',group_id)]).users
+                if self.env.user.id in users.ids:
+                    record.show_approve=True
+                    break;
+                else:
+                    record.show_approve=False
+                    break;
+                    
 #    @api.multi
 #    @api.depends('expense_details')
 #    def amount_other_expense_if_any(self):
@@ -185,21 +217,48 @@ class HrExpense(models.Model):
 #        if self.expense_type=='emp_expense':
 #            self.write({'partner_id_preferred':False})
         self.write({'bank_journal_id_expense':False})
-        non_approval=self.env['approval.config.line'].search([('type_product','=',self.type_product.id)])
+        non_approval=self.env['approval.config'].search([('product_type','=',self.type_product.id)])
         print "non_approvalnon_approvalnon_approval",non_approval
         if non_approval:
-            if non_approval.currency_id.id!=self.currency_id.id:
-                from_currency = non_approval.currency_id
-                to_currency = self.currency_id
-                limit_amt = from_currency.compute(non_approval.approve_amount, to_currency, round=False)
-            else:
-                limit_amt=non_approval.approve_amount
-            if self.total_amount>limit_amt:
-                self.write({'approval_status':'app_required','approval_by':non_approval.approval_by.id,'user_id':self._uid,'state': 'submit'})
+            
+            if self.total_amount>non_approval.approve_not_req_upto:
+                if not non_approval.approval_line:
+                    raise UserError(_('There is no Approval Line defined in Approval Configuration.'))
+
+                amt_upto_list=[]
+                for each_line in non_approval.approval_line:
+                    if non_approval.currency_id.id!=self.currency_id.id:
+                        from_currency = non_approval.currency_id
+                        to_currency = self.currency_id
+                        limit_amt = from_currency.compute(each_line.approve_amount_upto, to_currency, round=False)
+                    else:
+                        limit_amt=each_line.approve_amount_upto
+                    amt_upto_list.append(limit_amt)
+                amt_upto_list.sort()
+                print "amt_upto_listamt_upto_list",amt_upto_list
+                for each_amt in amt_upto_list:
+                    if self.total_amount<each_amt:
+                        print "each_amteach_amteach_amt",each_amt
+                        line_id=self.env['approval.config.line'].search([('approve_amount_upto','=',each_amt),('approve_id','=',non_approval.id)])
+                        self.write({'approval_status':'app_required','approval_by':line_id.approval_by.id,'user_id':self._uid,'state': 'submit'})
+                        return True
+                    else:
+                        self._cr.execute('SELECT ID FROM approval_config_line where approve_amount_upto=(select max(approve_amount_upto) from approval_config_line where approve_id=%s)', (non_approval.id,))
+                        result=self._cr.fetchone()
+                        print "resultresult",result
+                        cl_brw=self.env['approval.config.line'].browse(result[0])
+                        self.write({'approval_status':'app_required','approval_by':cl_brw.approval_by.id,'user_id':self._uid,'state': 'submit'})
+
             else:
                 self.write({'state': 'approve'})
         else:
+            group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+            print "group_idgroup_id",group_id
+            users=self.env['res.groups'].search([('id', '=',group_id)]).users
             self.write({'state': 'submit','approval_status':'app_required'})
+            if users:
+                self.write({'approval_by':users[0].id})
+
         return True
 
     @api.multi
@@ -488,9 +547,9 @@ class HrExpense(models.Model):
         return True
     
     @api.multi
-    def approve_expenses(self):
-        self.write({'state': 'approve','approved_by':self._uid})
+    def approve_expense_custom(self):
 
+        self.write({'state': 'approve','approved_by':self._uid})
     
                 
     @api.onchange('product_id')
