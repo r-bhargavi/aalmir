@@ -162,7 +162,7 @@
 	<!--#CH_N079 make fields readonly -->
     		<field name="origin" position="replace">
 		 <field name="origin" attrs="{'readonly':[('state', '!=','draft')]}"/>
-		 <field name="ack_rec" string="Acknowledged by Production" readonly="1" attrs="{'invisible':[('picking_type_code', '=', 'internal'),('state', '!=','done')]}"/>
+		 <field name="ack_rec" string="Acknowledged by Production" readonly="1" attrs="{'invisible':[('ack_rec', '=', False),('picking_type_code', '=', 'internal'),('state', '!=','done')]}"/>
 		 <field name="expected_comple_date" attrs="{'invisible':[('expected_comple_date', '=',False)]}"/>
 		 <field name="no_of_shifts" attrs="{'invisible':['|',('state', '=','done'),('no_of_shifts', '=',0)]}"/>
 		 <field name="next_bo" readonly="1" attrs="{'invisible':[('next_bo', '=',False)]}"/>

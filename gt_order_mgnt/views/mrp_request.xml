@@ -237,6 +237,7 @@
            <field name="cycle_total" position='replace'/>
 	</field>
 	</record> 
+
     <record id="mrp_operations.mrp_production_form_inherit_view2" model="ir.ui.view">
         <field name="name">mrp.production.form.inherit2</field>
         <field name="model">mrp.production</field>

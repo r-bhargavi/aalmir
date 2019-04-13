@@ -239,8 +239,8 @@ class StockStoreLocationWizard(models.TransientModel):
 			for operation in self.picking.pack_operation_product_ids:
 				operation.product_qty=operation.qty_done
 		 	self.picking.do_transfer()
-			
-    # click button in Master batch wizard when Picking is in Move to location
+                            # click button in Master batch wizard when Picking is in Move to location
+# click button in Master batch wizard when Picking is in Move to location
     @api.multi	
     def generate_master_batch(self):
     	'''Function used to move Quantity from Input to STOCK(Transit-IN) Location.
@@ -405,8 +405,7 @@ class StockStoreLocationWizard(models.TransientModel):
 		        pack.write({'qty_done': pack.product_qty})
 		    else:
 		        pack.unlink()
-		self.picking.do_transfer()
-
+		self.picking.do_transfer()#
     # On Clicking dispatch process in Wizard of delivery order
     @api.multi
     def dispatch_process(self):

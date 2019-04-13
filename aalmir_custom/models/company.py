@@ -36,6 +36,7 @@ class resCompany(models.Model):
 #                    each_wh.product_id=False
 #                    each_wh.Packaging_type=False
 #                    each_wh.state='empty'
+#            return True
 
 #        moves_mo=self.env['stock.move'].search([('state','in',['done','cancel','confirmed']),('location_id','=',21),('location_dest_id','=',7)])
 #        print "moves_momoves_momoves_mo",moves_mo,len(moves_mo)
