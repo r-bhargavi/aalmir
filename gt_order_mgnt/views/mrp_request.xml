@@ -218,12 +218,6 @@
             <field name="product_uom" position='attributes'>
                   <attribute name='string'>Unit</attribute>
             </field>
-            <!--field name="product_uom" position="after">
-              <field name="wastage_allow" string='Wastage(Kg)'/> COMENTED due to move in new module
-            </field-->
-<!--            <field name="product_qty" position="after">
-               <field name="n_produce_qty" string='Produced Qty'/>
-            </field>-->
             <field name="name" position='attributes'>
                   <attribute name='string'>MO Name</attribute>
             </field>
@@ -401,19 +395,6 @@
                         </form>
                      </field>
                   </page>
-                 <!--page string='Wastage Information' attrs="{'invisible':[('wastage_ids','=',[])]}">
-                   <field name='wastage_ids' nolabel='1' readonly='1' attrs="{'invisible':[('wastage_ids','=',[])]}">
-                        <tree>
-                           <field name='name' />
-                            
-                            <field name='total_product_qty' string="Total Produced Qty"/>
-                            <field name="total_uom_id"  string="Unit"/>
-                            <field name="total_wastage_qty"/>
-                            <field name="wastage_uom_id"  string="Unit"/>
-                        </tree>
-                     </field>
-
-                </page-->
                </notebook>
                
               </xpath>
@@ -465,8 +446,6 @@
                    <field name='shift_produced' string='Shift Completed'/>
                     <field name='total_product_qty' string="Produced Qty"/>
                      <field name="total_uom_id"  string="Unit"/>
-                      <!--field name="total_wastage_qty"/>
-                      <field name="wastage_uom_id"  string="Unit"/-->
               </xpath>
               <!--xpath expr="//field[@name='workcenter_lines']/tree" position='attributes'>
                    <attribute name='editable'>bottom</attribute>

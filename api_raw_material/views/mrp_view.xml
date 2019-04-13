@@ -15,6 +15,9 @@
 				            <field name='product_id'/>
 				            <field name='qty' />
 				            <field name='requested_qty' sum='total'/>
+				            <field name='percent_rm'/>
+				            <field name='percent_value'/>
+				            <field name='percent_value_25'/>
 				            <!--field name='proceed_qty' /-->
 				            <field name='receive_qty' sum='total'/>
 				            <field name='consumed_qty' sum='total'/>

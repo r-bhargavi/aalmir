@@ -68,13 +68,13 @@ class MrpProduction(models.Model):
     request_state=fields.Selection([('draft','Requested'),('approve','Approved'), ('reject','Rejeted'),('cancel','Cancelled')], string='Status', related='material_request_id.state')
     delivery_ids=fields.Many2many('stock.picking','mrp_stock_raw_material_rel','production_id',
                                   'picking_id',string='Delivery Details',copy=False)
-    total_wastage_qty=fields.Float('Produced Wastage Qty',compute='count_wastage_qty')
+    total_wastage_qty=fields.Float('Produced Wastage Qty',compute='count_wastage_qty',store=True)
     remain_wastage_qty=fields.Float('Remaining Wastage Qty',compute='remain_wastage')
     requested_wastage_qty=fields.Float('Requested Wastage Qty')
     remain_wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
     wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
     wastage_ids=fields.One2many('mrp.production.workcenter.line','production_id',string='Wastage Details',copy=False)
-    wastage_allow=fields.Float('Allowed Wastage', compute='allowwastage_mo')
+    wastage_allow=fields.Float('Allowed Wastage', compute='allowwastage_mo',store=True)
     allow_wastage_uom_id=fields.Many2one('product.uom', default=_get_uom_id)
     wastage_batch_ids=fields.One2many('mrp.order.batch.number','production_id', compute='wastage_batches')
   
@@ -158,8 +158,8 @@ class MrpProduction(models.Model):
     @api.multi
     def RM_Request_Mo(self):
         for record in self:
-            if record.no_of_shifts==0.0:
-                raise UserError(_('Shifts on Manufacturing cannot be 0.Please add shifts!!')) 
+#            if record.no_of_shifts==0.0:
+#                raise UserError(_('Shifts on Manufacturing cannot be 0.Please add shifts!!')) 
 
             if record.product_lines:
                 email_to=''
@@ -185,12 +185,16 @@ class MrpProduction(models.Model):
                 body +="<table class='table' style='width:80%; height: 50%;font-family:arial; text-align:left;'><tr><th>Material Name </th><th> qty</th></tr>" 
                 lst=[]
                 for line in record.product_lines:
+                    if record.no_of_shifts==0.0:
+                        shift_value=1
+                    else:
+                        shift_value=record.no_of_shifts
                     #term_qry="select  date_planned from mrp_production_workcenter_line where id in (select DISTINCT order_id from workorder_raw_material where product_id ="+str(line.product_id.id)+ "and production_id =" +str(record.id) +") limit 1"
                     #self.env.cr.execute(term_qry)
                     #schedule_order=self.env.cr.fetchone()
                     body +="<tr><td>%s</td><td>%s %s</td></tr>"%(str(line.product_id.name), str(line.product_qty), str(line.product_uom.name)) 
                     lst.append((0,0,{'product_id':line.product_id.id,'uom_id':line.product_uom.id,
-                        'qty':line.required_qty,'shift_qty':line.required_qty/record.no_of_shifts,'pending_qty':line.required_qty, 'rm_type':'stock','required_date':record.date_planned,
+                        'qty':line.required_qty,'shift_qty':line.required_qty/shift_value,'pending_qty':line.required_qty, 'rm_type':'stock','required_date':record.date_planned,
                         'expected_compl_date':record.n_request_date,'production_id':record.id,
                         })) 
                 location_dest_id=record.location_dest_id

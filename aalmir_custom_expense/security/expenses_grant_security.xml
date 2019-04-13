@@ -3,12 +3,12 @@
 <data noupdate="0">
     
 
-    <record id="restricted_hr_expense_grant" model="res.groups">
+<!--    <record id="restricted_hr_expense_grant" model="res.groups">
         <field name="name">Expenses Grant</field>
         <field name="category_id" ref="base.module_category_usability"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="comment">the user will have access to approve expenses submitted.</field>
-    </record>
+    </record>-->
     <record id="restricted_hr_expense_grant_for_no_ac" model="res.groups">
         <field name="name">Expenses Grant for no Approval Config</field>
         <field name="category_id" ref="base.module_category_usability"/>
@@ -20,18 +20,18 @@
 
 <data noupdate="0">
 
-    <record id="expense_rule_restricted_group_hr" model="ir.rule">
+<!--    <record id="expense_rule_restricted_group_hr" model="ir.rule">
         <field name="name">HR Expense Approval</field>
         <field ref="hr_expense.model_hr_expense" name="model_id"/>
         <field name="domain_force">['|',('user_id','=',user.id),('approval_by','=',user.id)]</field>
         <field name="groups" eval="[(4, ref('restricted_hr_expense_grant'))]"/>
-    </record>
+    </record>-->
     
     <record id="hr_expense.property_rule_expense_manager" model="ir.rule">
             <field name="name">Manager Expense</field>
             <field name="model_id" ref="model_hr_expense"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('account.group_account_user')), (4, ref('restricted_hr_expense_grant'))]"/>
+            <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
         </record>
 </data>
 </openerp>

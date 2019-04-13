@@ -224,7 +224,7 @@ class MrpProduction(models.Model):
     n_produce_qty_now = fields.Float('Quantity Produced',help='Quantity Produced from Manufacture Order',compute='_n_get_produced_qty_now')
     produce_uom_id=fields.Many2one('product.uom', compute='_n_get_produced_qty')
     n_note = fields.Text('Instruction In PR',help='Instruction Given by Sale Support for Manufacture of this product',related='request_line.n_Note')
-    no_of_shifts = fields.Integer('No.Of Shifts')
+    no_of_shifts = fields.Float('No.Of Shifts')
     n_approved_qty = fields.Float('Quantity Approved',help='Quantity Approved by Quality Check',compute='_get_approved_qty')
 
     mo_scrap = fields.Float('Mo Scrap Quantity',compute='_get_scrap_qty')
@@ -332,6 +332,9 @@ class MrpProduction(models.Model):
                   
     @api.multi
     def update_shifts_temp(self):
+        if self.no_of_shifts==0:
+            raise UserError("No of Shifts cannot be 0!!")
+
         for each in self.material_request_id:
             for each_line in each.request_line_ids:
                 each_line.shift_qty=each_line.qty/self.no_of_shifts
@@ -814,6 +817,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(pcs_qty * bom.product_qty), 'production_id':rec.id,
                                     'next_order_id':order.next_order_id.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                     'original_qty':(pcs_qty * bom.product_qty)}))
                           order.raw_materials_id=lst
                           
@@ -826,6 +832,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(pcs_qty * bom.product_qty),'production_id':rec.id,
                                     'next_order_id':order.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                    'original_qty':(pcs_qty * bom.product_qty)}))
                           order.raw_materials_id=lst
                           if rec.n_packaging.unit_id.name =='Kg':
@@ -853,6 +862,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(pcs_qty * bom.product_qty),'production_id':rec.id, 
                                     'next_order_id':order.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                     'original_qty':(pcs_qty * bom.product_qty)}))
                           order.raw_materials_id=lst
                           order.batch_unit='Rolls'
@@ -865,6 +877,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(pcs_qty * bom.product_qty),'production_id':rec.id,
                                     'next_order_id':order.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                     'original_qty':(pcs_qty * bom.product_qty)}))
                           order.raw_materials_id=lst
                           order.batch_unit='Rolls'
@@ -886,6 +901,9 @@ class MrpProduction(models.Model):
                                         lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                           'qty':(rm_qty),'production_id':rec.id,
                                           'next_order_id':order.id,
+                                          'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                            'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                           'original_qty':(rm_qty)})) 
                           order.raw_materials_id=lst      
                           
@@ -897,6 +915,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(qty.product_qty),'production_id':rec.id,
                                     'next_order_id':order.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                     'original_qty':qty.product_qty})) 
                           order.raw_materials_id=lst 
                        if order.process_id.process_type == 'ptube':
@@ -907,6 +928,9 @@ class MrpProduction(models.Model):
                                   lst.append((0,0,{'product_id':bom.product_id.id, 'uom_id':bom.product_uom.id,
                                     'qty':(pcs_qty * bom.product_qty), 'production_id':rec.id, 
                                     'next_order_id':order.id,
+                                    'percent_rm':bom.percentage,
+                                    'percent_value':(order.each_batch_qty*bom.percentage)/100,
+                                    'percent_value_25':(order.each_batch_qty*bom.percentage)/2500,
                                     'original_qty':(pcs_qty * bom.product_qty)}))
                           order.raw_materials_id=lst
                           order.batch_unit='Rolls'

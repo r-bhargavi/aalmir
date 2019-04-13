@@ -163,6 +163,9 @@
                 <group>
                   <group>
                      <field name="complete_produce" string='Mark as Done'/>  
+                     <field name="extra_check" invisible="1"/>  
+                    <label style="color:red" attrs="{'invisible': [('extra_check','=',False)]}" string="You are Transferring Qty more then required!!"/>
+
                   </group>
                   <group>
                   </group>

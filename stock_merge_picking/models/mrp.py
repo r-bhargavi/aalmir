@@ -101,13 +101,22 @@ class MrpProductProduce(models.Model):
     produced_uom_id=fields.Many2one('product.uom' ,'Unit')
     remain_lines = fields.One2many('mrp.product.produce.line', 'produce_remain_id', 'Products Consumed')
     actual_qty=fields.Float(compute='compute_actual_qty')
+    extra_check=fields.Boolean(compute='compute_extra_check')
     
     @api.depends('batch_ids')
     def compute_actual_qty(self):
         if self.batch_ids:
             for each in self.batch_ids:
                 self.actual_qty+=each.convert_product_qty
-
+                
+    @api.depends('produced_qty')
+    def compute_extra_check(self):
+        if self.produced_qty:
+            obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
+            if obj.product_qty<self.produced_qty+obj.n_produce_qty:
+                self.extra_check=True
+            else:
+                self.extra_check=False
     @api.multi
     @api.onchange('complete_produce')
     def remain_raw_mrp(self): 
@@ -150,12 +159,38 @@ class MrpProductProduce(models.Model):
                record.product_qty=round(qty, 2)
             else:
                  record.product_qty=0.0
-    
-    @api.multi
+    def _make_production_produce_line_extra(self,production,qty,uom):
+        stock_move = self.env['stock.move']
+        proc_obj = self.env['procurement.order']
+        source_location_id = production.product_id.property_stock_production.id
+        destination_location_id = production.location_dest_id.id
+        procs = proc_obj.search([('production_id', '=', production.id)])
+        procurement = procs 
+        data = {
+            'name': production.name,
+            'date': production.date_planned,
+            'date_expected': production.date_planned,
+            'product_id': production.product_id.id,
+            'product_uom': uom.id,
+            'product_uom_qty': qty,
+            'location_id': source_location_id,
+            'location_dest_id': destination_location_id,
+            'move_dest_id': production.move_prod_id.id,
+            'procurement_id': procurement and procurement.id,
+            'company_id': production.company_id.id,
+            'production_id': production.id,
+            'origin': production.name,
+            'group_id': procurement and procurement.group_id.id,
+        }
+        move_id = stock_move.create(data)
+        print "move_idmove_idmove_id",move_id
+        move_id.action_confirm()
     def do_produce(self):
 
         obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
         res=super(MrpProductProduce,self).do_produce()
+        if obj:
+            raise UserError("Please Select Batches to Transfer Qty")
         if not self.batch_ids:
             raise UserError("Please Select Batches to Transfer Qty")
 
@@ -172,6 +207,7 @@ class MrpProductProduce(models.Model):
                       pro_date.consumed_qty= pro_date.consumed_qty + consume.product_qty
         print "lot_idlot_id",self.lot_id
         if self.lot_id and not self.lot_id.production_id:
+
            self.lot_id.production_id=obj.id
         if self.lot_id:
            self.lot_id.total_qty =self.product_qty
@@ -184,6 +220,10 @@ class MrpProductProduce(models.Model):
            pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','not in',('done','cancel'))])
            print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
            if not pick_exist:
+#              if obj.n_produce_qty>=obj.product_qty:
+#                 self._make_production_produce_line_extra(obj,self.product_qty,self.product_uom_id)
+#                 self.env['mrp.production'].action_produce(obj,self.product_qty,'consume_produce',wiz=False)
+
               pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
               print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
            print "moves ino bj-------------------",obj.move_created_ids

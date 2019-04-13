@@ -12,6 +12,7 @@
                 </field>
                  <xpath expr="//field[@name='signature']" position="before">
                     <field name="approve_purchase" />
+                    <field name="approve_expense" string="Can Approve Expenses"/>
                     <field name="designation_purchase"  attrs="{'invisible':[('approve_purchase','=',False)]}"/>
                  </xpath>   
                 <xpath expr="//field[@name='signature']" position="after">

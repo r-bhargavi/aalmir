@@ -43,6 +43,17 @@
           </tree>
         </field>
      </record>
+     <record id="mrp_production_tree_view_inherite_rm" model="ir.ui.view">
+        <field name="name">mrp.production.tree</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"></field>
+        <field name="arch" type="xml">
+           <field name="product_qty" position="after">
+		    <field name="wastage_allow" string="Allowed Wastage"/>
+		    <field name="total_wastage_qty" string="Total  Wastage Qty"/>
+            </field>
+            </field>
+	</record>
      
      <record id="mrp_production_rawmaterial_request_form" model="ir.ui.view">
         <field name="name">Raw Material Request Form</field>

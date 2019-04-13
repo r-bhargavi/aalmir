@@ -377,13 +377,13 @@ class StockPicking(models.Model):
      type_of_picking=fields.Selection([('exrprtcart', 'Standard export carton')], string="Type of Picking")
      invoice_ids = fields.Many2many("account.invoice", string='Invoices',copy=False)
 
-     dispatch_date=fields.Datetime('Dispatch Date',copy=False)
+     dispatch_date=fields.Datetime('Dispatch Date',copy=False,track_visibility='always')
      dispatch_doc = fields.Many2many('ir.attachment','dispatch_attachment_rel','dispatch_doc','id','Dispatch Documents',help="1. Delivery Pictures \n 2. Security stamped DO.",copy=False)
      dispatch_doc_name = fields.Char(string='Doc Name',copy=False)
 
      delivery_date=fields.Datetime('Delivery Date',copy=False)
      expected_comple_date=fields.Datetime('Expected Completion Date',copy=False)
-     no_of_shifts=fields.Integer('No of Shifts',copy=False)
+     no_of_shifts=fields.Float('No of Shifts',copy=False)
      next_bo=fields.Many2one('stock.picking',string='Next BackOrder',copy=False)
 
      delivery_doc = fields.Many2many('ir.attachment','delivery_attachment_rel','delivery_doc','id','Delivered Documents',copy=False)

@@ -202,6 +202,7 @@ class IssueBulkBatches(models.TransientModel):
                 if not machine_id:
                     vals=({'order_id':record.wo_id.id, 
                                'batch_id':each.id,
+                               'previous_batch_id':record.previous_batch_id.id,
                                'employee_ids':[(6,0,record.employee_ids.ids)],
                                'produced_qty':record.produce_qty,
                              'product_qty':(each.req_product_qty - each.product_qty) if each.req_product_qty > each.product_qty else 0.0,'uom_id':record.wo_id.wk_required_uom.id,'user_id':record.wo_id.user_ids.ids,

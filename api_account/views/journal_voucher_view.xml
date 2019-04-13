@@ -64,12 +64,12 @@
             <field name="arch" type="xml">
             <form string='Journal Voucher'>
 		<header>
-<!--			<button type="object" string="Submit Voucher" class="oe_highlight" name="submit_voucher" states="draft"/>
+			<button type="object" string="Submit Voucher" class="oe_highlight" name="submit_voucher" states="draft"/>
 			<button type="object" string="Approval Reminder" class="oe_highlight" name="submit_voucher" attrs="{'invisible':['|',('state','not in',['submitted','resent_for_approval']),('sent_mail','=',False)]}" states="submitted"/>
 			<button type="object" string="Approve Voucher" class="oe_highlight" name="approve_voucher" groups="api_account.voucher_approval_process" states="submitted,resent_for_approval"/>
 			<button type="object" string="Reject Voucher" class="oe_highlight" name="reject_voucher"  groups="api_account.voucher_approval_process" states="submitted,resent_for_approval"/>
-			<button type="object" string="Reset to Draft" class="oe_highlight" name="reset_to_draft" states="reject"/>
-			<!--<button type="object" string="Post" class="oe_highlight" name="post_voucher" states="approved"/>-->
+			<button type="object" string="Reset to Draft" class="oe_highlight" name="reset_to_draft" states="reject"/>			
+                        <!--<button type="object" string="Post" class="oe_highlight" name="post_voucher" states="approved"/>-->
 			<button type="object" string="Cancel" class="oe_highlight" name="cancel" states="posted"/>
 			<field name="state" widget="statusbar"/>
 		</header>

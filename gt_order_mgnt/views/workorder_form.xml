@@ -23,26 +23,38 @@
                             <td width="25%"><t t-esc="doc.date_planned" /></td>
                         </tr>
                         <tr>
-                            <td width="25%" style="font-weight: bold;" t-if='doc.production_id'>Manufacturing No.</td>
-                            <td width="25%" t-if='doc.production_id'><t t-esc="doc.production_id.name" /></td>
+<!--                            <td width="25%" style="font-weight: bold;" t-if='doc.production_id'>Manufacturing No.</td>
+                            <td width="25%" t-if='doc.production_id'><t t-esc="doc.production_id.name" /></td>-->
                             <td width="25%" style="font-weight: bold;" t-if='doc.machine'>Machine Name</td>
                             <td width="25%" t-if='doc.machine'><t t-esc="doc.machine.name" /></td>
-                        </tr>
-                       <tr>
-                            <td style="font-weight: bold;" t-if="doc.workcenter_id">Process Name</td>
-                            <td t-if="doc.product"><t t-esc="doc.workcenter_id.name"/></td>
                             <td style="font-weight: bold;" t-if="doc.production_id">BOM Code</td>
                             <td t-if="doc.production_id"><t t-esc="doc.production_id.bom_id.master_id.name"/></td>
                         </tr>
+                       <!--<tr>-->
+<!--                            <td style="font-weight: bold;" t-if="doc.workcenter_id">Process Name</td>
+                            <td t-if="doc.product"><t t-esc="doc.workcenter_id.name"/></td>-->
+                            
+                        <!--</tr>-->
                         <tr>
-                            <td style="font-weight: bold;" t-if="doc.product">Product Name</td>
-                            <td t-if="doc.product"><t t-esc="doc.product.name"/></td>
-                            <td style="font-weight: bold;" t-if="doc.wk_required_qty"> Required Qty</td>
-                            <td t-if="doc.wk_required_qty"><span t-esc="doc.wk_required_qty" /><span t-esc="doc.uom.name" /></td>
+<!--                            <td style="font-weight: bold;" t-if="doc.product">Product Name</td>
+                            <td t-if="doc.product"><t t-esc="doc.product.name"/></td>-->
+                            <td style="font-weight: bold;" t-if="doc.qty"> Required Qty</td>
+                            <td t-if="doc.qty"><span t-esc="doc.qty" /><span t-esc="doc.uom.name" /></td>
+                            <td style="font-weight: bold;" t-if="doc.wk_required_qty"> Inj.Total Qty</td>
+                            <td t-if="doc.wk_required_qty"><span t-esc="doc.wk_required_qty" /><span t-esc="doc.wk_required_uom_replica.name" /></td>
                         </tr>
+                        <tr>
+                            <td style="font-weight: bold;" t-if="doc.req_product_qty_replica">No.Of Mixing</td>
+                            <td t-if="doc.req_product_qty_replica"><t t-esc="doc.req_product_qty_replica"/></td>
+                            <td style="font-weight: bold;" t-if="doc.each_batch_qty_replica"> Qty/Mix</td>
+                            <td t-if="doc.each_batch_qty_replica"><span t-esc="doc.each_batch_qty_replica" /><span t-esc="doc.wk_required_uom_replica.name" /></td>
+                        </tr>
+                       
                         <tr>
                             <td style="font-weight: bold;" t-if='doc.shift_required'>Shift Required</td>
                             <td t-if='doc.shift_required'><t t-esc="'%.2f'% doc.shift_required" /></td>
+                            <td style="font-weight: bold;" t-if='doc.rm_per_shift'>RM/Shift</td>
+                            <td t-if='doc.rm_per_shift'><t t-esc="'%.2f'% doc.rm_per_shift" /></td>
                             <td style="font-weight: bold;" t-if='doc.shift_base_qty'>Each Shift Base Qty</td>
                             <td t-if='doc.shift_base_qty'><t t-esc="doc.shift_base_qty" /></td>
                         </tr>
@@ -51,6 +63,12 @@
                             <td ></td>
                             <td style="font-weight: bold;">Finish Time</td>
                             <td ></td>
+                        </tr>
+                         <tr>
+                            <td style="font-weight: bold;" t-if="doc.shift_required_nwo">Shifts Required</td>
+                            <td t-if="doc.shift_required_nwo"><t t-esc="doc.shift_required_nwo"/></td>
+                            <td style="font-weight: bold;" t-if="doc.shift_required">Shifts Required</td>
+                            <td t-if="doc.shift_required"><t t-esc="doc.shift_required"/></td>
                         </tr>
                         <!--tr>
                             <td style="font-weight: bold;" t-if='doc.user_ids'>Assign To</td>
@@ -118,11 +136,14 @@
                      </table>
                      <table class="table table-bordered" style="border: 1px solid #9999;margin-top:30px;" t-if="doc.raw_materials_id">
                       <tr>
-                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="4">Raw Material Details</th>
+                            <th style="text-align:center;font-weight: bold;font-size:large" colspan="7">Raw Material Details</th>
                         </tr>
                       <tr>
                          <td>Seq.</td>
                           <td>Raw Material</td>
+                          <td>% Composition</td>
+                          <td>Qty/Mixing(kg)</td>
+                          <td>Qty/Mixing(Bags)</td>
                           <td>Qty</td>
                           <td>Unit</td>
                       </tr>
@@ -135,7 +156,11 @@
                                     <t t-esc="count" />
                                 </td>
                                 <td><span t-esc='l.product_id.name'/></td>
-                                <td><span t-esc="'%.2f'% l.report_qty"/></td>
+                                <td><span t-esc='l.percent_rm'/></td>
+                                <td><span t-esc='l.percent_value'/></td>
+                                <td><span t-esc='l.percent_value_25'/></td>
+                                <!--<td><span t-esc="'%.2f'% l.report_qty"/></td>-->
+                                <td><span t-esc="'%.2f'% l.qty"/></td>
                                <td><span t-field='l.uom_id.name'/></td>
                             </tr>
                         </t>

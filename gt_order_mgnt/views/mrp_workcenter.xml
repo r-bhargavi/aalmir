@@ -923,11 +923,11 @@
 		                <field name="mrp_third_qty_sheet" class="oe_inline" style="width:94px;" help="Pcs * (Width + Left + Right)/100" readonly='1'/>
 		                <field name="mrp_third_uom_sheet" style="width:100px;" readonly='1' />
 		            </div-->
-                         <label for='wk_required_qty' string="Required Qty"/>
+<!--                        <label for='wk_required_qty' string="Required Qty"/>
 		            <div>
 				  <field name="wk_required_qty" class="oe_inline" nolabel="1" readonly="1"/>
 				  <field name="wk_required_uom"  class="oe_inline" nolabel="1" readonly="1"/>
-		            </div>
+		            </div>                         -->
                          <label for='total_product_qty' string="Produced Qty"/>
 		            <div>
 				  <field name="total_product_qty" class="oe_inline" nolabel="1" readonly="1"/>
@@ -1005,9 +1005,12 @@
                     <label for="p_hour" string='Duration(HH:MM:SS)' 
                       attrs="{'invisible':[('machine','=',False)]}"/>
                           <div class="address_format" attrs="{'invisible':[('machine','=',False)]}">
-				 <field name='p_hour' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
-				 <field name='p_minute' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
-				  <field name='p_second' style="width: 25%" attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>
+				 <!--<field name='p_hour' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>-->
+				 <field name='p_hour' style="width: 25%"/>
+				 <!--<field name='p_minute' style="width: 25%"  attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>-->
+				 <field name='p_minute' style="width: 25%" />
+				  <!--<field name='p_second' style="width: 25%" attrs="{'readonly':['|',('state','!=','draft'),('information_types','=','default')],'required':[('machine','!=',False)]}"/>-->
+				  <field name='p_second' style="width: 25%"/>
 			    </div>
                        <label for="shift_time" string='Shift Time'  
                           attrs="{'invisible':['|',('process_type','=','raw'),('machine','=',False)]}"/>
@@ -1031,6 +1034,30 @@
 				  <field name="shift_base_uom"  class="oe_inline" nolabel="1" readonly="1"/>
 		            </div>
     			 <field name='next_order_id' readonly='1' attrs="{'invisible':[('next_order_id','=',False)]}"/>
+                         <label for='wk_required_qty' string="Inj.Total Qty" attrs="{'invisible':[('wk_required_qty','=',0.0)]}"/>
+		            <div>
+				  <field name="wk_required_qty" attrs="{'invisible':[('wk_required_qty','=',0.0)]}" class="oe_inline" nolabel="1" readonly="1"/>
+				  <field name="wk_required_uom"  attrs="{'invisible':[('wk_required_uom','=',False)]}" class="oe_inline" nolabel="1" readonly="1"/>
+		            </div>
+                            <label for='each_batch_qty_replica' string="Qty/Mix" attrs="{'invisible':[('each_batch_qty_replica','=',0)]}" />
+
+		            <div>
+				  <field name='each_batch_qty_replica' attrs="{'invisible':[('each_batch_qty_replica','=',0)]}" readonly="1" class="oe_inline" nolabel="1"
+                                  />
+                                <field name="wk_required_uom_replica"  class="oe_inline" nolabel="1" 
+                                  attrs="{'invisible':[('wk_required_uom_replica','=',False)]}" options="{'no_create': True, 'no_open': True}"/>
+		            </div>
+                            
+				  <label for='req_product_qty' attrs="{'invisible':[('req_product_qty_replica','=',0.0)]}" string="No.of Mixing" />
+		      <div>
+	                <field name="req_product_qty_replica"  string="No.of Mixing" 
+                                attrs="{'invisible':[('req_product_qty_replica','=',0.0)]}"/>
+		            </div>
+                            <!--<field name='rm_per_shift' readonly="1" attrs="{'invisible':[('rm_per_shift','=',0.0)]}" />-->
+                                <field name='rm_per_shift'  attrs="{'invisible':['|',('rm_per_shift','=',0.0),('next_order_id','=',False)]}"/>
+                          <field name='shift_required_nwo' string="No.Of Shifts next WO" attrs="{'invisible':['|',('shift_required_nwo','=',0.0),('next_order_id','=',False)]}"/>
+                          <field name='number_next' string="Number Next"/>
+
                     <!--label for="duration"/>
                             <div>
                                 <button style="pointer-events: none;background-color:#777777;" class="oe_inline label label-default">

@@ -10,6 +10,7 @@ class Users(models.Model):
     signature_image = fields.Binary(string='Signature Upload')
     digital_signature = fields.Binary(string='Digital Signature')
     approve_purchase = fields.Boolean('Can Approve PO')
+    approve_expense = fields.Boolean('Allowed Expense Configuration',help="If checked then allowed to configure Expenses")
     designation_purchase = fields.Char('Designation on Purchase')
     machine_ids = fields.Many2many('machinery', string='Machine')
     employee_ids = fields.Many2many('hr.employee', string='Operators')

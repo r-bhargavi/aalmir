@@ -53,15 +53,15 @@ class ApprovalConfigLine(models.Model):
                  'Duplicated Approval By User not allowed in Approval Config Line!'),('approve_approve_amount_upto_uniq', 'unique (approve_id,approve_amount_upto)',     
                  'Duplicated Amount Approve Upto in approval config line not allowed !')]
     
-    @api.onchange('approval_by')
-    def approval_by_onchange(self):
-        user_list=[]
-        group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant')[1]
-        print "group_idgroup_idgroup_id",group_id
-        for usr in self.env['res.groups'].search([('id', '=',group_id)]).users:
-            user_list.append(usr.id)
-        print "user_listuser_list",user_list
-        return {'domain': {'approval_by': [('id', 'in', user_list)]}}
+#    @api.onchange('approval_by')
+#    def approval_by_onchange(self):
+#        user_list=[]
+#        group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant')[1]
+#        print "group_idgroup_idgroup_id",group_id
+#        for usr in self.env['res.groups'].search([('id', '=',group_id)]).users:
+#            user_list.append(usr.id)
+#        print "user_listuser_list",user_list
+#        return {'domain': {'approval_by': [('id', 'in', user_list)]}}
     
     @api.onchange('approve_amount_upto')
     def approve_amount_upto_onchange(self):

@@ -1712,8 +1712,9 @@ class MrpWorkcenterPructionline(models.Model):
             if not record.req_product_qty:
                raise UserError(_("Please Fill the Required Batch No. for Batch Numbers Issue....."))
             else:
-               name=record.name[8:11]
-               pr_no=record.production_id.name[:7]
+#               name=record.name[8:11]
+#               pr_no=record.production_id.name[:7]
+               pr_no=record.name
                b_list=[]
                body='<b>New Batch Numbers Issue In Work Order:</b>'
                body +='<ul><li> Production No. : '+str(record.production_id.name) +'</li></ul>'
@@ -1734,14 +1735,22 @@ class MrpWorkcenterPructionline(models.Model):
                   for bom_wastage in record.production_id.bom_id.bom_wastage_ids:
                       if bom_wastage.workcenter_id.id == record.workcenter_id.id:
                          wastage_qty=(record.wk_required_qty *((record.product.weight)*bom_wastage.value ) /100)
-               for x in range(0, record.req_product_qty if record.req_product_qty < 10 else 10 ): 
+#               for x in range(0, record.req_product_qty if record.req_product_qty < 10 else 10 ): 
+               for x in range(0, record.req_product_qty): 
                    qty=0.0
                    if req >  record.each_batch_qty:
                       qty= record.each_batch_qty
                    else:
                       qty=req
                    code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
-                   final_code= str(pr_no)+'-'+str(code)#str(pr_no)+str(name)+str(code)
+                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number'),('name','=','MRP BATCH NUMBER')])
+#                   if not record.number_next:
+#                       record.write({'number_next':1})
+                   sequence.write({'number_next_actual':record.number_next+1})
+                   print "record.number_nextrecord.number_next",record.number_next
+                   record.number_next=record.number_next+1
+                   final_code= str(pr_no)+'-'+str(code)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
+                   print "final_codefinal_code",final_code
                    batch=self.env['mrp.order.batch.number'].create({'name':final_code,'product_id':record.product.id,
                                        'production_id':record.production_id.id,
                                        'sale_line_id':record.production_id.sale_line.id if record.production_id.sale_line else False,
@@ -1751,6 +1760,7 @@ class MrpWorkcenterPructionline(models.Model):
                    req -=record.each_batch_qty
                    b_list.append(batch.id)
                    body +=str(batch.name)+' '
+               record.number_next=record.number_next+1
                body +='</li></ul>' 
                record.batch_ids=b_list
                record.issue_bool=True
@@ -2082,6 +2092,16 @@ class MrpWorkcenterPructionline(models.Model):
         for record in self: 
             if record.req_product_qty:
                record.req_product_qty_comp=record.req_product_qty
+    @api.multi
+    @api.depends('each_batch_qty')
+    def compute_replica(self):
+        for record in self: 
+            if record.each_batch_qty:
+               record.each_batch_qty_replica=record.each_batch_qty
+               record.req_product_qty_replica= record.wk_required_qty /record.each_batch_qty
+               record.wk_required_uom_replica=record.wk_required_uom.id
+
+
     
     @api.multi
     @api.depends('sequence')
@@ -2115,8 +2135,12 @@ class MrpWorkcenterPructionline(models.Model):
                                ('4', '4x'),('5', '5x')], string='Production Output', default='1')
     remark=fields.Text('Remark')
     req_product_qty = fields.Integer('Required Batch Qty')
+    req_product_qty_replica = fields.Float('Required Batch Qty',compute='compute_replica')
+    rm_per_shift = fields.Float('RM/Shift',compute='cal_shift')
     req_product_qty_comp = fields.Integer('Required Batch Qty',compute='compute_req_qty')
     each_batch_qty = fields.Integer('Each Batch Qty')
+    number_next = fields.Integer('Number Next')
+    each_batch_qty_replica = fields.Integer('Each Batch Qty',compute='compute_replica')
     print_type=fields.Selection([('normal','Normal'),('detailed','Detailed')], default='normal', string='Print Type')    
     req_uom_id=fields.Many2one('product.uom')
     batch_ids=fields.Many2many('mrp.order.batch.number',string='Batch No.') 
@@ -2163,10 +2187,12 @@ class MrpWorkcenterPructionline(models.Model):
     process_type=fields.Selection([('raw','Raw Material'),('film','Film (Extrusion)'),('cutting','Cutting'),
               ('ptube', 'Printing in Tube'), ('psheet', 'Printing in Sheet'),('other', 'Others'),
                ('injection', 'Injection')], related='process_id.process_type', string='Type')
-    shift_required=fields.Float('Shift Required', compute='cal_shift', digits_compute=dp.get_precision('Product Unit of Measure'))
+    shift_required=fields.Float('Shift Required', compute='cal_shift', digits_compute=dp.get_precision('Product Unit of Measure'),store=True)
+    shift_required_nwo=fields.Float('Shift Required',related='next_order_id.shift_required',store=True)
     shift_produced=fields.Float('Shift Completed',compute='cal_shift', digits_compute=dp.get_precision('Product Unit of Measure'))  
     wk_required_qty = fields.Float('Required Quantity')
     wk_required_uom = fields.Many2one('product.uom')
+    wk_required_uom_replica = fields.Many2one('product.uom',compute='compute_replica')
     n_packaging = fields.Many2one('product.packaging' ,string="Package Type")
     wk_rm_qty=fields.Float('Remaining Qty', compute='Rmqty')
     capacity_per_cycle_kg=fields.Float('Capacity Per Cycle KG', compute='Capacity_kg')
@@ -2332,6 +2358,8 @@ class MrpWorkcenterPructionline(models.Model):
     @api.depends('capacity_per_cycle','p_hour','p_minute','p_second','time_option','machine.time_efficiency', 'shift_time')
     def cal_shift(self):
         for record in self:
+              if record.shift_required_nwo>0.0:
+                  record.rm_per_shift=  record.wk_required_qty / record.shift_required_nwo
               if record.capacity_per_cycle and record.shift_time:#and record.process_id.process_type != 'raw' :
                     shift_time=record.shift_time * 3600
 		    hr=(record.p_hour * 60 *60)  +(record.p_minute*60 + record.p_second)
@@ -2341,6 +2369,9 @@ class MrpWorkcenterPructionline(models.Model):
 		    capacity= record.wk_required_qty / (int(record.capacity_per_cycle) * int(time_option) )
 		    hours = (capacity * hr)/3600
 		    record.shift_required= hours / record.shift_time
+                    print "dxfdsfsdfsdfsdfdsfds",record.shift_required
+#                    if record.shift_required>0.0:
+#                        record.rm_per_shift=  record.wk_required_qty / record.shift_required
                     if record.shift_required:
 		       record.shift_produced=record.total_product_qty/(record.wk_required_qty/record.shift_required)  if  record.total_product_qty else 0.0
                     else:
@@ -2382,15 +2413,27 @@ class MrpWorkcenterPructionline(models.Model):
     @api.multi
     def change_state(self):
         for res in self:
-                if res.first_order==True:
-                    res.production_id.no_of_shifts=res.req_product_qty
+                if res.each_batch_qty:
+                    for each_rm in res.raw_materials_id:
+                        each_rm.write({'percent_value':(res.each_batch_qty*each_rm.percent_rm)/100,
+                                            'percent_value_25':(res.each_batch_qty*each_rm.percent_rm)/2500,
+                                          })
+                if res.order_last==True:
+                    if res.shift_required:
+                        res.production_id.no_of_shifts=res.shift_required
+                    else:
+                        res.production_id.no_of_shifts=res.req_product_qty
+                if res.production_id.material_request_id and res.production_id.no_of_shifts>0:
+                    for rm in res.production_id.material_request_id[0]:
+                        for rm_line in rm.request_line_ids:
+                            rm_line.shift_qty=rm_line.qty/res.production_id.no_of_shifts
         	if self._context.get('ready'):
 #                    need to uncomment while gng live for bom
-#                        if res.production_id.state not in ('ready','in_production'):
-#                            raise UserError(_('Cannot Lock Work Order as MO is not in Ready to produce or Production state!!'))
+                        if res.production_id.state in ('draft','confirmed','cancel'):
+                            raise UserError(_('Cannot Lock Work Order as Raw Material is still not requested for MO!!'))
 
-#                        if not res.machine:
-#		          raise UserError(_('Please Select Machine Before Lock Work order..'))
+                        if not res.machine:
+		          raise UserError(_('Please Select Machine Before Lock Work order..'))
 		        if not res.req_product_qty and not res.each_batch_qty:
 		           raise UserError(_("Please Fill the Required Batch No. and Each Batch Qty..."))
                         if not res.batch_ids:
@@ -2435,6 +2478,9 @@ class MrpWorkcenterPructionline(models.Model):
     def batch_detail(self):
         for record in self:
             if record.each_batch_qty:
+               if record.each_batch_qty>record.wk_required_qty:
+                  raise UserError(_("Each Batch Qty cannot be greater then Total Order Qty!!"))
+
                qty=0.0
                if record.process_type == 'cutting':
                   if record.req_uom_id.name == 'Kg':
