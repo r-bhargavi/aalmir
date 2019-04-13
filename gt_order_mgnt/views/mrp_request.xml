@@ -218,8 +218,8 @@
             <field name="product_uom" position='attributes'>
                   <attribute name='string'>Unit</attribute>
             </field>
-            <field name="product_uom" position="after">
-              <field name="wastage_allow" string='Wastage(Kg)'/> 
+            field name="product_uom" position="after">
+              <field name="wastage_allow" string='Wastage(Kg)'/> COMENTED due to move in new module
             </field
             <field name="product_qty" position="after">
                <field name="n_produce_qty" string='Produced Qty'/>
@@ -243,6 +243,7 @@
            <field name="cycle_total" position='replace'/>
 	</field>
 	</record> -->
+
     <record id="mrp_operations.mrp_production_form_inherit_view2" model="ir.ui.view">
         <field name="name">mrp.production.form.inherit2</field>
         <field name="model">mrp.production</field>
