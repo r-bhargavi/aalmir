@@ -209,7 +209,7 @@
            <field name="date_planned" position="replace">
                 <field name="date_planned" string='Scheduled Start Date'/>
                  <field name='n_request_date'/>
-                 <field name="n_client_date" />
+                 <field name="n_client_date"/>
                  <field name='partner_id'/>
            </field>
             <field name="routing_id" position="before">
@@ -222,7 +222,7 @@
                   <attribute name='string'>MO Name</attribute>
             </field>
            <field name="name" position='before'>
-                <field name="planned_status" />
+                <field name="planned_status"/>
             </field>
             <field name="origin" position='attributes'>
                   <attribute name='string'>Sale Order No.</attribute>
