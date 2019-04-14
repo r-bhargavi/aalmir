@@ -61,7 +61,6 @@
         'report_menu.xml',
         'views/aalmir_delivery_report.xml',
         'views/purchase_view.xml',
-        'views/mrp_request.xml',
         'views/purchase_rfq_report.xml',
         'views/purchase_order_report.xml',
         'views/sale_support_history_date_view.xml',
@@ -76,6 +75,8 @@
         'views/squence_view.xml',
         'views/mrp_workcenter.xml',
         'views/mrp_workorder_report.xml',
+        'views/mrp_request.xml',
+
         'views/print_batch_number.xml',
         'views/app_search_view.xml',
         'views/workorder_form.xml',

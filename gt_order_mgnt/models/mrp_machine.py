@@ -693,21 +693,23 @@ class MrpWorkorderMachineProduce(models.Model):
                order=self.env['mrp.production.workcenter.line'].search([('production_id','=',record.production_id.id),('sequence','>',record.order_id.sequence)], limit=1)
                if order:
                   next_order=order.id
-               body='<b>Product Produced In Work Order:</b>'
-#               body +='<ul><li> Produced Qty    : '+str(record.product_qty) +'</li></ul>'
-               body +='<ul><li> Produced Qty    : '+str(record.produced_qty) +'</li></ul>'
-               body +='<ul><li> Production No. : '+str(record.production_id.name) +'</li></ul>'
-               body +='<ul><li> Work Order No.  : '+str(record.order_id.name) +'</li></ul>'
-               body +='<ul><li> Batch Number   : '+str(record.batch_id.name) +'</li></ul>'
-               body +='<ul><li> User Name      : '+str(self.create_uid.name) +'</li></ul>' 
-               body +='<ul><li> Produced Time   : '+str(datetime.now() + timedelta(hours=4)) +'</li></ul>' 
-               body +='<ul><li> Remark         : '+str(self.remark) +'</li></ul>'
-               if record.wastage_qty:
+               if not self._context.get('bulk_issue',False):
+                  body='<b>Product Produced In Work Order:</b>'
+     #               body +='<ul><li> Produced Qty    : '+str(record.product_qty) +'</li></ul>'
+                  body +='<ul><li> Produced Qty    : '+str(record.produced_qty) +'</li></ul>'
+                  body +='<ul><li> Production No. : '+str(record.production_id.name) +'</li></ul>'
+                  body +='<ul><li> Work Order No.  : '+str(record.order_id.name) +'</li></ul>'
+                  body +='<ul><li> Batch Number   : '+str(record.batch_id.name) +'</li></ul>'
+                  body +='<ul><li> User Name      : '+str(self.create_uid.name) +'</li></ul>' 
+                  body +='<ul><li> Produced Time   : '+str(datetime.now() + timedelta(hours=4)) +'</li></ul>' 
+                  body +='<ul><li> Remark         : '+str(self.remark) +'</li></ul>'
+               if record.wastage_qty and not self._context.get('bulk_issue',False):
                   body +='<b><p style="color:red">Wastage Information:</p></b>'
                   body +='<ul><li style="color:red"> Wastage Qty  : '+str(self.wastage_qty) +'</li></ul>'
                   body +='<ul><li style="color:red"> Reason         : '+str(self.wastage_reason) +'</li></ul>'
-               record.order_id.message_post(body=body)
-               record.production_id.message_post(body=body)
+               if body:
+                  record.order_id.message_post(body=body)
+                  record.production_id.message_post(body=body)
                record.production_id.write({'state':'in_production'})
                record.bool_check =False 
                name=''
@@ -2152,7 +2154,7 @@ class MrpWorkcenterPructionline(models.Model):
     machine_breakdown=fields.Boolean('Machine BreakDown', default=False)
     maintenace_count=fields.Integer("Work Orders Count", compute='count_maintenace')
     schedule_id=fields.Many2one('mrp.production.workcenter.line.schedule')
-    total_wastage_qty=fields.Float('Total Wastage Qty', compute='total_wastageqty')
+    total_wastage_qty=fields.Float('Total Wastage Qty', compute='total_wastageqty',store=True)
     wastage_uom_id=fields.Many2one('product.uom', compute='total_wastageqty') 
     batch_unit=fields.Char('Batch Unit')
     new_end_date=fields.Datetime('End Date')
@@ -2564,7 +2566,15 @@ class MrpWorkcenterPructionline(models.Model):
                          wastage_qty=(record.wk_required_qty *((record.product.weight)*bom_wastage.value ) /100)
                for x in range(0, record.extra_batch):  
                    code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
-                   final_code= str(pr_no)+'-'+str(code)#str(pr_no)+str(name)+str(code)
+                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number'),('name','=','MRP BATCH NUMBER')])
+#                   if not record.number_next:
+#                       record.write({'number_next':1})
+                   sequence.write({'number_next_actual':record.number_next+1})
+                   print "record.number_nextrecord.number_next",record.number_next
+                   record.number_next=record.number_next+1
+                   final_code= str(pr_no)+'-'+str(code)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
+#                   code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
+#                   final_code= str(pr_no)+'-'+str(code)#str(pr_no)+str(name)+str(code)
                    batch=self.env['mrp.order.batch.number'].create({'name':final_code,'product_id':record.product.id,
                                        'production_id':record.production_id.id, 'uom_id':record.req_uom_id.id,
                                         'req_product_qty':record.each_batch_qty, 'order_id':record.id,

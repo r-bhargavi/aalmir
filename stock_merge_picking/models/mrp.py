@@ -185,12 +185,13 @@ class MrpProductProduce(models.Model):
         move_id = stock_move.create(data)
         print "move_idmove_idmove_id",move_id
         move_id.action_confirm()
+    @api.multi
     def do_produce(self):
 
         obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
         res=super(MrpProductProduce,self).do_produce()
-        if obj:
-            raise UserError("Please Select Batches to Transfer Qty")
+#        if obj:
+#            raise UserError("Please Select Batches to Transfer Qty")
         if not self.batch_ids:
             raise UserError("Please Select Batches to Transfer Qty")
 
@@ -220,9 +221,9 @@ class MrpProductProduce(models.Model):
            pick_exist=self.env['stock.picking'].search([('origin','=',obj.name),('location_id','=',obj.location_dest_id.id),('location_dest_id','=',stck_location.id),('picking_type_id','=',picking_type_2.id),('state','not in',('done','cancel'))])
            print "pick_existpick_existpick_existpick_existpick_exist",pick_exist
            if not pick_exist:
-#              if obj.n_produce_qty>=obj.product_qty:
-#                 self._make_production_produce_line_extra(obj,self.product_qty,self.product_uom_id)
-#                 self.env['mrp.production'].action_produce(obj,self.product_qty,'consume_produce',wiz=False)
+              if obj.n_produce_qty>=obj.product_qty:
+                 self._make_production_produce_line_extra(obj,self.product_qty,self.product_uom_id)
+                 obj.action_produce(self.product_qty,'consume_produce',wiz=False)
 
               pick_exist=self.env['stock.picking'].create({'origin':obj.name,'location_id':obj.location_dest_id.id,'location_dest_id':stck_location.id,'picking_type_id':picking_type_2.id})
               print "picking_createpicking_createpicking_create-123-456--79--------------",pick_exist
