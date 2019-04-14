@@ -3,6 +3,8 @@
 
 from openerp import api, fields, models, _
 from openerp.exceptions import UserError, ValidationError
+from datetime import datetime, date, time, timedelta
+
 
 
 
@@ -197,6 +199,8 @@ class IssueBulkBatches(models.TransientModel):
                 raise UserError(_("Produce Qty cannot be greater then Required Qty of Batch!!"))
 
             print "len----------------",record.batch_ids.ids
+            body=''
+            batch_numbers=''
             for each in record.batch_ids:
                 machine_id=self.env['mrp.order.machine.produce'].search([('batch_id','=',each.id)])
                 if not machine_id:
@@ -217,7 +221,7 @@ class IssueBulkBatches(models.TransientModel):
                         vals.update({'supplier_btc_no':[(6,0,context.get('bacth_assigned_ids',False))]})
                     machine_id=self.env['mrp.order.machine.produce'].create(vals)
                     machine_id.confirmation()
-                    machine_id.orderProduceqty()
+                    machine_id.with_context({'bulk_issue':True}).orderProduceqty()
                 else:
                     if self.previous_order_ids:
                         machine_id.write({'previous_order_ids':[(6,0,record.previous_order_ids.ids)]})
@@ -228,5 +232,18 @@ class IssueBulkBatches(models.TransientModel):
                     machine_id.write({'produced_qty':record.produce_qty,'employee_ids':[(6,0,[record.employee_ids.ids])],'previous_batch_id':record.previous_batch_id.id})
                     machine_id.confirmation()
                     machine_id.orderProduceqty()
+                batch_numbers += str(each.name) +' '
+
+            body='<b>Product Produced In Work Order:</b>'
+     #               body +='<ul><li> Produced Qty    : '+str(record.product_qty) +'</li></ul>'
+            body +='<ul><li> Produced Qty    : '+str(machine_id.produced_qty) +'</li></ul>'
+            body +='<ul><li> Production No. : '+str(machine_id.production_id.name) +'</li></ul>'
+            body +='<ul><li> Work Order No.  : '+str(machine_id.order_id.name) +'</li></ul>'
+            body +='<ul><li> Batch Numbers   : '+batch_numbers +'</li></ul>'
+            body +='<ul><li> User Name      : '+str(self.create_uid.name) +'</li></ul>' 
+            body +='<ul><li> Produced Time   : '+str(datetime.now() + timedelta(hours=4)) +'</li></ul>' 
+            if body:
+               record.wo_id.message_post(body=body)
+               record.wo_id.production_id.message_post(body=body)
         return True
     
