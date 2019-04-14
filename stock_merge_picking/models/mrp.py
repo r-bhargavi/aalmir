@@ -185,12 +185,12 @@ class MrpProductProduce(models.Model):
         move_id = stock_move.create(data)
         print "move_idmove_idmove_id",move_id
         move_id.action_confirm()
+        
+    @api.multi
     def do_produce(self):
 
         obj = self.env['mrp.production'].browse(self._context.get('active_id')) 
         res=super(MrpProductProduce,self).do_produce()
-        if obj:
-            raise UserError("Please Select Batches to Transfer Qty")
         if not self.batch_ids:
             raise UserError("Please Select Batches to Transfer Qty")
 
@@ -210,6 +210,7 @@ class MrpProductProduce(models.Model):
 
            self.lot_id.production_id=obj.id
         if self.lot_id:
+
            self.lot_id.total_qty =self.product_qty
            self.lot_id.product_uom_id=self.product_uom_id.id
 #           create pikcing if no pick for mrp finished move from input to stock
