@@ -216,9 +216,9 @@
 		<field name="model">account.payment</field>
 		<field name="inherit_id" ref="account.view_account_payment_tree"></field>
 		<field name="arch" type="xml">
-                    <xpath expr="//tree" position='attributes'>
+<!--                    <xpath expr="//tree" position='attributes'>
                   <attribute name='create'>false</attribute>
-              </xpath>
+              </xpath>-->
                    <field name='payment_method_id' position='attributes'>
                       <attribute name='invisible'>1</attribute>
                    </field> 
@@ -235,6 +235,9 @@
                     <xpath expr="//form" position='attributes'>
                   <attribute name='create'>false</attribute>
               </xpath>
+                   <field name="payment_type" position='attributes'>
+                      <attribute name='readonly'>1</attribute>
+                   </field>
                    <field name="communication" position='attributes'>
                       <attribute name='string'>Internal Note</attribute>
                       <attribute name='required'>1</attribute>
@@ -274,6 +277,22 @@
             <field name="view_mode">tree,form,graph</field>
             <field name="context">{'default_payment_type': 'inbound', 'group_by':'payment_from'}</field>
             <field name="domain">[('partner_type', '=', 'customer')]</field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                  Click to register a payment
+                </p><p>
+                  Payments are used to register liquidity movements (send, collect or transfer money).
+                  You can then process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+       <record id="account.action_account_payments_payable" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{'default_payment_type': 'transfer'}</field>
             <field name="view_id" ref="account.view_account_payment_tree"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
