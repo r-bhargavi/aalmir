@@ -49,7 +49,7 @@
 			</field>
                         <sheet>
                         <notebook>
-                            <page string="Transfer Details" attrs="{'invisible':[('pay_p_up','=',False)]}">
+                            <page string="Transfer Details" attrs="{'invisible':['|',('mail_details','=',False),('pay_p_up','=',False)]}">
                                 <group>
                                 <field name="mail_details" readonly="1"/>
                                                             </group>
@@ -60,7 +60,7 @@
                                                                                            </group>
 
                             </page>
-                            <page string="Bill/Receiving Details" attrs="{'invisible':[('pay_p_up','=',False)]}">
+                            <page string="Bill/Receiving Details" attrs="{'invisible':['|',('bill_line','=',[]),('pay_p_up','=',False)]}">
                                 <field name="bill_line">
                                     <tree editable="top">
                                         <field name="bill_id" readonly="1"/>

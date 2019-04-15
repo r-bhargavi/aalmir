@@ -632,43 +632,44 @@ class accountPayment(models.Model):
 	   attachments = values.pop('attachments', []) 
            attachment=[]
 
-           if self.uploaded_document:
-               attachments.append((self.doc_name,self.uploaded_document))
-           if self.invoice_ids:
-                  report_obj = self.pool.get('report')
-                  
-                  for inv in self.invoice_ids:
-                      data=report_obj.get_pdf(self._cr, self._uid, inv.ids,
-                              'gt_order_mgnt.report_invoice_aalmir',  context=self._context)
-                      val  = base64.encodestring(data)
-                      rep_name='Invoice:'+str(inv.number)+'.pdf'
-                      attachments.append((rep_name,val))
-                      data1=report_obj.get_pdf(self._cr, self._uid, inv.ids,
-                              'stock_merge_picking.report_payment',  context=self._context)
-                      val1  = base64.encodestring(data1)
-		      rep_name1=''
-		      if inv.type in ('out_invoice','out_refund'):
-                      	rep_name1='Payment-Receipt:'+str(inv.number)+'.pdf'
-		      else:
-			rep_name1='Payment-Voucher:'+str(inv.number)+'.pdf'
-                      attachments.append((rep_name1,val1))
-                      
-	   attachment_data={} 
-           if attachments:
-		   for attachment in attachments: 
-		       attachment_data = {
-				        'name': attachment[0],
-				        'datas_fname': attachment[0],
-				        'datas': attachment[1],
-				        'res_model': 'mail.message',
-				        'res_id': msg_id.mail_message_id.id,
-                                        'type':'binary',
-				        
-				          }
-		       attachment_ids.append(Attachment.create(attachment_data).id)
-		   if attachment_ids:
-		      values['attachment_ids'] =[(4, attachment_ids)]# [(6, 0, attachment_ids)]
-		      msg_id.write({'attachment_ids':[(4, attachment_ids)]}) #[(6, 0, attachment_ids)],
+#commented as per discussion with khaqan that no aattchemnts shud go in mail in any type of payment
+#           if self.uploaded_document:
+#               attachments.append((self.doc_name,self.uploaded_document))
+#           if self.invoice_ids:
+#                  report_obj = self.pool.get('report')
+#                  
+#                  for inv in self.invoice_ids:
+#                      data=report_obj.get_pdf(self._cr, self._uid, inv.ids,
+#                              'gt_order_mgnt.report_invoice_aalmir',  context=self._context)
+#                      val  = base64.encodestring(data)
+#                      rep_name='Invoice:'+str(inv.number)+'.pdf'
+#                      attachments.append((rep_name,val))
+#                      data1=report_obj.get_pdf(self._cr, self._uid, inv.ids,
+#                              'stock_merge_picking.report_payment',  context=self._context)
+#                      val1  = base64.encodestring(data1)
+#		      rep_name1=''
+#		      if inv.type in ('out_invoice','out_refund'):
+#                      	rep_name1='Payment-Receipt:'+str(inv.number)+'.pdf'
+#		      else:
+#			rep_name1='Payment-Voucher:'+str(inv.number)+'.pdf'
+#                      attachments.append((rep_name1,val1))
+#                      
+#	   attachment_data={} 
+#           if attachments:
+#		   for attachment in attachments: 
+#		       attachment_data = {
+#				        'name': attachment[0],
+#				        'datas_fname': attachment[0],
+#				        'datas': attachment[1],
+#				        'res_model': 'mail.message',
+#				        'res_id': msg_id.mail_message_id.id,
+#                                        'type':'binary',
+#				        
+#				          }
+#		       attachment_ids.append(Attachment.create(attachment_data).id)
+#		   if attachment_ids:
+#		      values['attachment_ids'] =[(4, attachment_ids)]# [(6, 0, attachment_ids)]
+#		      msg_id.write({'attachment_ids':[(4, attachment_ids)]}) #[(6, 0, attachment_ids)],
 				            
 	   msg_id.send()
            if self.cheque_status == 'cleared':

@@ -68,13 +68,13 @@ class MrpProduction(models.Model):
     request_state=fields.Selection([('draft','Requested'),('approve','Approved'), ('reject','Rejeted'),('cancel','Cancelled')], string='Status', related='material_request_id.state')
     delivery_ids=fields.Many2many('stock.picking','mrp_stock_raw_material_rel','production_id',
                                   'picking_id',string='Delivery Details',copy=False)
-    total_wastage_qty=fields.Float('Produced Wastage Qty',compute='count_wastage_qty',store=True)
+    total_wastage_qty=fields.Float('Produced Wastage Qty',compute='count_wastage_qty')
     remain_wastage_qty=fields.Float('Remaining Wastage Qty',compute='remain_wastage')
     requested_wastage_qty=fields.Float('Requested Wastage Qty')
     remain_wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
     wastage_uom_id=fields.Many2one('product.uom',  default=_get_uom_id)
     wastage_ids=fields.One2many('mrp.production.workcenter.line','production_id',string='Wastage Details',copy=False)
-    wastage_allow=fields.Float('Allowed Wastage', compute='allowwastage_mo',store=True)
+    wastage_allow=fields.Float('Allowed Wastage', compute='allowwastage_mo')
     allow_wastage_uom_id=fields.Many2one('product.uom', default=_get_uom_id)
     wastage_batch_ids=fields.One2many('mrp.order.batch.number','production_id', compute='wastage_batches')
   

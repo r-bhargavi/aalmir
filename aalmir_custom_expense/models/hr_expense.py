@@ -243,11 +243,18 @@ class HrExpense(models.Model):
                         self.write({'approval_status':'app_required','approval_by':line_id.approval_by.id,'user_id':self._uid,'state': 'submit'})
                         return True
                     else:
-                        self._cr.execute('SELECT ID FROM approval_config_line where approve_amount_upto=(select max(approve_amount_upto) from approval_config_line where approve_id=%s)', (non_approval.id,))
-                        result=self._cr.fetchone()
-                        print "resultresult",result
-                        cl_brw=self.env['approval.config.line'].browse(result[0])
-                        self.write({'approval_status':'app_required','approval_by':cl_brw.approval_by.id,'user_id':self._uid,'state': 'submit'})
+                        group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+                        print "group_idgroup_id",group_id
+                        users=self.env['res.groups'].search([('id', '=',group_id)]).users
+                        if users:
+                            self.write({'approval_status':'app_required','approval_by':users[0].id,'user_id':self._uid,'state': 'submit'})
+
+#                        self._cr.execute('SELECT ID FROM approval_config_line where approve_amount_upto=(select max(approve_amount_upto) from approval_config_line where approve_id=%s)', (non_approval.id,))
+#                        result=self._cr.fetchone()
+#                        print "resultresult",result
+#                        cl_brw=self.env['approval.config.line'].browse(result[0])
+                        else:
+                            self.write({'approval_status':'app_required','user_id':self._uid,'state': 'submit'})
 
             else:
                 self.write({'state': 'approve'})

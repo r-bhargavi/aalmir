@@ -1751,7 +1751,8 @@ class MrpWorkcenterPructionline(models.Model):
                    sequence.write({'number_next_actual':record.number_next+1})
                    print "record.number_nextrecord.number_next",record.number_next
                    record.number_next=record.number_next+1
-                   final_code= str(pr_no)+'-'+str(code)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
+#                   final_code= str(pr_no)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
+                   final_code= str(pr_no)+'-'+str(record.number_next)#str(pr_no)+str(name)+str(code)
                    print "final_codefinal_code",final_code
                    batch=self.env['mrp.order.batch.number'].create({'name':final_code,'product_id':record.product.id,
                                        'production_id':record.production_id.id,
@@ -2154,7 +2155,7 @@ class MrpWorkcenterPructionline(models.Model):
     machine_breakdown=fields.Boolean('Machine BreakDown', default=False)
     maintenace_count=fields.Integer("Work Orders Count", compute='count_maintenace')
     schedule_id=fields.Many2one('mrp.production.workcenter.line.schedule')
-    total_wastage_qty=fields.Float('Total Wastage Qty', compute='total_wastageqty',store=True)
+    total_wastage_qty=fields.Float('Total Wastage Qty', compute='total_wastageqty')
     wastage_uom_id=fields.Many2one('product.uom', compute='total_wastageqty') 
     batch_unit=fields.Char('Batch Unit')
     new_end_date=fields.Datetime('End Date')
@@ -2362,6 +2363,9 @@ class MrpWorkcenterPructionline(models.Model):
         for record in self:
               if record.shift_required_nwo>0.0:
                   record.rm_per_shift=  record.wk_required_qty / record.shift_required_nwo
+                  if record.rm_per_shift>record.wk_required_qty:
+                     record.rm_per_shift=  record.wk_required_qty
+
               if record.capacity_per_cycle and record.shift_time:#and record.process_id.process_type != 'raw' :
                     shift_time=record.shift_time * 3600
 		    hr=(record.p_hour * 60 *60)  +(record.p_minute*60 + record.p_second)
@@ -2392,7 +2396,9 @@ class MrpWorkcenterPructionline(models.Model):
                         'mo_cal':True , 'prev_workorder_id':self.id ,'default_order_id':self.id,
                         'default_wk_required_qty':self.wk_required_qty,'default_machine':self.machine.id,
                         'default_capacity_type':self.capacity_type.id,
-                        'default_wk_required_uom':self.wk_required_uom.id})
+                        'default_wk_required_uom':self.wk_required_uom.id,
+                    
+})
         for line in self:
             order_cal_tree = self.env.ref('stock_merge_picking.view_mrp_machine_calendar_inherite', False)
             order_form = self.env.ref('mrp_operations.mrp_production_workcenter_form_view_inherit', False)
@@ -2572,7 +2578,8 @@ class MrpWorkcenterPructionline(models.Model):
                    sequence.write({'number_next_actual':record.number_next+1})
                    print "record.number_nextrecord.number_next",record.number_next
                    record.number_next=record.number_next+1
-                   final_code= str(pr_no)+'-'+str(code)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
+                   final_code= str(pr_no)+'-'+str(record.number_next)#str(pr_no)+str(name)+str(code)
+#                   final_code= str(pr_no)+'-'+str('000')+str(record.number_next)#str(pr_no)+str(name)+str(code)
 #                   code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
 #                   final_code= str(pr_no)+'-'+str(code)#str(pr_no)+str(name)+str(code)
                    batch=self.env['mrp.order.batch.number'].create({'name':final_code,'product_id':record.product.id,

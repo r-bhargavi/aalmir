@@ -531,7 +531,7 @@
                 <button name="change_state" string="Lock" type="object" context="{'ready':True}" 
                    			class="oe_highlight"  attrs="{'invisible': [('state','!=','draft')]}"/>
            	<button name="change_state" string="Unlock" type="object"   context="{'draft':True}" 
-                   			class="oe_highlight"  attrs="{'invisible': [('state','!=','ready')]}"/>
+                   			groups='base.group_no_one' class="oe_highlight"  attrs="{'invisible': [('state','!=','ready')]}"/>
              </button>
                 
                   <xpath expr="//form/sheet/group" position='before'>
@@ -1056,7 +1056,7 @@
                             <!--<field name='rm_per_shift' readonly="1" attrs="{'invisible':[('rm_per_shift','=',0.0)]}" />-->
                                 <field name='rm_per_shift'  attrs="{'invisible':['|',('rm_per_shift','=',0.0),('next_order_id','=',False)]}"/>
                           <field name='shift_required_nwo' string="No.Of Shifts next WO" attrs="{'invisible':['|',('shift_required_nwo','=',0.0),('next_order_id','=',False)]}"/>
-                          <field name='number_next' string="Number Next"/>
+                          <field name='number_next' string="Number Next" invisible="0" groups='base.group_no_one'/>
 
                     <!--label for="duration"/>
                             <div>
