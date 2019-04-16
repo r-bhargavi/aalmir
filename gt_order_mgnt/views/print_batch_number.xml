@@ -31,9 +31,9 @@
 		            <div class="row">
 		                   <div class="col-xs-12" style="text-align: center; height:100%;">
 		                      <t t-foreach="o.batch_ids" t-as="batch">
-		                      <div class="" t-if="batch.print_bool == 1" style="width:20%; float:left; border-bottom:1px black; height:111px; padding-top:67px;">		                            
-		                           <p t-field="batch.product_id.default_code" style="font-size:12px; font-weight:bold;"/>
-		                           <p t-field="batch.name" style="font-size:12px; font-weight:bold;"/>
+		                      <div class="" t-if="batch.print_bool == 1" style="width:20%; float:left; border-bottom:1px black; height:111px; padding-top:57px;">		                            
+		                           <p t-field="batch.product_id.default_code" style="font-size:18px; font-weight:bold;"/>
+		                           <p t-field="batch.name" style="font-size:16px; font-weight:bold;"/>
 		                       </div>
 		                   </t>
 		                   </div>

@@ -1913,6 +1913,11 @@ class MrpWorkcenterPructionline(models.Model):
                   rec.machine.status = 'active'
                   rec.machine.running_workorder_id=rec.id
                   rec.machine.running_production_id=rec.production_id.id
+            if rec.raw_materials_id:
+                for each in rec.raw_materials_id:
+                    if each.percent_rm>0.0:
+                        each.write({'percent_value':each.order_id.each_batch_qty*rm.percent_rm/100,'percent_value_25':each.order_id.each_batch_qty*rm.percent_rm/2500})
+
         return res
              
     '''@api.multi
