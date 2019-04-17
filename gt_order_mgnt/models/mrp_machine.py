@@ -1916,7 +1916,7 @@ class MrpWorkcenterPructionline(models.Model):
             if rec.raw_materials_id:
                 for each in rec.raw_materials_id:
                     if each.percent_rm>0.0:
-                        each.write({'percent_value':each.order_id.each_batch_qty*rm.percent_rm/100,'percent_value_25':each.order_id.each_batch_qty*rm.percent_rm/2500})
+                        each.write({'percent_value':each.order_id.each_batch_qty*each.percent_rm/100,'percent_value_25':each.order_id.each_batch_qty*each.percent_rm/2500})
 
         return res
              
@@ -2108,14 +2108,14 @@ class MrpWorkcenterPructionline(models.Model):
                record.each_batch_qty_replica=record.each_batch_qty
                record.req_product_qty_replica= record.wk_required_qty /record.each_batch_qty
                record.wk_required_uom_replica=record.wk_required_uom.id
-    @api.multi
-    def show_qty_mix(self):
-        for record in self:
-            print "sdfsdfsdsdfds",record
-            if record.process_id.process_type=='raw':
-               record.show_qty_mix=True
-            else:
-               record.show_qty_mix=False
+#    @api.multi
+#    def show_qty_mix(self):
+#        for record in self:
+#            print "sdfsdfsdsdfds",record
+#            if record.process_id.process_type=='raw':
+#               record.show_qty_mix=True
+#            else:
+#               record.show_qty_mix=False
 
 
     
@@ -2152,7 +2152,7 @@ class MrpWorkcenterPructionline(models.Model):
     remark=fields.Text('Remark')
     req_product_qty = fields.Integer('Required Batch Qty')
     req_product_qty_replica = fields.Float('Required Batch Qty',compute='compute_replica')
-    show_qty_mix = fields.Boolean('Qty/Mix Show',compute='show_qty_mix')
+#    show_qty_mix = fields.Boolean('Qty/Mix Show',compute='show_qty_mix')
     rm_per_shift = fields.Float('RM/Shift',compute='cal_shift')
     req_product_qty_comp = fields.Integer('Required Batch Qty',compute='compute_req_qty')
     each_batch_qty = fields.Integer('Each Batch Qty')
