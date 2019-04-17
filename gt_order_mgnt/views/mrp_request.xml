@@ -1036,6 +1036,7 @@
             <field eval="1" name="sequence"/>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="n_production_request_tree_history"/>
+             <field name="context">{'group_by':'state'}</field>
             <field name="act_window_id" ref="n_production_request_action_history1"/>
         </record>
         <record id="action_partner_form_view12" model="ir.actions.act_window.view">
