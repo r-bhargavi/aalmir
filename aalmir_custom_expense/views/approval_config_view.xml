@@ -24,7 +24,9 @@
                                 <field name="approval_line">
 
                                     <tree editable="top">
-                                        <field name="approve_amount_upto" required="1" />
+                                        <field name="approve_id" invisible="1"/>
+                                        <field name="approve_amount_upto" required="1"/>
+                                        <field name="monthly_amt" required="1"/>
                                         <field name="approval_by" options="{'no_quick_create': True, 'no_create_edit' : True}" domain="[('approve_expense','=',True)]" required="1"/>
                                     </tree>
                                 </field>

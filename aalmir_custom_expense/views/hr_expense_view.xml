@@ -36,6 +36,19 @@
                 </p>
             </field>
     </record>
+    <record id="hr_expense.hr_expense_product" model="ir.actions.act_window">
+            <field name="name">Expense Products</field>
+            <field name="res_model">product.product</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"default_can_be_expensed": 1,'group_by':'type_product'}</field>
+            <field name="domain">[('can_be_expensed', '=', True)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a new expense category.
+              </p>
+            </field>
+        </record>
     <menuitem parent="hr_expense.menu_hr_expense_root" name="Requests" id="menu_action_account_payments_main"  sequence="13" groups="account.group_account_user"/>
 
     <menuitem action="action_account_payments_payable_posted" parent="menu_action_account_payments_main" id="menu_action_account_payments_payable_posted"  sequence="12" groups="account.group_account_user"/>
@@ -133,6 +146,8 @@
 		<field name="arch" type="xml">
                 <field name="employee_id" position="after">
                     <field name="approval_by"/>
+                    <field name="approve_conf_exist" invisible="1"/>
+                    <field name="special_approval" invisible="1"/>
                 </field>
                 <field name="employee_id" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -265,6 +280,10 @@
                      <field name="requested_by" attrs="{'readonly':[('state','=','done')]}"/>
                     <field name="department" attrs="{'readonly':[('state','=','done')]}"/>
                     <field name="approval_status" readonly="1"/>
+                    <field name="approve_conf_exist" invisible="1"/>
+                    <field name="special_approval" invisible="1"/>
+                    <field name="total_thirty" groups="base.group_no_one"/>
+                    <field name="mothly_exp_limit" groups="base.group_no_one"/>
                     <!--<field name="tot_amount_if_other_expense"/>-->
                      <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
                     <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>
@@ -277,6 +296,9 @@
                     <!--<attribute name="groups">aalmir_custom_expense.restricted_hr_expense_grant,base.group_erp_manager</attribute>-->
                     <button type="object" name="approve_expense_custom" string="Approve" class="btn-primary"
                             attrs="{'invisible':['|',('state','!=','submit'),('show_approve','=',False)]}"
+                 />                
+                    <button type="object" name="send_for_special_approval" string="Send For Special Approval" attrs="{'invisible':['|',('state','!=','submit'),('special_approval','=',False)]}" class="btn-primary"
+                            
                  />                
                     <button type="object" name="approve_expense_custom" string="Approve Admin" class="btn-primary"
                             attrs="{'invisible':[('state','!=','submit')]}" groups="base.group_no_one"

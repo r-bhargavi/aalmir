@@ -10,9 +10,14 @@ from dateutil.relativedelta import relativedelta
 
 class HrExpense(models.Model):
     _inherit = "hr.expense"
-    show_approve=fields.Boolean('Show Approve', compute='compute_show_approve')
+    show_approve=fields.Boolean('Show Approve', compute='compute_show_approve',copy=False)
+    total_thirty=fields.Float('30 Days total', compute='compute_thirty_days_expense',copy=False,help="This amount shows total including current amount and previous 30 days paid expenses of same expense")
+    mothly_exp_limit=fields.Float('Your Monthly Limit', compute='compute_monthly_expense_limit',copy=False)
 
     cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
+    approve_conf_exist = fields.Boolean(string='Approval Config Exists?',copy=False)
+    special_approval = fields.Boolean(string='Special Approval',copy=False)
+
     uploaded_document_cancel = fields.Many2many('ir.attachment','cancel_attachment_exp_rel','cancel_att','exp_id','Upload Cancel Proof',copy=False,track_visibility='always')
     name = fields.Char(string='Expense Description', readonly=True)
     account_pay_id = fields.Many2one('account.move', string='Payment Journal Entry', copy=False, track_visibility="onchange")
@@ -67,9 +72,38 @@ class HrExpense(models.Model):
 #    tot_amount_if_other_expense=fields.Float('Total Amount', compute='amount_other_expense_if_any')
 
     @api.multi
+    def compute_thirty_days_expense(self):
+        for record in self:
+            thirty_days_from_now=date.today()+timedelta(days=30)
+            print "thirty_days_from_nowthirty_days_from_now",thirty_days_from_now
+            expense_ids=self.search([('state','not in',['draft','submit','cancel']),('id','!=',record.id),('type_product','=',record.type_product.id),('date','<=',thirty_days_from_now)])
+            amount_total_exp=0.0
+
+            if expense_ids:
+                for each in expense_ids:
+                    amount_total_exp+=each.total_amount
+            record.total_thirty=amount_total_exp+record.total_amount
+    @api.multi
+    def compute_monthly_expense_limit(self):
+        for record in self:
+            non_approval=self.env['approval.config'].search([('product_type','=',record.type_product.id)])
+            if non_approval:
+                line_id=self.env['approval.config.line'].search([('approve_id','=',non_approval.id),('approval_by','=',record._uid)])
+                if line_id:
+                    record.mothly_exp_limit=line_id.monthly_amt
+                else:
+                    record.mothly_exp_limit=0.0
+
+            
+    @api.multi
     def compute_show_approve(self):
         for record in self:
             non_approval=self.env['approval.config'].search([('product_type','=',record.type_product.id)])
+            if record.special_approval==True:
+                print "sdfsdfsdffsdf",self._uid,self.approval_by
+                if record._uid==record.approval_by.id:
+                    record.show_approve=True
+                    break;
             if non_approval:
                 user_ids=[]
                 for each_line in non_approval.approval_line:
@@ -85,11 +119,19 @@ class HrExpense(models.Model):
                     record.show_approve=True
                     break;
                 else:
-                    record.show_approve=False
-                    break;
+                    group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+                    users=self.env['res.groups'].search([('id', '=',group_id)]).users
+                    if self.env.user.id in users.ids:
+                        record.show_approve=True
+                        break;
+                    else:
+                        record.show_approve=False
+                        break;
+#                else:
+#                    record.show_approve=False
+#                    break;
             else:
                 group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
-                print "group_idgroup_id",group_id
                 users=self.env['res.groups'].search([('id', '=',group_id)]).users
                 if self.env.user.id in users.ids:
                     record.show_approve=True
@@ -220,7 +262,6 @@ class HrExpense(models.Model):
         non_approval=self.env['approval.config'].search([('product_type','=',self.type_product.id)])
         print "non_approvalnon_approvalnon_approval",non_approval
         if non_approval:
-            
             if self.total_amount>non_approval.approve_not_req_upto:
                 if not non_approval.approval_line:
                     raise UserError(_('There is no Approval Line defined in Approval Configuration.'))
@@ -259,6 +300,8 @@ class HrExpense(models.Model):
             else:
                 self.write({'state': 'approve'})
         else:
+            self.write({'approve_conf_exist':True})
+
             group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
             print "group_idgroup_id",group_id
             users=self.env['res.groups'].search([('id', '=',group_id)]).users
@@ -272,7 +315,7 @@ class HrExpense(models.Model):
     def refuse_expenses(self, reason):
         result = super(HrExpense, self).refuse_expenses(reason)
 
-        self.write({'refuse_reason': reason,'approved_by':False,'approval_by':False})
+        self.write({'refuse_reason': reason,'approved_by':False,'approval_by':False,'special_approval':False})
         return result
     
     def _prepare_move_line(self, line):
@@ -554,9 +597,40 @@ class HrExpense(models.Model):
         return True
     
     @api.multi
+    def send_for_special_approval(self):
+            self.write({'special_approval':False})
+            group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+            users=self.env['res.groups'].search([('id', '=',group_id)]).users  
+            self.write({'approval_by':users[0].id})
+    @api.multi
     def approve_expense_custom(self):
+        group_id = self.env['ir.model.data'].get_object_reference('aalmir_custom_expense','restricted_hr_expense_grant_for_no_ac')[1]
+        users=self.env['res.groups'].search([('id', '=',group_id)]).users
+        print "usersusersusers",users
+        if self._uid in users.ids:
+            self.write({'state': 'approve','approved_by':self._uid})
+            return True
 
-        self.write({'state': 'approve','approved_by':self._uid})
+        if self.approve_conf_exist==False:
+            non_approval=self.env['approval.config'].search([('product_type','=',self.type_product.id)])
+            if non_approval:
+                line_id=self.env['approval.config.line'].search([('approve_id','=',non_approval.id),('approval_by','=',self._uid)])
+            thirty_days_from_now=date.today()+timedelta(days=30)
+            print "thirty_days_from_nowthirty_days_from_now",thirty_days_from_now
+            expense_ids=self.search([('state','not in',['draft','submit','cancel']),('id','!=',self.id),('approval_by','=',self._uid),('type_product','=',self.type_product.id),('date','<=',thirty_days_from_now)])
+            amount_total_exp=0.0
+            if expense_ids:
+                for each in expense_ids:
+                    amount_total_exp+=each.total_amount
+            print "jhjhjkjhkjnkj",amount_total_exp
+            if amount_total_exp and (amount_total_exp+self.total_amount>line_id.monthly_amt):
+                self.write({'special_approval':True})
+                self.env.cr.commit()
+
+            if amount_total_exp and (amount_total_exp+self.total_amount>line_id.monthly_amt):
+                raise UserError(_("Expense Amount including current expenses crosses the limit of montly expense approval which is %s.") % (line_id.monthly_amt))
+        else:
+            self.write({'state': 'approve','approved_by':self._uid})
     
                 
     @api.onchange('product_id')

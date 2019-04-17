@@ -936,6 +936,7 @@
                           
                          <field name="mo_date_request" readonly="1" string='Required by Date'/>
                         <field name='mo_date_planned' readonly="1"/>
+                        <field name='show_qty_mix' invisible="0"/>
                         <field name="mo_date_completed" readonly="1"/>
                         <field name='workorder_type' readonly="1" invisible='1'/>
                     </group>
