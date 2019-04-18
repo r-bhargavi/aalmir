@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 class HrExpense(models.Model):
     _inherit = "hr.expense"
     show_approve=fields.Boolean('Show Approve', compute='compute_show_approve',copy=False)
-    total_thirty=fields.Float('30 Days total', compute='compute_thirty_days_expense',copy=False,help="This amount shows total including current amount and previous 30 days paid expenses of same expense")
+    total_thirty=fields.Float('30 Days total', compute='compute_thirty_days_expense',copy=False,help="This amount shows total including current amount and previous 30 days paid expenses of expense type")
     mothly_exp_limit=fields.Float('Your Monthly Limit', compute='compute_monthly_expense_limit',copy=False)
 
     cancel_reason = fields.Char(string='Cancel Reason',track_visibility='always' ,copy=False)
@@ -617,16 +617,18 @@ class HrExpense(models.Model):
                 line_id=self.env['approval.config.line'].search([('approve_id','=',non_approval.id),('approval_by','=',self._uid)])
             thirty_days_from_now=date.today()+timedelta(days=30)
             print "thirty_days_from_nowthirty_days_from_now",thirty_days_from_now
-            expense_ids=self.search([('state','not in',['draft','submit','cancel']),('id','!=',self.id),('approval_by','=',self._uid),('type_product','=',self.type_product.id),('date','<=',thirty_days_from_now)])
+            expense_ids=self.search([('state','not in',['draft','submit','cancel']),('id','!=',self.id),('type_product','=',self.type_product.id),('date','<=',thirty_days_from_now)])
             amount_total_exp=0.0
             if expense_ids:
                 for each in expense_ids:
                     amount_total_exp+=each.total_amount
-            print "jhjhjkjhkjnkj",amount_total_exp
+            print "jhjhjkjhkjnkj-------",amount_total_exp
             if amount_total_exp and (amount_total_exp+self.total_amount>line_id.monthly_amt):
                 self.write({'special_approval':True})
                 self.env.cr.commit()
-
+#            else:
+#                self.write({'state': 'approve','approved_by':self._uid})
+            
             if amount_total_exp and (amount_total_exp+self.total_amount>line_id.monthly_amt):
                 raise UserError(_("Expense Amount including current expenses crosses the limit of montly expense approval which is %s.") % (line_id.monthly_amt))
         else:
