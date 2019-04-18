@@ -207,17 +207,14 @@
                 </field>
                 <field name="tax_ids" position="attributes">
                                 <attribute name='options'>{'no_create_edit': True, 'no_quick_create': True}</attribute>
-
                 </field>
                 <field name="product_id" position="after">
                     <field name="show_approve" invisible="1"/>
-                    <field name="type_product" required="1" readonly="1"/>
-                    <field name="type_product" required="1" readonly="1"/>
+                    <field name="type_product" required="1" readonly="1" string="Expense Type"/>
                     <field name="cancel_reason" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <field name="uploaded_document_cancel" widget="many2many_binary" filename="doc_name" readonly="1" attrs="{'invisible':[('cancel_reason','=',False)]}"/>
                     <!--<field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('product_expense_account','!=',False)]}"/>-->
-                    <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('state','=','done')]}"/>
-
+                    <field name="product_expense_account" attrs="{'required':[('product_expense_account','=',False)],'readonly':[('state','=','done')]}"  string="Expense Account"/>
                 </field>
 <!--                <field name="bank_journal_id" position="attributes">
                                     <attribute name="attrs">{}</attribute>-->
@@ -295,8 +292,8 @@
                     <field name="approval_status" readonly="1"/>
                     <field name="approve_conf_exist" invisible="1"/>
                     <field name="special_approval" invisible="1"/>
-                    <field name="total_thirty" groups="base.group_no_one"/>
-                    <field name="mothly_exp_limit" groups="base.group_no_one"/>
+                    <field name="total_thirty" />
+                    <field name="mothly_exp_limit" groups=""/>
                     <!--<field name="tot_amount_if_other_expense"/>-->
                      <field name="approval_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approval_by','=',False)]}"/>
                     <field name="approved_by" attrs="{'readonly':[('state','!=','draft')],'invisible':[('approved_by','=',False)]}"/>

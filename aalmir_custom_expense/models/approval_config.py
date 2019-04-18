@@ -13,10 +13,10 @@ class ApprovalConfig(models.Model):
     
     
     name=fields.Char(string='Approval Name')
-    product_type=fields.Many2one('type.product', 'Product Type')
-    approval_line = fields.One2many('approval.config.line','approve_id','Approval Lines')
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
-    approve_not_req_upto = fields.Float('Approval Not Required Upto')
+    product_type=fields.Many2one('type.product', 'Expense Type:')
+    approval_line = fields.One2many('approval.config.line','approve_id','Approval Limits')
+    currency_id = fields.Many2one('res.currency', string='Currency:', default=lambda self: self.env.user.company_id.currency_id)
+    approve_not_req_upto = fields.Float('No Approval Required Upto:')
 
     @api.onchange('product_type')
     def product_type_onchange(self):
@@ -42,15 +42,15 @@ class ApprovalConfig(models.Model):
                 raise UserError(_('No Approval Line can have 0 amount!!'))
         for each_line in approve_config.approval_line:
             if each.monthly_amt<each_line.approve_amount_upto:
-                raise UserError(_('Monthly AMount set on lines cannot be less then individual expense limit amount!!'))
+                raise UserError(_('Monthly Amount set on lines cannot be less then individual expense limit amount!!'))
         return approve_config
 	
 class ApprovalConfigLine(models.Model):
     _name = 'approval.config.line'
     
     approve_id = fields.Many2one('approval.config', 'Approve ID')
-    approval_by = fields.Many2one('res.users', 'Approval By')
-    approve_amount_upto = fields.Float('Can approve expenses upto')
+    approval_by = fields.Many2one('res.users', 'Can Be Approved By')
+    approve_amount_upto = fields.Float('Can approve single expense of amount upto')
     monthly_amt = fields.Float('Monthly Total Limit Allowed')
 
     _sql_constraints = [('approve_approval_by_uniq', 'unique (approve_id,approval_by)',     
@@ -72,11 +72,11 @@ class ApprovalConfigLine(models.Model):
     	if self.approve_amount_upto:
             if self.approve_amount_upto<=self.approve_id.approve_not_req_upto:
 #                self.approve_amount_upto=0.0
-                return {'warning': {'title': "Invalid", 'message': "You cannot add amount less then the approval not req upto in Configuration!!"}}
+                return {'warning': {'title': "Invalid", 'message': "The amount entered is less then or equal to the amount of 'Approval not required upto'"}}
     @api.onchange('monthly_amt')
     def monthly_onchange(self):
     	if self.monthly_amt:
-            if self.monthly_amt<=self.approve_amount_upto:
+            if self.monthly_amt<self.approve_amount_upto:
                 self.monthly_amt=0.0
                 return {'warning': {'title': "Invalid", 'message': "You cannot set Monthly Limit Less then Individual Expense Limit!!"}}
 

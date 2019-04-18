@@ -1009,6 +1009,7 @@
         <field name="res_model">n.manufacturing.request</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'group_by':'n_state'}</field>
         <field name="domain">[('n_state', 'in', ['draft'])]</field>
     </record>
    <record id="action_partner_tree_view2" model="ir.actions.act_window.view">
@@ -1029,13 +1030,15 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">n.manufacturing.request</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form</field>        
+        <field name="context">{'group_by':'n_state'}</field>
         <field name="domain">[('n_state', 'not in', ('draft','new'))]</field>
     </record>
    <record id="action_partner_tree_view22" model="ir.actions.act_window.view">
             <field eval="1" name="sequence"/>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="n_production_request_tree_history"/>
+             <field name="context">{'group_by':'state'}</field>
             <field name="act_window_id" ref="n_production_request_action_history1"/>
         </record>
         <record id="action_partner_form_view12" model="ir.actions.act_window.view">

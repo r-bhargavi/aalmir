@@ -1745,7 +1745,7 @@ class MrpWorkcenterPructionline(models.Model):
                    else:
                       qty=req
                    code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
-                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number'),('name','=','MRP BATCH NUMBER')])
+                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number.wo'),('name','=','Batch sequencing WorkOrder')])
 #                   if not record.number_next:
 #                       record.write({'number_next':1})
                    sequence.write({'number_next_actual':record.number_next+1})
@@ -2586,7 +2586,7 @@ class MrpWorkcenterPructionline(models.Model):
                          wastage_qty=(record.wk_required_qty *((record.product.weight)*bom_wastage.value ) /100)
                for x in range(0, record.extra_batch):  
                    code = self.env['ir.sequence'].next_by_code('mrp.order.batch.number') or 'New'
-                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number'),('name','=','MRP BATCH NUMBER')])
+                   sequence = self.env['ir.sequence'].search([('code','=','mrp.order.batch.number.wo'),('name','=','Batch sequencing WorkOrder')])
 #                   if not record.number_next:
 #                       record.write({'number_next':1})
                    sequence.write({'number_next_actual':record.number_next+1})
