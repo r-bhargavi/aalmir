@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                  <field name="property_account_expense_id" position="after">
                     <field name="partner_id_preferred" attrs="{'invisible':[('can_be_expensed','=',False)]}"/>
-                    <field name="type_product" attrs="{'invisible':[('can_be_expensed','=',False)],'required':[('can_be_expensed','=',True)]}"/>
+                    <field name="type_product" options="{'no_quick_create': True, 'no_create_edit' : True}" attrs="{'invisible':[('can_be_expensed','=',False)],'required':[('can_be_expensed','=',True)]}"/>
 
               </field>
             </field>
