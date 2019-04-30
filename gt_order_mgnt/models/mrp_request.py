@@ -1655,7 +1655,8 @@ class productionCancel(models.TransientModel):
             	if mo_ids:
 	            	search_id=self.env['sale.order.line.status'].search([('n_string','=','manufacture')],limit=1)
         		obj.request_line.n_sale_line.n_status_rel=[(3,search_id.id)]
-		obj.request_line.n_sale_order_line.pending_qty += abs(obj.n_request_qty-obj.n_produce_qty) 	
+                if obj.request_line.n_sale_order_line:
+                    obj.request_line.n_sale_order_line.pending_qty += abs(obj.n_request_qty-obj.n_produce_qty) 	
             '''if obj.state in ('ready','in_production'): 
                print"PPPPPPPPPPPPPPPPPPPPPPPPP"
                workorders=self.env['mrp.production.workcenter.line'].search([('production_id','=',obj.id)], order='sequence desc')

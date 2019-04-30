@@ -49,8 +49,7 @@
                                 <field name="wo_schedule_planned"  attrs="{'invisible':[('n_mo','!=',False)]}" />
 				<field name="wo_schedule_planned_end" attrs="{'invisible':[('n_mo','!=',False)]}"
                                  readonly='1' />
-                                <field name='time_adjust' widget="float_time"
-                                    attrs="{'invisible':[('n_mo','!=',False)]}"  />
+                                <field name='time_adjust' widget="float_time" attrs="{'invisible':[('n_mo','!=',False)]}"  />
                                <field name='work_order_id' invisible="1"/>
 			</group>
 			<group>

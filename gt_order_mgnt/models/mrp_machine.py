@@ -65,6 +65,8 @@ class MachineMaintenance(models.Model):
                body +='<ul><li> Work Order No.  : '+str(record.workorder_id.name) +'</li></ul>'
                body +='<ul><li> Machine   : '+str(record.machine_id.name) +'</li></ul>'
                body +='<ul><li> Sent Date   : '+str(date.today()) +'</li></ul>'
+               body +='<ul><li> Required by   : '+str(record.required_date) +'</li></ul>'
+               body +='<ul><li> Urgent   : '+str(record.urgent) +'</li></ul>'
                body +='<ul><li> Maintenance Type   : '+str(res) +'</li></ul>'
                body +='<ul><li> Remark      : '+str(self.note) +'</li></ul>' 
                record.workorder_id.message_post(body=body)
@@ -2454,8 +2456,8 @@ class MrpWorkcenterPructionline(models.Model):
                         if res.production_id.state in ('draft','confirmed','cancel'):
                             raise UserError(_('Cannot Lock Work Order as Raw Material is still not requested for MO!!'))
 
-                        if not res.machine:
-		          raise UserError(_('Please Select Machine Before Lock Work order..'))
+#                        if not res.machine:
+#		          raise UserError(_('Please Select Machine Before Lock Work order..'))
 		        if not res.req_product_qty and not res.each_batch_qty:
 		           raise UserError(_("Please Fill the Required Batch No. and Each Batch Qty..."))
                         if not res.batch_ids:
